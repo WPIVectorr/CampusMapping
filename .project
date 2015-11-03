@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>CampusMapping</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+<<<<<<< HEAD
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+=======
+	</buildSpec>
+	<natures>
+>>>>>>> 47624ddbcea87b377fa74f513a433da5319feeb3
+	</natures>
+</projectDescription>

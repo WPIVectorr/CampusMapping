@@ -1,2 +1,0 @@
-# CampusMapping
-Software Engineering Mapping

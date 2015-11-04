@@ -5,5 +5,6 @@ public class baseClass {
 	{
 		System.out.println("Test print");
 		System.out.println("Test print 2");
+		System.out.println("Test print 3");
 	}
 }

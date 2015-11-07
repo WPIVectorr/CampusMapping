@@ -7,8 +7,8 @@ import java.sql.Statement;
 
 public class pointDatabase 
 {
-	private static String DatabaseName = "pointDatabase.db";
-	private static String PointSchema = "id integer, xCoord integer, yCoord integer, name String";
+	private static String DATABASE_NAME = "pointDatabase.db";
+	private static String POINT_SCHEMA = "id integer, xCoord integer, yCoord integer, name String";
 	private static Connection connection;
 	
 	public static void main(String args[]) throws ClassNotFoundException
@@ -17,12 +17,12 @@ public class pointDatabase
 		connection = null;															//Initialize connection
 		try
 		{							
-			connection = DriverManager.getConnection("jdbc:sqlite:"+DatabaseName);	// create a database connection
+			connection = DriverManager.getConnection("jdbc:sqlite:"+DATABASE_NAME);	// create a database connection
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);  										// set timeout to 30 sec.
 
 			statement.executeUpdate("drop table if exists points");
-			statement.executeUpdate("create table points ("+ PointSchema + ")");
+			statement.executeUpdate("create table points ("+ POINT_SCHEMA + ")");
 			statement.executeUpdate("insert into points values(1, 23, 45, 'SL105')");
 			statement.executeUpdate("insert into points values(2, 46, 98, 'AK206')");
 			statement.executeUpdate("insert into points values(3, 90, 12, 'FL120')");

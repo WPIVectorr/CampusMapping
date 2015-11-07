@@ -27,14 +27,20 @@ import javax.swing.JScrollBar;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import java.awt.Color;
 
 public class SwingTest extends JFrame{
 
 	private JFrame frame;
-	String labels[] = {"Select a Point", "A", "B", "C"};
+	String buildings[] = {"Select Building", "Atwater Kent", "Boynton Hall", 
+			"Campus Center", "Gordon Libraray", "Higgins House", "Project Center", 
+			"Stratton Hall"};
+	String rooms[] = {"Select room #", "111", "222", "333", "444"};
 	String point1;
 	String point2;
 	private JTextField textField;
+	private JTextField txtStartingLocation;
+	private JTextField txtDestination;
 
 	/**
 	 * Launch the application.
@@ -64,37 +70,59 @@ public class SwingTest extends JFrame{
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.getContentPane().setBackground(new Color(255, 235, 205));
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 					
-		JComboBox<String> comboBox = new JComboBox(labels);
-		comboBox.setBounds(107, 33, 201, 20);
+		JComboBox<String> comboBox = new JComboBox(buildings);
+		comboBox.setBounds(122, 30, 148, 20);
 		frame.getContentPane().add(comboBox);
 		
-		JComboBox<String> comboBox_1 = new JComboBox(labels);
-		comboBox_1.setBounds(107, 83, 201, 20);
+		JComboBox<String> comboBox_1 = new JComboBox(buildings);
+		comboBox_1.setBounds(122, 80, 148, 20);
 		frame.getContentPane().add(comboBox_1);
 		
+		JComboBox comboBox_2 = new JComboBox(rooms);
+		comboBox_2.setBounds(296, 30, 148, 20);
+		frame.getContentPane().add(comboBox_2);
+		
+		JComboBox comboBox_3 = new JComboBox(rooms);
+		comboBox_3.setBounds(296, 80, 148, 20);
+		frame.getContentPane().add(comboBox_3);
+		
 		textField = new JTextField();
-		textField.setBounds(107, 173, 201, 30);
+		textField.setBounds(-13, 176, 463, 30);
 		frame.getContentPane().add(textField);
 		textField.setColumns(10);
 		
 		JButton btnNewButton = new JButton("Directions");
+		btnNewButton.setBackground(new Color(0, 255, 127));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				point1 = (String) comboBox.getSelectedItem();
 				point2 = (String) comboBox_1.getSelectedItem();
-				if (point1 == "Select a Point" || point2 == "Select a Point")
+				if (point1 == "Select a Point" || point2 == "Select Building")
 					textField.setText("Error: Select Two Points");
 				else
 					textField.setText("Point " + point1 + " to Point " + point2);
 			}
 		});
 		
-		btnNewButton.setBounds(165, 132, 94, 30);
+		btnNewButton.setBounds(187, 132, 94, 30);
 		frame.getContentPane().add(btnNewButton);
+		
+		JLabel lblStartingLocation = new JLabel("Starting Location:");
+		lblStartingLocation.setBounds(6, 31, 119, 16);
+		frame.getContentPane().add(lblStartingLocation);
+		
+		JLabel lblDestination = new JLabel("Destination:");
+		lblDestination.setBounds(6, 81, 119, 16);
+		frame.getContentPane().add(lblDestination);
+		
+		
+		
+		
 		
 	}
 }

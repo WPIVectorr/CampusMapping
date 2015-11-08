@@ -36,6 +36,14 @@ public class SwingTest extends JFrame{
 			"Campus Center", "Gordon Libraray", "Higgins House", "Project Center", 
 			"Stratton Hall"};
 	String rooms[] = {"Select room #", "111", "222", "333", "444"};
+	String[] akRooms = {"Select room #", "10", "20", "30", "40"};
+	String[] bhRooms = {"Select room #", "11", "21", "31", "41"};
+	String[] ccRooms = {"Select room #", "12", "22", "32", "42"};
+	String[] glRooms = {"Select room #", "13", "23", "33", "43"};
+	String[] hhRooms = {"Select room #", "14", "24", "34", "44"};
+	String[] pcRooms = {"Select room #", "15", "25", "35", "45"};
+	String[] shRooms = {"Select room #", "16", "26", "36", "46"};
+	
 	String point1;
 	String point2;
 	private JTextField textField;
@@ -71,25 +79,46 @@ public class SwingTest extends JFrame{
 	private void initialize() {
 		frame = new JFrame();
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 470, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
-					
-		JComboBox<String> comboBox = new JComboBox(buildings);
-		comboBox.setBounds(122, 30, 148, 20);
-		frame.getContentPane().add(comboBox);
+
 		
-		JComboBox<String> comboBox_1 = new JComboBox(buildings);
-		comboBox_1.setBounds(122, 80, 148, 20);
-		frame.getContentPane().add(comboBox_1);
+		JComboBox startRooms = new JComboBox(rooms);
+		startRooms.setBounds(296, 30, 148, 20);
+		frame.getContentPane().add(startRooms);
 		
-		JComboBox comboBox_2 = new JComboBox(rooms);
-		comboBox_2.setBounds(296, 30, 148, 20);
-		frame.getContentPane().add(comboBox_2);
 		
-		JComboBox comboBox_3 = new JComboBox(rooms);
-		comboBox_3.setBounds(296, 80, 148, 20);
-		frame.getContentPane().add(comboBox_3);
+		JComboBox<String> startBuilds = new JComboBox(buildings);
+		startBuilds.setBounds(122, 30, 148, 20);
+		frame.getContentPane().add(startBuilds);
+		startBuilds.addActionListener (new ActionListener () {
+		    public void actionPerformed(ActionEvent e) {
+		    	
+		    	startRooms.removeAllItems();
+		    	String buildSelect = (String)startBuilds.getSelectedItem();
+		    	startRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelect)));
+		    }
+		});
+		
+		JComboBox destRooms = new JComboBox(rooms);
+		destRooms.setBounds(296, 80, 148, 20);
+		frame.getContentPane().add(destRooms);
+		
+		JComboBox<String> destBuilds = new JComboBox(buildings);
+		destBuilds.setBounds(122, 80, 148, 20);
+		frame.getContentPane().add(destBuilds);
+		destBuilds.addActionListener (new ActionListener () {
+		    public void actionPerformed(ActionEvent e) {
+		    	
+		    	destRooms.removeAllItems();
+		    	String buildSelect = (String)startBuilds.getSelectedItem();
+		    	destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelect)));
+		    }
+		});
+		
+
+
 		
 		textField = new JTextField();
 	    textField.setHorizontalAlignment(JTextField.CENTER);
@@ -102,12 +131,12 @@ public class SwingTest extends JFrame{
 		btnNewButton.setBackground(new Color(0, 255, 127));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				point1 = (String) comboBox.getSelectedItem();
-				point2 = (String) comboBox_1.getSelectedItem();
+				point1 = (String) startBuilds.getSelectedItem();
+				point2 = (String) destBuilds.getSelectedItem();
 				if (point1 == "Select a Point" || point2 == "Select Building")
 					textField.setText("Error: Select Two Points");
 				else
-					textField.setText("Point " + point1 + " to Point " + point2);
+					textField.setText(point1 + " to  " + point2);
 			}
 		});
 		
@@ -121,11 +150,29 @@ public class SwingTest extends JFrame{
 		JLabel lblDestination = new JLabel("Destination:");
 		lblDestination.setBounds(6, 81, 119, 16);
 		frame.getContentPane().add(lblDestination);
+				
 		
 		
-		
-		
-		
+		}
+	
+	public String[] generateRoomNums(String select){
+		switch (select){
+		case "Atwater Kent":
+			return akRooms;
+		case "Boynton Hall":
+			return bhRooms;
+		case "Campus Center":
+			return ccRooms;
+		case "Gordon Library":
+			return glRooms;
+		case "Higgins House":
+			return hhRooms;
+		case "Project Center":
+			return pcRooms;
+		case "Stratton Hall":
+			return shRooms;
+		}
+		return rooms;
 	}
 }
 

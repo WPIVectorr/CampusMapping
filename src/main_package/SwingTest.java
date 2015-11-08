@@ -92,9 +92,11 @@ public class SwingTest extends JFrame{
 		frame.getContentPane().add(comboBox_3);
 		
 		textField = new JTextField();
-		textField.setBounds(-13, 176, 463, 30);
+	    textField.setHorizontalAlignment(JTextField.CENTER);
+		textField.setToolTipText("");
+		textField.setBounds(6, 174, 438, 30);
 		frame.getContentPane().add(textField);
-		textField.setColumns(10);
+		textField.setColumns(1);
 		
 		JButton btnNewButton = new JButton("Directions");
 		btnNewButton.setBackground(new Color(0, 255, 127));

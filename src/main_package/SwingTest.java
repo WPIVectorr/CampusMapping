@@ -33,7 +33,7 @@ public class SwingTest extends JFrame{
 
 	private JFrame frame;
 	String buildings[] = {"Select Building", "Atwater Kent", "Boynton Hall", 
-			"Campus Center", "Gordon Libraray", "Higgins House", "Project Center", 
+			"Campus Center", "Gordon Library", "Higgins House", "Project Center", 
 			"Stratton Hall"};
 	String rooms[] = {"Select room #", "111", "222", "333", "444"};
 	String[] akRooms = {"Select room #", "10", "20", "30", "40"};
@@ -96,8 +96,8 @@ public class SwingTest extends JFrame{
 		    public void actionPerformed(ActionEvent e) {
 		    	
 		    	startRooms.removeAllItems();
-		    	String buildSelect = (String)startBuilds.getSelectedItem();
-		    	startRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelect)));
+		    	String buildSelectStart = (String)startBuilds.getSelectedItem();
+		    	startRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectStart)));
 		    }
 		});
 		
@@ -112,8 +112,8 @@ public class SwingTest extends JFrame{
 		    public void actionPerformed(ActionEvent e) {
 		    	
 		    	destRooms.removeAllItems();
-		    	String buildSelect = (String)startBuilds.getSelectedItem();
-		    	destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelect)));
+		    	String buildSelectDest = (String)destBuilds.getSelectedItem();
+		    	destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
 		    }
 		});
 		

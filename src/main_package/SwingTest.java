@@ -32,10 +32,13 @@ import java.awt.Color;
 public class SwingTest extends JFrame{
 
 	private JFrame frame;
+	//drop down menu of buildings on campus
 	String buildings[] = {"Select Building", "Atwater Kent", "Boynton Hall", 
 			"Campus Center", "Gordon Library", "Higgins House", "Project Center", 
 			"Stratton Hall"};
-	String rooms[] = {"Select room #", "111", "222", "333", "444"};
+	
+	//drop down menu of room numbers based off of the building selected on campus
+	String rooms[] = {"Select room #", "Please choose building first"};
 	String[] akRooms = {"Select room #", "10", "20", "30", "40"};
 	String[] bhRooms = {"Select room #", "11", "21", "31", "41"};
 	String[] ccRooms = {"Select room #", "12", "22", "32", "42"};
@@ -46,6 +49,8 @@ public class SwingTest extends JFrame{
 	
 	String point1;
 	String point2;
+	String point3;
+	String point4;
 	private JTextField textField;
 	private JTextField txtStartingLocation;
 	private JTextField txtDestination;
@@ -77,21 +82,24 @@ public class SwingTest extends JFrame{
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		//initializes the frame
 		frame = new JFrame();
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
 		frame.setBounds(100, 100, 470, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
-		
+		//creates the drop down box with rooms for start (initially waits for the building to have 
+		//the specific buildings room numbers)
 		JComboBox startRooms = new JComboBox(rooms);
 		startRooms.setBounds(296, 30, 148, 20);
 		frame.getContentPane().add(startRooms);
 		
-		
+		//creates drop down box with building names
 		JComboBox<String> startBuilds = new JComboBox(buildings);
 		startBuilds.setBounds(122, 30, 148, 20);
 		frame.getContentPane().add(startBuilds);
+		//adds the room numbers based off of building name
 		startBuilds.addActionListener (new ActionListener () {
 		    public void actionPerformed(ActionEvent e) {
 		    	
@@ -101,13 +109,17 @@ public class SwingTest extends JFrame{
 		    }
 		});
 		
+		//creates the drop down of room numbers for destination (initially waits for the building to have 
+		//the specific buildings room numbers)
 		JComboBox destRooms = new JComboBox(rooms);
 		destRooms.setBounds(296, 80, 148, 20);
 		frame.getContentPane().add(destRooms);
 		
+		//creates a drop down box with destination building names
 		JComboBox<String> destBuilds = new JComboBox(buildings);
 		destBuilds.setBounds(122, 80, 148, 20);
 		frame.getContentPane().add(destBuilds);
+		//adds the correct room numbers for the building specified
 		destBuilds.addActionListener (new ActionListener () {
 		    public void actionPerformed(ActionEvent e) {
 		    	
@@ -119,7 +131,7 @@ public class SwingTest extends JFrame{
 		
 
 
-		
+		//creates a centered text field that will write back the users info they typed in
 		textField = new JTextField();
 	    textField.setHorizontalAlignment(JTextField.CENTER);
 		textField.setToolTipText("");
@@ -127,26 +139,42 @@ public class SwingTest extends JFrame{
 		frame.getContentPane().add(textField);
 		textField.setColumns(1);
 		
+		
 		JButton btnNewButton = new JButton("Directions");
 		btnNewButton.setBackground(new Color(0, 255, 127));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				//gets the start and end building and room numbers the user chose
 				point1 = (String) startBuilds.getSelectedItem();
 				point2 = (String) destBuilds.getSelectedItem();
-				if (point1 == "Select a Point" || point2 == "Select Building")
+				point3 = (String) startRooms.getSelectedItem();
+				point4 = (String) destRooms.getSelectedItem();
+				
+				//prints an error if no or both buildings weren't selected
+				if (point1.equals("Select Building") || point2.equals("Select Building"))
 					textField.setText("Error: Select Two Points");
+				//prints an error if the exact same room number and building were put as start and destinaiton
+				else if(point1.equals(point2) && point3.equals(point4)){
+					textField.setText("Error: Select Two Different Points");
+				}
+				//if no room numbers are selected prints an error
+				else if (point3.equals("Select room #") || point4.equals("Select room #"))
+					textField.setText("Error: please select room numbers");
+				//prints the starting building and room number and end building and room number
 				else
-					textField.setText(point1 + " to  " + point2);
+					textField.setText(point1 + " room " + point3 + " to  " + point2 + " room " + point4);
 			}
 		});
 		
 		btnNewButton.setBounds(187, 132, 94, 30);
 		frame.getContentPane().add(btnNewButton);
 		
+		//adds the starting location label to the line with starting location options
 		JLabel lblStartingLocation = new JLabel("Starting Location:");
 		lblStartingLocation.setBounds(6, 31, 119, 16);
 		frame.getContentPane().add(lblStartingLocation);
 		
+		//adds the destination label to the line with destination location options
 		JLabel lblDestination = new JLabel("Destination:");
 		lblDestination.setBounds(6, 81, 119, 16);
 		frame.getContentPane().add(lblDestination);
@@ -155,6 +183,8 @@ public class SwingTest extends JFrame{
 		
 		}
 	
+	//assigns the selected building name to have the string of room 
+	//numbers based off of the building selected
 	public String[] generateRoomNums(String select){
 		switch (select){
 		case "Atwater Kent":

@@ -11,7 +11,7 @@ public class AStar {
 	HashMap<Point, Integer> fscore = new HashMap<Point, Integer>(); // Estimated time from each node to end
 	int Nc = 0; // Index for Closed
 	
-	public void PathFind(Point start, Point end) {		
+	public Point[] PathFind(Point start, Point end) {		
 		gscore.put(start, 0); // Initialize scores
 		fscore.put(start, CostEstimate(start, end));
 		
@@ -20,8 +20,7 @@ public class AStar {
 		while(!Open.isEmpty()){
 			Point Current = Open.removeFirst(); // Working with lowest element in Open
 			if(Current == end){
-				//Reconstruct Path Here
-				return; // Found the Exit, Need
+				return ReconstructPath(end); // Found the Exit
 			}
 			Closed[Nc] = Current; // Add it to Closed
 			Nc++;
@@ -58,6 +57,7 @@ public class AStar {
 				}
 			}
 		}
+		return null; // No Path Found
 	}
 	
 	private int CostEstimate(Point a, Point b){
@@ -79,5 +79,16 @@ public class AStar {
 			}
 		}
 		Open.add(addPoint);
+	}
+	private Point[] ReconstructPath(Point PathEnd){
+		Point Current = PathEnd;
+		Point[] ReturnPath = null;
+		int N = 0;
+		while(CameFrom.containsKey(Current)){
+			ReturnPath[N] = Current;
+			N++;
+			Current = CameFrom.get(Current);
+		}
+		return ReturnPath;
 	}
 }

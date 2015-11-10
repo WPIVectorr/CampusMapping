@@ -9,7 +9,7 @@ public class baseClass {
 		System.out.println("Test print 2");
 		System.out.println("Test print 3");
 		System.out.println("Test print 4");
-<<<<<<< HEAD
+
 		testDatabase();
 	}
 	public static void testDatabase ()
@@ -18,8 +18,6 @@ public class baseClass {
 		testDB.initDatabase();
 		testDB.testInsert();
 		testDB.printDatabase(true, true, true);
-=======
-		
->>>>>>> refs/remotes/origin/master
+
 	}
 }

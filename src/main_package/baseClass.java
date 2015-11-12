@@ -1,6 +1,6 @@
 package main_package;
 
-import database.pointDatabase;
+import database.MappingDatabase;
 
 public class baseClass {
 	public static void main(String[] args)
@@ -14,7 +14,7 @@ public class baseClass {
 	}
 	public static void testDatabase ()
 	{
-		pointDatabase testDB = new pointDatabase();
+		MappingDatabase testDB = new MappingDatabase();
 		testDB.initDatabase();
 		testDB.testInsert();
 		testDB.printDatabase(true, true, true);

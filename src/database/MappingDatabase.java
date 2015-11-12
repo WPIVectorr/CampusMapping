@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class pointDatabase 
+public class MappingDatabase 
 {
 	//-------------------------------------------------Constants---------------------------------------------------------------
 	private static String DATABASE_NAME = "campusMapping.db";

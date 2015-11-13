@@ -1,11 +1,13 @@
 package database;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import main_package.*;
 
-public class pointDatabase 
+public class MappingDatabase 
 {
 	//-------------------------------------------------Constants---------------------------------------------------------------
 	private static String DATABASE_NAME = "campusMapping.db";
@@ -14,50 +16,21 @@ public class pointDatabase
 	private static String POINT_TABLE_NAME = "Points";
 	private static String EDGE_TABLE_NAME = "Edges";
 	
-	private static String MAP_SCHEMA = "id integer";
-	private static String POINT_SCHEMA = "id integer, xCoord integer, yCoord integer, name String";
-	private static String EDGE_SCHEMA = "id integer";
+	private static String MAP_SCHEMA = "id integer, String name, int numPoints";
+	private static String POINT_SCHEMA = "id integer, name String, x integer, y integer, numEdges integer, idEdge1 integer,"
+			+ " idEdge2 integer, idEdge3 integer, idEdge4 integer, idEdge5 integer, idEdge6 integer, idEdge7 integer, idEdge8 integer,"
+			+ "idEdge9 integer, idEdge10 integer";
+	private static String EDGE_SCHEMA = "id integer, idPoint1 integer, idPoint2 integer, weight integer, isOutside integer, isStairs integer";
 	
 	//----------------------------------------------Global Variables-----------------------------------------------------------
 	private static Connection connection;
+	public final static boolean DEBUG = true;
 	
 	//--------------------------------------------Function Definitions---------------------------------------------------------
 	public static void main(String args[]) throws ClassNotFoundException
 	{
 		Class.forName("org.sqlite.JDBC");													//Look into exactly what this is intended to do
 		connection = null;																	//Initialize connection
-		try
-		{							
-			connection = DriverManager.getConnection("jdbc:sqlite:"+DATABASE_NAME);			//Create a database connection
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);  												// set timeout to 30 sec.
-
-			initDatabase();
-			System.out.println ("Inserting into table");
-			statement.executeUpdate("insert into points values(1, 23, 45, 'SL105')");
-			statement.executeUpdate("insert into points values(2, 46, 98, 'AK206')");
-			statement.executeUpdate("insert into points values(3, 90, 12, 'FL120')");
-			statement.executeUpdate("insert into points values(4, 16, 25, 'KV121')");
-			printDatabase(true, true, true);
-		}
-		catch(SQLException e)
-		{
-			System.err.println(e.getMessage());												//If the error message is "out of memory", 
-																							//it probably means no database file is found
-		}
-		finally
-		{
-			try
-			{
-			 if(connection != null)
-			   connection.close();
-			}
-			catch(SQLException e)
-			{
-			 // connection close failed.
-			 System.err.println(e);
-			}
-		}
 	}
 	public static void initDatabase()
 	{
@@ -68,13 +41,21 @@ public class pointDatabase
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);  												// set timeout to 30 sec.
 
-			System.out.println("Creating tables");
+			System.out.println("Dropping old tables");
 			statement.executeUpdate("drop table if exists "+MAP_TABLE_NAME);
 			statement.executeUpdate("drop table if exists "+POINT_TABLE_NAME);
 			statement.executeUpdate("drop table if exists "+EDGE_TABLE_NAME);
+			System.out.println("Creating new tables");
 			statement.executeUpdate("create table "+ MAP_TABLE_NAME +" ("+ MAP_SCHEMA + ")");
+			if (DEBUG)
+				System.out.println("Constructed Table: "+MAP_TABLE_NAME);
 			statement.executeUpdate("create table "+ POINT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
+			if (DEBUG)
+				System.out.println("Constructed Table: "+POINT_TABLE_NAME);
 			statement.executeUpdate("create table "+ EDGE_TABLE_NAME +" ("+ EDGE_SCHEMA + ")");
+			if (DEBUG)
+				System.out.println("Constructed Table: "+EDGE_TABLE_NAME);
+			System.out.println("Finished creating tables");
 		}
 		catch(SQLException e)
 		{
@@ -87,9 +68,58 @@ public class pointDatabase
 		//Check if map exists
 		//If map does not exist, and id is unique, insert as map with unique id
 	}
-	public void insertPoint()
+	public static void insertPoint(Point pt)
 	{
+		int counter = 0;
+		int pointID = pt.getId();
+		String ptName = pt.getName();
+		int ptX = pt.getX();
+		int ptY = pt.getY();
+		Edge[] edgeArray = pt.getEdges();
+		int numberEdges = pt.getNumberEdges();
 		
+		//TODO: Check exists
+		if (DEBUG)
+			System.out.println("Beginning to construct insert statement");
+		
+		try {
+			connection = DriverManager.getConnection("jdbc:sqlite:"+DATABASE_NAME);
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);  												// set timeout to 30 sec.
+			
+			String insertStatement = "insert into points values(";
+			insertStatement += pointID;
+			insertStatement += ", ";
+			insertStatement += ("'"+ptName+"'");
+			insertStatement += ", ";
+			insertStatement += ptX;
+			insertStatement += ", ";
+			insertStatement += ptY;
+			insertStatement += ", ";
+			insertStatement += numberEdges;
+			insertStatement += ", ";
+			if (DEBUG)
+			{
+				System.out.println("About to add edge id's to insert statement");
+			}
+			for (counter =0; counter < numberEdges; counter++)
+			{
+				insertStatement += edgeArray[counter].getID();
+				insertStatement += ", ";
+			}
+			for (counter = numberEdges; counter < 9; counter++)
+			{
+				insertStatement += "null";
+				insertStatement += ", ";
+			}
+			insertStatement += "null";										//Formatting, last var doesn't have comma after
+			insertStatement += ")";
+			if (DEBUG)
+				System.out.println ("Insert statement: "+insertStatement);
+			statement.executeUpdate(insertStatement);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}			
 	}
 	public void insertEdge()
 	{
@@ -138,25 +168,17 @@ public class pointDatabase
 																					// it probably means no database file is found
 		}
 	}
-	
+
+	public boolean checkExists (Point pt)
+	{
+		int ptID = pt.getId();
+		return false; 
+	}
 	public static void testInsert()
 	{
-		try
-		{
-			connection = DriverManager.getConnection("jdbc:sqlite:"+DATABASE_NAME);			//Create a database connection
-			
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);  												// set timeout to 30 sec.
-
-			System.out.println ("Inserting into table");
-			statement.executeUpdate("insert into points values(1, 23, 45, 'SL105')");
-			statement.executeUpdate("insert into points values(2, 46, 98, 'AK206')");
-			statement.executeUpdate("insert into points values(3, 90, 12, 'FL120')");
-			statement.executeUpdate("insert into points values(4, 16, 25, 'KV121')");
-		}
-		catch(SQLException e)
-		{
-			System.err.println(e.getMessage());												//If the error message is "out of memory", 
-		}
+		Edge[] emptyArray = null;
+		Point testPoint = new Point(1432, "testPoint", 23, 56, emptyArray, 0);
+		insertPoint(testPoint);
+		
 	}
 }	

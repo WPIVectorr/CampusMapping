@@ -177,7 +177,7 @@ public class MappingDatabase
 
 	public boolean checkExists (Map map, Point pt)
 	{
-		map.
+		//map.
 		int ptID = pt.getId();
 		return false; 
 	}

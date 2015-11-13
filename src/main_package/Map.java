@@ -11,7 +11,7 @@ public class Map {
 	
 	public Point addPoint(Point a){
 		Points.add(a);
-		//addToDatabase function
+		//MappingDatabase.getInstance().addToDatabase
 		return a;
 		
 	}

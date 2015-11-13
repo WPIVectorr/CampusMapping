@@ -28,6 +28,10 @@ public class MappingDatabase
 	private static Connection connection;
 	public final static boolean DEBUG = true;
 	
+	ArrayList<Map> allMaps;
+	ArrayList<Point> allPoints;
+	ArrayList<Edge> allEdges;
+	
 	//--------------------------------------------Function Definitions---------------------------------------------------------
 	public static void main(String args[]) throws ClassNotFoundException
 	{
@@ -171,8 +175,9 @@ public class MappingDatabase
 		}
 	}
 
-	public boolean checkExists (Point pt)
+	public boolean checkExists (Map map, Point pt)
 	{
+		map.
 		int ptID = pt.getId();
 		return false; 
 	}

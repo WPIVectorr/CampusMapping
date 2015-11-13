@@ -25,33 +25,33 @@ public class AStar {
 			Closed[Nc] = Current; // Add it to Closed
 			Nc++;
 			
-			for(int i = 0; i < Current.edges.length; i++) {
-				if(ClosedContains(Current.edges[i].a)){
+			for(int i = 0; i < Current.getEdges().length; i++) {
+				if(ClosedContains(Current.getEdges()[i].getPoint1())){
 					
 				}
-				else if(ClosedContains(Current.edges[i].b)){
+				else if(ClosedContains(Current.getEdges()[i].getPoint2())){
 					
 				}
 				else{
-					int tentGScore = gscore.get(Current) + Current.edges[i].weight;
-					if(Current.edges[i].a == Current){
-						if(!Open.contains(Current.edges[i].b) || gscore.get(Current.edges[i].b) > tentGScore){
-							if(!Open.contains(Current.edges[i].b)) {
-								OpenAdd(Current.edges[i].b);
+					int tentGScore = gscore.get(Current) + Current.getEdges()[i].getWeight();
+					if(Current.getEdges()[i].getPoint1() == Current){
+						if(!Open.contains(Current.getEdges()[i].getPoint2()) || gscore.get(Current.getEdges()[i].getPoint2()) > tentGScore){
+							if(!Open.contains(Current.getEdges()[i].getPoint2())) {
+								OpenAdd(Current.getEdges()[i].getPoint2());
 							}
-							CameFrom.put(Current.edges[i].b, Current);
-							gscore.put(Current.edges[i].b, tentGScore);
-							fscore.put(Current.edges[i].b, tentGScore + CostEstimate(Current.edges[i].b, end));
+							CameFrom.put(Current.getEdges()[i].getPoint2(), Current);
+							gscore.put(Current.getEdges()[i].getPoint2(), tentGScore);
+							fscore.put(Current.getEdges()[i].getPoint2(), tentGScore + CostEstimate(Current.getEdges()[i].getPoint2(), end));
 						}
 					}
-					else if(Current.edges[i].b == Current){
-						if(!Open.contains(Current.edges[i].a) || gscore.get(Current.edges[i].a) > tentGScore){
-							if(!Open.contains(Current.edges[i].a)) {
-								OpenAdd(Current.edges[i].a);
+					else if(Current.getEdges()[i].getPoint2() == Current){
+						if(!Open.contains(Current.getEdges()[i].getPoint1()) || gscore.get(Current.getEdges()[i].getPoint1()) > tentGScore){
+							if(!Open.contains(Current.getEdges()[i].getPoint1())) {
+								OpenAdd(Current.getEdges()[i].getPoint1());
 							}
-							CameFrom.put(Current.edges[i].a, Current);
-							gscore.put(Current.edges[i].a, tentGScore);
-							fscore.put(Current.edges[i].a, tentGScore + CostEstimate(Current.edges[i].a, end));
+							CameFrom.put(Current.getEdges()[i].getPoint1(), Current);
+							gscore.put(Current.getEdges()[i].getPoint1(), tentGScore);
+							fscore.put(Current.getEdges()[i].getPoint1(), tentGScore + CostEstimate(Current.getEdges()[i].getPoint1(), end));
 						}
 					}
 				}
@@ -61,7 +61,7 @@ public class AStar {
 	}
 	
 	private int CostEstimate(Point a, Point b){
-		return (int)Math.sqrt((double)((a.x+b.x)^2)+((a.y+b.y)^2));
+		return (int)Math.sqrt((double)((a.getX()+b.getX())^2)+((a.getY()+b.getY())^2));
 	}
 	private boolean ClosedContains(Point testPoint){
 		for(int i = 0; i < Closed.length; i++){

@@ -17,7 +17,6 @@ public class baseClass {
 		MappingDatabase testDB = new MappingDatabase();
 		testDB.initDatabase();
 		testDB.testInsert();
-		testDB.printDatabase(true, true, true);
-
+		//testDB.printDatabase(true, true, true);
 	}
 }

@@ -32,9 +32,9 @@ public class GenTextDir {
 			double angleRotate = 0;
 			if(prevPointY == 0){
 				if(prevPointX < 0){
-					angleRotate = -Math.PI/2;
-				} else {
 					angleRotate = Math.PI/2;
+				} else {
+					angleRotate = -Math.PI/2;
 				}
 			} else {
 				angleRotate = Math.atan(prevPointX / prevPointY);
@@ -70,9 +70,9 @@ public class GenTextDir {
 					System.out.println("The point: " + nextPoint.getName() + " has 0 no change in Y");
 				}
 				if(nextPointX < 0){
-					angle = 90;
+					angle = Math.PI/2;
 				} else {
-					angle = -90;
+					angle = -Math.PI/2;
 				}
 			} else {
 				if(nextPointX >= 0){
@@ -86,14 +86,25 @@ public class GenTextDir {
 			if(DEBUG){
 				System.out.println("Turn " + angle + " degrees");
 			}
+			angle = Math.abs(angle);
 			if((angle >= -0.1) && (angle <= 0.1)){
 				currString = "Once you reach " + currPoint.getName() + " continue going straight until you reach " + nextPoint.getName();
 			} else if (nextPointX <= 0){
-				currString = "Once you reach " + currPoint.getName() + " then turn " + Math.floor(-angle) + " degrees to your left, and head towards " + nextPoint.getName();
+				if(nextPointY < 0){
+					angle = angle + 90;
+				}
+				currString = "Once you reach " + currPoint.getName() + " then turn " + Math.floor(angle) + " degrees to your left, and head towards " + nextPoint.getName();
 			} else {
-				currString = "Once you reach " + currPoint.getName() + " then turn " + Math.floor(-angle) + " degrees to your right, and head towards " + nextPoint.getName();
+				if(nextPointY < 0){
+					angle = angle + 90;
+				}
+				currString = "Once you reach " + currPoint.getName() + " then turn " + Math.floor(angle) + " degrees to your right, and head towards " + nextPoint.getName();
 			}
 			retString[i+1] = currString;
+			if(DEBUG){
+				System.out.println("");
+				System.out.println("");
+			}
 		}
 		
 		double dist = PythagTheorem(nextPoint.getX() - currPoint.getX(), nextPoint.getY() - currPoint.getY());//CONVERT TO FEET

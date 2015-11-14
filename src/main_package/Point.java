@@ -7,15 +7,13 @@ public class Point {
 	private String name;
 	private int x;
 	private int y;
-	private ArrayList<Edge> edges = new ArrayList<Edge>(10);
-	private int numberEdges = 0;
+	private ArrayList<Edge> edges = new ArrayList<Edge>();
 	
-	public Point(int id, String name, int x, int y, int numberEdges) {
+	public Point(int id, String name, int x, int y) {
 		this.id = id;
 		this.name = name;
 		this.x = x;
 		this.y = y;
-		this.numberEdges = numberEdges;
 	}
 	
 	public int getId() {
@@ -48,17 +46,16 @@ public class Point {
 		this.edges = edges;
 	}
 	public int getNumberEdges() {
-		return numberEdges;
-	}
-	public void setNumberEdges(int numberEdges) {
-		this.numberEdges = numberEdges;
+		return edges.size();
 	}
 	public void addEdge(Edge addMe){
 		edges.add(addMe);;
-		numberEdges++;
 	}
 	public int getNumEdges()
 	{
-		return this.numberEdges;
+		return edges.size();
+	}
+	public String toString(){
+		return "(" + x + "," + y + ")";
 	}
 }

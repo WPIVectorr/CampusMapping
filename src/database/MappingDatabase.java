@@ -5,8 +5,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-
 import main_package.*;
 
 public class MappingDatabase 
@@ -77,7 +75,7 @@ public class MappingDatabase
 		String ptName = pt.getName();
 		int ptX = pt.getX();
 		int ptY = pt.getY();
-		ArrayList<Edge> edgeArray = pt.getEdges();
+		Edge[] edgeArray = pt.getEdges();
 		int numberEdges = pt.getNumberEdges();
 		
 		//TODO: Check exists
@@ -179,7 +177,7 @@ public class MappingDatabase
 	public static void testInsert()
 	{
 		Edge[] emptyArray = null;
-		Point testPoint = new Point(1432, "testPoint", 23, 56, 0);
+		Point testPoint = new Point(1432, "testPoint", 23, 56, emptyArray, 0);
 		insertPoint(testPoint);
 		
 	}

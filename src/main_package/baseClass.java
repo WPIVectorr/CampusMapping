@@ -31,7 +31,7 @@ public class baseClass {
 		testPoints[0] = c;
 		testPoints[1] = b;
 		testPoints[2] = a;
-		GenTestDir testGenTestDir = new GenTestDir(); 
+		GenTextDir testGenTestDir = new GenTextDir(); 
 		String[] testOneString = testGenTestDir.genTextDir(testPoints);
 		System.out.println(testOneString[0]);
 		System.out.println(testOneString[1]);

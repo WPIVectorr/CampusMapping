@@ -28,14 +28,20 @@ public class GUI extends JFrame{
 	String[] pcRooms = {"Select room #", "15", "25", "35", "45"};
 	String[] shRooms = {"Select room #", "16", "26", "36", "46"};
 	
+	int[][] coordTest1 = {{30,30}, {100, 300}, {800, 300}, {100, 200}};
+	int[][] coordTest2 = {{500,500}, {300, 100}, {800, 500}, {100, 200}};
+	int[][] coordTest3 = {{400, 200}, {50, 30}, {8, 300}, {10, 20}};
+	
 	String point1;
 	String point2;
 	String point3;
 	String point4;
+	private boolean showRoute;
+	private boolean showRoute2;
+	private boolean showRoute3;
 	private JTextField textField;
 	private JTextField txtStartingLocation;
 	private JTextField txtDestination;
-	
     private JPanel buttonPanel;
     private DrawRoute drawPanel = new DrawRoute();
 
@@ -118,10 +124,10 @@ public class GUI extends JFrame{
  		textField.setBounds(6, 174, 438, 30);
  		textField.setColumns(1);
  		  
- 		  JButton btnNewButton = new JButton("Directions");
- 		  buttonPanel.add(btnNewButton);
- 		  btnNewButton.setBackground(new Color(0, 255, 127));
- 		  btnNewButton.addActionListener(new ActionListener() {
+ 		  JButton directionsButton = new JButton("Directions");
+ 		  buttonPanel.add(directionsButton);
+ 		  directionsButton.setBackground(new Color(0, 255, 127));
+ 		  directionsButton.addActionListener(new ActionListener() {
  		  	public void actionPerformed(ActionEvent arg0) {
  		  		//gets the start and end building and room numbers the user chose
  		  		point1 = (String) startBuilds.getSelectedItem();
@@ -129,6 +135,21 @@ public class GUI extends JFrame{
  		  		point3 = (String) startRooms.getSelectedItem();
  		  		point4 = (String) destRooms.getSelectedItem();
  		  		
+ 		  		if (point1.equals("Atwater Kent")){
+ 		  			showRoute = true;
+ 		  			showRoute2 = false;
+ 		  			showRoute3 = false;
+ 		  		}
+ 		  		else if (point1.equals("Boynton Hall")){
+ 		  			showRoute = false;
+ 		  			showRoute2 = true;
+ 		  			showRoute3 = false;
+ 		  		}
+ 		  		else if (point1.equals("Campus Center")){
+ 		  			showRoute = false;
+ 		  			showRoute2 = false;
+ 		  			showRoute3 = true;
+ 		  		}
  		  		//prints an error if no or both buildings weren't selected
  		  		if (point1.equals("Select Building") || point2.equals("Select Building"))
  		  			textField.setText("Error: Select Two Points");
@@ -146,7 +167,7 @@ public class GUI extends JFrame{
  		  	}
  		  });
  		  
- 		  btnNewButton.setBounds(187, 132, 94, 30);
+ 		  directionsButton.setBounds(187, 132, 94, 30);
  		  
  		  Component horizontalStrut = Box.createHorizontalStrut(20);
  		  buttonPanel.add(horizontalStrut);
@@ -190,11 +211,34 @@ public class GUI extends JFrame{
             super.paintComponent(g);
             g.drawImage(img, 0, 0, null);
            
-            if (point1 == "Boynton Hall"){
-            	g.drawLine(0, 0, 50, 100);
+            if (showRoute){
+                g.drawString("Origin", coordTest1[0][0], coordTest1[0][1]);
+	            // For each point with (x, y) draw a line from the previous point to the point
+	            for (int i = 1; i < coordTest1.length; i++){
+	            	g.drawLine(coordTest1[i - 1][0], coordTest1[i - 1][1], coordTest1[i][0], coordTest1[i][1]);
+	                // Adds strings denoting point number for demonstration
+	            	g.drawString("Point " + i, coordTest1[i][0], coordTest1[i][1]);
+	            }
             }
-            else if (point2 == "Atwater Kent"){
-            	g.drawLine(100, 200, 300, 400);
+            
+            if (showRoute2){
+                g.drawString("Origin", coordTest2[0][0], coordTest2[0][1]);
+	            // For each point with (x, y) draw a line from the previous point to the point
+	            for (int i = 1; i < coordTest2.length; i++){
+	            	g.drawLine(coordTest2[i - 1][0], coordTest2[i - 1][1], coordTest2[i][0], coordTest2[i][1]);
+	                // Adds strings denoting point number for demonstration
+	            	g.drawString("Point " + i, coordTest2[i][0], coordTest2[i][1]);
+	            }
+            }
+            
+            if (showRoute3){
+                g.drawString("Origin", coordTest3[0][0], coordTest3[0][1]);
+	            // For each point with (x, y) draw a line from the previous point to the point
+	            for (int i = 1; i < coordTest3.length; i++){
+	            	g.drawLine(coordTest3[i - 1][0], coordTest3[i - 1][1], coordTest3[i][0], coordTest3[i][1]);
+	                // Adds strings denoting point number for demonstration
+	            	g.drawString("Point " + i, coordTest3[i][0], coordTest3[i][1]);
+	            }
             }
         }
     }

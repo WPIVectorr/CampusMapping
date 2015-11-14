@@ -1,4 +1,3 @@
-
 package main_package;
 
 import database.MappingDatabase;
@@ -12,7 +11,9 @@ public class baseClass {
 		System.out.println("Test print 4");
 
 		testDatabase();
+
 		testGenDir();
+
 	}
 	public static void testDatabase ()
 	{
@@ -25,9 +26,9 @@ public class baseClass {
 	
 	public static void testGenDir(){
 		System.out.println("");
-		Point a = new Point(0, "Stair Bottom", 0, 0, 3);
-		Point b = new Point(1, "Stair Top", 1, 0, 3);
-		Point c = new Point(2, "Hallway Start", 2, -1, 3);
+		Point a = new Point(0, "Stair Bottom", 0, 0);
+		Point b = new Point(1, "Stair Top", 1, 0);
+		Point c = new Point(2, "Hallway Start", 2, -1);
 		Point[] testPoints = new Point[3];
 		testPoints[0] = c;
 		testPoints[1] = b;
@@ -41,9 +42,9 @@ public class baseClass {
 		
 		System.out.println("");
 		
-		a = new Point(0, "Stair Bottom", 0, 0, 3);
-		b = new Point(1, "Stair Top", 1, 0, 3);
-		c = new Point(2, "Hallway Start", 2, 1, 3);
+		a = new Point(0, "Stair Bottom", 0, 0);
+		b = new Point(1, "Stair Top", 1, 0);
+		c = new Point(2, "Hallway Start", 2, 1);
 		
 		testPoints[0] = c;
 		testPoints[1] = b;
@@ -57,9 +58,9 @@ public class baseClass {
 		
 		System.out.println("");
 		
-		a = new Point(0, "Stair Bottom", 0, 0, 3);
-		b = new Point(1, "Stair Top", 1, 0, 3);
-		c = new Point(2, "Hallway Start", 2, 0, 3);
+		a = new Point(0, "Stair Bottom", 0, 0);
+		b = new Point(1, "Stair Top", 1, 0);
+		c = new Point(2, "Hallway Start", 2, 0);
 		
 		testPoints[0] = c;
 		testPoints[1] = b;

@@ -178,7 +178,7 @@ public class MappingDatabase
 	}
 	public static void testInsert()
 	{
-		Point testPoint = new Point(1432, "testPoint", 23, 56, 0);
+		Point testPoint = new Point(1432, "testPoint", 23, 56);
 		insertPoint(testPoint);
 		
 	}

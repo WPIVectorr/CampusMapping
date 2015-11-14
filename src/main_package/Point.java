@@ -7,7 +7,7 @@ public class Point {
 	private String name;
 	private int x;
 	private int y;
-	private ArrayList<Edge> edges = new ArrayList<Edge>(10);
+	private ArrayList<Edge> edges = new ArrayList<Edge>();
 	
 	public Point(int id, String name, int x, int y) {
 		this.id = id;
@@ -54,5 +54,8 @@ public class Point {
 	public int getNumEdges()
 	{
 		return edges.size();
+	}
+	public String toString(){
+		return "(" + x + "," + y + ")";
 	}
 }

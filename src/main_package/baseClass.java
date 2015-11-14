@@ -11,6 +11,8 @@ public class baseClass {
 		System.out.println("Test print 4");
 
 		testDatabase();
+		
+		
 	}
 	public static void testDatabase ()
 	{

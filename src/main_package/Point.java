@@ -8,13 +8,24 @@ public class Point {
 	private int x;
 	private int y;
 	private ArrayList<Edge> edges = new ArrayList<Edge>();
+	private int numberEdges;
 	
 	public Point(int id, String name, int x, int y) {
 		this.id = id;
 		this.name = name;
 		this.x = x;
 		this.y = y;
+		this.numberEdges = 0;
 	}
+	
+	public Point(int id, String name, int x, int y, int numberEdges) {
+		this.id = id;
+		this.name = name;
+		this.x = x;
+		this.y = y;
+		this.numberEdges = numberEdges;
+	}
+	
 	
 	public int getId() {
 		return id;

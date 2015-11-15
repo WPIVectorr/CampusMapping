@@ -1,5 +1,5 @@
 package database;
-import main_package.*;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -11,24 +11,43 @@ import main_package.*;
 
 public class MappingDatabase 
 {
-	//-------------------------------------------------Constants---------------------------------------------------------------
+	//-----------------------------------------------------------Constants--------------------------------------------------------------------
 	private static String DATABASE_NAME = "campusMapping.db";
 	
 	private static String MAP_TABLE_NAME = "Maps";
 	private static String POINT_TABLE_NAME = "Points";
 	private static String EDGE_TABLE_NAME = "Edges";
 	
-	private static String MAP_SCHEMA = "id integer, String name, int numPoints";
+	//private static String MAP_SCHEMA = "id integer, String name, int numPoints";
 	private static String POINT_SCHEMA = "id integer, name String, x integer, y integer, numEdges integer, idEdge1 integer,"
 			+ " idEdge2 integer, idEdge3 integer, idEdge4 integer, idEdge5 integer, idEdge6 integer, idEdge7 integer, idEdge8 integer,"
 			+ "idEdge9 integer, idEdge10 integer";
 	private static String EDGE_SCHEMA = "id integer, idPoint1 integer, idPoint2 integer, weight integer, isOutside integer, isStairs integer";
 	
-	//----------------------------------------------Global Variables-----------------------------------------------------------
+	//--------------------------------------------------------Global Variables---------------------------------------------------------------
 	private static Connection connection;
 	public final static boolean DEBUG = true;
 	
-	//--------------------------------------------Function Definitions---------------------------------------------------------
+	private static ArrayList<Map> allMaps = new ArrayList<Map>();
+	private static ArrayList<Point> allPoints = new ArrayList<Point>();
+	private static ArrayList<Edge> allEdges = new ArrayList<Edge>();
+	
+	//------------------------------------------------------Singleton Handling---------------------------------------------------------------
+	private static MappingDatabase instance;
+	
+	private MappingDatabase()
+	{
+		
+	}
+	
+	public static MappingDatabase getInstance()
+	{
+		if (instance == null)
+			instance = new MappingDatabase();
+		return instance;
+	}
+	
+	//------------------------------------------------------Function Definitions-------------------------------------------------------------
 	public static void main(String args[]) throws ClassNotFoundException
 	{
 		Class.forName("org.sqlite.JDBC");													//Look into exactly what this is intended to do
@@ -48,12 +67,12 @@ public class MappingDatabase
 			statement.executeUpdate("drop table if exists "+POINT_TABLE_NAME);
 			statement.executeUpdate("drop table if exists "+EDGE_TABLE_NAME);
 			System.out.println("Creating new tables");
-			statement.executeUpdate("create table "+ MAP_TABLE_NAME +" ("+ MAP_SCHEMA + ")");
-			if (DEBUG)
-				System.out.println("Constructed Table: "+MAP_TABLE_NAME);
-			statement.executeUpdate("create table "+ POINT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
-			if (DEBUG)
-				System.out.println("Constructed Table: "+POINT_TABLE_NAME);
+			//statement.executeUpdate("create table "+ MAP_TABLE_NAME +" ("+ MAP_SCHEMA + ")");
+			//if (DEBUG)
+			//	System.out.println("Constructed Table: "+MAP_TABLE_NAME);
+			//statement.executeUpdate("create table "+ POINT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
+			//if (DEBUG)
+			//	System.out.println("Constructed Table: "+POINT_TABLE_NAME);
 			statement.executeUpdate("create table "+ EDGE_TABLE_NAME +" ("+ EDGE_SCHEMA + ")");
 			if (DEBUG)
 				System.out.println("Constructed Table: "+EDGE_TABLE_NAME);
@@ -64,14 +83,37 @@ public class MappingDatabase
 			System.err.println(e.getMessage());												//If the error message is "out of memory", 
 		}
 	}
-	public void insertMap()
+	
+	public static void insertMap(Map map) throws AlreadyExistsException
 	{
-		//Get all information for new map
-		//Check if map exists
-		//If map does not exist, and id is unique, insert as map with unique id
+		int mapId = map.getId();
+		//-------------------------------------------------Add to objects--------------------------------------------------------------------
+		int counter = 0;
+		boolean alreadyExists = false;
+		if (allMaps == null || allMaps.isEmpty())
+		{
+			
+		}
+		else
+		{
+			for (counter = 0; counter<allMaps.size(); counter++)
+			{
+				if (allMaps.get(counter).getId() == mapId)
+				{
+					alreadyExists = true;
+				}
+			}
+		}
+		if (alreadyExists)
+			throw new AlreadyExistsException("Map already exists in object database");
+		else
+			allMaps.add(map);
 	}
-	public static void insertPoint(Point pt)
+
+	public static void insertPoint(Map map, Point pt) throws AlreadyExistsException, NoMapException, InsertFailureException
 	{
+		String RELEVANT_TABLE_NAME = "";
+		
 		int counter = 0;
 		int pointID = pt.getId();
 		String ptName = pt.getName();
@@ -80,63 +122,218 @@ public class MappingDatabase
 		ArrayList<Edge> edgeArray = pt.getEdges();
 		int numberEdges = pt.getNumberEdges();
 		
-		//TODO: Check exists
-		if (DEBUG)
-			System.out.println("Beginning to construct insert statement");
+		RELEVANT_TABLE_NAME += ("Map"+map.getId()+"Points");
 		
+		
+//		if (checkExists(map, pt))															//Check if point already exists in map object
+//		{
+//			throw new AlreadyExistsException("Point already exists in map");
+//		}
+//		else
+		
+		{
+			if (DEBUG)
+				System.out.println("Beginning to construct insert statement");
+			//--------------------------------------------------Add to Database--------------------------------------------------------
+			try {
+				boolean alreadyExists = false;
+				connection = DriverManager.getConnection("jdbc:sqlite:"+DATABASE_NAME);
+				Statement statement = connection.createStatement();
+				statement.setQueryTimeout(30);  											// set timeout to 30 sec.
+				
+				ResultSet rs = statement.executeQuery("SELECT name FROM sqlite"
+						+ "_master WHERE type='table' "
+						+ "AND name='"+RELEVANT_TABLE_NAME+"'");							//Check if table already exists or not
+				if (resultSetEmpty(rs))
+				{
+					if (DEBUG)
+						System.out.println("Creating table: " + RELEVANT_TABLE_NAME);
+					statement.executeUpdate("create table "+ 								//If does not exist, then create table
+											RELEVANT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
+				}
+				else
+				{
+					rs = statement.executeQuery("SELECT * from "+RELEVANT_TABLE_NAME);
+					while (rs.next())
+					{
+						int comparisonId = rs.getInt("id");
+						if (comparisonId == pt.getId())
+						{
+							throw new AlreadyExistsException("Point with same id exists already in SQLite DB");
+						}
+					}
+				}
+				
+				String insertStatement = "insert into " +RELEVANT_TABLE_NAME+" values(";
+				insertStatement += pointID;
+				insertStatement += ", ";
+				insertStatement += ("'"+ptName+"'");
+				insertStatement += ", ";
+				insertStatement += ptX;
+				insertStatement += ", ";
+				insertStatement += ptY;
+				insertStatement += ", ";
+				insertStatement += numberEdges;
+				insertStatement += ", ";
+				for (counter =0; counter < numberEdges; counter++)
+				{
+					insertStatement += edgeArray.get(counter).getID();
+					insertStatement += ", ";
+				}
+				for (counter = numberEdges; counter < 9; counter++)
+				{
+					insertStatement += "null";
+					insertStatement += ", ";
+				}
+				insertStatement += "null";													//Formatting, last var doesn't have comma after
+				insertStatement += ")";
+				if (DEBUG)
+					System.out.println ("Insert statement: "+insertStatement);
+				statement.executeUpdate(insertStatement);
+				if (DEBUG)
+					System.out.println("Sucessfully inserted into database");
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new InsertFailureException("Failed to add to SQLite database");
+			}
+			//-------------------------------------------------Add to local object storage----------------------------------------
+			int mapId = map.getId();
+			int mapIndex = -1;
+			if (allMaps == null)
+			{
+				throw new NoMapException("Object database doesn't contain any maps");
+			}
+			if (allMaps.isEmpty())
+			{
+				throw new NoMapException("Object map database is empty");
+			}
+			else
+			{
+				counter = 0;
+				for (counter = 0; counter<allMaps.size(); counter++)
+				{
+					if (allMaps.get(counter).getId() == mapId)
+					{
+						mapIndex = counter;
+					}
+				}
+				if (mapIndex == -1)
+				{
+					throw new NoMapException("Map does not exist in object database");
+				}
+				else
+				{
+					if (checkExists(map, pt))												//Check if point already exists in map object
+					{
+						throw new AlreadyExistsException("Point already exists in map");	//TODO revisit if this is actually how I want this to be handled
+					}
+					Map mapToAddTo = allMaps.get(mapIndex);
+					ArrayList<Point> tempArrayList = new ArrayList<Point>();
+					tempArrayList = mapToAddTo.getPointList();
+					boolean addRes = false;
+					addRes = tempArrayList.add(pt);
+					if (addRes == false)
+						throw new InsertFailureException("Failed to add to object database");
+					else
+					{
+						mapToAddTo.setPointList(tempArrayList);
+					}
+				}																			//End map search check
+			}																				//End empty check
+			if (allPoints == null || allPoints.isEmpty())									//Begin adding to allPoints table
+			{
+				allPoints.add(pt);
+			}
+			else
+			{
+				counter = 0;
+				boolean idExists = false;
+				for (counter = 0; counter<allPoints.size(); counter++)
+				{
+					if (allPoints.get(counter).getId() == pt.getId())
+						idExists = true;
+				}
+				if (idExists)
+				{
+					throw new AlreadyExistsException("Point id is already in object database (allPoints");
+				}
+				else
+				{
+					boolean insertRes;
+					insertRes = allPoints.add(pt);
+					if (!insertRes)
+					{
+						throw new InsertFailureException("Failed to add to allPoints array list");
+					}
+				}
+			}
+			if (DEBUG)
+				System.out.println("Succesfully inserted into object database");
+			
+		}																					//End checkExists check
+	}																						//End insertPoint
+	
+	public void insertEdge()
+	{
+		//TODO fill in
+	}
+	
+	public static ArrayList<Point> getPoints(Map map)
+	{
+		ArrayList<Point> retArray = new ArrayList<Point>();
 		try {
 			connection = DriverManager.getConnection("jdbc:sqlite:"+DATABASE_NAME);
 			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);  												// set timeout to 30 sec.
+			statement.setQueryTimeout(30);  											// set timeout to 30 sec.
+			String TABLE_NAME = "";
+			TABLE_NAME += ("Map"+map.getId()+"Points");
 			
-			String insertStatement = "insert into points values(";
-			insertStatement += pointID;
-			insertStatement += ", ";
-			insertStatement += ("'"+ptName+"'");
-			insertStatement += ", ";
-			insertStatement += ptX;
-			insertStatement += ", ";
-			insertStatement += ptY;
-			insertStatement += ", ";
-			insertStatement += numberEdges;
-			insertStatement += ", ";
-			if (DEBUG)
+			int newPtId;
+			String newPtName;
+			int newPtX;
+			int newPtY;
+			int newPtNumberEdges;
+			ArrayList<Edge> newPtEdges = new ArrayList<Edge>();
+			
+			ResultSet rs = statement.executeQuery("SELECT * FROM "+TABLE_NAME);
+			while (rs.next())
 			{
-				System.out.println("About to add edge id's to insert statement");
+				newPtId = rs.getInt("id");
+				newPtName = rs.getString("name");
+				newPtX = rs.getInt("x");
+				newPtY = rs.getInt("y");
+				newPtNumberEdges = rs.getInt("numEdges");
+				/*
+				 * TODO Get edges here
+				 */
+				Point newPt = new Point(newPtId, newPtName, newPtX, newPtY, newPtNumberEdges);
+				retArray.add(newPt);
 			}
-			for (counter =0; counter < numberEdges; counter++)
-			{
-				insertStatement += edgeArray.get(counter).getID();
-				insertStatement += ", ";
-			}
-			for (counter = numberEdges; counter < 9; counter++)
-			{
-				insertStatement += "null";
-				insertStatement += ", ";
-			}
-			insertStatement += "null";										//Formatting, last var doesn't have comma after
-			insertStatement += ")";
-			if (DEBUG)
-				System.out.println ("Insert statement: "+insertStatement);
-			statement.executeUpdate(insertStatement);
+			return retArray;																			//TODO add error handling
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return retArray;
 		}			
 	}
-	public void insertEdge()
+
+	
+	public ArrayList<Map> getMaps()
 	{
-		
+		return allMaps;
 	}
+	
 	public static void printDatabase(boolean printMaps, boolean printPoints, boolean printEdges)
 	{
 		try
 		{
 			Statement statement = connection.createStatement();
+			//SELECT name FROM my_db.sqlite_master WHERE type='table';
 			if (printMaps)
 			{
 				ResultSet rs = statement.executeQuery("select * from "+MAP_TABLE_NAME);
 				System.out.println("Printing "+MAP_TABLE_NAME+" from "+DATABASE_NAME);
-				while(rs.next())														// read the result set
+				while(rs.next())															// read the result set
 				{
 					System.out.println("");
 				}
@@ -145,7 +342,7 @@ public class MappingDatabase
 			{
 				ResultSet rs = statement.executeQuery("select * from "+POINT_TABLE_NAME);
 				System.out.println("Printing "+POINT_TABLE_NAME+" from "+DATABASE_NAME);
-				while(rs.next())														// read the result set
+				while(rs.next())															// read the result set
 				{
 					System.out.println("name = " + rs.getString("name"));
 					System.out.println("id = " + rs.getInt("id"));
@@ -158,7 +355,7 @@ public class MappingDatabase
 			{
 				ResultSet rs = statement.executeQuery("select * from "+EDGE_TABLE_NAME);
 				System.out.println("Printing "+EDGE_TABLE_NAME+" from "+DATABASE_NAME);
-				while(rs.next())														// read the result set
+				while(rs.next())															// read the result set
 				{
 					System.out.println();
 				}
@@ -166,20 +363,172 @@ public class MappingDatabase
 		}
 		catch(SQLException e)
 		{
-			System.err.println(e.getMessage());										// if the error message is "out of memory", 
-																					// it probably means no database file is found
+			System.err.println(e.getMessage());												// if the error message is "out of memory", 
+																							// it probably means no database file is found
 		}
 	}
 
-	public boolean checkExists (Point pt)
+	public static void printObjects(boolean printMaps, boolean printPoints, boolean printEdges)
 	{
-		int ptID = pt.getId();
-		return false; 
+		System.out.println("Printing stored objects");
+		int counter = 0;
+		if (printMaps)
+		{
+			for (counter = 0; counter<allMaps.size();counter++)
+			{
+				System.out.println("Map"+allMaps.get(counter).getId());
+			}
+		}
+		if (printPoints)
+		{
+			for (counter = 0; counter<allPoints.size(); counter++)
+			{
+				System.out.println("Point"+allPoints.get(counter).getId());
+			}
+		}
+		if (printEdges)
+		{
+			for (counter = 0; counter<allEdges.size(); counter++)
+			{
+				System.out.println("Edge"+allEdges.get(counter).getId());
+			}
+		}
 	}
+	
+	public static boolean checkExists (Map map, Point pt)
+	{
+		ArrayList<Point> pointList = map.getPointList();
+		if (pointList == null)
+			return false;
+		else if (pointList.isEmpty())
+			return false;
+		else
+		{
+			int arrayLength = pointList.size();
+			int counter = 0;
+			for (counter = 0; counter < arrayLength; counter++)
+			{
+				if (pointList.get(counter).getId() == pt.getId())
+					return true;
+			}
+			return false;
+		}
+	}
+	
+	public static boolean resultSetEmpty(ResultSet rs)
+	{
+		try {
+			if (!rs.next())
+				return true;
+			else
+				return false;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return true;												//TODO look into why this needs to be in a try catch
+		}
+	}
+	
 	public static void testInsert()
 	{
-		Point testPoint = new Point(1432, "testPoint", 23, 56);
-		insertPoint(testPoint);
+		//clearDatabase();
+		Edge[] emptyArray = null;
+		ArrayList<Point> emptyPointArrayList = new ArrayList<Point>();
+		Map testMap = new Map(emptyPointArrayList, 22);
+		Point testPoint = new Point(1432, "testPoint", 23, 56, 0);
+		
+		try {
+			insertMap(testMap);
+		} catch (AlreadyExistsException e1) {
+			e1.printStackTrace();
+		}
+	
+		
+		try {																				//Test insert point
+			insertPoint(testMap, testPoint);
+		} catch (AlreadyExistsException e) {
+			e.printStackTrace();
+		} catch (NoMapException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InsertFailureException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		ArrayList <Point> testArray = getPoints(testMap);
+		System.out.println(testArray.get(0).getId());
+		//printObjects(true, true, true); 
 		
 	}
+	
+	private static void clearDatabase()
+	{
+		if (DEBUG)
+			System.out.println("Clearing database!");
+		String command = "";
+		try {
+			Statement statement = connection.createStatement();
+
+			ResultSet rs = statement.executeQuery("SELECT name FROM sqlite"
+					+ "_master WHERE type='table' ");
+			while (rs.next())
+			{
+				command += ("drop table "+rs.getString(1));
+				statement.executeUpdate(command);
+				if (DEBUG)
+					System.out.println(command);
+				command = "";
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/*
+	private static void populateFromDatabase()
+	{
+		allMaps.clear();
+		allPoints.clear();
+		allEdges.clear();
+		
+		try {
+			connection = DriverManager.getConnection("jdbc:sqlite:"+DATABASE_NAME);
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);  											// set timeout to 30 sec.
+			ResultSet rs1 = statement.executeQuery("SELECT name FROM sqlite"
+					+ "_master WHERE type='table' ");
+			//int counter = 0;
+			int newPtId;
+			String newPtName;
+			int newPtX;
+			int newPtY;
+			int newPtNumberEdges;
+			ArrayList<Edge> newPtEdges = new ArrayList<Edge>();
+			
+			while (rs1.next())
+			{
+				ResultSet rs2 = statement.executeQuery("SELECT * FROM "+rs1.getString(0));
+				while(rs2.next())
+				//TODO CHECK TABLE NAME FOR MAP OR EDGE
+				{
+					newPtId = rs2.getInt("id");
+					newPtName = rs2.getString("name");
+					newPtX = rs2.getInt("x");
+					newPtY = rs2.getInt("y");
+					newPtNumberEdges = rs2.getInt("numEdges");
+					
+					 //TODO Get edges here
+					 
+					Point newPt = new Point(newPtId, newPtName, newPtX, newPtY, newPtNumberEdges);
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	*/
 }	
+

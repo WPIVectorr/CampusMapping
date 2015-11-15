@@ -53,9 +53,10 @@ public class baseClass {
 	}
 	public static void testDatabase ()
 	{
-		MappingDatabase testDB = new MappingDatabase();
+		MappingDatabase testDB = MappingDatabase.getInstance();
 		testDB.initDatabase();
 		testDB.testInsert();
+		//System.out.println("------------------------------Done Testing Database-----------------------------");
 		//testDB.printDatabase(true, true, true);
 	}
 	

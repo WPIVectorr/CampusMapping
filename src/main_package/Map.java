@@ -29,6 +29,25 @@ public class Map {
 		 return null;
 	}
 	
+	public Map (ArrayList<Point> points, int id)
+	{
+		this.Points = points;
+		this.mapId = id;
+	}
+	public ArrayList<Point> getPointList()
+	{
+		return Points;
+	}
+	public void setPointList(ArrayList<Point> newPoints)
+	{
+		this.Points = newPoints;
+	}
+	public int getId()
+	{
+		return mapId;
+	}
 
+	
+	
 
 }

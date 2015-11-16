@@ -9,6 +9,15 @@ import java.util.ArrayList;
 
 import main_package.*;
 
+/*
+ * TODO
+ * Cleanup insertEdge, make it add edgeId to the relevant points in the SQLite database
+ * Add functions
+ * -getAllMaps
+ * Cleanup print database and print objects
+ * Adjust populate to work with edges
+ * TODO
+ */
 public class MappingDatabase 
 {
 	//-----------------------------------------------------------Constants--------------------------------------------------------------------
@@ -77,6 +86,7 @@ public class MappingDatabase
 			System.err.println(e.getMessage());												//If the error message is "out of memory", 
 		}
 	}
+	
 	public static void insertMap(Map map) throws AlreadyExistsException
 	{
 		int mapId = map.getId();

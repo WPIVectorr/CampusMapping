@@ -485,6 +485,18 @@ public class MappingDatabase
 
 	public ArrayList<Map> getMaps()
 	{
+		int counter = 0;
+		for (counter = 0; counter<allMaps.size(); counter++)
+		{
+			Map tempMap = allMaps.get(counter);
+			try {
+				tempMap.setPointList(getPoints(tempMap));
+			} catch (PopulateErrorException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			allMaps.set(counter, tempMap);
+		}
 		return allMaps;
 	}
 	

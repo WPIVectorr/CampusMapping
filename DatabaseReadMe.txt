@@ -10,11 +10,15 @@ There are a number of functions that can be called on an instance of the databas
 
 insertMap (Map map)
 	This one does pretty much what the name says. It checks for existing maps and if none exist, adds the one specified.
+	Maps are stored with their names and ids. Map points and edges are stored in a different table.
 
 insertPoint(Map map, Point pt)
 	This one does what the name implies. It checks if there is already an existing point with the same id on the map and if so throws 
 	an AlreadyExistsException. This is so that it can handled by the GUI
 
+insertEdge(Edge edge)
+	Does what name implies. All you need to do is give it an edge. The function handles the rest.
+	
 getPoints(Map map)
 	This returns (in theory) an ArrayList of all the points on a given map. This will require some more extensive testing, I'm not entirely sure
 	that it saves points between sessions right now.

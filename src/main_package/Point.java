@@ -10,6 +10,10 @@ public class Point {
 	private ArrayList<Edge> edges = new ArrayList<Edge>();
 	private int numberEdges;
 	
+	public Point()
+	{
+		
+	}
 	public Point(int id, String name, int x, int y) {
 		this.id = id;
 		this.name = name;
@@ -60,7 +64,8 @@ public class Point {
 		return edges.size();
 	}
 	public void addEdge(Edge addMe){
-		edges.add(addMe);;
+		edges.add(addMe);
+		numberEdges++;
 	}
 	public int getNumEdges()
 	{
@@ -68,5 +73,18 @@ public class Point {
 	}
 	public String toString(){
 		return "(" + x + "," + y + ")";
+	}
+	public void print()
+	{
+		System.out.println ("Name:"+this.name);
+		System.out.println ("ID:"+this.id);
+		System.out.println ("X:"+this.x);
+		System.out.println ("Y:"+this.y);
+		System.out.println ("NumEdges:"+this.numberEdges);
+		int i = 0;
+		for (i = 0; i<this.numberEdges; i++)
+		{
+			System.out.println("Edge"+(i+1)+"id:"+this.edges.get(i).getId());
+		}
 	}
 }

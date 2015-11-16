@@ -6,12 +6,12 @@ import java.util.LinkedList;
 
 public class AStar {
 	static LinkedList<Point> Open = new LinkedList<Point>(); // List of all Open nodes
-	static ArrayList<Point> Closed = new ArrayList<Point>(10000); // Array of all closed Nodes
+	static ArrayList<Point> Closed = new ArrayList<Point>(); // Array of all closed Nodes
 	static HashMap<Point, Point> CameFrom = new HashMap<Point, Point>(); // Map to track path taken to each node
 	static HashMap<Point, Integer> gscore = new HashMap<Point, Integer>(); // Time taken to each node
 	static HashMap<Point, Integer> fscore = new HashMap<Point, Integer>(); // Estimated time from each node to end
 	
-	public static Point[] PathFind(Point start, Point end) {		
+	public static ArrayList<Point> PathFind(Point start, Point end) {		
 		gscore.put(start, 0); // Initialize scores
 		fscore.put(start, CostEstimate(start, end));
 		
@@ -35,22 +35,22 @@ public class AStar {
 					int tentGScore = gscore.get(Current) + Current.getEdges().get(i).getWeight();
 					if(Current.getEdges().get(i).getPoint1() == Current){
 						if(!Open.contains(Current.getEdges().get(i).getPoint2()) || gscore.get(Current.getEdges().get(i).getPoint2()) > tentGScore){
-							if(!Open.contains(Current.getEdges().get(i).getPoint2())) {
-								OpenAdd(Current.getEdges().get(i).getPoint2());
-							}
 							CameFrom.put(Current.getEdges().get(i).getPoint2(), Current);
 							gscore.put(Current.getEdges().get(i).getPoint2(), tentGScore);
 							fscore.put(Current.getEdges().get(i).getPoint2(), tentGScore + CostEstimate(Current.getEdges().get(i).getPoint2(), end));
+							if(!Open.contains(Current.getEdges().get(i).getPoint2())) {
+								OpenAdd(Current.getEdges().get(i).getPoint2());
+							}
 						}
 					}
 					else if(Current.getEdges().get(i).getPoint2() == Current){
 						if(!Open.contains(Current.getEdges().get(i).getPoint1()) || gscore.get(Current.getEdges().get(i).getPoint1()) > tentGScore){
-							if(!Open.contains(Current.getEdges().get(i).getPoint1())) {
-								OpenAdd(Current.getEdges().get(i).getPoint1());
-							}
 							CameFrom.put(Current.getEdges().get(i).getPoint1(), Current);
 							gscore.put(Current.getEdges().get(i).getPoint1(), tentGScore);
 							fscore.put(Current.getEdges().get(i).getPoint1(), tentGScore + CostEstimate(Current.getEdges().get(i).getPoint1(), end));
+							if(!Open.contains(Current.getEdges().get(i).getPoint1())) {
+								OpenAdd(Current.getEdges().get(i).getPoint1());
+							}
 						}
 					}
 				}
@@ -71,16 +71,14 @@ public class AStar {
 		}
 		Open.add(addPoint);
 	}
-	private static Point[] ReconstructPath(Point PathEnd){
+	private static ArrayList<Point> ReconstructPath(Point PathEnd){
 		Point Current = PathEnd;
-		Point[] ReturnPath = new Point[1000];
-		int N = 0;
+		ArrayList<Point> ReturnPath = new ArrayList<Point>();
 		while(CameFrom.containsKey(Current)){
-			ReturnPath[N] = Current;
-			N++;
+			ReturnPath.add(Current);
 			Current = CameFrom.get(Current);
 		}
-		ReturnPath[N] = Current;
+		ReturnPath.add(Current);
 		return ReturnPath;
 	}
 }

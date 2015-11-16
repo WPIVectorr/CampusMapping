@@ -139,14 +139,15 @@ public class MapUpdaterGUI extends JFrame {
          buttonPanel.add(btnSaveMap);
          getContentPane().add(drawPanel);
 
-/*         btnSavePoint.addActionListener(new ActionListener(){
+         btnSavePoint.addActionListener(new ActionListener(){
              
              @Override
              public void actionPerformed(ActionEvent e) {
              	System.out.println("SavePoint");
-             	//if()
+             	editPoint.setName(roomNumber.getText());
+             	roomNumber.setText("");
              }
-         });*/
+         });
          
 
 
@@ -195,7 +196,7 @@ public class MapUpdaterGUI extends JFrame {
     }
     
 
-    class DrawRoute extends JPanel implements MouseListener{
+    class DrawRoute extends JPanel{
 		ArrayList<Point> markForDelete = new ArrayList<Point>();
     	//Point editPoint;
     	//Driver values used for testing:
@@ -211,14 +212,14 @@ public class MapUpdaterGUI extends JFrame {
            
 
 		            addMouseListener(new MouseAdapter() {
-		                @Override
 		                
 		                public void mouseReleased(MouseEvent e) {
 		                	newClick = false;
-			                lastMousex =  e.getX();
-			                lastMousey =  e.getY();
-			                newClick = true;
+		                    lastMousex =  e.getX();
+		                    lastMousey =  e.getY();
+		                    newClick = true;
 		                }
+
 		            });
 
 
@@ -300,36 +301,6 @@ public class MapUpdaterGUI extends JFrame {
             newClick = false;
             repaint();
         }
-    	@Override
-    	public void mouseClicked(MouseEvent e) {
-
-
-    	}
-
-    	@Override
-    	public void mouseEntered(MouseEvent arg0) {
-    		// TODO Auto-generated method stub
-    		
-    	}
-
-    	@Override
-    	public void mouseExited(MouseEvent arg0) {
-    		// TODO Auto-generated method stub
-    		
-    	}
-
-    	@Override
-    	public void mouseReleased(MouseEvent arg0) {
-    		// TODO Auto-generated method stub
-    		
-    	}
-
-    	@Override
-    	public void mousePressed(MouseEvent arg0) {
-    		// TODO Auto-generated method stub
-    		
-    	}
-
     }
 
 

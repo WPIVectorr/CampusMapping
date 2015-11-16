@@ -16,6 +16,9 @@ insertPoint(Map map, Point pt)
 	This one does what the name implies. It checks if there is already an existing point with the same id on the map and if so throws 
 	an AlreadyExistsException. This is so that it can handled by the GUI
 
+insertEdge(Edge edge)
+	Does what name implies. All you need to do is give it an edge. The function handles the rest.
+	
 getPoints(Map map)
 	This returns (in theory) an ArrayList of all the points on a given map. This will require some more extensive testing, I'm not entirely sure
 	that it saves points between sessions right now.

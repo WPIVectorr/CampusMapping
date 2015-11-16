@@ -29,10 +29,11 @@ public class Map {
 		 return null;
 	}
 	
-	public Map (ArrayList<Point> points, int id)
+	public Map (ArrayList<Point> points, int id, String mapName)
 	{
 		this.Points = points;
 		this.mapId = id;
+		this.mapName = mapName;
 	}
 	public ArrayList<Point> getPointList()
 	{
@@ -45,6 +46,10 @@ public class Map {
 	public int getId()
 	{
 		return mapId;
+	}
+	public String getName()
+	{
+		return mapName;
 	}
 
 }

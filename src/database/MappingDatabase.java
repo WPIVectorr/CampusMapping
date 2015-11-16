@@ -438,7 +438,7 @@ public class MappingDatabase
 		Point p6 = new Point(5, "p6", 27, 90);
 		Edge[] emptyArray = null;
 		ArrayList<Point> emptyPointArrayList = new ArrayList<Point>();
-		Map testMap = new Map(emptyPointArrayList, 22);
+		Map testMap = new Map(emptyPointArrayList, 22, "Test Map");
 		Point testPoint = new Point(1432, "testPoint", 23, 56, 0);
 		insertablePoints.add(testPoint);
 		insertablePoints.add(p1);

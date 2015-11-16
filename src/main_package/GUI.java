@@ -5,18 +5,17 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import database.MappingDatabase;
+
 public class GUI extends JFrame{
 
 	BufferedImage img = null;
-	private JPanel contentPane;
-	//drop down menu of buildings on campus
-	String buildings[] = {"Select Building", "Atwater Kent", "Boynton Hall", 
-			"Campus Center", "Gordon Library", "Higgins House", "Project Center", 
-			"Stratton Hall"};
 	
 	//drop down menu of room numbers based off of the building selected on campus
 	String rooms[] = {"Select room #", "Please choose building first"};
@@ -32,6 +31,8 @@ public class GUI extends JFrame{
 	int[][] coordTest2 = {{500,500}, {300, 100}, {800, 500}, {100, 200}};
 	int[][] coordTest3 = {{400, 200}, {50, 30}, {8, 300}, {10, 20}};
 	
+	ArrayList<Map> maps;
+	
 	String point1;
 	String point2;
 	String point3;
@@ -45,12 +46,51 @@ public class GUI extends JFrame{
     private JPanel buttonPanel;
     private DrawRoute drawPanel = new DrawRoute();
 
+    int buildStartIndex;
+    int buildDestIndex;
+
     public GUI() throws IOException{
     	super("GUI");
         setSize(932, 778);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
          
        //  img = ImageIO.read(new File("temp.jpg"));
+        
+        // Stub for testing 
+    	ArrayList<Map> maps = new ArrayList<Map>();
+    	Point testPoint1 = new Point (1, "One", 50, 100);
+    	Point testPoint2 = new Point (2, "Two", 600, 500);
+    	Point testPoint3 = new Point (3, "Three", 500, 700);
+    	ArrayList<Point> testArrayList = new ArrayList<Point>();
+    	testArrayList.add(testPoint1);
+    	testArrayList.add(testPoint2);
+    	testArrayList.add(testPoint3);
+    	Map testMap = new Map(testArrayList, 1, "Campus");
+    	maps.add(testMap);
+    	// Fill building drop down menus with names of points
+    	int pointListSize = maps.get(0).getPointList().size();
+    	String[] buildings = new String[pointListSize + 1];
+    	buildings[0] = "Select a building";
+    	for (int i = 1; i < pointListSize + 1; i++){
+    		buildings[i] = maps.get(0).getPointList().get(i - 1).getName();
+    	}
+    	    	
+    	/*maps = MappingDatabase.getInstance().getMaps();
+    	ArrayList<Map> maps = new ArrayList<Map>();
+    	ArrayList<String> buildingsTest = new ArrayList<String>(); 
+    	Point testPoint1 = new Point (1, "One", 50, 100);
+    	Point testPoint2 = new Point (2, "Two", 50, 100);
+    	Point testPoint3 = new Point (3, "Three", 50, 100);
+    	ArrayList<Point> testArrayList = new ArrayList<Point>();
+    	testArrayList.add(testPoint1);
+    	testArrayList.add(testPoint2);
+    	testArrayList.add(testPoint3);
+    	Map testMap = new Map(testArrayList, 1, "Test");
+    	maps.add(testMap);
+    	String[] buildings = new String[maps.size()];
+    	for (int i = 0; i < maps.size(); i++){
+    		buildings[i] = maps.get(i).getName();
+    	}*/
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(4, 0, 10, 10));
@@ -68,24 +108,28 @@ public class GUI extends JFrame{
         JComboBox<String> startBuilds = new JComboBox(buildings);
         buttonPanel.add(startBuilds);
         startBuilds.setBounds(122, 30, 148, 20);
-        JComboBox startRooms = new JComboBox(rooms);
-        //adds the room numbers based off of building name
+        JComboBox<Point> startRooms = new JComboBox(rooms);
+        /*adds the room numbers based off of building name
         startBuilds.addActionListener (new ActionListener () {
             public void actionPerformed(ActionEvent e) {
             	
             	startRooms.removeAllItems();
             	String buildSelectStart = (String)startBuilds.getSelectedItem();
-            	startRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectStart)));
+                buildStartIndex = startBuilds.getSelectedIndex();
+                int startRoomSize = maps.get(buildStartIndex).getPointList().size();
+                String[] startRoomArray = new String[startRoomSize];
+                startRoomArray[0] = "Select a room";
             }
-        });
- 		         
-         
- 		         
+        });*/
+ 		          		         
        //creates the drop down box with rooms for start (initially waits for the building to have 
  		         //the specific buildings room numbers)
 
- 		         buttonPanel.add(startRooms);
+ 	//	         buttonPanel.add(startRooms);
  		         startRooms.setBounds(296, 30, 148, 20);
+ 		         
+ 		         Component horizontalStrut_1 = Box.createHorizontalStrut(20);
+ 		         buttonPanel.add(horizontalStrut_1);
  		         
  		         //adds the destination label to the line with destination location options
  		         JLabel lblDestination = new JLabel("Destination:");
@@ -95,23 +139,27 @@ public class GUI extends JFrame{
         JComboBox<String> destBuilds = new JComboBox(buildings);
         buttonPanel.add(destBuilds);
         destBuilds.setBounds(122, 80, 148, 20);
+        lblDestination.setLabelFor(destBuilds);
+        
+        Component horizontalStrut_2 = Box.createHorizontalStrut(20);
+        buttonPanel.add(horizontalStrut_2);
  		
  		JComboBox destRooms = new JComboBox(rooms);
-        //adds the correct room numbers for the building specified
+        /*adds the correct room numbers for the building specified
         destBuilds.addActionListener (new ActionListener () {
         public void actionPerformed(ActionEvent e) {
          		    	
         destRooms.removeAllItems();
         String buildSelectDest = (String)destBuilds.getSelectedItem();
-        destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+        buildDestIndex = destBuilds.getSelectedIndex();
+       // destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
         }
-        });
-        lblDestination.setLabelFor(destBuilds);
+        });*/
 
  		
  		//creates the drop down of room numbers for destination (initially waits for the building to have 
  		//the specific buildings room numbers)
- 		buttonPanel.add(destRooms);
+ 	//	buttonPanel.add(destRooms);
  		destRooms.setBounds(296, 80, 148, 20);
  		
 
@@ -194,6 +242,8 @@ public class GUI extends JFrame{
  			return pcRooms;
  		case "Stratton Hall":
  			return shRooms;
+ 		case "Campus":
+ 			return akRooms;
  		}
  		return rooms;
  	}

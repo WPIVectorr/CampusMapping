@@ -1,7 +1,7 @@
 package main_package;
 
 public class Edge {
-	private int id;
+	private String id;
 	private Point point1;
 	private Point point2;
 	private int weight;
@@ -15,18 +15,18 @@ public class Edge {
 		point1.addEdge(this);
 		point2.addEdge(this);
 	}
-	public int getID()
+	public String getID()
 	{
 		return id;
 	}
-	public void setID(int newID)
+	public void setID(String newID)
 	{
 		this.id = newID;
 	}
-	public int getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public Point getPoint1() {

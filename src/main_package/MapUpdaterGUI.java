@@ -202,7 +202,7 @@ public class MapUpdaterGUI extends JFrame implements MouseListener{
 
 		            addMouseListener(new MouseAdapter() {
 		                @Override
-		                public void mousePressed(MouseEvent e) {
+		                public void mouseReleased(MouseEvent e) {
 		                lastMousex =  e.getX();
 		                lastMousey =  e.getY();
 		                Point point = new Point(pointID, pointName, lastMousex, lastMousey, numEdges);
@@ -220,6 +220,7 @@ public class MapUpdaterGUI extends JFrame implements MouseListener{
 				    				break;
 				    			case 3://remove points
 				    				System.out.println("RemovePoints");
+				    				
 				    	            break;
 				    			default:
 				    				break;
@@ -229,9 +230,26 @@ public class MapUpdaterGUI extends JFrame implements MouseListener{
 		            });
 
             
-            
+            //draws all the points onto the map.
             for(int i=0;i<pointArray.size();i++)
-            {
+            {				
+            	System.out.println(pointArray.size());
+    	/*		switch(getRadButton())
+        			{
+    			case 1:
+    				break;
+    			case 2:
+    				break;
+        				case 3: 
+								if(lastMousex>pointArray.get(i).getX()-pointSize 
+										|| lastMousex<pointArray.get(i).getX()+pointSize
+										&& lastMousey<pointArray.get(i).getY()-pointSize
+										|| lastMousey<pointArray.get(i).getY()+pointSize)
+									{
+            							pointArray.remove(i);
+									}
+							break;
+        			}*/
             	int drawX = (int) pointArray.get(i).getX();
             	int drawY = (int) pointArray.get(i).getY();
             	//draws the points onto the map.

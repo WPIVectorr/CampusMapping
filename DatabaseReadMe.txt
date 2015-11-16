@@ -10,6 +10,7 @@ There are a number of functions that can be called on an instance of the databas
 
 insertMap (Map map)
 	This one does pretty much what the name says. It checks for existing maps and if none exist, adds the one specified.
+	Maps are stored with their names and ids. Map points and edges are stored in a different table.
 
 insertPoint(Map map, Point pt)
 	This one does what the name implies. It checks if there is already an existing point with the same id on the map and if so throws 

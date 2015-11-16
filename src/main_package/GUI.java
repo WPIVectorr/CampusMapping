@@ -173,6 +173,26 @@ public class GUI extends JFrame{
  		  buttonPanel.add(horizontalStrut);
           
          getContentPane().add(drawPanel);
+         
+         JButton PreviousButton = new JButton("Previous");
+		  buttonPanel.add(PreviousButton);
+		  PreviousButton.setBackground(new Color(255, 255, 127));
+		  PreviousButton.addActionListener(new ActionListener() {
+		  	public void actionPerformed(ActionEvent prev) {
+		  		//go back to previous direction in array
+		  	}
+		  });
+		  PreviousButton.setBounds(0, 132, 94, 30);
+		  
+		  JButton NextButton = new JButton("Next");
+		  buttonPanel.add(NextButton);
+		  NextButton.setBackground(new Color(0, 255, 255));
+		  NextButton.addActionListener(new ActionListener() {
+		  	public void actionPerformed(ActionEvent next) {
+		  		//go back to next direction in array
+		  	}
+		  });
+		  NextButton.setBounds(75, 132, 94, 30);
 
     }
      

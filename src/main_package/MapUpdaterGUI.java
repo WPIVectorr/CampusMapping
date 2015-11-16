@@ -12,7 +12,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Box;
 
-public class MapUpdaterGUI extends JFrame implements MouseListener{
+public class MapUpdaterGUI extends JFrame {
 
 	
 
@@ -21,11 +21,13 @@ public class MapUpdaterGUI extends JFrame implements MouseListener{
 	private int pointSize = 5;
 	private boolean newClick = false;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
-	
+	private Point currentPoint;
+	private Point editPoint;
 	
 	BufferedImage img = null;
 	private JPanel contentPane;
 	private static JButton btnSaveMap;
+	private static JButton btnSavePoint;
 	private static JRadioButton rdbtnAddPoints;
 	private static JRadioButton rdbtnEditPoints;
 	private static JRadioButton rdbtnRemovePoints;
@@ -137,7 +139,14 @@ public class MapUpdaterGUI extends JFrame implements MouseListener{
          buttonPanel.add(btnSaveMap);
          getContentPane().add(drawPanel);
 
-         
+/*         btnSavePoint.addActionListener(new ActionListener(){
+             
+             @Override
+             public void actionPerformed(ActionEvent e) {
+             	System.out.println("SavePoint");
+             	//if()
+             }
+         });*/
          
 
 
@@ -186,14 +195,13 @@ public class MapUpdaterGUI extends JFrame implements MouseListener{
     }
     
 
-    class DrawRoute extends JPanel {
-
-    	ArrayList<Point> markForDelete = new ArrayList<Point>();
+    class DrawRoute extends JPanel implements MouseListener{
+		ArrayList<Point> markForDelete = new ArrayList<Point>();
+    	//Point editPoint;
     	//Driver values used for testing:
-    	int pointID = 001;
-    	String pointName = "Point 1";
+    	int pointID = 0;
     	int numEdges = 0;
-    	//ArrayList<Circle> circleList = new ArrayList<Circle>();
+    	
     	
         @Override
         public void paintComponent(Graphics g) {
@@ -213,33 +221,35 @@ public class MapUpdaterGUI extends JFrame implements MouseListener{
 		                }
 		            });
 
+
+		            
+		            //add point to the point array (has to take place outside of below loop)
 		            if(newClick == true)
 		            {
 		            	System.out.println(newClick);
 		                if(getRadButton()==1) //if addpoint
 		               		{
-					            Point point = new Point(pointID, pointName, lastMousex, lastMousey, numEdges);
+		                		Integer arraySize = pointArray.size();
+					            Point point = new Point(arraySize, "Point " + arraySize.toString(), lastMousex, lastMousey, numEdges);
 				                pointArray.add(point); 	
 		               		}
 		            }
 		            
 		            
             //draws all the points onto the map.
+		            //cleans the array of deleted points.
 		    if(pointArray.size()>0)
 		    {
 	            for(int i=0;i<pointArray.size();i++)
 	            {				
-	            	Point currentPoint = pointArray.get(i);
-	            	System.out.println(pointArray.size());
-	
+	            	currentPoint = pointArray.get(i);	
 	            	int drawX = (int) currentPoint.getX();
 	            	int drawY = (int) currentPoint.getY();
 	            	//draws the points onto the map.
 	            	g.drawOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
-	                //g.drawOval(lastMousex-2, lastMousey-2, 5, 5);
-	
-	                
-	                //yes, I know that this if statement serves no purpose. wtf is with Java
+	               
+	            	
+	                //newClick has some interesting storage things going on. wtf is with Java
 		            if(newClick == true)
 		            {
 	
@@ -252,7 +262,17 @@ public class MapUpdaterGUI extends JFrame implements MouseListener{
 				    				break;
 				    			case 2://edit points
 				    				System.out.println("EditPoints");
-				    				
+				    				if(		   (lastMousex>currentPoint.getX()-(pointSize+5) 
+											&& 	lastMousex<currentPoint.getX()+(pointSize+5))
+											&& (lastMousey>currentPoint.getY()-(pointSize+5)
+											&& 	lastMousey<currentPoint.getY()+(pointSize+5)))
+										{
+										if(newClick ==true)
+											editPoint = currentPoint;
+											roomNumber.setText(currentPoint.getName());
+											//editPoint.setName(roomNumber.getText());
+										newClick =false;
+										}
 				    				break;
 				    			case 3://remove points
 				    				System.out.println("RemovePoints");
@@ -276,39 +296,41 @@ public class MapUpdaterGUI extends JFrame implements MouseListener{
 		    for (int i = 0; i < markForDelete.size(); i++) {
 				pointArray.remove(markForDelete.get(i));
 			}
+		    
             newClick = false;
             repaint();
         }
+    	@Override
+    	public void mouseClicked(MouseEvent e) {
+
+
+    	}
+
+    	@Override
+    	public void mouseEntered(MouseEvent arg0) {
+    		// TODO Auto-generated method stub
+    		
+    	}
+
+    	@Override
+    	public void mouseExited(MouseEvent arg0) {
+    		// TODO Auto-generated method stub
+    		
+    	}
+
+    	@Override
+    	public void mouseReleased(MouseEvent arg0) {
+    		// TODO Auto-generated method stub
+    		
+    	}
+
+    	@Override
+    	public void mousePressed(MouseEvent arg0) {
+    		// TODO Auto-generated method stub
+    		
+    	}
+
     }
 
-	@Override
-	public void mouseClicked(MouseEvent e) {
-
-
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

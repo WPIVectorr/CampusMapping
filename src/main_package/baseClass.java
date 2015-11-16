@@ -6,8 +6,6 @@ import java.util.ArrayList;
 public class baseClass {
 	public static void main(String[] args)
 	{
-		testDatabase();
-		
 		Point p1 = new Point(0, "p1", 0, 0);
 		Point p2 = new Point(1, "p2", 0, 1);
 		Point p3 = new Point(2, "p3", 1, 0);

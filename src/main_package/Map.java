@@ -33,10 +33,11 @@ public class Map {
 		 return null;
 	}
 	
-	public Map (ArrayList<Point> points, int id)
+	public Map (ArrayList<Point> points, int id, String mapName)
 	{
 		this.Points = points;
 		this.mapId = id;
+		this.mapName = mapName;
 	}
 	public ArrayList<Point> getPointList()
 	{

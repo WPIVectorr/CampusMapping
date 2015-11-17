@@ -621,6 +621,72 @@ public class MappingDatabase
 		}
 	}
 	
+	public static void testInsert()
+	{
+		ArrayList<Point> insertablePoints = new ArrayList<Point>();
+		Point p1 = new Point(0, "p1", 0, 0);
+		Point p2 = new Point(1, "p2", 0, 1);
+		Point p3 = new Point(2, "p3", 1, 0);
+		Point p4 = new Point(3, "p4", 2, 0);
+		Point p5 = new Point(4, "p5", 23, 90);
+		Point p6 = new Point(5, "p6", 27, 90);
+		Edge[] emptyArray = null;
+		ArrayList<Point> emptyPointArrayList = new ArrayList<Point>();
+		Map testMap = new Map(emptyPointArrayList, 22, "Test Map");
+		Point testPoint = new Point(1432, "testPoint", 23, 56, 0);
+		insertablePoints.add(testPoint);
+		insertablePoints.add(p1);
+		insertablePoints.add(p2);
+		insertablePoints.add(p3);
+		insertablePoints.add(p4);
+		insertablePoints.add(p5);
+		
+		int counter = 0;
+		
+		try {
+			populateFromDatabase();
+		} catch (PopulateErrorException e2) {
+			e2.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {																				//Test insert map																			
+			insertMap(testMap);
+		} catch (AlreadyExistsException e1) {
+			e1.printStackTrace();
+		}
+		
+		for (counter = 0; counter<insertablePoints.size(); counter++)
+		{
+			try {																				//Test insert point
+				insertPoint(testMap, insertablePoints.get(counter));
+			} catch (AlreadyExistsException e) {
+				System.out.println("Point:"+insertablePoints.get(counter).getId()+ " already exists");
+			} catch (NoMapException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InsertFailureException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		ArrayList <Point> testArray  = getPoints(testMap);
+		int count = 0;
+		System.out.println("Printing points found in map: "+testMap.getId());
+		for (count = 0; count<testArray.size(); count++)
+		{
+			System.out.println("PointId:"+testArray.get(count).getId());
+		}
+		//printObjects(true, true, true); 
+		
+	}
+	
 	private static void clearDatabase()
 	{
 		if (DEBUG)

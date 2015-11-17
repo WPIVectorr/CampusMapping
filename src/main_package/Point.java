@@ -78,7 +78,7 @@ public class Point {
 		return edges.size();
 	}
 	public String toString(){
-		return "(" + x + "," + y + ")";
+		return name;
 	}
 	public void print()
 	{

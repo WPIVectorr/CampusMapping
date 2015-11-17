@@ -1120,13 +1120,13 @@ public class MappingDatabase
 			System.out.println(e4.getMessage());
 		}
 		ArrayList<Point> points = new ArrayList<Point>();
-		Point testPoint1 = new Point (1, "One", 50, 100);
-		Point testPoint2 = new Point (2, "Two", 600, 500);
-		Point testPoint3 = new Point (3, "Three", 500, 700);
-		Point testPoint4 = new Point (4, "Four", 200, 200);
-		Point testPoint7 = new Point (7, "seven", 100, 500);
-		Point testPoint5 = new Point (5, "Five", 500, 600);
-		Point testPoint6 = new Point (6, "Six", 700, 500);
+		Point testPoint1 = new Point (15, "One", 50, 100);
+		Point testPoint2 = new Point (30, "Two", 600, 500);
+		Point testPoint3 = new Point (45, "Three", 500, 700);
+		Point testPoint4 = new Point (78, "Four", 200, 200);
+		Point testPoint7 = new Point (109, "seven", 100, 500);
+		Point testPoint5 = new Point (88, "Five", 500, 600);
+		Point testPoint6 = new Point (91, "Six", 700, 500);
 		points.add(testPoint1);
 		points.add(testPoint2);
 		points.add(testPoint3);
@@ -1197,10 +1197,20 @@ public class MappingDatabase
 		}
 		ArrayList<Map>maps = getMaps();
 		System.out.println("Number maps: " + maps.size());
-		System.out.println("First map name:" + maps.get(0).getName());
-		for (z = 0; z<maps.get(0).getPointList().size(); z++)
+		
+		ArrayList<Map> mapList = getMaps();
+		int j = 0;
+		int k = 0;
+		for (j = 0; j<mapList.size(); j++)
 		{
-			maps.get(0).getPointList().get(z).print();
+			Map tempMap = mapList.get(j);
+			System.out.println("Map: "+tempMap);
+			ArrayList<Point> pointList = tempMap.getPointList();
+			for (k = 0; k<pointList.size(); k++)
+			{
+				System.out.println("--------------------Point "+pointList.get(k).getId()+"---------------------------");
+				pointList.get(k).print();
+			}
 		}
 	}
 }	

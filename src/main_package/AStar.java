@@ -60,7 +60,7 @@ public class AStar {
 	}
 	
 	private static int CostEstimate(Point a, Point b){
-		return (int)Math.sqrt((double)((a.getX()+b.getX())^2)+((a.getY()+b.getY())^2));
+		return (int)Math.sqrt((double)((a.getX()-b.getX())^2)+((a.getY()-b.getY())^2));
 	}
 	private static void OpenAdd(Point addPoint){
 		for(int i = 0; i < Open.size(); i++){
@@ -80,5 +80,12 @@ public class AStar {
 		}
 		ReturnPath.add(Current);
 		return ReturnPath;
+	}
+	public static void reset(){
+		Open.clear();
+		Closed.clear();
+		CameFrom.clear();
+		fscore.clear();
+		gscore.clear();
 	}
 }

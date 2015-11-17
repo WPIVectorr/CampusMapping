@@ -1,14 +1,8 @@
 package main_package;
 
-import java.util.ArrayList;
-
 public class GenTextDir {
 	boolean DEBUG = false;
-	public String[] genTextDir(ArrayList<Point> listPoints){
-		Point[] arrPoints = new Point[listPoints.size()];
-		for (int i = 0; i < listPoints.size(); i++){
-			arrPoints[i] = listPoints.get(i);
-		}
+	public String[] genTextDir(Point[] arrPoints){
 		String[] retString = new String[arrPoints.length + 1];
 		retString[0] = "Start your path at " + arrPoints[arrPoints.length - 1].getName();
 		retString[1] = "Travel towards: " + arrPoints[arrPoints.length - 2].getName();
@@ -112,12 +106,8 @@ public class GenTextDir {
 				System.out.println("");
 			}
 		}
-		double dist = 0;
-		if(nextPoint != null){
-			dist = PythagTheorem(nextPoint.getX() - currPoint.getX(), nextPoint.getY() - currPoint.getY());//CONVERT TO FEET
-		} else {
-			dist = PythagTheorem(arrPoints[1].getX() - arrPoints[0].getX(), arrPoints[1].getY() - arrPoints[0].getY());
-		}
+		
+		double dist = PythagTheorem(nextPoint.getX() - currPoint.getX(), nextPoint.getY() - currPoint.getY());//CONVERT TO FEET
 		dist = dist * 10;
 		dist = Math.floor(dist);
 		dist = dist / 10;

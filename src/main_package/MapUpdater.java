@@ -42,60 +42,60 @@ import javax.swing.*;
  * This applet allows the user to move a texture painted rectangle around the applet
  * window.  The rectangle flickers and draws slowly because this applet does not use 
  * double buffering.
-*/
+ */
 
 public class MapUpdater extends JApplet {
-    static protected JLabel label;
-    DPanel d;
+	static protected JLabel label;
+	DPanel d;
 
-    public void init(){
-        getContentPane().setLayout(new BorderLayout());
+	public void init(){
+		getContentPane().setLayout(new BorderLayout());
 
-        d = new DPanel();
-        d.setBackground(Color.white);
-        getContentPane().add(d);
+		d = new DPanel();
+		d.setBackground(Color.white);
+		getContentPane().add(d);
 
-        label = new JLabel("Click to add point");
-        getContentPane().add("South", label);
-    }
+		label = new JLabel("Click to add point");
+		getContentPane().add("South", label);
+	}
 
-    public static void main(String s[]) {
-        JFrame f = new JFrame("MapUpdater");
-        
-        f.addWindowListener(new WindowAdapter() {public void windowClosing(WindowEvent e) {System.exit(0);}});
-        
-        JApplet applet = new MapUpdater();
-        f.getContentPane().add("Center", applet);
-        applet.init();
-        f.pack();
-        f.setSize(new Dimension(550,250));
-        f.setVisible(true);
-    }
+	public static void main(String s[]) {
+		JFrame f = new JFrame("MapUpdater");
+
+		f.addWindowListener(new WindowAdapter() {public void windowClosing(WindowEvent e) {System.exit(0);}});
+
+		JApplet applet = new MapUpdater();
+		f.getContentPane().add("Center", applet);
+		applet.init();
+		f.pack();
+		f.setSize(new Dimension(550,250));
+		f.setVisible(true);
+	}
 
 }
 
 
-class DPanel extends JPanel {
-        //Rectangle rect = new Rectangle(0, 0, 100, 50);
-        BufferedImage bi;
-        Graphics2D big;
-        
-        // Holds the coordinates of the user's last mousePressed event.
-        int last_x, last_y;
-        boolean firstTime = true;
-        //TexturePaint fillPolka, strokePolka;
-        Rectangle area;                
-        // True if the user pressed, dragged or released the mouse outside of
-        // the rectangle; false otherwise.
-        boolean pressOut = false;   
+class DPanel extends JPanel implements MouseListener, MouseMotionListener{
+	//Rectangle rect = new Rectangle(0, 0, 100, 50);
+	BufferedImage bi;
+	Graphics2D big;
+
+	// Holds the coordinates of the user's last mousePressed event.
+	int last_x, last_y;
+	boolean firstTime = true;
+	//TexturePaint fillPolka, strokePolka;
+	Rectangle area;                
+	// True if the user pressed, dragged or released the mouse outside of
+	// the rectangle; false otherwise.
+	boolean pressOut = false;   
 
 
-    public DPanel(){
-               setBackground(Color.white);
-                //addMouseMotionListener(this);
-                //addMouseListener(this);
+	public DPanel(){
+		setBackground(Color.white);
+		addMouseMotionListener(this);
+		addMouseListener(this);
 
-/*                // Creates the fill texture paint pattern.
+		/*                // Creates the fill texture paint pattern.
                 bi = new BufferedImage(5, 5, BufferedImage.TYPE_INT_RGB);
                 big = bi.createGraphics();
                 big.setColor(Color.pink);
@@ -105,8 +105,8 @@ class DPanel extends JPanel {
                 Rectangle r = new Rectangle(0,0,5,5);
                 fillPolka = new TexturePaint(bi, r);
                 big.dispose();*/
-        
-/*                //Creates the stroke texture paint pattern.
+
+		/*                //Creates the stroke texture paint pattern.
                 bi = new BufferedImage(5, 5, BufferedImage.TYPE_INT_RGB);
                 big = bi.createGraphics();
                 big.setColor(Color.cyan);
@@ -116,34 +116,34 @@ class DPanel extends JPanel {
                 r = new Rectangle(0,0,5,5);
                 strokePolka = new TexturePaint(bi, r);
                 big.dispose();*/
-    }
+	}
 
-    // Handles the event of the user pressing down the mouse button.
-    public void mousePressed(MouseEvent e){
+	// Handles the event of the user pressing down the mouse button.
+	public void mousePressed(MouseEvent e){
 
-          /*  last_x = rect.x - e.getX();
+		/*  last_x = rect.x - e.getX();
             last_y = rect.y - e.getY();*/
 
-        last_x =  e.getX();
-        last_y =  e.getY();
-       // Point2D.Double point = new Point2D.Double(last_x, last_y);
-        MapUpdater.label.setText("last click = " + last_x + ", " + last_y);
-        
-        placePoint(last_x, last_y);
-        
-        
-        
-    }
+		last_x =  e.getX();
+		last_y =  e.getY();
+		// Point2D.Double point = new Point2D.Double(last_x, last_y);
+		MapUpdater.label.setText("last click = " + last_x + ", " + last_y);
 
-    /*
-     * @param x x coord of point to be placed
-     * @param y y coord of point to be placed.
-     * @return void
-     */
-    private void placePoint(int x, int y) {
+		placePoint(last_x, last_y);
+
+
+
+	}
+
+	/*
+	 * @param x x coord of point to be placed
+	 * @param y y coord of point to be placed.
+	 * @return void
+	 */
+	private void placePoint(int x, int y) {
 		// TODO Auto-generated method stub
-		
-/*    	if(firstTime)
+
+		/*    	if(firstTime)
     	{
     		for(int i=0;i<db.points.length;i++)
     		{
@@ -151,46 +151,46 @@ class DPanel extends JPanel {
     		}
     		firstTime =false;
     	}*/
-    	
-    	
-    	Point2D.Double point = new Point2D.Double(x,y);
-    	System.out.println(point.getX());
-		
+
+
+		Point2D.Double point = new Point2D.Double(x,y);
+		System.out.println(point.getX());
+
 		//storePoint(last_x, last_y);
-		
-		
-    	
+
+
+
 	}
 
 	/*
-     * @param x x coord of point placed on map
-     * @param y y coord of point placed on map
-     * @return db index for point
-     */
-    private int storePoint(int x, int y) {
+	 * @param x x coord of point placed on map
+	 * @param y y coord of point placed on map
+	 * @return db index for point
+	 */
+	private int storePoint(int x, int y) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-/*	// Handles the event of a user dragging the mouse while holding
-    // down the mouse button.
-    public void mouseDragged(MouseEvent e){
+	// Handles the event of a user dragging the mouse while holding
+	// down the mouse button.
+	public void mouseDragged(MouseEvent e){
 
-    }
+	}
 
-    // Handles the event of a user releasing the mouse button.
-    public void mouseReleased(MouseEvent e){
+	// Handles the event of a user releasing the mouse button.
+	public void mouseReleased(MouseEvent e){
 
-    }
-       
-     // This method is required by MouseListener.
-     public void mouseMoved(MouseEvent e){}
+	}
 
-     // These methods are required by MouseMotionListener.
-     public void mouseClicked(MouseEvent e){}
-     public void mouseExited(MouseEvent e){}
-     public void mouseEntered(MouseEvent e){}
-                         
-*/
+	// This method is required by MouseListener.
+	public void mouseMoved(MouseEvent e){}
+
+	// These methods are required by MouseMotionListener.
+	public void mouseClicked(MouseEvent e){}
+	public void mouseExited(MouseEvent e){}
+	public void mouseEntered(MouseEvent e){}
+
+
 
 }

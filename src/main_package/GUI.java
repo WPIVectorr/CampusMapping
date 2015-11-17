@@ -18,24 +18,21 @@ import database.MappingDatabase;
 public class GUI extends JFrame{
 	MappingDatabase md = MappingDatabase.getInstance();
 
-	BufferedImage img = null;
+	private BufferedImage img = null;
 
 	//drop down menu of room numbers based off of the building selected on campus
-	String rooms[] = {"Select room #", "Please choose building first"};
-
-	ArrayList<Map> maps;
-	ArrayList<Point> route;
+	private String rooms[] = {"Select room #", "Please choose building first"};
+	private ArrayList<Map> maps;
+	private ArrayList<Point> route;
 	private Point start;
 	private Point end;
 	private boolean showRoute;
 	private JTextField textField;
-	private JTextField txtStartingLocation;
-	private JTextField txtDestination;
 	private JPanel buttonPanel;
 	private DrawRoute drawPanel = new DrawRoute();
 
-	int buildStartIndex;
-	int buildDestIndex;
+	private int buildStartIndex;
+	private int buildDestIndex;
 
 	public GUI() throws IOException, AlreadyExistsException, SQLException{
 		super("GUI");
@@ -44,9 +41,9 @@ public class GUI extends JFrame{
 
 		//  img = ImageIO.read(new File("temp.jpg"));
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		md.testMaps();
+		//md.testMaps();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
+
 		// Stub for testing 
 		ArrayList<Map> maps = new ArrayList<Map>();
 		Point testPoint1 = new Point (1, "One", 50, 100);
@@ -81,7 +78,7 @@ public class GUI extends JFrame{
 		Map testMap2 = new Map(testArrayList2, 2, "AK");
 		maps.add(testMap);
 		maps.add(testMap2);
-*/
+
 		// Fill building drop down menus with names of points
 		//int pointListSize = maps.get(0).getPointList().size();
 		
@@ -264,39 +261,48 @@ public class GUI extends JFrame{
 		directionsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//gets the start and end building and room numbers the user chose
-
-				start = (Point) startBuilds.getSelectedItem();
-				end = (Point) destBuilds.getSelectedItem();
-
-				AStar astar = new AStar();
-				astar.reset();
-				/*for (int i=0; i<route.size();i++){
- 		  			route.set(i, null);
- 		  		}*/
-				route = astar.PathFind(start, end);
-				//System.out.println("Hey");
-				if(route != null){
-					for(int i = route.size() - 1; i >= 0; i--){
-						//System.out.println(route.get(i));
-					}
-				}
-				showRoute = true;
-				if (route == null){
-					textField.setText(start.getName() + "->" + end.getName());
+				if (mapsDropdown.getSelectedItem() == "Select Map"){
+					textField.setText("Please Select a Map First");
 				}
 				else{
-					//System.out.println(route.size());
-					GenTextDir gentextdir = new GenTextDir();
-					String[] directions; // = new String[route.size() + 1];
-					directions = gentextdir.genTextDir(route);
-					for(int i = 0; i < directions.length; i++){
-						//System.out.println(directions[i]);
-					}
-					textField.setText(directions[0]);
-
+					start = (Point) startBuilds.getSelectedItem();
+					end = (Point) destBuilds.getSelectedItem();
 				}
 
-				repaint();
+				if (start.equals(end)){
+					textField.setText("Please Choose Two Different Points");
+				}
+				else{
+					AStar astar = new AStar();
+					astar.reset();
+					/*for (int i=0; i<route.size();i++){
+ 		  			route.set(i, null);
+ 		  		}*/
+					route = astar.PathFind(start, end);
+					//System.out.println("Hey");
+					if(route != null){
+						for(int i = route.size() - 1; i >= 0; i--){
+							//System.out.println(route.get(i));
+						}
+					}
+					showRoute = true;
+					if (route == null){
+						textField.setText(start.getName() + "->" + end.getName());
+					}
+					else{
+						//System.out.println(route.size());
+						GenTextDir gentextdir = new GenTextDir();
+						String[] directions; // = new String[route.size() + 1];
+						directions = gentextdir.genTextDir(route);
+						for(int i = 0; i < directions.length; i++){
+							//System.out.println(directions[i]);
+						}
+						textField.setText(directions[0]);
+
+					}
+
+					repaint();
+				}
 			}
 		});
 

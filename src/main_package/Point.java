@@ -58,4 +58,7 @@ public class Point {
 	public String toString(){
 		return "(" + x + "," + y + ")";
 	}
+	public boolean equals(Point compPoint){
+		return this.id == compPoint.getId();
+	}
 }

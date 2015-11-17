@@ -9,11 +9,23 @@ public class Edge {
 	private boolean isStairs;
 	
 	public Edge(Point point1, Point point2, int weight){
+		this.id = (point1.getId() + "-" + point2.getId());
 		this.point1 = point1;
 		this.point2 = point2;
 		this.weight = weight;
-		point1.addEdge(this);
-		point2.addEdge(this);
+		point1.addEdge(this);								//TODO this may be duplicating edges
+		point2.addEdge(this);								//TODO this may be duplicating edges
+	}
+	public Edge(Point point1, Point point2, int weight, boolean isOutside, boolean isStairs){
+		this.id = (point1.getId() + "-" + point2.getId());
+		this.point1 = point1;
+		this.point2 = point2;
+		this.weight = weight;
+		this.isOutside = isOutside;
+		this.isStairs = isStairs;
+		
+		point1.addEdge(this);								//TODO this may be duplicating edges
+		point2.addEdge(this);								//TODO this may be duplicating edges
 	}
 	public String getID()
 	{

@@ -23,8 +23,8 @@ public class GUI extends JFrame{
 	//drop down menu of room numbers based off of the building selected on campus
 	String rooms[] = {"Select room #", "Please choose building first"};
 
-	ArrayList<Map> maps = new ArrayList<Map>();
-	ArrayList<Point> route;
+	private ArrayList<Map> maps = new ArrayList<Map>();
+	private ArrayList<Point> route;
 	private Point start;
 	private Point end;
 	private boolean showRoute;
@@ -34,8 +34,8 @@ public class GUI extends JFrame{
 	private JPanel buttonPanel;
 	private DrawRoute drawPanel = new DrawRoute();
 
-	int buildStartIndex;
-	int buildDestIndex;
+	private int buildStartIndex;
+	private int buildDestIndex;
 
 	public GUI() throws IOException, AlreadyExistsException, SQLException{
 		super("GUI");
@@ -43,17 +43,17 @@ public class GUI extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//  img = ImageIO.read(new File("temp.jpg"));
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		md.initDatabase();
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/*md.initDatabase();
 		md.testMaps();
 		//System.out.println("testMaps: " + md.getMaps().size());
 		maps = md.getMaps();
 		System.out.println("------------------edges check-------------------");
 		maps.get(0).getPointList().get(0).print();
-		//maps.get(index)
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//maps.get(index)*/
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		/*// Stub for testing 
+		// Stub for testing 
 		ArrayList<Map> maps = new ArrayList<Map>();
 		Point testPoint1 = new Point (1, "One", 50, 100);
 		Point testPoint2 = new Point (2, "Two", 600, 500);
@@ -86,8 +86,8 @@ public class GUI extends JFrame{
 		Map testMap = new Map(testArrayList, 1, "Campus");
 		Map testMap2 = new Map(testArrayList2, 2, "AK");
 		maps.add(testMap);
-		maps.add(testMap2);*/
-/*System.out.println("```````````````````````````````````````````````````````````");
+		maps.add(testMap2);
+		/*System.out.println("```````````````````````````````````````````````````````````");
 	System.out.println(maps.equals(maps1));
 	System.out.println("maps.get(0)/(1) " + maps.get(0).getName() + " " + maps.get(1).getName());
 	System.out.println("maps1.get(0)/(1) " + maps1.get(0).getName() + " " + maps1.get(1).getName());
@@ -95,7 +95,7 @@ System.out.println("mapslistsize: " + maps.get(1).getPointList().size());
 System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 		// Fill building drop down menus with names of points
 		//int pointListSize = maps.get(0).getPointList().size();
-		
+
 		//buildings[0] = "Select a building";
 		//for (int i = 0; i < pointListSize; i++){
 		//buildings[i] = maps.get(0).getPointList().get(i);
@@ -229,12 +229,12 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				}
 				//startBuilds.removeAllItems();
 				//for (int i=0; i < buildings.length; i++){
-					//System.out.println("buildings[i] match: " + buildings[i]);
-					//startBuilds.addItem(buildings[i]);
+				//System.out.println("buildings[i] match: " + buildings[i]);
+				//startBuilds.addItem(buildings[i]);
 				//}
 				//destBuilds.removeAllItems();
 				//for (int i=0; i < buildings.length; i++){
-					///destBuilds.addItem(buildings[i]);
+				///destBuilds.addItem(buildings[i]);
 				//}
 			}
 		});
@@ -278,42 +278,53 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 
 				start = (Point) startBuilds.getSelectedItem();
 				end = (Point) destBuilds.getSelectedItem();
-				System.out.println("--------------------astar--------------------------------");
-				start.print();
-				end.print();
-				AStar astar = new AStar();
-				astar.reset();
-				/*for (int i=0; i<route.size();i++){
+				if(!start.equals(end)){
+
+
+
+					System.out.println("--------------------astar--------------------------------");
+					start.print();
+					end.print();
+					AStar astar = new AStar();
+					astar.reset();
+					/*for (int i=0; i<route.size();i++){
  		  			route.set(i, null);
  		  		}*/
-				route = astar.PathFind(start, end);
-				System.out.println("route variable: " + (route == null));
-				System.out.println("Hey");
-				if(route != null){
-					System.out.println("route: ");
-					for(int i = route.size() - 1; i >= 0; i--){
-						System.out.println(route.get(i));
+					route = astar.PathFind(start, end);
+					System.out.println("route variable: " + (route == null));
+					System.out.println("Hey");
+					if(route != null){
+						System.out.println("route: ");
+						for(int i = route.size() - 1; i >= 0; i--){
+							System.out.println(route.get(i));
+						}
 					}
+					showRoute = true;
+					if (route == null){
+						textField.setText(start.getName() + "->" + end.getName());
+					}
+					else{
+						//System.out.println(route.size());
+						GenTextDir gentextdir = new GenTextDir();
+						String[] directions; // = new String[route.size() + 1];
+						directions = gentextdir.genTextDir(route);
+						for(int i = 0; i < directions.length; i++){
+							//System.out.println(directions[i]);
+						}
+						textField.setText(directions[0]);
+
+					}
+
+					repaint();
 				}
-				showRoute = true;
-				if (route == null){
-					textField.setText(start.getName() + "->" + end.getName());
-				}
+				//if the points are identical, asks the user to input different points
 				else{
-					//System.out.println(route.size());
-					GenTextDir gentextdir = new GenTextDir();
-					String[] directions; // = new String[route.size() + 1];
-					directions = gentextdir.genTextDir(route);
-					for(int i = 0; i < directions.length; i++){
-						//System.out.println(directions[i]);
-					}
-					textField.setText(directions[0]);
-
+					textField.setText("Pick two different points");
+					repaint();
 				}
-
-				repaint();
 			}
 		});
+
 
 		directionsButton.setBounds(187, 132, 94, 30);
 

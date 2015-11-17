@@ -6,6 +6,15 @@ This returns a single instance of MappingDatabase which can be accessed from any
 It may be necessary to refresh your copy of the database at times if another class is using the instance and modifies it. This will
 require some testing, but as of right now shouldn't be an issue.
 
+---------------------------------------------------------------------IMPORTANT-------------------------------------------------------------------------
+In terms of storage philosophy
+-The database assumes that maps are constructed as simple objects with only an id and name. This is because I assumed that maps would initially be created 
+	without any points. Maps must be inserted before anything else
+-The database assumes that points are created before edges. This follows from edges requiring that points exist. Points must be inserted before edges.
+
+SO: The order of insertion is : Maps -> Points -> Edges
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
 There are a number of functions that can be called on an instance of the database.
 
 insertMap (Map map)

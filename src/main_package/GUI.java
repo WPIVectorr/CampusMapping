@@ -52,9 +52,9 @@ public class GUI extends JFrame{
 		maps.get(0).getPointList().get(0).print();
 		//maps.get(index)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
+
 		// Stub for testing 
-		ArrayList<Map> maps = new ArrayList<Map>();
+		ArrayList<Map> maps1 = new ArrayList<Map>();
 		Point testPoint1 = new Point (1, "One", 50, 100);
 		Point testPoint2 = new Point (2, "Two", 600, 500);
 		Point testPoint3 = new Point (3, "Three", 500, 700);
@@ -85,8 +85,13 @@ public class GUI extends JFrame{
 		testArrayList2.add(testPoint6);
 		Map testMap = new Map(testArrayList, 1, "Campus");
 		Map testMap2 = new Map(testArrayList2, 2, "AK");
-		maps.add(testMap);
-		maps.add(testMap2);*/
+		maps1.add(testMap);
+		maps1.add(testMap2);
+System.out.println("```````````````````````````````````````````````````````````");
+	System.out.println(maps.equals(maps1));
+	System.out.println("maps.get(0)/(1) " + maps.get(0).getName() + " " + maps.get(1).getName());
+	System.out.println("maps1.get(0)/(1) " + maps1.get(0).getName() + " " + maps1.get(1).getName());
+	
 
 		// Fill building drop down menus with names of points
 		//int pointListSize = maps.get(0).getPointList().size();

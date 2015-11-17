@@ -92,6 +92,8 @@ public class Point {
 		{
 			System.out.println("Edge"+(i+1)+"id:"+this.edges.get(i).getId());
 			
+			this.edges.get(i).print();
+			//System.out.println("Edge"+(i+1)+"id:"+this.edges.get(i).getId());
 		}
 	}
 }

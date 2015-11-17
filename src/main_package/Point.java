@@ -91,6 +91,7 @@ public class Point {
 		for (i = 0; i<this.numberEdges; i++)
 		{
 			System.out.println("Edge"+(i+1)+"id:"+this.edges.get(i).getId());
+			
 		}
 	}
 }

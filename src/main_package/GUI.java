@@ -6,14 +6,17 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import database.AlreadyExistsException;
 import database.MappingDatabase;
 
 public class GUI extends JFrame{
+	MappingDatabase md = MappingDatabase.getInstance();
 
 	BufferedImage img = null;
 
@@ -34,13 +37,16 @@ public class GUI extends JFrame{
 	int buildStartIndex;
 	int buildDestIndex;
 
-	public GUI() throws IOException{
+	public GUI() throws IOException, AlreadyExistsException, SQLException{
 		super("GUI");
 		setSize(932, 778);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//  img = ImageIO.read(new File("temp.jpg"));
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		md.testMaps();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 		// Stub for testing 
 		ArrayList<Map> maps = new ArrayList<Map>();
 		Point testPoint1 = new Point (1, "One", 50, 100);
@@ -75,7 +81,7 @@ public class GUI extends JFrame{
 		Map testMap2 = new Map(testArrayList2, 2, "AK");
 		maps.add(testMap);
 		maps.add(testMap2);
-
+*/
 		// Fill building drop down menus with names of points
 		//int pointListSize = maps.get(0).getPointList().size();
 		
@@ -310,7 +316,7 @@ public class GUI extends JFrame{
 
 	}
 
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 		GUI myTest = new GUI();
 		myTest.setVisible(true);
 	}

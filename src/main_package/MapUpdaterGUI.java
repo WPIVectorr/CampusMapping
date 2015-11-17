@@ -151,10 +151,15 @@ public class MapUpdaterGUI extends JFrame {
              
              @Override
              public void actionPerformed(ActionEvent e) {
-             	System.out.println("SavePoint");
-             	editPoint.setName(roomNumber.getText());
-             	roomNumber.setText("Select a Point to Edit");
-             	editingPoint = false;
+            	 if(editingPoint)
+            	 {
+	             	System.out.println("SavePoint");
+	             	editPoint.setName(roomNumber.getText());
+	             	roomNumber.setText("Select a Point to Edit");
+	             	editingPoint = false;
+            	 }else{
+            		 
+            	 }
              }
          });
          
@@ -208,6 +213,7 @@ public class MapUpdaterGUI extends JFrame {
 
     class DrawRoute extends JPanel{
 		ArrayList<Point> markForDelete = new ArrayList<Point>();
+		ArrayList<Point> paintArray = new ArrayList<Point>(); //arraylist of points already painted
     	//Point editPoint;
     	//Driver values used for testing:
     	int pointID = 0;
@@ -219,7 +225,7 @@ public class MapUpdaterGUI extends JFrame {
     	
         @Override
         public void paintComponent(Graphics g) {
-       
+        	
             super.paintComponent(g);
             g.drawImage(img, 0, 0, null);
            
@@ -231,6 +237,7 @@ public class MapUpdaterGUI extends JFrame {
 		                    lastMousex =  e.getX();
 		                    lastMousey =  e.getY();
 		                    newClick = true;
+		                    
 		                }
 
 		            });
@@ -261,8 +268,11 @@ public class MapUpdaterGUI extends JFrame {
 	            	int drawX = (int) currentPoint.getX();
 	            	int drawY = (int) currentPoint.getY();
 	            	//draws the points onto the map.
-	            	g.fillOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
-	            	
+	            	if(paintArray.contains(currentPoint))
+	            	{
+	            		g.fillOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
+	            	}      	
+
 	            	
 	            
 	            	
@@ -333,6 +343,7 @@ public class MapUpdaterGUI extends JFrame {
 		            }
 	            }	            
             }
+
 		    for (int i = 0; i < markForDelete.size(); i++) {	    	
             	//remove edges to list
             	for(int j=0;j<markForDelete.get(i).getNumEdges();j++)
@@ -346,6 +357,7 @@ public class MapUpdaterGUI extends JFrame {
 			}
 		    
             newClick = false;
+
             repaint();
         }
 

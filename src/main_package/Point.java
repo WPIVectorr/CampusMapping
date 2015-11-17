@@ -63,9 +63,15 @@ public class Point {
 	public int getNumberEdges() {
 		return edges.size();
 	}
+	//adds one edge
 	public void addEdge(Edge addMe){
 		edges.add(addMe);
-		numberEdges++;
+		this.numberEdges++;
+	}
+	//deletes all edges
+	public void deleteEdges(){
+		edges.clear();
+		this.numberEdges = 0;
 	}
 	public int getNumEdges()
 	{

@@ -61,10 +61,10 @@ public class baseClass {
 		Point a = new Point(0, "Stair Bottom", 0, 0);
 		Point b = new Point(1, "Stair Top", 1, 0);
 		Point c = new Point(2, "Hallway Start", 2, -1);
-		ArrayList<Point> testPoints = new ArrayList<Point>();
-		testPoints.add(c);
-		testPoints.add(b);
-		testPoints.add(a);
+		Point[] testPoints = new Point[3];
+		testPoints[0] = c;
+		testPoints[1] = b;
+		testPoints[2] = a;
 		GenTextDir testGenTestDir = new GenTextDir(); 
 		String[] testOneString = testGenTestDir.genTextDir(testPoints);
 		System.out.println(testOneString[0]);
@@ -78,10 +78,9 @@ public class baseClass {
 		b = new Point(1, "Stair Top", 1, 0);
 		c = new Point(2, "Hallway Start", 2, 1);
 		
-		testPoints.clear();
-		testPoints.add(c);
-		testPoints.add(b);
-		testPoints.add(a);
+		testPoints[0] = c;
+		testPoints[1] = b;
+		testPoints[2] = a;
 		
 		testOneString = testGenTestDir.genTextDir(testPoints);
 		System.out.println(testOneString[0]);
@@ -94,10 +93,10 @@ public class baseClass {
 		a = new Point(0, "Stair Bottom", 0, 0);
 		b = new Point(1, "Stair Top", 1, 0);
 		c = new Point(2, "Hallway Start", 2, 0);
-		testPoints.clear();
-		testPoints.add(c);
-		testPoints.add(b);
-		testPoints.add(a);
+		
+		testPoints[0] = c;
+		testPoints[1] = b;
+		testPoints[2] = a;
 		
 		testOneString = testGenTestDir.genTextDir(testPoints);
 		System.out.println(testOneString[0]);
@@ -121,12 +120,13 @@ public class baseClass {
 		Point p14 = new Point(13, "p9", 7, 1);
 		Point p15 = new Point(14, "p9", 8, 1);
 		
-		ArrayList<Point> testPoints2 = new ArrayList<Point>();
-		testPoints2.add(p8);
-		testPoints2.add(p6);
-		testPoints2.add(p5);
-		testPoints2.add(p2);
-		testPoints2.add(p1);
+		Point[] testPoints2 = new Point[5];
+		testPoints2[0] = p8;
+		testPoints2[1] = p6;
+		testPoints2[2] = p5;
+		testPoints2[3] = p2;
+		testPoints2[4] = p1;
+		
 		testOneString = testGenTestDir.genTextDir(testPoints2);
 		System.out.println(testOneString[0]);
 		System.out.println(testOneString[1]);
@@ -136,12 +136,12 @@ public class baseClass {
 		System.out.println(testOneString[5]);
 		
 		System.out.println("");
-		testPoints2.clear();
-		testPoints2.add(p8);
-		testPoints2.add(p9);
-		testPoints2.add(p5);
-		testPoints2.add(p2);
-		testPoints2.add(p1);
+		
+		testPoints2[0] = p8;
+		testPoints2[1] = p9;
+		testPoints2[2] = p5;
+		testPoints2[3] = p2;
+		testPoints2[4] = p1;
 		
 		testOneString = testGenTestDir.genTextDir(testPoints2);
 		System.out.println(testOneString[0]);

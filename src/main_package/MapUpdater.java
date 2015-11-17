@@ -75,7 +75,7 @@ public class MapUpdater extends JApplet {
 }
 
 
-class DPanel extends JPanel {
+class DPanel extends JPanel implements MouseListener, MouseMotionListener{
         //Rectangle rect = new Rectangle(0, 0, 100, 50);
         BufferedImage bi;
         Graphics2D big;
@@ -92,8 +92,8 @@ class DPanel extends JPanel {
 
     public DPanel(){
                setBackground(Color.white);
-                //addMouseMotionListener(this);
-                //addMouseListener(this);
+                addMouseMotionListener(this);
+                addMouseListener(this);
 
 /*                // Creates the fill texture paint pattern.
                 bi = new BufferedImage(5, 5, BufferedImage.TYPE_INT_RGB);
@@ -172,7 +172,7 @@ class DPanel extends JPanel {
 		return 0;
 	}
 
-/*	// Handles the event of a user dragging the mouse while holding
+	// Handles the event of a user dragging the mouse while holding
     // down the mouse button.
     public void mouseDragged(MouseEvent e){
 
@@ -191,6 +191,6 @@ class DPanel extends JPanel {
      public void mouseExited(MouseEvent e){}
      public void mouseEntered(MouseEvent e){}
                          
-*/
+
 
 }

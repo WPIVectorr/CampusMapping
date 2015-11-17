@@ -220,7 +220,17 @@ public class MapUpdaterGUI extends JFrame {
 		int numEdges = 0;
 		int edgeWeight = 1;
 
+/*		addMouseListener(new MouseAdapter() {
 
+			public void mouseReleased(MouseEvent e) {
+				newClick = false;
+				lastMousex =  e.getX();
+				lastMousey =  e.getY();
+				newClick = true;
+
+			}
+
+		});*/
 
 
 		@Override
@@ -228,7 +238,6 @@ public class MapUpdaterGUI extends JFrame {
 
 			super.paintComponent(g);
 			g.drawImage(img, 0, 0, null);
-
 
 			addMouseListener(new MouseAdapter() {
 
@@ -238,10 +247,10 @@ public class MapUpdaterGUI extends JFrame {
 					lastMousey =  e.getY();
 					newClick = true;
 
+			repaint();
 				}
 
 			});
-
 
 
 			//add point to the point array (has to take place outside of below loop)
@@ -265,22 +274,7 @@ public class MapUpdaterGUI extends JFrame {
 				{			    
 
 					currentPoint = pointArray.get(i);	
-					int drawX = (int) currentPoint.getX();
-					int drawY = (int) currentPoint.getY();
-					//draws the points onto the map.
-					if(paintArray.contains(currentPoint))
-					{
-						g.fillOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
-					}      	
 
-
-
-
-					for (int j = 0; j < edgeArray.size(); j++) {
-						g.drawLine(edgeArray.get(j).getPoint1().getX(),edgeArray.get(j).getPoint1().getY(),
-								edgeArray.get(j).getPoint2().getX(),edgeArray.get(j).getPoint2().getY());
-
-					}
 
 
 					//add edges to list
@@ -341,7 +335,21 @@ public class MapUpdaterGUI extends JFrame {
 							break;
 						}
 					}
+					int drawX = (int) currentPoint.getX();
+					int drawY = (int) currentPoint.getY();
+					//draws the points onto the map.
+					g.fillOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
+
+
+
+
+					for (int j = 0; j < edgeArray.size(); j++) {
+						g.drawLine(edgeArray.get(j).getPoint1().getX(),edgeArray.get(j).getPoint1().getY(),
+								edgeArray.get(j).getPoint2().getX(),edgeArray.get(j).getPoint2().getY());
+
+					}
 				}	            
+				
 			}
 
 			for (int i = 0; i < markForDelete.size(); i++) {	    	
@@ -358,7 +366,6 @@ public class MapUpdaterGUI extends JFrame {
 
 			newClick = false;
 
-			repaint();
 		}
 
 

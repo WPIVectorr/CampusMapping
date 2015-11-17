@@ -35,22 +35,22 @@ public class AStar {
 					int tentGScore = gscore.get(Current) + Current.getEdges().get(i).getWeight();
 					if(Current.getEdges().get(i).getPoint1() == Current){
 						if(!Open.contains(Current.getEdges().get(i).getPoint2()) || gscore.get(Current.getEdges().get(i).getPoint2()) > tentGScore){
-							if(!Open.contains(Current.getEdges().get(i).getPoint2())) {
-								OpenAdd(Current.getEdges().get(i).getPoint2());
-							}
 							CameFrom.put(Current.getEdges().get(i).getPoint2(), Current);
 							gscore.put(Current.getEdges().get(i).getPoint2(), tentGScore);
 							fscore.put(Current.getEdges().get(i).getPoint2(), tentGScore + CostEstimate(Current.getEdges().get(i).getPoint2(), end));
+							if(!Open.contains(Current.getEdges().get(i).getPoint2())) {
+								OpenAdd(Current.getEdges().get(i).getPoint2());
+							}
 						}
 					}
 					else if(Current.getEdges().get(i).getPoint2() == Current){
 						if(!Open.contains(Current.getEdges().get(i).getPoint1()) || gscore.get(Current.getEdges().get(i).getPoint1()) > tentGScore){
-							if(!Open.contains(Current.getEdges().get(i).getPoint1())) {
-								OpenAdd(Current.getEdges().get(i).getPoint1());
-							}
 							CameFrom.put(Current.getEdges().get(i).getPoint1(), Current);
 							gscore.put(Current.getEdges().get(i).getPoint1(), tentGScore);
 							fscore.put(Current.getEdges().get(i).getPoint1(), tentGScore + CostEstimate(Current.getEdges().get(i).getPoint1(), end));
+							if(!Open.contains(Current.getEdges().get(i).getPoint1())) {
+								OpenAdd(Current.getEdges().get(i).getPoint1());
+							}
 						}
 					}
 				}

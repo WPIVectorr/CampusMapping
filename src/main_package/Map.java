@@ -14,6 +14,14 @@ public class Map {
 		this.mapId = mapId;
 		this.mapName = mapName;
 	}
+	
+	public Map (ArrayList<Point> pointList, int mapId, String mapName)
+	{
+		this.Points = pointList;
+		this.mapId = mapId;
+		this.mapName = mapName;
+	}
+	
 	public Point addPoint(Point a){
 		Points.add(a);
 		//MappingDatabase.getInstance().addToDatabase

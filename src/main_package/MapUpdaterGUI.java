@@ -22,7 +22,7 @@ public class MapUpdaterGUI extends JFrame {
 
 	private int lastMousex, lastMousey;
 	private int pointSize = 5;
-	private boolean newClick = false;
+	private static boolean newClick = false;
 	private boolean editingPoint = false;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
 	private Point currentPoint;
@@ -211,9 +211,9 @@ public class MapUpdaterGUI extends JFrame {
 	}
 
 
-	class DrawRoute extends JPanel{
+	class DrawRoute extends JPanel implements MouseListener{
 		ArrayList<Point> markForDelete = new ArrayList<Point>();
-		ArrayList<Point> paintArray = new ArrayList<Point>(); //arraylist of points already painted
+		
 		//Point editPoint;
 		//Driver values used for testing:
 		int pointID = 0;
@@ -229,7 +229,7 @@ public class MapUpdaterGUI extends JFrame {
 			super.paintComponent(g);
 			g.drawImage(img, 0, 0, null);
 
-
+/*
 			addMouseListener(new MouseAdapter() {
 
 				public void mouseReleased(MouseEvent e) {
@@ -240,7 +240,7 @@ public class MapUpdaterGUI extends JFrame {
 
 				}
 
-			});
+			});*/
 
 
 
@@ -268,14 +268,10 @@ public class MapUpdaterGUI extends JFrame {
 					int drawX = (int) currentPoint.getX();
 					int drawY = (int) currentPoint.getY();
 					//draws the points onto the map.
-					if(paintArray.contains(currentPoint))
-					{
-						g.fillOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
-					}      	
 
+					g.fillOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
 
-
-
+					
 					for (int j = 0; j < edgeArray.size(); j++) {
 						g.drawLine(edgeArray.get(j).getPoint1().getX(),edgeArray.get(j).getPoint1().getY(),
 								edgeArray.get(j).getPoint2().getX(),edgeArray.get(j).getPoint2().getY());
@@ -355,10 +351,61 @@ public class MapUpdaterGUI extends JFrame {
 				pointArray.remove(markForDelete.get(i));
 				markForDelete.remove(i);
 			}
-
+			System.out.println(newClick);
+			revalidate();
+			if(newClick)
+				repaint();
 			newClick = false;
+			
 
-			repaint();
+		}
+
+
+
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+
+
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+
+
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+
+
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+
+
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			newClick = false;
+			lastMousex =  e.getX();
+			lastMousey =  e.getY();
+			newClick = true;
+
 		}
 
 

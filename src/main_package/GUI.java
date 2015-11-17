@@ -19,27 +19,12 @@ public class GUI extends JFrame{
 	
 	//drop down menu of room numbers based off of the building selected on campus
 	String rooms[] = {"Select room #", "Please choose building first"};
-	String[] akRooms = {"Select room #", "10", "20", "30", "40"};
-	String[] bhRooms = {"Select room #", "11", "21", "31", "41"};
-	String[] ccRooms = {"Select room #", "12", "22", "32", "42"};
-	String[] glRooms = {"Select room #", "13", "23", "33", "43"};
-	String[] hhRooms = {"Select room #", "14", "24", "34", "44"};
-	String[] pcRooms = {"Select room #", "15", "25", "35", "45"};
-	String[] shRooms = {"Select room #", "16", "26", "36", "46"};
-	
-	int[][] coordTest1 = {{30,30}, {100, 300}, {800, 300}, {100, 200}};
-	int[][] coordTest2 = {{500,500}, {300, 100}, {800, 500}, {100, 200}};
-	int[][] coordTest3 = {{400, 200}, {50, 30}, {8, 300}, {10, 20}};
 	
 	ArrayList<Map> maps;
-	
-	String point1;
-	String point2;
-	String point3;
-	String point4;
+	ArrayList<Point> route;
+	private Point start;
+	private Point end;
 	private boolean showRoute;
-	private boolean showRoute2;
-	private boolean showRoute3;
 	private JTextField textField;
 	private JTextField txtStartingLocation;
 	private JTextField txtDestination;
@@ -61,18 +46,29 @@ public class GUI extends JFrame{
     	Point testPoint1 = new Point (1, "One", 50, 100);
     	Point testPoint2 = new Point (2, "Two", 600, 500);
     	Point testPoint3 = new Point (3, "Three", 500, 700);
+    	Point testPoint4 = new Point (4, "Four", 200, 200);
+    	Edge e1 = new Edge(testPoint1, testPoint2, 1);
+    	Edge e2 = new Edge(testPoint2, testPoint3, 1);
+    	Edge e3 = new Edge(testPoint1, testPoint4, 1);
+    	testPoint1.addEdge(e1);
+    	testPoint1.addEdge(e3);
+    	testPoint2.addEdge(e1);
+    	testPoint2.addEdge(e2);
+    	testPoint3.addEdge(e2);
+    	testPoint4.addEdge(e3);
     	ArrayList<Point> testArrayList = new ArrayList<Point>();
     	testArrayList.add(testPoint1);
     	testArrayList.add(testPoint2);
     	testArrayList.add(testPoint3);
+    	testArrayList.add(testPoint4);
     	Map testMap = new Map(testArrayList, 1, "Campus");
     	maps.add(testMap);
     	// Fill building drop down menus with names of points
     	int pointListSize = maps.get(0).getPointList().size();
-    	String[] buildings = new String[pointListSize + 1];
-    	buildings[0] = "Select a building";
-    	for (int i = 1; i < pointListSize + 1; i++){
-    		buildings[i] = maps.get(0).getPointList().get(i - 1).getName();
+    	Point[] buildings = new Point[pointListSize];
+    	//buildings[0] = "Select a building";
+    	for (int i = 0; i < pointListSize; i++){
+    		buildings[i] = maps.get(0).getPointList().get(i);
     	}
     	    	
     	/*maps = MappingDatabase.getInstance().getMaps();
@@ -105,7 +101,10 @@ public class GUI extends JFrame{
         contentPane.add(buttonPanel, BorderLayout.NORTH);
  		         
         //creates drop down box with building names
-        JComboBox<String> startBuilds = new JComboBox(buildings);
+        JComboBox<Point> startBuilds = new JComboBox();
+        for (int i=0; i < buildings.length; i++){
+        	startBuilds.addItem(buildings[i]);
+        }
         buttonPanel.add(startBuilds);
         startBuilds.setBounds(122, 30, 148, 20);
         JComboBox<Point> startRooms = new JComboBox(rooms);
@@ -136,7 +135,10 @@ public class GUI extends JFrame{
  		         buttonPanel.add(lblDestination);
  		         lblDestination.setBounds(6, 68, 85, 44);
         //creates a drop down box with destination building names
-        JComboBox<String> destBuilds = new JComboBox(buildings);
+        JComboBox<Point> destBuilds = new JComboBox();
+        for (int i=0; i < buildings.length; i++){
+        	destBuilds.addItem(buildings[i]);
+        }
         buttonPanel.add(destBuilds);
         destBuilds.setBounds(122, 80, 148, 20);
         lblDestination.setLabelFor(destBuilds);
@@ -145,6 +147,7 @@ public class GUI extends JFrame{
         buttonPanel.add(horizontalStrut_2);
  		
  		JComboBox destRooms = new JComboBox(rooms);
+ 		
         /*adds the correct room numbers for the building specified
         destBuilds.addActionListener (new ActionListener () {
         public void actionPerformed(ActionEvent e) {
@@ -178,39 +181,38 @@ public class GUI extends JFrame{
  		  directionsButton.addActionListener(new ActionListener() {
  		  	public void actionPerformed(ActionEvent arg0) {
  		  		//gets the start and end building and room numbers the user chose
- 		  		point1 = (String) startBuilds.getSelectedItem();
- 		  		point2 = (String) destBuilds.getSelectedItem();
- 		  		point3 = (String) startRooms.getSelectedItem();
- 		  		point4 = (String) destRooms.getSelectedItem();
+	  		
+ 		  		start = (Point) startBuilds.getSelectedItem();
+ 		  		end = (Point) destBuilds.getSelectedItem();
  		  		
- 		  		if (point1.equals("Atwater Kent")){
- 		  			showRoute = true;
- 		  			showRoute2 = false;
- 		  			showRoute3 = false;
+ 		  		AStar astar = new AStar();
+ 		  		astar.reset();
+ 		  		/*for (int i=0; i<route.size();i++){
+ 		  			route.set(i, null);
+ 		  		}*/
+ 		  		route = astar.PathFind(start, end);
+ 		  		System.out.println("Hey");
+ 		  		if(route != null){
+ 		  			for(int i = route.size() - 1; i >= 0; i--){
+ 		  				System.out.println(route.get(i));
+ 		  			}
  		  		}
- 		  		else if (point1.equals("Boynton Hall")){
- 		  			showRoute = false;
- 		  			showRoute2 = true;
- 		  			showRoute3 = false;
+ 		  		showRoute = true;
+ 		  		if (route == null){
+ 		  			textField.setText(start.getName() + "->" + end.getName());
  		  		}
- 		  		else if (point1.equals("Campus Center")){
- 		  			showRoute = false;
- 		  			showRoute2 = false;
- 		  			showRoute3 = true;
+ 		  		else{
+ 		  			System.out.println(route.size());
+ 	 		  		GenTextDir gentextdir = new GenTextDir();
+ 	 		  		String[] directions; // = new String[route.size() + 1];
+ 	 		  		directions = gentextdir.genTextDir(route);
+ 	 		  		for(int i = 0; i < directions.length; i++){
+ 	 		  			System.out.println(directions[i]);
+ 	 		  		}
+ 	 		  		textField.setText(directions[0]);
+ 	 		  	
  		  		}
- 		  		//prints an error if no or both buildings weren't selected
- 		  		if (point1.equals("Select Building") || point2.equals("Select Building"))
- 		  			textField.setText("Error: Select Two Points");
- 		  		//prints an error if the exact same room number and building were put as start and destinaiton
- 		  		else if(point1.equals(point2) && point3.equals(point4)){
- 		  			textField.setText("Error: Select Two Different Points");
- 		  		}
- 		  		//if no room numbers are selected prints an error
- 		  		else if (point3.equals("Select room #") || point4.equals("Select room #"))
- 		  			textField.setText("Error: please select room numbers");
- 		  		//prints the starting building and room number and end building and room number
- 		  		else
- 		  			textField.setText(point1 + " room " + point3 + " to  " + point2 + " room " + point4);
+ 		  		
  		  		repaint();
  		  	}
  		  });
@@ -223,31 +225,6 @@ public class GUI extends JFrame{
          getContentPane().add(drawPanel);
 
     }
-     
- 	//assigns the selected building name to have the string of room 
- 	//numbers based off of the building selected
- 	public String[] generateRoomNums(String select){
- 		switch (select){
- 		case "Atwater Kent":
- 			return akRooms;
- 		case "Boynton Hall":
- 			return bhRooms;
- 		case "Campus Center":
- 			return ccRooms;
- 		case "Gordon Library":
- 			return glRooms;
- 		case "Higgins House":
- 			return hhRooms;
- 		case "Project Center":
- 			return pcRooms;
- 		case "Stratton Hall":
- 			return shRooms;
- 		case "Campus":
- 			return akRooms;
- 		}
- 		return rooms;
- 	}
-
 
     public static void main(String[] args) throws IOException{
     	GUI myTest = new GUI();
@@ -260,35 +237,12 @@ public class GUI extends JFrame{
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
             g.drawImage(img, 0, 0, null);
-           
-            if (showRoute){
-                g.drawString("Origin", coordTest1[0][0], coordTest1[0][1]);
-	            // For each point with (x, y) draw a line from the previous point to the point
-	            for (int i = 1; i < coordTest1.length; i++){
-	            	g.drawLine(coordTest1[i - 1][0], coordTest1[i - 1][1], coordTest1[i][0], coordTest1[i][1]);
-	                // Adds strings denoting point number for demonstration
-	            	g.drawString("Point " + i, coordTest1[i][0], coordTest1[i][1]);
-	            }
-            }
             
-            if (showRoute2){
-                g.drawString("Origin", coordTest2[0][0], coordTest2[0][1]);
-	            // For each point with (x, y) draw a line from the previous point to the point
-	            for (int i = 1; i < coordTest2.length; i++){
-	            	g.drawLine(coordTest2[i - 1][0], coordTest2[i - 1][1], coordTest2[i][0], coordTest2[i][1]);
-	                // Adds strings denoting point number for demonstration
-	            	g.drawString("Point " + i, coordTest2[i][0], coordTest2[i][1]);
-	            }
-            }
-            
-            if (showRoute3){
-                g.drawString("Origin", coordTest3[0][0], coordTest3[0][1]);
-	            // For each point with (x, y) draw a line from the previous point to the point
-	            for (int i = 1; i < coordTest3.length; i++){
-	            	g.drawLine(coordTest3[i - 1][0], coordTest3[i - 1][1], coordTest3[i][0], coordTest3[i][1]);
-	                // Adds strings denoting point number for demonstration
-	            	g.drawString("Point " + i, coordTest3[i][0], coordTest3[i][1]);
-	            }
+            if (showRoute && route != null){           
+            for (int i = 1; i < route.size(); i++){
+            	//System.out.println(route.get(i));
+            	g.drawLine(route.get(i-1).getX(), route.get(i-1).getY(), route.get(i).getX(), route.get(i).getY());
+            	}
             }
         }
     }

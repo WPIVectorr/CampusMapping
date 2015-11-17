@@ -15,24 +15,22 @@ import database.MappingDatabase;
 
 public class GUI extends JFrame{
 
-	BufferedImage img = null;
+	private BufferedImage img = null;
 	
 	//drop down menu of room numbers based off of the building selected on campus
-	String rooms[] = {"Select room #", "Please choose building first"};
+	private String rooms[] = {"Select room #", "Please choose building first"};
 	
-	ArrayList<Map> maps;
-	ArrayList<Point> route;
+	private ArrayList<Map> maps;
+	private ArrayList<Point> route;
 	private Point start;
 	private Point end;
 	private boolean showRoute;
 	private JTextField textField;
-	private JTextField txtStartingLocation;
-	private JTextField txtDestination;
     private JPanel buttonPanel;
     private DrawRoute drawPanel = new DrawRoute();
 
-    int buildStartIndex;
-    int buildDestIndex;
+    private int buildStartIndex;
+    private int buildDestIndex;
 
     public GUI() throws IOException{
     	super("GUI");
@@ -184,7 +182,10 @@ public class GUI extends JFrame{
 	  		
  		  		start = (Point) startBuilds.getSelectedItem();
  		  		end = (Point) destBuilds.getSelectedItem();
- 		  		
+ 		  		if (start.equals(end)){
+ 		  			textField.setText("Select Two Different Points");
+ 		  		}
+ 		  		else{
  		  		AStar astar = new AStar();
  		  		astar.reset();
  		  		/*for (int i=0; i<route.size();i++){
@@ -214,6 +215,7 @@ public class GUI extends JFrame{
  		  		}
  		  		
  		  		repaint();
+ 		  		}
  		  	}
  		  });
  		  

@@ -23,7 +23,7 @@ public class GUI extends JFrame{
 	//drop down menu of room numbers based off of the building selected on campus
 	String rooms[] = {"Select room #", "Please choose building first"};
 
-	ArrayList<Map> maps;
+	ArrayList<Map> maps = new ArrayList<Map>();
 	ArrayList<Point> route;
 	private Point start;
 	private Point end;
@@ -44,7 +44,13 @@ public class GUI extends JFrame{
 
 		//  img = ImageIO.read(new File("temp.jpg"));
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		md.initDatabase();
 		md.testMaps();
+		//System.out.println("testMaps: " + md.getMaps().size());
+		maps = md.getMaps();
+		System.out.println("------------------edges check-------------------");
+		maps.get(0).getPointList().get(0).print();
+		//maps.get(index)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
 		// Stub for testing 
@@ -56,12 +62,12 @@ public class GUI extends JFrame{
 		Edge e1 = new Edge(testPoint1, testPoint2, 1);
 		Edge e2 = new Edge(testPoint2, testPoint3, 1);
 		Edge e3 = new Edge(testPoint1, testPoint4, 1);
-		testPoint1.addEdge(e1);
-		testPoint1.addEdge(e3);
-		testPoint2.addEdge(e1);
-		testPoint2.addEdge(e2);
-		testPoint3.addEdge(e2);
-		testPoint4.addEdge(e3);
+		//testPoint1.addEdge(e1);
+		//testPoint1.addEdge(e3);
+		//testPoint2.addEdge(e1);
+		//testPoint2.addEdge(e2);
+		//testPoint3.addEdge(e2);
+		//testPoint4.addEdge(e3);
 		ArrayList<Point> testArrayList = new ArrayList<Point>();
 		testArrayList.add(testPoint1);
 		testArrayList.add(testPoint2);
@@ -72,7 +78,7 @@ public class GUI extends JFrame{
 		Point testPoint5 = new Point (5, "Five", 500, 600);
 		Point testPoint6 = new Point (6, "Six", 700, 500);
 		Edge e7 = new Edge(testPoint7, testPoint6, 1);
-		testPoint7.addEdge(e7);
+		//testPoint7.addEdge(e7);
 		ArrayList<Point> testArrayList2 = new ArrayList<Point>();
 		testArrayList2.add(testPoint7);
 		testArrayList2.add(testPoint5);
@@ -80,8 +86,8 @@ public class GUI extends JFrame{
 		Map testMap = new Map(testArrayList, 1, "Campus");
 		Map testMap2 = new Map(testArrayList2, 2, "AK");
 		maps.add(testMap);
-		maps.add(testMap2);
-*/
+		maps.add(testMap2);*/
+
 		// Fill building drop down menus with names of points
 		//int pointListSize = maps.get(0).getPointList().size();
 		
@@ -267,17 +273,21 @@ public class GUI extends JFrame{
 
 				start = (Point) startBuilds.getSelectedItem();
 				end = (Point) destBuilds.getSelectedItem();
-
+				System.out.println("--------------------astar--------------------------------");
+				start.print();
+				end.print();
 				AStar astar = new AStar();
 				astar.reset();
 				/*for (int i=0; i<route.size();i++){
  		  			route.set(i, null);
  		  		}*/
 				route = astar.PathFind(start, end);
-				//System.out.println("Hey");
+				System.out.println("route variable: " + (route == null));
+				System.out.println("Hey");
 				if(route != null){
+					System.out.println("route: ");
 					for(int i = route.size() - 1; i >= 0; i--){
-						//System.out.println(route.get(i));
+						System.out.println(route.get(i));
 					}
 				}
 				showRoute = true;

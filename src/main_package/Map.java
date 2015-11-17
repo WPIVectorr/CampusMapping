@@ -9,13 +9,17 @@ public class Map {
 	private int numPoints;
 	private String mapName;
 	
+	public Map (int mapId, String mapName)
+	{
+		this.mapId = mapId;
+		this.mapName = mapName;
+	}
 	public Point addPoint(Point a){
 		Points.add(a);
 		//MappingDatabase.getInstance().addToDatabase
 		return a;
 		
 	}
-	
 	public Point getPoint(int xcoord, int ycoord){
 		//goes through arraylist Points and returns the Point with
 		//the x and y coordinates inputted
@@ -46,6 +50,10 @@ public class Map {
 	public int getId()
 	{
 		return mapId;
+	}
+	public void setId(int newId)
+	{
+		this.mapId = newId;
 	}
 	public String getName()
 	{

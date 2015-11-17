@@ -7,6 +7,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
+
 import javafx.scene.shape.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,9 +23,13 @@ public class MapUpdaterGUI extends JFrame {
 	private int lastMousex, lastMousey;
 	private int pointSize = 5;
 	private boolean newClick = false;
+	private boolean editingPoint = false;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
 	private Point currentPoint;
 	private Point editPoint;
+
+	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
+	private Edge currentEdge;
 	
 	BufferedImage img = null;
 	private JPanel contentPane;
@@ -109,6 +116,7 @@ public class MapUpdaterGUI extends JFrame {
  		  roomNumber = new JTextField();
  		  buttonPanel.add(roomNumber);
  		  roomNumber.setHorizontalAlignment(JTextField.CENTER);
+ 		  roomNumber.setText("Select a Point to Edit");
  		  roomNumber.setToolTipText("");
  		  roomNumber.setBounds(6, 174, 438, 30);
  		  roomNumber.setColumns(1);
@@ -129,11 +137,11 @@ public class MapUpdaterGUI extends JFrame {
  		  modeSelector.add(rdbtnEditPoints); 
 
  		  
- 		  JLabel lblLastPoint = new JLabel("No Point Selected");
+ 		  JLabel lblLastPoint = new JLabel("Select a Point to Edit");
  		  buttonPanel.add(lblLastPoint);
  		  
  		  /*JButton*/ 
-		 JButton btnSavePoint = new JButton("Save Point");
+		 btnSavePoint = new JButton("No Point Selected");
 		 buttonPanel.add(btnSavePoint);
 		 btnSaveMap = new JButton("Save Map"); //defined above to change text in point selector
          buttonPanel.add(btnSaveMap);
@@ -145,7 +153,8 @@ public class MapUpdaterGUI extends JFrame {
              public void actionPerformed(ActionEvent e) {
              	System.out.println("SavePoint");
              	editPoint.setName(roomNumber.getText());
-             	roomNumber.setText("");
+             	roomNumber.setText("Select a Point to Edit");
+             	editingPoint = false;
              }
          });
          
@@ -193,6 +202,7 @@ public class MapUpdaterGUI extends JFrame {
     public static void main(String[] args) throws IOException{
     	MapUpdaterGUI myTest = new MapUpdaterGUI();
         myTest.setVisible(true);
+        
     }
     
 
@@ -202,7 +212,10 @@ public class MapUpdaterGUI extends JFrame {
     	//Driver values used for testing:
     	int pointID = 0;
     	int numEdges = 0;
+    	int edgeWeight = 1;
+    		
     	
+
     	
         @Override
         public void paintComponent(Graphics g) {
@@ -232,7 +245,7 @@ public class MapUpdaterGUI extends JFrame {
 		               		{
 		                		Integer arraySize = pointArray.size();
 					            Point point = new Point(arraySize, "Point " + arraySize.toString(), lastMousex, lastMousey, numEdges);
-				                pointArray.add(point); 	
+				                pointArray.add(point); 
 		               		}
 		            }
 		            
@@ -242,14 +255,29 @@ public class MapUpdaterGUI extends JFrame {
 		    if(pointArray.size()>0)
 		    {
 	            for(int i=0;i<pointArray.size();i++)
-	            {				
+	            {			    
+	
 	            	currentPoint = pointArray.get(i);	
 	            	int drawX = (int) currentPoint.getX();
 	            	int drawY = (int) currentPoint.getY();
 	            	//draws the points onto the map.
-	            	g.drawOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
-	               
+	            	g.fillOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
 	            	
+	            	
+	            
+	            	
+	        			for (int j = 0; j < edgeArray.size(); j++) {
+	            			g.drawLine(edgeArray.get(j).getPoint1().getX(),edgeArray.get(j).getPoint1().getY(),
+	            					edgeArray.get(j).getPoint2().getX(),edgeArray.get(j).getPoint2().getY());
+	            			
+						}
+	        			
+
+	            	//add edges to list
+	            	for(int j=0;j<currentPoint.getNumEdges();j++)
+	            	{
+	            		edgeArray.add(currentPoint.getEdges().get(j));
+	            	}	
 	                //newClick has some interesting storage things going on. wtf is with Java
 		            if(newClick == true)
 		            {
@@ -258,25 +286,36 @@ public class MapUpdaterGUI extends JFrame {
 		                
 			                switch (getRadButton()) 
 			                {
-				    			case 1://add points
-	
-				    				break;
-				    			case 2://edit points
-				    				System.out.println("EditPoints");
+				    			case 2://edit points				    				
 				    				if(		   (lastMousex>currentPoint.getX()-(pointSize+5) 
 											&& 	lastMousex<currentPoint.getX()+(pointSize+5))
 											&& (lastMousey>currentPoint.getY()-(pointSize+5)
 											&& 	lastMousey<currentPoint.getY()+(pointSize+5)))
 										{
-										if(newClick ==true)
-											editPoint = currentPoint;
-											roomNumber.setText(currentPoint.getName());
-											//editPoint.setName(roomNumber.getText());
-										newClick =false;
+											if(newClick ==true && editingPoint == false)
+											{
+												editPoint = currentPoint;
+												roomNumber.setText(editPoint.getName());
+												btnSavePoint.setText("Save");
+												editingPoint = true;
+												newClick =false;
+											}else if(newClick == true && editingPoint == true)
+											{
+												currentEdge = new Edge(editPoint,currentPoint,edgeWeight);
+												if(currentPoint.getNumberEdges()>0)//this has to be caught in an exception later
+												{
+													for (int j = 0; j < currentPoint.getNumberEdges(); j++) {
+														System.out.println("add edge: "+
+																currentPoint.getEdges().get(j).getPoint1().getName() 
+																+ ", " +
+																currentPoint.getEdges().get(j).getPoint2().getName());	
+													}
+												}
+												newClick = false;
+											}
 										}
 				    				break;
 				    			case 3://remove points
-				    				System.out.println("RemovePoints");
 									if(		(	lastMousex>currentPoint.getX()-(pointSize+5) 
 											&& 	lastMousex<currentPoint.getX()+(pointSize+5))
 											&& (lastMousey>currentPoint.getY()-(pointSize+5)
@@ -294,13 +333,24 @@ public class MapUpdaterGUI extends JFrame {
 		            }
 	            }	            
             }
-		    for (int i = 0; i < markForDelete.size(); i++) {
+		    for (int i = 0; i < markForDelete.size(); i++) {	    	
+            	//remove edges to list
+            	for(int j=0;j<markForDelete.get(i).getNumEdges();j++)
+            	{
+            		edgeArray.clear();
+            	}	
+            	
+            	markForDelete.get(i).deleteEdges();
 				pointArray.remove(markForDelete.get(i));
+				markForDelete.remove(i);
 			}
 		    
             newClick = false;
             repaint();
         }
+
+
+
     }
 
 

@@ -60,7 +60,12 @@ public class Point {
 		return edges.size();
 	}
 	public void addEdge(Edge addMe){
-		edges.add(addMe);;
+		edges.add(addMe);
+		this.numberEdges++;
+	}
+	public void deleteEdges(){
+		edges.clear();
+		this.numberEdges = 0;
 	}
 	public int getNumEdges()
 	{

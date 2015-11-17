@@ -6,14 +6,17 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import database.AlreadyExistsException;
 import database.MappingDatabase;
 
 public class GUI extends JFrame{
+	MappingDatabase md = MappingDatabase.getInstance();
 
 	BufferedImage img = null;
 
@@ -34,13 +37,54 @@ public class GUI extends JFrame{
 	int buildStartIndex;
 	int buildDestIndex;
 
-	public GUI() throws IOException{
+	public GUI() throws IOException, AlreadyExistsException, SQLException{
 		super("GUI");
 		setSize(932, 778);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//  img = ImageIO.read(new File("temp.jpg"));
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		md.initDatabase();
+		md.testInsert();
+		Point testPoint1 = new Point (1, "One", 50, 100);
+		Point testPoint2 = new Point (2, "Two", 600, 500);
+		Point testPoint3 = new Point (3, "Three", 500, 700);
+		Point testPoint4 = new Point (4, "Four", 200, 200);
+		Edge e1 = new Edge(testPoint1, testPoint2, 1);
+		Edge e2 = new Edge(testPoint2, testPoint3, 1);
+		Edge e3 = new Edge(testPoint1, testPoint4, 1);
+		testPoint1.addEdge(e1);
+		testPoint1.addEdge(e3);
+		testPoint2.addEdge(e1);
+		testPoint2.addEdge(e2);
+		testPoint3.addEdge(e2);
+		testPoint4.addEdge(e3);
+		ArrayList<Point> testArrayList = new ArrayList<Point>();
+		testArrayList.add(testPoint1);
+		testArrayList.add(testPoint2);
+		testArrayList.add(testPoint3);
+		testArrayList.add(testPoint4);
 
+		Point testPoint7 = new Point (7, "seven", 100, 500);
+		Point testPoint5 = new Point (5, "Five", 500, 600);
+		Point testPoint6 = new Point (6, "Six", 700, 500);
+		Edge e7 = new Edge(testPoint7, testPoint6, 1);
+		testPoint7.addEdge(e7);
+		ArrayList<Point> testArrayList2 = new ArrayList<Point>();
+		testArrayList2.add(testPoint7);
+		testArrayList2.add(testPoint5);
+		testArrayList2.add(testPoint6);
+		Map testMap = new Map(testArrayList, 1, "Campus");
+		Map testMap2 = new Map(testArrayList2, 2, "AK");
+		System.out.println("Testmap pts: " + testMap.getPointList().get(0));
+		md.insertMap(testMap);
+		md.insertMap(testMap2);
+		maps = md.getMaps();
+		System.out.println("map size: " + maps.size());
+		System.out.println("maps.name" + maps.get(1).getName());
+		System.out.println("point name: " + maps.get(1).getPointList().get(0));
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 		// Stub for testing 
 		ArrayList<Map> maps = new ArrayList<Map>();
 		Point testPoint1 = new Point (1, "One", 50, 100);
@@ -75,7 +119,7 @@ public class GUI extends JFrame{
 		Map testMap2 = new Map(testArrayList2, 2, "AK");
 		maps.add(testMap);
 		maps.add(testMap2);
-
+*/
 		// Fill building drop down menus with names of points
 		//int pointListSize = maps.get(0).getPointList().size();
 		
@@ -310,7 +354,7 @@ public class GUI extends JFrame{
 
 	}
 
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 		GUI myTest = new GUI();
 		myTest.setVisible(true);
 	}

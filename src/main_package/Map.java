@@ -2,6 +2,7 @@ package main_package;
 
 import java.util.ArrayList;
 
+
 public class Map {
 	private ArrayList<Point> Points; 
 	private ArrayList<Edge> Edges;
@@ -9,13 +10,25 @@ public class Map {
 	private int numPoints;
 	private String mapName;
 	
+	public Map (int mapId, String mapName)
+	{
+		this.mapId = mapId;
+		this.mapName = mapName;
+	}
+	
+	public Map (ArrayList<Point> pointList, int mapId, String mapName)
+	{
+		this.Points = pointList;
+		this.mapId = mapId;
+		this.mapName = mapName;
+	}
+	
 	public Point addPoint(Point a){
 		Points.add(a);
 		//MappingDatabase.getInstance().addToDatabase
 		return a;
 		
 	}
-	
 	public Point getPoint(int xcoord, int ycoord){
 		//goes through arraylist Points and returns the Point with
 		//the x and y coordinates inputted
@@ -29,6 +42,30 @@ public class Map {
 		 return null;
 	}
 	
-
+	public Map (ArrayList<Point> points, int id)
+	{
+		this.Points = points;
+		this.mapId = id;
+	}
+	public ArrayList<Point> getPointList()
+	{
+		return Points;
+	}
+	public void setPointList(ArrayList<Point> newPoints)
+	{
+		this.Points = newPoints;
+	}
+	public int getId()
+	{
+		return mapId;
+	}
+	public void setId(int newId)
+	{
+		this.mapId = newId;
+	}
+	public String getName()
+	{
+		return mapName;
+	}
 
 }

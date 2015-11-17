@@ -16,7 +16,7 @@ public class AStar {
 		fscore.put(start, CostEstimate(start, end));
 		
 		Open.add(start); // Initialize Open
-		
+		System.out.println("----------------------------open true in astar: " + !Open.isEmpty());
 		while(!Open.isEmpty()){
 			Point Current = Open.removeFirst(); // Working with lowest element in Open
 			if(Current.equals(end)){
@@ -60,7 +60,7 @@ public class AStar {
 	}
 	
 	private static int CostEstimate(Point a, Point b){
-		return (int)Math.sqrt((double)((a.getX()+b.getX())^2)+((a.getY()+b.getY())^2));
+		return (int)Math.sqrt((double)((a.getX()-b.getX())^2)+((a.getY()-b.getY())^2));
 	}
 	private static void OpenAdd(Point addPoint){
 		for(int i = 0; i < Open.size(); i++){
@@ -80,5 +80,12 @@ public class AStar {
 		}
 		ReturnPath.add(Current);
 		return ReturnPath;
+	}
+	public static void reset(){
+		Open.clear();
+		Closed.clear();
+		CameFrom.clear();
+		fscore.clear();
+		gscore.clear();
 	}
 }

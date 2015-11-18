@@ -5,6 +5,12 @@ import java.util.ArrayList;
 public class GenTextDir {
 	boolean DEBUG = false;
 	public String[] genTextDir(ArrayList<Point> listPoints){
+		if(listPoints.size() <= 1){
+			String[] retString = new String[1];
+			retString[0] = "invalid Points given";
+			return retString;
+		}
+		
 		Point[] arrPoints = new Point[listPoints.size()];
 		for (int i = 0; i < listPoints.size(); i++){
 			arrPoints[i] = listPoints.get(i);

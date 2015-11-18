@@ -54,6 +54,7 @@ public class MappingDatabase
 	{
 		if (instance == null)
 			instance = new MappingDatabase();
+		initDatabase();
 		return instance;
 	}
 	

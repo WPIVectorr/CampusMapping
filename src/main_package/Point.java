@@ -34,6 +34,9 @@ public class Point {
 	public int getId() {
 		return id;
 	}
+	public void setID(int x){
+		this.id = x;
+	}
 	public String getName()
 	{
 		return this.name;
@@ -93,8 +96,7 @@ public class Point {
 		int i = 0;
 		for (i = 0; i<this.numberEdges; i++)
 		{
-			System.out.println("Edge"+(i+1)+"id:"+this.edges.get(i).getId());
-			
+			//System.out.println("Edge"+(i+1)+"id:"+this.edges.get(i).getId());
 			this.edges.get(i).print();
 			//System.out.println("Edge"+(i+1)+"id:"+this.edges.get(i).getId());
 		}

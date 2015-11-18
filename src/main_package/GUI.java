@@ -53,7 +53,7 @@ public class GUI extends JFrame{
 		MappingDatabase.initDatabase();
 
 		md.initDatabase();
-		md.testMaps();
+		//md.testMaps();
 		maps = md.getMaps();
 		System.out.println("-------------------------------------------");
 		System.out.println("maps size:"+maps.size());
@@ -222,21 +222,25 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				buildDestIndex = mapsDropdown.getSelectedIndex();
 				////////////////////////////////////////////////////////////////////////////////
 				//String mapTitle = maps.get(buildDestIndex).getName();
-				String mapTitle = "AtwaterKent1";
+				String mapTitle = "AtwaterKent2";
 				File dest = new File("src/VectorMaps");
 				String destInput = dest.getAbsolutePath();
 				//assuming all maps saved in vectorMaps are in jpg
-				destInput = destInput + "/" + mapTitle + ".jpg";
+				destInput = destInput + "\\" + mapTitle + ".jpg";
 				File destFile = new File(destInput);
 				try{
 					img = ImageIO.read(destFile);
 				}
 				catch(IOException a){
+					System.out.println("Could not find file:"+destInput);
 					a.printStackTrace();
 				}
 
-
-
+				System.out.println("DIe die: " +maps.get(0).getPointList().size());
+				System.out.println("points: ");
+				for(int count = 0; count < maps.get(0).getPointList().size(); count++){
+					System.out.println(maps.get(0).getPointList().get(count).getName());
+				}
 				//if(buildDestIndex == -1)
 				//buildDestIndex = 0;
 				//System.out.println("buildDest: " + buildDestIndex);
@@ -248,6 +252,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 					//System.out.println("building size: " + buildings.length);
 					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
 						startBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
+						System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
 						//System.out.println("buildings[i] " + buildings[i]);
 
 						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));

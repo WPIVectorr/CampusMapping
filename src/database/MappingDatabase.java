@@ -102,7 +102,7 @@ public class MappingDatabase
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30); 
 			
-			statement.executeUpdate("create table if not exists"+ 								//If does not exist, then create table
+			statement.executeUpdate("create table if not exists "+ 								//If does not exist, then create table
 					RELEVANT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
 			
 			ResultSet rs = connection.createStatement().executeQuery("SELECT * from "+MAP_TABLE_NAME);
@@ -200,7 +200,7 @@ public class MappingDatabase
 				{
 					if (DEBUG)
 						System.out.println("Creating table: " + RELEVANT_TABLE_NAME);
-					statement.executeUpdate("create table if not exists"+ 								//If does not exist, then create table
+					statement.executeUpdate("create table if not exists "+ 								//If does not exist, then create table
 											RELEVANT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
 				}
 				else

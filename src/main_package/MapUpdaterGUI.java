@@ -19,7 +19,10 @@ import javax.swing.*;
 import javax.swing.Box;
 
 import database.AlreadyExistsException;
+import database.DoesNotExistException;
+import database.InsertFailureException;
 import database.MappingDatabase;
+import database.NoMapException;
 
 public class MapUpdaterGUI extends JFrame {
 
@@ -131,14 +134,16 @@ public class MapUpdaterGUI extends JFrame {
 		mapDropDown.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				String name = mapDropDown.getSelectedItem().toString();
-				
 				ArrayList<Map> mapList = md.getMaps();
-				System.out.println("mapsize: "+mapList.size());
+				//System.out.println("mapsize: "+mapList.size());
+				//System.out.println("map Name:"+mapList.get(0).getName());
 				for(int i = 0; i < mapList.size(); i++){
-					if(name.equals(mapList.get(i).getName()))
+					System.out.println("Trying to find name:"+name);
+					if(name.equals(mapList.get(i).getName()+".jpg"))
 					{
 						currentMap = mapList.get(i);
-						System.out.println("CurrentMapName: "+currentMap.getName());
+						pointArray = currentMap.getPointList();
+						System.out.println("Found map with number of points: "+currentMap.getPointList().size());
 					}
 				}
 				
@@ -342,9 +347,25 @@ public class MapUpdaterGUI extends JFrame {
 					Point storePoint = pointArray.get(i);
 					storePoint.setID(i+currentMap.getId()*500);//CHANGE THIS to reflect ID stuff (AND DELETE THIS COMMENT
 					System.out.println(currentMap.getName());
-					currentMap.addPoint(storePoint);
+						try {
+							md.insertPoint(currentMap, storePoint);
+						} catch (AlreadyExistsException | NoMapException | InsertFailureException | SQLException f) {
+							// TODO Auto-generated catch block
+							System.out.println(f.getMessage());
+							//f.printStackTrace();
+						}
+						for (int j = 0; j < storePoint.getEdges().size(); j++) {
+							try {
+								md.insertEdge(storePoint.getEdges().get(j));
+							} catch (InsertFailureException | AlreadyExistsException | SQLException
+									| DoesNotExistException g) {
+								// TODO Auto-generated catch block
+								System.out.println(g);
+							}	
+						}
 					markForDelete.add(storePoint);
 				}
+				
 				mapDropDown.setSelectedItem(mapDropDown.getItemAt(0));
 				repaint();
 				
@@ -408,16 +429,7 @@ public class MapUpdaterGUI extends JFrame {
 		int numEdges = 0;
 		int edgeWeight = 1;
 
-		/*
-		 * addMouseListener(new MouseAdapter() {
-		 * 
-		 * public void mouseReleased(MouseEvent e) { newClick = false;
-		 * lastMousex = e.getX(); lastMousey = e.getY(); newClick = true;
-		 * 
-		 * }
-		 * 
-		 * });
-		 */
+	
 
 		@Override
 		public void paintComponent(Graphics g) {
@@ -464,13 +476,14 @@ public class MapUpdaterGUI extends JFrame {
 			// add point to the point array (has to take place outside of below
 			// loop)
 			if (newClick == true) {
-				System.out.println(newClick);
+				//System.out.println(newClick);
 				if (getRadButton() == 1) // if addpoint
 				{
 					Integer arraySize = pointArray.size();
 					Point point = new Point(arraySize, "Point " + arraySize.toString(), lastMousex, lastMousey,
 							numEdges);
 					pointArray.add(point);
+					repaint();
 				}
 			}
 
@@ -480,6 +493,7 @@ public class MapUpdaterGUI extends JFrame {
 				for (int i = 0; i < pointArray.size(); i++) {
 
 					currentPoint = pointArray.get(i);
+					//System.out.println("numEdges: "+currentPoint.getNumEdges());
 
 					// add edges to list
 					for (int j = 0; j < currentPoint.getNumEdges(); j++) {
@@ -500,7 +514,7 @@ public class MapUpdaterGUI extends JFrame {
 								if (newClick == true && editingPoint == false) {
 									editPoint = currentPoint;
 									roomNumber.setText(editPoint.getName());
-									btnSavePoint.setText("Save");
+									btnSavePoint.setText("Save Point Changes");
 									editingPoint = true;
 									newClick = false;
 								} else if (newClick == true && editingPoint == true) {
@@ -515,6 +529,7 @@ public class MapUpdaterGUI extends JFrame {
 									}
 									newClick = false;
 								}
+								repaint();
 							}
 							break;
 						case 3:// remove points
@@ -526,6 +541,7 @@ public class MapUpdaterGUI extends JFrame {
 									markForDelete.add(currentPoint);
 
 								newClick = false;
+								repaint();
 							}
 							break;
 						default:
@@ -546,6 +562,7 @@ public class MapUpdaterGUI extends JFrame {
 					// draws the points onto the map.
 					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 
+					//draw lines between points
 					for (int j = 0; j < edgeArray.size(); j++) {
 						g.drawLine(edgeArray.get(j).getPoint1().getX(), edgeArray.get(j).getPoint1().getY(),
 								edgeArray.get(j).getPoint2().getX(), edgeArray.get(j).getPoint2().getY());

@@ -25,6 +25,8 @@ public class GUI extends JFrame{
 
 	private ArrayList<Map> maps = new ArrayList<Map>();
 	private ArrayList<Point> route;
+	private String[] textDir;
+	private int textPos;
 	private Point start;
 	private Point end;
 	private boolean showRoute;
@@ -284,89 +286,120 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 			System.out.println("buildings[i] match: " + buildings[i]);
 			startBuilds.addItem(buildings[i]);
 		}*/
+				
+				
+				
+						//JComboBox destRooms = new JComboBox(rooms);
+				
+				
+						//creates the drop down of room numbers for destination (initially waits for the building to have 
+						//the specific buildings room numbers)
+						//	buttonPanel.add(destRooms);
+						//destRooms.setBounds(296, 80, 148, 20);
+				
+				
+						Component horizontalStrut = Box.createHorizontalStrut(20);
+						buttonPanel.add(horizontalStrut);
+		
+				JButton directionsButton = new JButton("Directions");
+				buttonPanel.add(directionsButton);
+				directionsButton.setBackground(new Color(0, 255, 127));
+				directionsButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						//gets the start and end building and room numbers the user chose
+
+						start = (Point) startBuilds.getSelectedItem();
+						end = (Point) destBuilds.getSelectedItem();
+						if(!start.equals(end)){
 
 
 
-		//JComboBox destRooms = new JComboBox(rooms);
-
-
-		//creates the drop down of room numbers for destination (initially waits for the building to have 
-		//the specific buildings room numbers)
-		//	buttonPanel.add(destRooms);
-		//destRooms.setBounds(296, 80, 148, 20);
-
-
-		Component horizontalStrut = Box.createHorizontalStrut(20);
-		buttonPanel.add(horizontalStrut);
-
-		JButton directionsButton = new JButton("Directions");
-		buttonPanel.add(directionsButton);
-		directionsButton.setBackground(new Color(0, 255, 127));
-		directionsButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				//gets the start and end building and room numbers the user chose
-
-				start = (Point) startBuilds.getSelectedItem();
-				end = (Point) destBuilds.getSelectedItem();
-				if(!start.equals(end)){
-
-
-
-					System.out.println("--------------------astar--------------------------------");
-					start.print();
-					end.print();
-					AStar astar = new AStar();
-					astar.reset();
-					/*for (int i=0; i<route.size();i++){
+							System.out.println("--------------------astar--------------------------------");
+							start.print();
+							end.print();
+							AStar astar = new AStar();
+							astar.reset();
+							/*for (int i=0; i<route.size();i++){
  		  			route.set(i, null);
  		  		}*/
-					route = astar.PathFind(start, end);
-					System.out.println("route variable: " + (route == null));
-					System.out.println("Hey");
-					if(route != null){
-						System.out.println("route: ");
-						for(int i = route.size() - 1; i >= 0; i--){
-							System.out.println(route.get(i));
+							route = astar.PathFind(start, end);
+							System.out.println("route variable: " + (route == null));
+							System.out.println("Hey");
+							if(route != null){
+								System.out.println("route: ");
+								for(int i = route.size() - 1; i >= 0; i--){
+									System.out.println(route.get(i));
+								}
+							}
+							showRoute = true;
+							if (route == null){
+								textField.setText(start.getName() + "->" + end.getName());
+							}
+							else{
+								//System.out.println(route.size());
+								GenTextDir gentextdir = new GenTextDir();
+								String[] directions; // = new String[route.size() + 1];
+								textDir = gentextdir.genTextDir(route);
+								for(int i = 0; i < textDir.length; i++){
+									//System.out.println(directions[i]);
+								}
+								textField.setText(textDir[0]);
+
+							}
+
+							repaint();
+						}
+						//if the points are identical, asks the user to input different points
+						else{
+							textField.setText("Pick two different points");
+							repaint();
 						}
 					}
-					showRoute = true;
-					if (route == null){
-						textField.setText(start.getName() + "->" + end.getName());
-					}
-					else{
-						//System.out.println(route.size());
-						GenTextDir gentextdir = new GenTextDir();
-						String[] directions; // = new String[route.size() + 1];
-						directions = gentextdir.genTextDir(route);
-						for(int i = 0; i < directions.length; i++){
-							//System.out.println(directions[i]);
+				});
+				
+				
+						directionsButton.setBounds(187, 132, 94, 30);
+				
+				Component horizontalStrut_1 = Box.createHorizontalStrut(20);
+				buttonPanel.add(horizontalStrut_1);
+				
+				JButton btnPrevious = new JButton("Previous");
+				btnPrevious.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						if(textPos == 0 || textDir == null){
+							
 						}
-						textField.setText(directions[0]);
-
+						else{
+							textPos--;
+							textField.setText(textDir[textPos]);
+						}
 					}
-
-					repaint();
-				}
-				//if the points are identical, asks the user to input different points
-				else{
-					textField.setText("Pick two different points");
-					repaint();
-				}
-			}
-		});
-
-
-		directionsButton.setBounds(187, 132, 94, 30);
-
-
-
-		//creates a centered text field that will write back the users info they typed in
-		textField = new JTextField();
-		buttonPanel.add(textField);
-		textField.setHorizontalAlignment(JTextField.CENTER);
-		textField.setToolTipText("");
-		textField.setBounds(6, 174, 438, 30);
-		textField.setColumns(1);
+				});
+				buttonPanel.add(btnPrevious);
+		
+		
+		
+				//creates a centered text field that will write back the users info they typed in
+				textField = new JTextField();
+				buttonPanel.add(textField);
+				textField.setHorizontalAlignment(JTextField.CENTER);
+				textField.setToolTipText("");
+				textField.setBounds(6, 174, 438, 30);
+				textField.setColumns(1);
+				
+				JButton btnNext = new JButton("Next");
+				btnNext.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						if(textDir == null || textPos == textDir.length - 1){
+							
+						}
+						else {
+							textPos++;
+							textField.setText(textDir[textPos]);
+						}
+					}
+				});
+				buttonPanel.add(btnNext);
 
 		getContentPane().add(drawPanel);
 

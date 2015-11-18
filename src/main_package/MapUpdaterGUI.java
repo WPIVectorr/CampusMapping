@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -17,6 +18,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Box;
 
+import database.AlreadyExistsException;
+import database.MappingDatabase;
+
 public class MapUpdaterGUI extends JFrame {
 
 	private int lastMousex, lastMousey;
@@ -25,8 +29,12 @@ public class MapUpdaterGUI extends JFrame {
 	private boolean editingPoint = false;
 	private boolean addingMap = false;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
+	private ArrayList<Point> markForDelete = new ArrayList<Point>();
 	private Point currentPoint;
 	private Point editPoint;
+	
+	private Map currentMap;
+	private MappingDatabase md = MappingDatabase.getInstance();
 
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private Edge currentEdge;
@@ -86,8 +94,6 @@ public class MapUpdaterGUI extends JFrame {
 		setSize(932, 778);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// img = ImageIO.read(new File("temp.jpg"));
-
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridLayout(4, 0, 10, 10));
 		buttonPanel.setBackground(new Color(255, 235, 205));
@@ -116,22 +122,40 @@ public class MapUpdaterGUI extends JFrame {
 			 * tempMapName.length();
 			 * mapDropDown.addItem(tempMapName.substring(0, nameLength - 4));
 			 */
-
 			// includes extension
-			mapDropDown.addItem(imgList[f].getName());
+			if(!(imgList[f].getName().equals(".DS_Store"))){
+					mapDropDown.addItem(imgList[f].getName());
+			}
 		}
 
 		mapDropDown.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				String name = mapDropDown.getSelectedItem().toString();
+				
+				ArrayList<Map> mapList = md.getMaps();
+				System.out.println("mapsize: "+mapList.size());
+				for(int i = 0; i < mapList.size(); i++){
+					if(name.equals(mapList.get(i).getName()))
+					{
+						currentMap = mapList.get(i);
+						System.out.println("CurrentMapName: "+currentMap.getName());
+					}
+				}
+				
+				
 				File destinationFile = new File("src/VectorMaps/" + name);
 				destinationFile = new File(destinationFile.getAbsolutePath());
-				try {
-					img = ImageIO.read(destinationFile);
-				} catch (IOException g) {
-					System.out.println("Invalid Map Selection");
-					g.printStackTrace();
+				if (!(name.equals("Select Map"))) {
+					try {
+						img = ImageIO.read(destinationFile);
+					} catch (IOException g) {
+						System.out.println("Invalid Map Selection");
+						g.printStackTrace();
+					}
+				} else {
+					img = null;
 				}
+				repaint();
 			}
 		});
 		// List that stores the name of every Map in the database
@@ -187,24 +211,83 @@ public class MapUpdaterGUI extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String maptitle = mapName.getText();
-				String srcInput = txtImageDirectoryPath.getText();
 				addingMap = true;
+				String maptitle = mapName.getText();
+				
+				maptitle = maptitle.trim();
+				String srcInput = txtImageDirectoryPath.getText();
+				String mapNameNoExt;
+				int l = 0;
+
+				// check directory to see if it exists
+				File srcFile = new File(srcInput);
+				if (!(srcFile.exists()) || maptitle == null || maptitle.equals("")) {
+					addingMap = false;
+					System.out.println("Error: Map is invalid");
+				} else {
+					for (int k = 0; k < mapDropDown.getItemCount(); k++) {
+						l = mapDropDown.getItemAt(k).toString().length();
+						mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
+						System.out.println(mapNameNoExt + "           " + (l - 4));
+						if (maptitle.equals(mapNameNoExt)) {
+							addingMap = false;
+							System.out.println("Error: Map invalid");
+						}
+					}
+				}
+
 				if (addingMap) {
-					// /Users/ibanatoski/Downloads/MACC_design2.png
+					// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
 					System.out.println("SavingMap");
 					File dest = new File("src/VectorMaps");
 					// File destAbs = dest.getAbsoluteFile();
-					File srcFile = new File(srcInput);
+
 					String destInput = dest.getAbsolutePath();
-					System.out.println("Destination Input: " + destInput);
-					System.out.println("Source Input: " + srcInput);
+					// System.out.println("Destination Input: " + destInput);
+					// System.out.println("Source Input: " + srcInput);
 					destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
 					System.out.println(destInput);
 					File destFile = new File(destInput);
 
 					// Add the name of the map to the Map Selction Dropdown menu
 					mapDropDown.addItem(maptitle + srcInput.substring(srcInput.length() - 4));
+
+					// Finds the highest mapID in the database and stores it in
+					// highestID
+					int highestID;
+					if(md.getMaps().isEmpty()){
+						highestID = 0;
+						System.out.print("Database contains no maps so highest ID is 1");
+						
+						
+					}
+					else{
+						//determines the highest mapID from the Maps stored in the database
+						ArrayList<Map> mdMapList = md.getMaps();
+						highestID = mdMapList.get(0).getId();
+						for (int h = 0; h < mdMapList.size(); h++) {
+							if (highestID < mdMapList.get(h).getId()) {
+								highestID = mdMapList.get(h).getId();
+							}
+						}
+					}
+
+					// Create the Map object to be stored in the database
+					Map m = new Map(highestID + 1, maptitle);
+					
+					highestID++;
+
+					try {
+						md.insertMap(m);
+					} catch (AlreadyExistsException e1) {
+						System.out.print("Look at me im  an error 1");
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						System.out.print("Look at me im  an error 2");
+						e1.printStackTrace();
+					}
 
 					try {
 						copyFileUsingStream(srcFile, destFile);
@@ -213,7 +296,7 @@ public class MapUpdaterGUI extends JFrame {
 						System.out.println("invalid copy");
 						a.printStackTrace();
 					}
-					// saveMap.setName(roomNumber.getText());
+
 					addingMap = false;
 				} else {
 
@@ -248,6 +331,23 @@ public class MapUpdaterGUI extends JFrame {
 				} else {
 
 				}
+			}
+		});
+		
+		btnSaveMap.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for (int i = 0; i < pointArray.size(); i++) {
+					Point storePoint = pointArray.get(i);
+					storePoint.setID(i+currentMap.getId()*500);//CHANGE THIS to reflect ID stuff (AND DELETE THIS COMMENT
+					System.out.println(currentMap.getName());
+					currentMap.addPoint(storePoint);
+					markForDelete.add(storePoint);
+				}
+				mapDropDown.setSelectedItem(mapDropDown.getItemAt(0));
+				repaint();
+				
 			}
 		});
 
@@ -297,7 +397,7 @@ public class MapUpdaterGUI extends JFrame {
 	}
 
 	class DrawRoute extends JPanel {
-		ArrayList<Point> markForDelete = new ArrayList<Point>();
+		
 		ArrayList<Point> paintArray = new ArrayList<Point>(); // arraylist of
 																// points
 																// already
@@ -319,19 +419,18 @@ public class MapUpdaterGUI extends JFrame {
 		 * });
 		 */
 
-
-
 		@Override
 		public void paintComponent(Graphics g) {
 
 			super.paintComponent(g);
-			
-			//-------------------------------
-			//if(img == null)
-				//img = ImageIO.read(new File("/User/ibanatoski/git/CampusMapping/src/VectorMaps/"));
-			if(!(img == null)){
-				
-				//Scale the image to the appropriate screen size
+
+			// -------------------------------
+			// if(img == null)
+			// img = ImageIO.read(new
+			// File("/User/ibanatoski/git/CampusMapping/src/VectorMaps/"));
+			if (!(img == null)) {
+
+				// Scale the image to the appropriate screen size
 				double wScale;
 
 				if (img.getHeight() >= img.getWidth()) {
@@ -343,27 +442,28 @@ public class MapUpdaterGUI extends JFrame {
 				}
 				if (wScale > windowScale)
 					windowScale += 1;
-				
+
+				// draw image/map
 				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
+			} else {
+				System.out.println("Image is null");
 			}
 
+			
+			//selecting points on the map
 			addMouseListener(new MouseAdapter() {
-
 				public void mouseReleased(MouseEvent e) {
 					newClick = false;
 					lastMousex = e.getX();
 					lastMousey = e.getY();
 					newClick = true;
-
-			repaint();
+					repaint();
 				}
-
 			});
 
-
-			//add point to the point array (has to take place outside of below loop)
-			if(newClick == true)
-			{
+			// add point to the point array (has to take place outside of below
+			// loop)
+			if (newClick == true) {
 				System.out.println(newClick);
 				if (getRadButton() == 1) // if addpoint
 				{
@@ -374,15 +474,12 @@ public class MapUpdaterGUI extends JFrame {
 				}
 			}
 
+			// draws all the points onto the map.
+			// cleans the array of deleted points.
+			if (pointArray.size() > 0) {
+				for (int i = 0; i < pointArray.size(); i++) {
 
-			//draws all the points onto the map.
-			//cleans the array of deleted points.
-			if(pointArray.size()>0)
-			{
-				for(int i=0;i<pointArray.size();i++)
-				{			    
-
-					currentPoint = pointArray.get(i);	
+					currentPoint = pointArray.get(i);
 
 					// add edges to list
 					for (int j = 0; j < currentPoint.getNumEdges(); j++) {
@@ -408,15 +505,7 @@ public class MapUpdaterGUI extends JFrame {
 									newClick = false;
 								} else if (newClick == true && editingPoint == true) {
 									currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
-									if (currentPoint.getNumberEdges() > 0)// this
-																			// has
-																			// to
-																			// be
-																			// caught
-																			// in
-																			// an
-																			// exception
-																			// later
+									if (currentPoint.getNumberEdges() > 0)// this has to be caught in an exception later
 									{
 										for (int j = 0; j < currentPoint.getNumberEdges(); j++) {
 											System.out.println("add edge: "
@@ -443,59 +532,61 @@ public class MapUpdaterGUI extends JFrame {
 							break;
 						}
 					}
-
+					
+					for (int j = 0; j < markForDelete.size(); j++) {
+						// remove edges to list
+						edgeArray.clear();
+						markForDelete.get(j).deleteEdges();
+						pointArray.remove(markForDelete.get(j));
+						markForDelete.remove(j);
+					}
+					
 					int drawX = (int) currentPoint.getX();
 					int drawY = (int) currentPoint.getY();
-					//draws the points onto the map.
-					g.fillOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
-
-
-
+					// draws the points onto the map.
+					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 
 					for (int j = 0; j < edgeArray.size(); j++) {
-						g.drawLine(edgeArray.get(j).getPoint1().getX(),edgeArray.get(j).getPoint1().getY(),
-								edgeArray.get(j).getPoint2().getX(),edgeArray.get(j).getPoint2().getY());
+						g.drawLine(edgeArray.get(j).getPoint1().getX(), edgeArray.get(j).getPoint1().getY(),
+								edgeArray.get(j).getPoint2().getX(), edgeArray.get(j).getPoint2().getY());
 
 					}
-				}	            
-				
-			}
-
-			for (int i = 0; i < markForDelete.size(); i++) {
-				// remove edges to list
-				for (int j = 0; j < markForDelete.get(i).getNumEdges(); j++) {
-					edgeArray.clear();
 				}
 
+			}
+
+/*			for (int i = 0; i < markForDelete.size(); i++) {
+				// remove edges to list
+				edgeArray.clear();
 				markForDelete.get(i).deleteEdges();
 				pointArray.remove(markForDelete.get(i));
 				markForDelete.remove(i);
-			}
+			}*/
 
 			newClick = false;
 
-				}
+		}
 
 	}
 
-		/*
-		 * Takes an input file directory path and a target directory path and
-		 * copies that File to the target location
-		 */
-		private void copyFileUsingStream(File source, File dest) throws IOException {
-			System.out.println(source.getPath());
-			FileInputStream is = null;
-			FileOutputStream os = null;
-			is = new FileInputStream(source);
-			System.out.println(source.getPath());
-			os = new FileOutputStream(dest);
-			System.out.println(dest.getPath());
-			byte[] buffer = new byte[1024];
-			int length;
-			while ((length = is.read(buffer)) > 0) {
-				os.write(buffer, 0, length);
-			}
-			is.close();
-			os.close();
+	/*
+	 * Takes an input file directory path and a target directory path and copies
+	 * that File to the target location
+	 */
+	private void copyFileUsingStream(File source, File dest) throws IOException {
+		System.out.println(source.getPath());
+		FileInputStream is = null;
+		FileOutputStream os = null;
+		is = new FileInputStream(source);
+		System.out.println(source.getPath());
+		os = new FileOutputStream(dest);
+		System.out.println(dest.getPath());
+		byte[] buffer = new byte[1024];
+		int length;
+		while ((length = is.read(buffer)) > 0) {
+			os.write(buffer, 0, length);
 		}
+		is.close();
+		os.close();
+	}
 }

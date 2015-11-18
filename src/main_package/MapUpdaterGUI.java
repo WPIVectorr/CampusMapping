@@ -134,23 +134,28 @@ public class MapUpdaterGUI extends JFrame {
 		mapDropDown.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				String name = mapDropDown.getSelectedItem().toString();
-				ArrayList<Map> mapList = md.getMaps();
-				//System.out.println("mapsize: "+mapList.size());
-				//System.out.println("map Name:"+mapList.get(0).getName());
-				for(int i = 0; i < mapList.size(); i++){
-					System.out.println("Trying to find name:"+name);
-					if(name.equals(mapList.get(i).getName()+".jpg"))
-					{
-						currentMap = mapList.get(i);
-						pointArray = currentMap.getPointList();
-						System.out.println("Found map with number of points: "+currentMap.getPointList().size());
-					}
-				}
-				
 				
 				File destinationFile = new File("src/VectorMaps/" + name);
 				destinationFile = new File(destinationFile.getAbsolutePath());
 				if (!(name.equals("Select Map"))) {
+				
+					ArrayList<Map> mapList = md.getMaps();
+					//System.out.println("mapsize: "+mapList.size());
+					//System.out.println("map Name:"+mapList.get(0).getName());
+					for(int i = 0; i < mapList.size(); i++){
+						System.out.println("Trying to find name:"+name);
+						if(name.equals(mapList.get(i).getName()+".jpg"))
+						{
+							currentMap = mapList.get(i);
+							pointArray = currentMap.getPointList();
+							System.out.println("Found map with number of points: "+currentMap.getPointList().size());
+						}
+				}
+				
+				
+/*				File destinationFile = new File("src/VectorMaps/" + name);
+				destinationFile = new File(destinationFile.getAbsolutePath());
+				if (!(name.equals("Select Map"))) {*/
 					try {
 						img = ImageIO.read(destinationFile);
 					} catch (IOException g) {
@@ -349,21 +354,25 @@ public class MapUpdaterGUI extends JFrame {
 					System.out.println(currentMap.getName());
 						try {
 							md.insertPoint(currentMap, storePoint);
+							System.out.println("AddPointSuccess");
 						} catch (AlreadyExistsException | NoMapException | InsertFailureException | SQLException f) {
 							// TODO Auto-generated catch block
 							System.out.println(f.getMessage());
 							//f.printStackTrace();
 						}
-						for (int j = 0; j < storePoint.getEdges().size(); j++) {
-							try {
-								md.insertEdge(storePoint.getEdges().get(j));
-							} catch (InsertFailureException | AlreadyExistsException | SQLException
-									| DoesNotExistException g) {
-								// TODO Auto-generated catch block
-								System.out.println(g);
-							}	
-						}
+
 					markForDelete.add(storePoint);
+				}
+				for (int i = 0; i < edgeArray.size(); i++) {
+					Edge storeEdge = edgeArray.get(i);
+
+						try {
+							md.insertEdge(storeEdge);
+						} catch (InsertFailureException | AlreadyExistsException | SQLException
+								| DoesNotExistException g) {
+							// TODO Auto-generated catch block
+							System.out.println(g.getMessage());
+						}
 				}
 				
 				mapDropDown.setSelectedItem(mapDropDown.getItemAt(0));

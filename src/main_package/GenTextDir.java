@@ -48,9 +48,9 @@ public class GenTextDir {
 				//System.out.println("PrevPointY = " + prevPointY);
 				if(prevPointY == 0){//if the previous points Y is at 0, we rotate either PI/2, or -PI/2
 					if(prevPointX < 0){//If it's X is less than 0, we are rotating PI/2
-						angleRotate = Math.PI/2;
-					} else {
 						angleRotate = -Math.PI/2;
+					} else {
+						angleRotate = Math.PI/2;
 					}
 				} else if (prevPointY < 0){
 					if(prevPointX > 0){
@@ -61,8 +61,10 @@ public class GenTextDir {
 				} else {
 					if(prevPointX > 0){
 						angleRotate = Math.PI + Math.atan(Math.abs(prevPointX) / Math.abs(prevPointY));
-					} else {
+					} else if (prevPointX < 0){
 						angleRotate = Math.PI - Math.atan(Math.abs(prevPointX) / Math.abs(prevPointY));
+					} else {
+						angleRotate = 0;
 					}
 				}
 				if(DEBUG){//testing
@@ -98,7 +100,6 @@ public class GenTextDir {
 					if(DEBUG){
 						System.out.println("The point: " + nextPoint.getName() + " has 0 no change in Y");
 					}
-					
 					if(nextPointX < 0){//If the next point is to the left of current point.
 						angle = Math.PI/2;//Turn left 90 degrees
 					} else {// otherwise
@@ -112,18 +113,23 @@ public class GenTextDir {
 					}
 				}
 				angle = angle * 180 / Math.PI;//Convert the angle found into degrees
-				
 				angle = Math.floor(angle);
 				if(DEBUG){
 					System.out.println("Turn " + angle + " degrees");
 				}
 				angle = Math.abs(angle);//Set the angle equal to its absolute value (no turning - degrees)
 				String turnAmount;
+				//System.out.println("At " + currPoint.getName() + " the past angle rotate value is: " + (180 * angleRotate / Math.PI));
+				//System.out.println("At " + currPoint.getName() + " the angle value is: " + angle);
+				//System.out.println("At " + currPoint.getName() + " the y value is: " + prevPointY);
+				//System.out.println("At " + currPoint.getName() + " the x value is: " + nextPointX);
 				if((angle >= -0.1) && (angle <= 0.1)){//if the angle is within some degree of error of 0, we are going straight
 					currString = "Once you reach " + currPoint.getName() + " go straight until " + nextPoint.getName();
 				} else if (nextPointX <= 0){//otherwise, if its X is negative, we are turning left.
-					if(nextPointY > 0){//if the Y is less than 0, angle is 180-angle
+					//System.out.println("At " + currPoint.getName() + " the new y value is: " + nextPointY);
+					if(nextPointY < 0){//if the Y is less than 0, angle is 180-angle
 						angle = 180-angle;
+						//System.out.println("angle at: " + currPoint.getName());
 					}
 					if(angle > 0 && angle < 60){
 						turnAmount = "slight left";
@@ -134,7 +140,7 @@ public class GenTextDir {
 					}
 					currString = "Turn a " + turnAmount + " at " + currPoint.getName() + " towards " + nextPoint.getName();
 				} else {//otherwise, do the same, but we are turning right
-					if(nextPointY > 0){
+					if(nextPointY < 0){
 						angle = 180-angle;
 					}
 					if(angle > 0 && angle < 60){

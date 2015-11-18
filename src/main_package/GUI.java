@@ -153,8 +153,6 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 		//}
 
 
-
-
 		/*adds the room numbers based off of building name
         startBuilds.addActionListener (new ActionListener () {
             public void actionPerformed(ActionEvent e) {
@@ -221,12 +219,12 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				//System.out.println("inside action listener");
 				buildDestIndex = mapsDropdown.getSelectedIndex();
 				////////////////////////////////////////////////////////////////////////////////
-				//String mapTitle = maps.get(buildDestIndex).getName();
-				String mapTitle = "AtwaterKent2";
+				String mapTitle = maps.get(buildDestIndex-1).getName();
+				//String mapTitle = "AtwaterKent1";
 				File dest = new File("src/VectorMaps");
 				String destInput = dest.getAbsolutePath();
 				//assuming all maps saved in vectorMaps are in jpg
-				destInput = destInput + "\\" + mapTitle + ".jpg";
+				destInput = destInput + "/" + mapTitle + ".jpg";
 				File destFile = new File(destInput);
 				try{
 					img = ImageIO.read(destFile);
@@ -433,12 +431,14 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 					windowScale += 1;
 
 				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
-
+		
 
 				if (showRoute && route != null){           
 					for (int i = 1; i < route.size(); i++){
 						//System.out.println(route.get(i));
+						g.setColor(Color.RED);
 						g.drawLine(route.get(i-1).getX(), route.get(i-1).getY(), route.get(i).getX(), route.get(i).getY());
+					
 					}
 				}
 			}

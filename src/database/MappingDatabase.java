@@ -1212,6 +1212,7 @@ public class MappingDatabase
 				pointList.get(k).print();
 			}
 		}
+		//System.out.println("maps.size()
 	}
 }	
 

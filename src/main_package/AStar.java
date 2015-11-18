@@ -16,24 +16,24 @@ public class AStar {
 		fscore.put(start, CostEstimate(start, end));
 		
 		Open.add(start); // Initialize Open
-		
+		System.out.println("----------------------------open true in astar: " + !Open.isEmpty());
 		while(!Open.isEmpty()){
 			Point Current = Open.removeFirst(); // Working with lowest element in Open
-			if(Current == end){
+			if(Current.equals(end)){
 				return ReconstructPath(end); // Found the Exit
 			}
 			Closed.add(Current); // Add it to Closed
 			
 			for(int i = 0; i < Current.getNumEdges(); i++) {
-				if(Closed.contains(Current.getEdges().get(i).getPoint1()) && Current.getEdges().get(i).getPoint1() != Current){
+				if(Closed.contains(Current.getEdges().get(i).getPoint1()) && !Current.getEdges().get(i).getPoint1().equals(Current)){
 					
 				}
-				else if(Closed.contains(Current.getEdges().get(i).getPoint2()) && Current.getEdges().get(i).getPoint2() != Current){
+				else if(Closed.contains(Current.getEdges().get(i).getPoint2()) && !Current.getEdges().get(i).getPoint2().equals(Current)){
 					
 				}
 				else{
 					int tentGScore = gscore.get(Current) + Current.getEdges().get(i).getWeight();
-					if(Current.getEdges().get(i).getPoint1() == Current){
+					if(Current.getEdges().get(i).getPoint1().equals(Current)){
 						if(!Open.contains(Current.getEdges().get(i).getPoint2()) || gscore.get(Current.getEdges().get(i).getPoint2()) > tentGScore){
 							CameFrom.put(Current.getEdges().get(i).getPoint2(), Current);
 							gscore.put(Current.getEdges().get(i).getPoint2(), tentGScore);
@@ -43,7 +43,7 @@ public class AStar {
 							}
 						}
 					}
-					else if(Current.getEdges().get(i).getPoint2() == Current){
+					else if(Current.getEdges().get(i).getPoint2().equals(Current)){
 						if(!Open.contains(Current.getEdges().get(i).getPoint1()) || gscore.get(Current.getEdges().get(i).getPoint1()) > tentGScore){
 							CameFrom.put(Current.getEdges().get(i).getPoint1(), Current);
 							gscore.put(Current.getEdges().get(i).getPoint1(), tentGScore);

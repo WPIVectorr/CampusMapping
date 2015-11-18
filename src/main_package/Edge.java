@@ -80,5 +80,5 @@ public class Edge {
 		System.out.println("Outside:"+this.isOutside);
 		System.out.println("Stairs"+this.isStairs);
 	}
-	
+
 }

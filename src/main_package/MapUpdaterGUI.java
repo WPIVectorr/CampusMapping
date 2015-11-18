@@ -5,6 +5,8 @@ import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,13 +19,11 @@ import javax.swing.Box;
 
 public class MapUpdaterGUI extends JFrame {
 
-
-
-
 	private int lastMousex, lastMousey;
 	private int pointSize = 5;
 	private boolean newClick = false;
 	private boolean editingPoint = false;
+	private boolean addingMap = false;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
 	private Point currentPoint;
 	private Point editPoint;
@@ -31,7 +31,13 @@ public class MapUpdaterGUI extends JFrame {
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private Edge currentEdge;
 
-	BufferedImage img = null;
+	// ---------------------------------
+	private int windowScale = 2;
+	private int windowSizeX = 932;
+	private int windowSizeY = 778;
+	BufferedImage img;
+	// ---------------------------------
+
 	private JPanel contentPane;
 	private static JButton btnSaveMap;
 	private static JButton btnSavePoint;
@@ -39,24 +45,24 @@ public class MapUpdaterGUI extends JFrame {
 	private static JRadioButton rdbtnEditPoints;
 	private static JRadioButton rdbtnRemovePoints;
 
-	//drop down menu of buildings on campus
-	String buildings[] = {"Select Building", "Atwater Kent", "Boynton Hall", 
-			"Campus Center", "Gordon Library", "Higgins House", "Project Center", 
-	"Stratton Hall"};
+	// drop down menu of buildings on campus
+	String buildings[] = { "Select Building", "Atwater Kent", "Boynton Hall", "Campus Center", "Gordon Library",
+			"Higgins House", "Project Center", "Stratton Hall" };
 
-	//drop down menu of room numbers based off of the building selected on campus
-	String rooms[] = {"Select room #", "Please choose building first"};
-	String[] akRooms = {"Select room #", "10", "20", "30", "40"};
-	String[] bhRooms = {"Select room #", "11", "21", "31", "41"};
-	String[] ccRooms = {"Select room #", "12", "22", "32", "42"};
-	String[] glRooms = {"Select room #", "13", "23", "33", "43"};
-	String[] hhRooms = {"Select room #", "14", "24", "34", "44"};
-	String[] pcRooms = {"Select room #", "15", "25", "35", "45"};
-	String[] shRooms = {"Select room #", "16", "26", "36", "46"};
+	// drop down menu of room numbers based off of the building selected on
+	// campus
+	String rooms[] = { "Select room #", "Please choose building first" };
+	String[] akRooms = { "Select room #", "10", "20", "30", "40" };
+	String[] bhRooms = { "Select room #", "11", "21", "31", "41" };
+	String[] ccRooms = { "Select room #", "12", "22", "32", "42" };
+	String[] glRooms = { "Select room #", "13", "23", "33", "43" };
+	String[] hhRooms = { "Select room #", "14", "24", "34", "44" };
+	String[] pcRooms = { "Select room #", "15", "25", "35", "45" };
+	String[] shRooms = { "Select room #", "16", "26", "36", "46" };
 
-	int[][] coordTest1 = {{30,30}, {100, 300}, {800, 300}, {100, 200}};
-	int[][] coordTest2 = {{500,500}, {300, 100}, {800, 500}, {100, 200}};
-	int[][] coordTest3 = {{400, 200}, {50, 30}, {8, 300}, {10, 20}};
+	int[][] coordTest1 = { { 30, 30 }, { 100, 300 }, { 800, 300 }, { 100, 200 } };
+	int[][] coordTest2 = { { 500, 500 }, { 300, 100 }, { 800, 500 }, { 100, 200 } };
+	int[][] coordTest3 = { { 400, 200 }, { 50, 30 }, { 8, 300 }, { 10, 20 } };
 
 	String point1;
 	String point2;
@@ -71,48 +77,89 @@ public class MapUpdaterGUI extends JFrame {
 	private JPanel buttonPanel;
 	private DrawRoute drawPanel = new DrawRoute();
 	private JTextField mapName;
+	private JButton btnNewButton;
+	private JTextField txtImageDirectoryPath;
+	private JComboBox mapDropDown;
 
-	public MapUpdaterGUI() throws IOException  {
+	public MapUpdaterGUI() throws IOException {
 		super("MapUpdaterGUI");
 		setSize(932, 778);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		//  img = ImageIO.read(new File("temp.jpg"));
+		// img = ImageIO.read(new File("temp.jpg"));
 
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridLayout(4, 0, 10, 10));
 		buttonPanel.setBackground(new Color(255, 235, 205));
 
-		//adds the destination label to the line with destination location options
-		JLabel lblDestination = new JLabel("Map Name:");
-		buttonPanel.add(lblDestination);
-		lblDestination.setBounds(6, 68, 85, 44);
+		// Map Drop Down List
+		mapDropDown = new JComboBox();
+		mapDropDown.setToolTipText("Select Map");
+		buttonPanel.add(mapDropDown);
+		mapDropDown.addItem("Select Map");
+
+		// When the Updater opens the software the list will be poulated with
+		// teh files in
+		// the VectorMapps resource folder
+		File vectorMapDir = new File("src/VectorMaps");
+		vectorMapDir = new File(vectorMapDir.getAbsolutePath());
+
+		// Truncates the extensions off of the map name so only the name is
+		// displayed in the
+		// dropdown menu for selecting a map
+		File[] imgList = vectorMapDir.listFiles();
+		String tempMapName;
+		int nameLength = 0;
+		for (int f = 0; f < imgList.length; f++) {
+			/*
+			 * tempMapName = imgList[f].getName(); nameLength =
+			 * tempMapName.length();
+			 * mapDropDown.addItem(tempMapName.substring(0, nameLength - 4));
+			 */
+
+			// includes extension
+			mapDropDown.addItem(imgList[f].getName());
+		}
+
+		mapDropDown.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent a) {
+				String name = mapDropDown.getSelectedItem().toString();
+				File destinationFile = new File("src/VectorMaps/" + name);
+				destinationFile = new File(destinationFile.getAbsolutePath());
+				try {
+					img = ImageIO.read(destinationFile);
+				} catch (IOException g) {
+					System.out.println("Invalid Map Selection");
+					g.printStackTrace();
+				}
+			}
+		});
+		// List that stores the name of every Map in the database
+
+		// mapList.add("Select Map");
 
 		Container contentPane = this.getContentPane();
 		contentPane.add(buttonPanel, BorderLayout.NORTH);
 
-		//adds the starting location label to the line with starting location options
+		// adds the starting location label to the line with starting location
+		// options
 		JLabel lblStartingLocation = new JLabel("Room Number");
 		buttonPanel.add(lblStartingLocation);
 		lblStartingLocation.setBounds(6, 31, 119, 16);
 
-		/*Initialization of the radio buttons*/
-		ButtonGroup modeSelector = new ButtonGroup(); 
-		rdbtnAddPoints = new JRadioButton("Add Points",true);
+		/* Initialization of the radio buttons */
+		ButtonGroup modeSelector = new ButtonGroup();
+		rdbtnAddPoints = new JRadioButton("Add Points", true);
 		buttonPanel.add(rdbtnAddPoints);
 		modeSelector.add(rdbtnAddPoints);
 
-
-
-
-
 		mapName = new JTextField();
+		mapName.setText("Map Name");
 		buttonPanel.add(mapName);
 		mapName.setColumns(10);
 
-
-
-		//creates a centered text field that will write back the users info they typed in
+		// creates a centered text field that will write back the users info
+		// they typed in
 		roomNumber = new JTextField();
 		buttonPanel.add(roomNumber);
 		roomNumber.setHorizontalAlignment(JTextField.CENTER);
@@ -121,70 +168,110 @@ public class MapUpdaterGUI extends JFrame {
 		roomNumber.setBounds(6, 174, 438, 30);
 		roomNumber.setColumns(1);
 
-
 		rdbtnRemovePoints = new JRadioButton("Remove Points");
 		buttonPanel.add(rdbtnRemovePoints);
 		modeSelector.add(rdbtnRemovePoints);
 
-		Component horizontalStrut = Box.createHorizontalStrut(20);
-		buttonPanel.add(horizontalStrut);
+		/* JButton Add Map */
 
-		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
-		buttonPanel.add(horizontalStrut_1);
-
-		rdbtnEditPoints = new JRadioButton("Edit Points");
-		buttonPanel.add(rdbtnEditPoints); 
-		modeSelector.add(rdbtnEditPoints); 
-
-
-		JLabel lblLastPoint = new JLabel("Select a Point to Edit");
-		buttonPanel.add(lblLastPoint);
-
-		/*JButton*/ 
-		btnSavePoint = new JButton("No Point Selected");
-		buttonPanel.add(btnSavePoint);
-		btnSaveMap = new JButton("Save Map"); //defined above to change text in point selector
-		buttonPanel.add(btnSaveMap);
 		getContentPane().add(drawPanel);
+		txtImageDirectoryPath = new JTextField();
+		txtImageDirectoryPath.setText("Map Image Directory Path");
+		buttonPanel.add(txtImageDirectoryPath);
+		txtImageDirectoryPath.setColumns(10);
 
-		btnSavePoint.addActionListener(new ActionListener(){
+		JButton btnAddMap = new JButton("Add Map");
+		buttonPanel.add(btnAddMap);
+
+		btnAddMap.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(editingPoint)
-				{
-					System.out.println("SavePoint");
-					editPoint.setName(roomNumber.getText());
-					roomNumber.setText("Select a Point to Edit");
-					editingPoint = false;
-				}else{
+				String maptitle = mapName.getText();
+				String srcInput = txtImageDirectoryPath.getText();
+				addingMap = true;
+				if (addingMap) {
+					// /Users/ibanatoski/Downloads/MACC_design2.png
+					System.out.println("SavingMap");
+					File dest = new File("src/VectorMaps");
+					// File destAbs = dest.getAbsoluteFile();
+					File srcFile = new File(srcInput);
+					String destInput = dest.getAbsolutePath();
+					System.out.println("Destination Input: " + destInput);
+					System.out.println("Source Input: " + srcInput);
+					destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
+					System.out.println(destInput);
+					File destFile = new File(destInput);
+
+					// Add the name of the map to the Map Selction Dropdown menu
+					mapDropDown.addItem(maptitle + srcInput.substring(srcInput.length() - 4));
+
+					try {
+						copyFileUsingStream(srcFile, destFile);
+						img = ImageIO.read(destFile);
+					} catch (IOException a) {
+						System.out.println("invalid copy");
+						a.printStackTrace();
+					}
+					// saveMap.setName(roomNumber.getText());
+					addingMap = false;
+				} else {
 
 				}
 			}
 		});
 
+		rdbtnEditPoints = new JRadioButton("Edit Points");
+		buttonPanel.add(rdbtnEditPoints);
+		modeSelector.add(rdbtnEditPoints);
 
+		JLabel lblLastPoint = new JLabel("Select a Point to Edit");
+		buttonPanel.add(lblLastPoint);
+
+		/* JButton */
+		btnSavePoint = new JButton("No Point Selected");
+		buttonPanel.add(btnSavePoint);
+		btnSaveMap = new JButton("Save Map"); // defined above to change text in
+												// point selector
+		buttonPanel.add(btnSaveMap);
+		getContentPane().add(drawPanel);
+
+		btnSavePoint.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (editingPoint) {
+					System.out.println("SavePoint");
+					editPoint.setName(roomNumber.getText());
+					roomNumber.setText("Select a Point to Edit");
+					editingPoint = false;
+				} else {
+
+				}
+			}
+		});
 
 	}
-	/*Returns the currently selected radbutton in the form of an 
-    int. 1 for addPoint, 2 for editPoint, 3 for removePoint*/
-	int getRadButton()
-	{
+
+	/*
+	 * Returns the currently selected radbutton in the form of an int. 1 for
+	 * addPoint, 2 for editPoint, 3 for removePoint
+	 */
+	int getRadButton() {
 		int activeButton = 0;
-		if(rdbtnAddPoints.isSelected())
+		if (rdbtnAddPoints.isSelected())
 			activeButton = 1;
-		if(rdbtnEditPoints.isSelected())
+		if (rdbtnEditPoints.isSelected())
 			activeButton = 2;
-		if(rdbtnRemovePoints.isSelected())
+		if (rdbtnRemovePoints.isSelected())
 			activeButton = 3;
 		return activeButton;
 	}
 
-
-	//assigns the selected building name to have the string of room 
-	//numbers based off of the building selected
-	public String[] generateRoomNums(String select){
-		switch (select){
+	// assigns the selected building name to have the string of room
+	// numbers based off of the building selected
+	public String[] generateRoomNums(String select) {
+		switch (select) {
 		case "Atwater Kent":
 			return akRooms;
 		case "Boynton Hall":
@@ -203,23 +290,34 @@ public class MapUpdaterGUI extends JFrame {
 		return rooms;
 	}
 
-
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException {
 		MapUpdaterGUI myTest = new MapUpdaterGUI();
 		myTest.setVisible(true);
 
 	}
 
-
-	class DrawRoute extends JPanel{
+	class DrawRoute extends JPanel {
 		ArrayList<Point> markForDelete = new ArrayList<Point>();
-		ArrayList<Point> paintArray = new ArrayList<Point>(); //arraylist of points already painted
-		//Point editPoint;
-		//Driver values used for testing:
+		ArrayList<Point> paintArray = new ArrayList<Point>(); // arraylist of
+																// points
+																// already
+																// painted
+		// Point editPoint;
+		// Driver values used for testing:
 		int pointID = 0;
 		int numEdges = 0;
 		int edgeWeight = 1;
 
+		/*
+		 * addMouseListener(new MouseAdapter() {
+		 * 
+		 * public void mouseReleased(MouseEvent e) { newClick = false;
+		 * lastMousex = e.getX(); lastMousey = e.getY(); newClick = true;
+		 * 
+		 * }
+		 * 
+		 * });
+		 */
 
 
 
@@ -227,32 +325,52 @@ public class MapUpdaterGUI extends JFrame {
 		public void paintComponent(Graphics g) {
 
 			super.paintComponent(g);
-			g.drawImage(img, 0, 0, null);
+			
+			//-------------------------------
+			//if(img == null)
+				//img = ImageIO.read(new File("/User/ibanatoski/git/CampusMapping/src/VectorMaps/"));
+			if(!(img == null)){
+				
+				//Scale the image to the appropriate screen size
+				double wScale;
 
+				if (img.getHeight() >= img.getWidth()) {
+					wScale = (double) img.getHeight() / (double) windowSizeY;
+					windowScale = img.getHeight() / windowSizeY;
+				} else {
+					wScale = (double) img.getHeight() / (double) windowSizeY;
+					windowScale = img.getWidth() / windowSizeX;
+				}
+				if (wScale > windowScale)
+					windowScale += 1;
+				
+				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
+			}
 
 			addMouseListener(new MouseAdapter() {
 
 				public void mouseReleased(MouseEvent e) {
 					newClick = false;
-					lastMousex =  e.getX();
-					lastMousey =  e.getY();
+					lastMousex = e.getX();
+					lastMousey = e.getY();
 					newClick = true;
 
+			repaint();
 				}
 
 			});
-
 
 
 			//add point to the point array (has to take place outside of below loop)
 			if(newClick == true)
 			{
 				System.out.println(newClick);
-				if(getRadButton()==1) //if addpoint
+				if (getRadButton() == 1) // if addpoint
 				{
 					Integer arraySize = pointArray.size();
-					Point point = new Point(arraySize, "Point " + arraySize.toString(), lastMousex, lastMousey, numEdges);
-					pointArray.add(point); 
+					Point point = new Point(arraySize, "Point " + arraySize.toString(), lastMousex, lastMousey,
+							numEdges);
+					pointArray.add(point);
 				}
 			}
 
@@ -265,13 +383,71 @@ public class MapUpdaterGUI extends JFrame {
 				{			    
 
 					currentPoint = pointArray.get(i);	
+
+					// add edges to list
+					for (int j = 0; j < currentPoint.getNumEdges(); j++) {
+						edgeArray.add(currentPoint.getEdges().get(j));
+					}
+					// newClick has some interesting storage things going on.
+					// wtf is with Java
+					if (newClick == true) {
+
+						MapUpdaterGUI.btnSaveMap.setText("Save Map, X:" + lastMousex + ", Y:" + lastMousey);
+
+						switch (getRadButton()) {
+						case 2:// edit points
+							if ((lastMousex > currentPoint.getX() - (pointSize + 5)
+									&& lastMousex < currentPoint.getX() + (pointSize + 5))
+									&& (lastMousey > currentPoint.getY() - (pointSize + 5)
+											&& lastMousey < currentPoint.getY() + (pointSize + 5))) {
+								if (newClick == true && editingPoint == false) {
+									editPoint = currentPoint;
+									roomNumber.setText(editPoint.getName());
+									btnSavePoint.setText("Save");
+									editingPoint = true;
+									newClick = false;
+								} else if (newClick == true && editingPoint == true) {
+									currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
+									if (currentPoint.getNumberEdges() > 0)// this
+																			// has
+																			// to
+																			// be
+																			// caught
+																			// in
+																			// an
+																			// exception
+																			// later
+									{
+										for (int j = 0; j < currentPoint.getNumberEdges(); j++) {
+											System.out.println("add edge: "
+													+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
+													+ currentPoint.getEdges().get(j).getPoint2().getName());
+										}
+									}
+									newClick = false;
+								}
+							}
+							break;
+						case 3:// remove points
+							if ((lastMousex > currentPoint.getX() - (pointSize + 5)
+									&& lastMousex < currentPoint.getX() + (pointSize + 5))
+									&& (lastMousey > currentPoint.getY() - (pointSize + 5)
+											&& lastMousey < currentPoint.getY() + (pointSize + 5))) {
+								if (newClick == true)
+									markForDelete.add(currentPoint);
+
+								newClick = false;
+							}
+							break;
+						default:
+							break;
+						}
+					}
+
 					int drawX = (int) currentPoint.getX();
 					int drawY = (int) currentPoint.getY();
 					//draws the points onto the map.
-					if(paintArray.contains(currentPoint))
-					{
-						g.fillOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
-					}      	
+					g.fillOval(drawX -(pointSize/2), drawY -(pointSize/2), pointSize, pointSize);
 
 
 
@@ -281,75 +457,15 @@ public class MapUpdaterGUI extends JFrame {
 								edgeArray.get(j).getPoint2().getX(),edgeArray.get(j).getPoint2().getY());
 
 					}
-
-
-					//add edges to list
-					for(int j=0;j<currentPoint.getNumEdges();j++)
-					{
-						edgeArray.add(currentPoint.getEdges().get(j));
-					}	
-					//newClick has some interesting storage things going on. wtf is with Java
-					if(newClick == true)
-					{
-
-						MapUpdaterGUI.btnSaveMap.setText("Save Map, X:" + lastMousex + ", Y:" + lastMousey);
-
-						switch (getRadButton()) 
-						{
-						case 2://edit points				    				
-							if(		   (lastMousex>currentPoint.getX()-(pointSize+5) 
-									&& 	lastMousex<currentPoint.getX()+(pointSize+5))
-									&& (lastMousey>currentPoint.getY()-(pointSize+5)
-											&& 	lastMousey<currentPoint.getY()+(pointSize+5)))
-							{
-								if(newClick ==true && editingPoint == false)
-								{
-									editPoint = currentPoint;
-									roomNumber.setText(editPoint.getName());
-									btnSavePoint.setText("Save");
-									editingPoint = true;
-									newClick =false;
-								}else if(newClick == true && editingPoint == true)
-								{
-									currentEdge = new Edge(editPoint,currentPoint,edgeWeight);
-									if(currentPoint.getNumberEdges()>0)//this has to be caught in an exception later
-									{
-										for (int j = 0; j < currentPoint.getNumberEdges(); j++) {
-											System.out.println("add edge: "+
-													currentPoint.getEdges().get(j).getPoint1().getName() 
-													+ ", " +
-													currentPoint.getEdges().get(j).getPoint2().getName());	
-										}
-									}
-									newClick = false;
-								}
-							}
-							break;
-						case 3://remove points
-							if(		(	lastMousex>currentPoint.getX()-(pointSize+5) 
-									&& 	lastMousex<currentPoint.getX()+(pointSize+5))
-									&& (lastMousey>currentPoint.getY()-(pointSize+5)
-											&& 	lastMousey<currentPoint.getY()+(pointSize+5)))
-							{
-								if(newClick ==true)
-									markForDelete.add(currentPoint);
-
-								newClick =false;
-							}
-							break;
-						default:
-							break;
-						}
-					}
 				}	            
+				
 			}
 
-			for (int i = 0; i < markForDelete.size(); i++) {	    	
-				//remove edges to list
-				for(int j=0;j<markForDelete.get(i).getNumEdges();j++)
-				{
+			for (int i = 0; i < markForDelete.size(); i++) {
+				// remove edges to list
+				for (int j = 0; j < markForDelete.get(i).getNumEdges(); j++) {
 					edgeArray.clear();
-				}	
+				}
 
 				markForDelete.get(i).deleteEdges();
 				pointArray.remove(markForDelete.get(i));
@@ -358,12 +474,28 @@ public class MapUpdaterGUI extends JFrame {
 
 			newClick = false;
 
-			repaint();
-		}
-
-
+				}
 
 	}
 
-
+		/*
+		 * Takes an input file directory path and a target directory path and
+		 * copies that File to the target location
+		 */
+		private void copyFileUsingStream(File source, File dest) throws IOException {
+			System.out.println(source.getPath());
+			FileInputStream is = null;
+			FileOutputStream os = null;
+			is = new FileInputStream(source);
+			System.out.println(source.getPath());
+			os = new FileOutputStream(dest);
+			System.out.println(dest.getPath());
+			byte[] buffer = new byte[1024];
+			int length;
+			while ((length = is.read(buffer)) > 0) {
+				os.write(buffer, 0, length);
+			}
+			is.close();
+			os.close();
+		}
 }

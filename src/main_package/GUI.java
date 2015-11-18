@@ -43,9 +43,18 @@ public class GUI extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//  img = ImageIO.read(new File("temp.jpg"));
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		MappingDatabase.initDatabase();
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/*md.initDatabase();
 		md.testMaps();
+		maps = md.getMaps();
+		System.out.println("-------------------------------------------");
+		System.out.println("maps size:"+maps.size());
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 		//System.out.println("testMaps: " + md.getMaps().size());
 		maps = md.getMaps();
 		System.out.println("------------------edges check-------------------");

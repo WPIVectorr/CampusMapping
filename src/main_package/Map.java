@@ -2,6 +2,7 @@ package main_package;
 
 import java.util.ArrayList;
 
+
 public class Map {
 	private ArrayList<Point> Points; 
 	private ArrayList<Edge> Edges;

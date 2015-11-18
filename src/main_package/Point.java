@@ -80,6 +80,9 @@ public class Point {
 	public String toString(){
 		return name;
 	}
+	public boolean equals(Point compPoint){
+		return this.id == compPoint.getId();
+	}
 	public void print()
 	{
 		System.out.println ("Name:"+this.name);

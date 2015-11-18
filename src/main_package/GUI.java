@@ -33,6 +33,9 @@ public class GUI extends JFrame{
 	private JTextField txtDestination;
 	private JPanel buttonPanel;
 	private DrawRoute drawPanel = new DrawRoute();
+	private int windowScale = 2;
+	private int windowSizeX = 932;
+	private int windowSizeY = 778;
 
 	private int buildStartIndex;
 	private int buildDestIndex;
@@ -44,7 +47,7 @@ public class GUI extends JFrame{
 
 		//  img = ImageIO.read(new File("temp.jpg"));
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		MappingDatabase.initDatabase();
 
 		md.initDatabase();
@@ -52,7 +55,7 @@ public class GUI extends JFrame{
 		maps = md.getMaps();
 		System.out.println("-------------------------------------------");
 		System.out.println("maps size:"+maps.size());
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//System.out.println("testMaps: " + md.getMaps().size());
 		maps = md.getMaps();
@@ -60,7 +63,7 @@ public class GUI extends JFrame{
 		maps.get(0).getPointList().get(0).print();
 		//maps.get(index)
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
+		/*
 		// Stub for testing 
 
 		// Stub for testing 
@@ -215,6 +218,23 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 			public void actionPerformed(ActionEvent e) {
 				//System.out.println("inside action listener");
 				buildDestIndex = mapsDropdown.getSelectedIndex();
+				////////////////////////////////////////////////////////////////////////////////
+				//String mapTitle = maps.get(buildDestIndex).getName();
+				String mapTitle = "AtwaterKent1";
+				File dest = new File("src/VectorMaps");
+				String destInput = dest.getAbsolutePath();
+				//assuming all maps saved in vectorMaps are in jpg
+				destInput = destInput + "/" + mapTitle + ".jpg";
+				File destFile = new File(destInput);
+				try{
+					img = ImageIO.read(destFile);
+				}
+				catch(IOException a){
+					a.printStackTrace();
+				}
+
+
+
 				//if(buildDestIndex == -1)
 				//buildDestIndex = 0;
 				//System.out.println("buildDest: " + buildDestIndex);
@@ -362,12 +382,26 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			g.drawImage(img, 0, 0, null);
+			double wScale;
+			if(img != null){
+				if (img.getHeight() >= img.getWidth()) {
+					wScale = (double) img.getHeight() / (double) windowSizeY;
+					windowScale = img.getHeight() / windowSizeY;
+				} else {
+					wScale = (double) img.getHeight() / (double) windowSizeY;
+					windowScale = img.getWidth() / windowSizeX;
+				}
+				if (wScale > windowScale)
+					windowScale += 1;
 
-			if (showRoute && route != null){           
-				for (int i = 1; i < route.size(); i++){
-					//System.out.println(route.get(i));
-					g.drawLine(route.get(i-1).getX(), route.get(i-1).getY(), route.get(i).getX(), route.get(i).getY());
+				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
+
+
+				if (showRoute && route != null){           
+					for (int i = 1; i < route.size(); i++){
+						//System.out.println(route.get(i));
+						g.drawLine(route.get(i-1).getX(), route.get(i-1).getY(), route.get(i).getX(), route.get(i).getY());
+					}
 				}
 			}
 		}

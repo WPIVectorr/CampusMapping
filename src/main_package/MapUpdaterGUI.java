@@ -29,6 +29,7 @@ public class MapUpdaterGUI extends JFrame {
 	private boolean editingPoint = false;
 	private boolean addingMap = false;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
+	private ArrayList<Point> markForDelete = new ArrayList<Point>();
 	private Point currentPoint;
 	private Point editPoint;
 	
@@ -130,11 +131,15 @@ public class MapUpdaterGUI extends JFrame {
 		mapDropDown.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				String name = mapDropDown.getSelectedItem().toString();
-				ArrayList<Map> mapList = md.getMaps();
 				
+				ArrayList<Map> mapList = md.getMaps();
+				System.out.println("mapsize: "+mapList.size());
 				for(int i = 0; i < mapList.size(); i++){
 					if(name.equals(mapList.get(i).getName()))
+					{
 						currentMap = mapList.get(i);
+						System.out.println("CurrentMapName: "+currentMap.getName());
+					}
 				}
 				
 				
@@ -208,6 +213,7 @@ public class MapUpdaterGUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				addingMap = true;
 				String maptitle = mapName.getText();
+				
 				maptitle = maptitle.trim();
 				String srcInput = txtImageDirectoryPath.getText();
 				String mapNameNoExt;
@@ -268,6 +274,7 @@ public class MapUpdaterGUI extends JFrame {
 
 					// Create the Map object to be stored in the database
 					Map m = new Map(highestID + 1, maptitle);
+					
 					highestID++;
 
 					try {
@@ -333,10 +340,14 @@ public class MapUpdaterGUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				for (int i = 0; i < pointArray.size(); i++) {
 					Point storePoint = pointArray.get(i);
-					storePoint.setID(i+/*currentMap.getID()**/500);//CHANGE THIS (AND DELETE THIS COMMENT
-					//currentMap.addPoint(storePoint);
-					
+					storePoint.setID(i+currentMap.getId()*500);//CHANGE THIS to reflect ID stuff (AND DELETE THIS COMMENT
+					System.out.println(currentMap.getName());
+					currentMap.addPoint(storePoint);
+					markForDelete.add(storePoint);
 				}
+				mapDropDown.setSelectedItem(mapDropDown.getItemAt(0));
+				repaint();
+				
 			}
 		});
 
@@ -386,7 +397,7 @@ public class MapUpdaterGUI extends JFrame {
 	}
 
 	class DrawRoute extends JPanel {
-		ArrayList<Point> markForDelete = new ArrayList<Point>();
+		
 		ArrayList<Point> paintArray = new ArrayList<Point>(); // arraylist of
 																// points
 																// already
@@ -438,17 +449,16 @@ public class MapUpdaterGUI extends JFrame {
 				System.out.println("Image is null");
 			}
 
+			
+			//selecting points on the map
 			addMouseListener(new MouseAdapter() {
-
 				public void mouseReleased(MouseEvent e) {
 					newClick = false;
 					lastMousex = e.getX();
 					lastMousey = e.getY();
 					newClick = true;
-
 					repaint();
 				}
-
 			});
 
 			// add point to the point array (has to take place outside of below
@@ -522,7 +532,15 @@ public class MapUpdaterGUI extends JFrame {
 							break;
 						}
 					}
-
+					
+					for (int j = 0; j < markForDelete.size(); j++) {
+						// remove edges to list
+						edgeArray.clear();
+						markForDelete.get(j).deleteEdges();
+						pointArray.remove(markForDelete.get(j));
+						markForDelete.remove(j);
+					}
+					
 					int drawX = (int) currentPoint.getX();
 					int drawY = (int) currentPoint.getY();
 					// draws the points onto the map.
@@ -537,16 +555,13 @@ public class MapUpdaterGUI extends JFrame {
 
 			}
 
-			for (int i = 0; i < markForDelete.size(); i++) {
+/*			for (int i = 0; i < markForDelete.size(); i++) {
 				// remove edges to list
-				for (int j = 0; j < markForDelete.get(i).getNumEdges(); j++) {
-					edgeArray.clear();
-				}
-
+				edgeArray.clear();
 				markForDelete.get(i).deleteEdges();
 				pointArray.remove(markForDelete.get(i));
 				markForDelete.remove(i);
-			}
+			}*/
 
 			newClick = false;
 

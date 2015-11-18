@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 public class AStar {
 	static LinkedList<Point> Open = new LinkedList<Point>(); // List of all Open nodes
-	static ArrayList<Point> Closed = new ArrayList<Point>(); // Array of all closed Nodes
+	static ArrayList<String> Closed = new ArrayList<String>(); // Array of all closed Nodes
 	static HashMap<String, Point> CameFrom = new HashMap<String, Point>(); // Map to track path taken to each node
 	static HashMap<String, Integer> gscore = new HashMap<String, Integer>(); // Time taken to each node
 	static HashMap<String, Integer> fscore = new HashMap<String, Integer>(); // Estimated time from each node to end
@@ -22,13 +22,13 @@ public class AStar {
 			if(Current.equals(end)){
 				return ReconstructPath(end); // Found the Exit
 			}
-			Closed.add(Current); // Add it to Closed
+			Closed.add(Integer.toString(Current.getId())); // Add it to Closed
 			
 			for(int i = 0; i < Current.getNumEdges(); i++) { // Check the points on each edge
-				if(Closed.contains(Current.getEdges().get(i).getPoint1()) && !Current.getEdges().get(i).getPoint1().equals(Current)){
+				if(Closed.contains(Integer.toString(Current.getEdges().get(i).getPoint1().getId())) && !Current.getEdges().get(i).getPoint1().equals(Current)){
 					//If point1 on this edge isnt this one and is already closed, dont do things
 				}
-				else if(Closed.contains(Current.getEdges().get(i).getPoint2()) && !Current.getEdges().get(i).getPoint2().equals(Current)){
+				else if(Closed.contains(Integer.toString(Current.getEdges().get(i).getPoint2().getId())) && !Current.getEdges().get(i).getPoint2().equals(Current)){
 					//If point2 on this edge isnt this one and is already closed, dont do things
 				}
 				else{ //This edge has a new point on it
@@ -76,6 +76,7 @@ public class AStar {
 	private static ArrayList<Point> ReconstructPath(Point PathEnd){ // Recreate a path to the given point
 		Point Current = PathEnd; // Initialize current
 		ArrayList<Point> ReturnPath = new ArrayList<Point>();
+
 		while(CameFrom.containsKey(Integer.toString(Current.getId()))){ // While the current point has one it came from
 			ReturnPath.add(Current); // Add the current one
 			Current = CameFrom.get(Integer.toString(Current.getId())); // Find the next one

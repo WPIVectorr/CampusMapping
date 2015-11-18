@@ -114,7 +114,7 @@ public class GenTextDir {
 					currString = "Once you reach " + currPoint.getName() + " then turn " + Math.floor(angle) + " degrees to your left, and head towards " + nextPoint.getName();
 				} else {//otherwise, do the same, but we are turning right
 					if(nextPointY < 0){
-						angle = angle + 90;
+						angle = 180-angle;
 					}
 					currString = "Once you reach " + currPoint.getName() + " then turn " + Math.floor(angle) + " degrees to your right, and head towards " + nextPoint.getName();
 				}

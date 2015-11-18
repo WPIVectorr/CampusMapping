@@ -43,17 +43,26 @@ public class GUI extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//  img = ImageIO.read(new File("temp.jpg"));
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		MappingDatabase.initDatabase();
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/*md.initDatabase();
+		md.initDatabase();
 		md.testMaps();
+		maps = md.getMaps();
+		System.out.println("-------------------------------------------");
+		System.out.println("maps size:"+maps.size());
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 		//System.out.println("testMaps: " + md.getMaps().size());
 		maps = md.getMaps();
 		System.out.println("------------------edges check-------------------");
 		maps.get(0).getPointList().get(0).print();
-		//maps.get(index)*/
+		//maps.get(index)
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		// Stub for testing 
+		/*// Stub for testing 
 		ArrayList<Map> maps = new ArrayList<Map>();
 		Point testPoint1 = new Point (1, "One", 50, 100);
 		Point testPoint2 = new Point (2, "Two", 600, 500);

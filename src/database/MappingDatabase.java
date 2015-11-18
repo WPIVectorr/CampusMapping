@@ -1202,6 +1202,7 @@ public class MappingDatabase
 		{
 			maps.get(0).getPointList().get(z).print();
 		}
+		//System.out.println("maps.size()
 	}
 }	
 

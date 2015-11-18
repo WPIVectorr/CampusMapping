@@ -93,6 +93,8 @@ public class MappingDatabase
 	public static void insertMap(Map map) throws AlreadyExistsException, SQLException
 	{
 		int mapId = map.getId();
+		String RELEVANT_TABLE_NAME = "";
+		RELEVANT_TABLE_NAME += ("Map"+map.getId()+"Points");
 		//--------------------------------------------------Add to Database-----------------------------------------------------------------
 
 		try {
@@ -100,7 +102,11 @@ public class MappingDatabase
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30); 
 			
-			ResultSet rs = statement.executeQuery("SELECT * from "+MAP_TABLE_NAME);
+
+			statement.executeUpdate("create table if not exists "+ 								//If does not exist, then create table
+					RELEVANT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
+			
+			ResultSet rs = connection.createStatement().executeQuery("SELECT * from "+MAP_TABLE_NAME);
 			while (rs.next())
 			{
 				int comparisonId = rs.getInt("id");
@@ -195,7 +201,8 @@ public class MappingDatabase
 				{
 					if (DEBUG)
 						System.out.println("Creating table: " + RELEVANT_TABLE_NAME);
-					statement.executeUpdate("create table "+ 								//If does not exist, then create table
+
+					statement.executeUpdate("create table if not exists "+ 								//If does not exist, then create table
 											RELEVANT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
 				}
 				else
@@ -842,6 +849,7 @@ public class MappingDatabase
 				break;
 			}
 		}
+				
 		if (found)
 		{
 			return retPt;
@@ -1216,4 +1224,3 @@ public class MappingDatabase
 		//System.out.println("maps.size()
 	}
 }	
-

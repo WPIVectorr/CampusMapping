@@ -162,9 +162,12 @@ public class GenTextDir {
 			dist = Math.floor(dist);
 			dist = dist / 10;
 			if(dist == 1){//Print out the dist value (also, check if its feet or foot)
-				retString[retString.length - 1] = "Go forward " + Double.toString(dist) + " foot to your destination";
+				//retString[retString.length - 1] = "Go forward " + Double.toString(dist) + " foot to your destination";
+				retString[retString.length - 1] = "Go forward to your destination";
+
 			} else {
-				retString[retString.length - 1] = "Go forward " + Double.toString(dist) + " feet to your destination";
+				//retString[retString.length - 1] = "Go forward " + Double.toString(dist) + " feet to your destination";
+				retString[retString.length - 1] = "Go forward to your destination";
 			}
 			return retString;//return retString
 		}

@@ -34,6 +34,9 @@ public class Point {
 	public int getId() {
 		return id;
 	}
+	public void setID(int x){
+		this.id = x;
+	}
 	public String getName()
 	{
 		return this.name;

@@ -250,6 +250,19 @@ public class MapUpdaterGUI extends JFrame {
 				}
 			}
 		});
+		
+		btnSaveMap.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for (int i = 0; i < pointArray.size(); i++) {
+					Point storePoint = pointArray.get(i);
+					storePoint.setID(i+/*currentMap.getID()**/500);//CHANGE THIS (AND DELETE THIS COMMENT
+					//currentMap.addPoint(storePoint);
+					
+				}
+			}
+		});
 
 	}
 

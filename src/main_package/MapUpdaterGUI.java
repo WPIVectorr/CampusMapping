@@ -377,10 +377,6 @@ public class MapUpdaterGUI extends JFrame {
 							System.out.println(g.getMessage());
 						}
 				}
-				
-				mapDropDown.setSelectedItem(mapDropDown.getItemAt(0));
-				repaint();
-				
 			}
 		});
 

@@ -91,6 +91,11 @@ public class MapUpdaterGUI extends JFrame {
 	private JButton btnNewButton;
 	private JTextField txtImageDirectoryPath;
 	private JComboBox mapDropDown;
+	private JButton btnNewButton_1;
+	private File mapToAdd;
+	private Component horizontalStrut;
+	private Component horizontalStrut_1;
+	private Component horizontalStrut_2;
 
 	public MapUpdaterGUI() throws IOException {
 		super("MapUpdaterGUI");
@@ -177,6 +182,9 @@ public class MapUpdaterGUI extends JFrame {
 
 		Container contentPane = this.getContentPane();
 		contentPane.add(buttonPanel, BorderLayout.NORTH);
+		
+		horizontalStrut_1 = Box.createHorizontalStrut(20);
+		buttonPanel.add(horizontalStrut_1);
 
 		// adds the starting location label to the line with starting location
 		// options
@@ -194,6 +202,9 @@ public class MapUpdaterGUI extends JFrame {
 		mapName.setText("Map Name");
 		buttonPanel.add(mapName);
 		mapName.setColumns(10);
+		
+		horizontalStrut = Box.createHorizontalStrut(20);
+		buttonPanel.add(horizontalStrut);
 
 		// creates a centered text field that will write back the users info
 		// they typed in
@@ -216,115 +227,142 @@ public class MapUpdaterGUI extends JFrame {
 		txtImageDirectoryPath.setText("Map Image Directory Path");
 		buttonPanel.add(txtImageDirectoryPath);
 		txtImageDirectoryPath.setColumns(10);
+		
+		JButton findMapFile = new JButton("Add Map From File");
+		buttonPanel.add(findMapFile);
+		findMapFile.addActionListener(new ActionListener() {
 
-		JButton btnAddMap = new JButton("Add Map");
-		buttonPanel.add(btnAddMap);
-
-		btnAddMap.addActionListener(new ActionListener() {
-
-			@Override
 			public void actionPerformed(ActionEvent e) {
-				addingMap = true;
-				String maptitle = mapName.getText();
-				
-				maptitle = maptitle.trim();
-				String srcInput = txtImageDirectoryPath.getText();
-				String mapNameNoExt;
-				int l = 0;
 
-				// check directory to see if it exists
-				File srcFile = new File(srcInput);
-				if (!(srcFile.exists()) || maptitle == null || maptitle.equals("")) {
-					addingMap = false;
-					System.out.println("Error: Map is invalid");
-				} else {
-					for (int k = 0; k < mapDropDown.getItemCount(); k++) {
-						l = mapDropDown.getItemAt(k).toString().length();
-						mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
-						System.out.println(mapNameNoExt + "           " + (l - 4));
-						if (maptitle.equals(mapNameNoExt)) {
-							addingMap = false;
-							System.out.println("Error: Map invalid");
-						}
-					}
-				}
+				JFrame chooseFile = new JFrame();
 
-				if (addingMap) {
-					// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
-					System.out.println("SavingMap");
-					File dest = new File("src/VectorMaps");
-					// File destAbs = dest.getAbsoluteFile();
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setDialogTitle("Specify Map to Add");
 
-					String destInput = dest.getAbsolutePath();
-					// System.out.println("Destination Input: " + destInput);
-					// System.out.println("Source Input: " + srcInput);
-					destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
-					System.out.println(destInput);
-					File destFile = new File(destInput);
+				int userSelection = fileChooser.showSaveDialog(chooseFile);
 
-					// Add the name of the map to the Map Selction Dropdown menu
-					mapDropDown.addItem(maptitle + srcInput.substring(srcInput.length() - 4));
-
-					// Finds the highest mapID in the database and stores it in
-					// highestID
-					int highestID;
-					if(md.getMaps().isEmpty()){
-						highestID = 0;
-						System.out.print("Database contains no maps so highest ID is 1");
-						
-						
-					}
-					else{
-						//determines the highest mapID from the Maps stored in the database
-						ArrayList<Map> mdMapList = md.getMaps();
-						highestID = mdMapList.get(0).getId();
-						for (int h = 0; h < mdMapList.size(); h++) {
-							if (highestID < mdMapList.get(h).getId()) {
-								highestID = mdMapList.get(h).getId();
-							}
-						}
-					}
-
-					// Create the Map object to be stored in the database
-					Map m = new Map(highestID + 1, maptitle);
-					
-					highestID++;
-
-					try {
-						md.insertMap(m);
-					} catch (AlreadyExistsException e1) {
-						System.out.print("Look at me im  an error 1");
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						System.out.print("Look at me im  an error 2");
-						e1.printStackTrace();
-					}
-
-					try {
-						copyFileUsingStream(srcFile, destFile);
-						img = ImageIO.read(destFile);
-					} catch (IOException a) {
-						System.out.println("invalid copy");
-						a.printStackTrace();
-					}
-
-					addingMap = false;
-				} else {
-
+				if (userSelection == JFileChooser.APPROVE_OPTION) {
+					mapToAdd = fileChooser.getSelectedFile();
+					txtImageDirectoryPath.setText(mapToAdd.toString());
 				}
 			}
 		});
+		
+				JLabel lblLastPoint = new JLabel("Select a Point to Edit");
+				buttonPanel.add(lblLastPoint);
 
 		rdbtnEditPoints = new JRadioButton("Edit Points");
 		buttonPanel.add(rdbtnEditPoints);
 		modeSelector.add(rdbtnEditPoints);
-
-		JLabel lblLastPoint = new JLabel("Select a Point to Edit");
-		buttonPanel.add(lblLastPoint);
+		
+				JButton btnAddMap = new JButton("Add Map");
+				buttonPanel.add(btnAddMap);
+				
+						btnAddMap.addActionListener(new ActionListener() {
+				
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								addingMap = true;
+								String maptitle = mapName.getText();
+								
+								maptitle = maptitle.trim();
+								String mapNameNoExt;
+								int l = 0;
+				
+								// check directory to see if it exists
+								String srcInput = mapToAdd.toString();
+								File srcFile = mapToAdd;
+								if ((maptitle == null || maptitle.equals(""))) {
+									addingMap = false;
+									System.out.println("Error: Map is invalid");
+								} else {
+									for (int k = 0; k < mapDropDown.getItemCount(); k++) {
+										l = mapDropDown.getItemAt(k).toString().length();
+										mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
+										System.out.println(mapNameNoExt + "           " + (l - 4));
+										if (maptitle.equals(mapNameNoExt)) {
+											addingMap = false;
+											System.out.println("Error: Map invalid");
+										}
+									}
+								}
+				
+								if (addingMap) {
+									// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
+									System.out.println("SavingMap");
+									File dest = new File("src/VectorMaps");
+									// File destAbs = dest.getAbsoluteFile();
+				
+									String destInput = dest.getAbsolutePath();
+									// System.out.println("Destination Input: " + destInput);
+									// System.out.println("Source Input: " + srcInput);
+									destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
+									System.out.println(destInput);
+									File destFile = new File(destInput);
+				
+									// Add the name of the map to the Map Selction Dropdown menu
+									mapDropDown.addItem(maptitle + srcInput.substring(srcInput.length() - 4));
+				
+									// Finds the highest mapID in the database and stores it in
+									// highestID
+									int highestID;
+									if(md.getMaps().isEmpty()){
+										highestID = 0;
+										System.out.print("Database contains no maps so highest ID is 1");
+										
+										
+									}
+									else{
+										//determines the highest mapID from the Maps stored in the database
+										ArrayList<Map> mdMapList = md.getMaps();
+										highestID = mdMapList.get(0).getId();
+										for (int h = 0; h < mdMapList.size(); h++) {
+											if (highestID < mdMapList.get(h).getId()) {
+												highestID = mdMapList.get(h).getId();
+											}
+										}
+									}
+				
+									// Create the Map object to be stored in the database
+									Map m = new Map(highestID + 1, maptitle);
+									
+									highestID++;
+				
+									try {
+										md.insertMap(m);
+									} catch (AlreadyExistsException e1) {
+										System.out.print("Look at me im  an error 1");
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									} catch (SQLException e1) {
+										// TODO Auto-generated catch block
+										System.out.print("Look at me im  an error 2");
+										e1.printStackTrace();
+									}
+				
+									try {
+										copyFileUsingStream(srcFile, destFile);
+										img = ImageIO.read(destFile);
+									} catch (IOException a) {
+										System.out.println("invalid copy");
+										a.printStackTrace();
+									}
+									mapDropDown.setSelectedIndex(mapDropDown.getItemCount()-1);
+									System.out.println(mapDropDown.getItemCount());
+									addingMap = false;
+								} else {
+				
+								}
+								
+							}
+						});
 
 		/* JButton */
+		
+		horizontalStrut_2 = Box.createHorizontalStrut(20);
+		buttonPanel.add(horizontalStrut_2);
+		
+		
 		btnSavePoint = new JButton("No Point Selected");
 		buttonPanel.add(btnSavePoint);
 		btnSaveMap = new JButton("Save Map"); // defined above to change text in
@@ -377,10 +415,6 @@ public class MapUpdaterGUI extends JFrame {
 							System.out.println(g.getMessage());
 						}
 				}
-				
-				mapDropDown.setSelectedItem(mapDropDown.getItemAt(0));
-				repaint();
-				
 			}
 		});
 

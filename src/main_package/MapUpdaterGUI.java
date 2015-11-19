@@ -36,7 +36,7 @@ public class MapUpdaterGUI extends JFrame {
 	private Point currentPoint;
 	private Point editPoint;
 	
-	private Map currentMap;
+	private Map currentMap = null;
 	private MappingDatabase md = MappingDatabase.getInstance();
 
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
@@ -134,16 +134,14 @@ public class MapUpdaterGUI extends JFrame {
 		mapDropDown.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				String name = mapDropDown.getSelectedItem().toString();
-
+				System.out.println("Selected item:"+name);
 				
 				File destinationFile = new File("src/VectorMaps/" + name);
 				destinationFile = new File(destinationFile.getAbsolutePath());
 				if (!(name.equals("Select Map"))) {
 
-				
 					ArrayList<Map> mapList = md.getMaps();
-					//System.out.println("mapsize: "+mapList.size());
-					//System.out.println("map Name:"+mapList.get(0).getName());
+					System.out.println("MapList size is "+mapList.size());
 					for(int i = 0; i < mapList.size(); i++){
 						System.out.println("Trying to find name:"+name);
 						if(name.equals(mapList.get(i).getName()+".jpg"))
@@ -337,7 +335,7 @@ public class MapUpdaterGUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (editingPoint) {
-					System.out.println("SavePoint");
+					System.out.println("Updating changed points");
 					editPoint.setName(roomNumber.getText());
 					roomNumber.setText("Select a Point to Edit");
 					editingPoint = false;
@@ -353,24 +351,30 @@ public class MapUpdaterGUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				for (int i = 0; i < pointArray.size(); i++) {
 					Point storePoint = pointArray.get(i);
-					storePoint.setID(i+currentMap.getId()*500);//CHANGE THIS to reflect ID stuff (AND DELETE THIS COMMENT
-					System.out.println(currentMap.getName());
+					System.out.println("currentmap's currentPoint's id:"+currentMap.getId());
+					storePoint.setID(i+currentMap.getId()*500);				//TODO change id assignment
+					Point newPoint = new Point(storePoint.getId(), storePoint.getName(),
+							storePoint.getX(), storePoint.getY());
+					System.out.println("Storing point in:"+currentMap.getName());
 						try {
-							md.insertPoint(currentMap, storePoint);
+							MappingDatabase.insertPoint(currentMap, newPoint);
 							System.out.println("AddPointSuccess");
-						} catch (AlreadyExistsException | NoMapException | InsertFailureException | SQLException f) {
-							// TODO Auto-generated catch block
+						} catch (AlreadyExistsException f){
 							System.out.println(f.getMessage());
-							//f.printStackTrace();
-						}
-
+						} catch (NoMapException e1) {
+							e1.printStackTrace();
+						} catch (InsertFailureException e1) {
+							e1.printStackTrace();
+						} catch (SQLException e1) {
+							e1.printStackTrace();
+						} 
 					markForDelete.add(storePoint);
 				}
 				for (int i = 0; i < edgeArray.size(); i++) {
 					Edge storeEdge = edgeArray.get(i);
 
 						try {
-							md.insertEdge(storeEdge);
+							MappingDatabase.insertEdge(storeEdge);
 						} catch (InsertFailureException | AlreadyExistsException | SQLException
 								| DoesNotExistException g) {
 							// TODO Auto-generated catch block
@@ -508,7 +512,6 @@ public class MapUpdaterGUI extends JFrame {
 						edgeArray.add(currentPoint.getEdges().get(j));
 					}
 					// newClick has some interesting storage things going on.
-					// wtf is with Java
 					if (newClick == true) {
 
 						MapUpdaterGUI.btnSaveMap.setText("Save Map, X:" + lastMousex + ", Y:" + lastMousey);
@@ -530,7 +533,7 @@ public class MapUpdaterGUI extends JFrame {
 									if (currentPoint.getNumberEdges() > 0)// this has to be caught in an exception later
 									{
 										for (int j = 0; j < currentPoint.getNumberEdges(); j++) {
-											System.out.println("add edge: "
+											System.out.println("Adding clicked edge between: "
 													+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
 													+ currentPoint.getEdges().get(j).getPoint2().getName());
 										}
@@ -613,5 +616,26 @@ public class MapUpdaterGUI extends JFrame {
 		}
 		is.close();
 		os.close();
+	}
+	
+ 	private Map updateCurrentMap(Map map)
+	{
+		int mapId = map.getId();
+		ArrayList<Map> mapList = md.getMaps();
+		boolean foundMap = false;
+		int j = 0;
+		for (j = 0; j<mapList.size(); j++)
+		{
+			if (mapId == mapList.get(j).getId())
+			{
+				foundMap = true;
+				return mapList.get(j);
+			}
+		}
+		if (foundMap == false)
+		{
+			System.out.println("Failed to find and update map");
+		}
+		return null;
 	}
 }

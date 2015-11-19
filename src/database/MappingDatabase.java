@@ -460,6 +460,9 @@ public class MappingDatabase
 			int newPtNumberEdges;
 			ArrayList<Edge> newPtEdges = new ArrayList<Edge>();
 			
+			System.out.println("Populating from database");
+			populateFromDatabase();
+			printObjects(true, true, true);
 			ResultSet rs = statement.executeQuery("SELECT * FROM "+TABLE_NAME);
 			while (rs.next())
 			{
@@ -481,6 +484,7 @@ public class MappingDatabase
 					boolean foundEdge = false;
 					for (edgeCounter = 0; edgeCounter<allEdges.size(); edgeCounter++)
 					{
+						System.out.println("Searching for point edge:"+edgeCounter);
 						if (allEdges.get(edgeCounter).getID().contentEquals(edgeId))
 						{
 							foundEdge = true;

@@ -33,14 +33,19 @@ public class GenTextDir {
 				prevPoint = arrPoints[arrPoints.length-i];//Grab the previous point the user was at
 				currPoint = arrPoints[arrPoints.length-(i+1)];//Grab the current point the user is at
 				nextPoint = arrPoints[arrPoints.length-(i+2)];//Grab the next point the user is going to.
-
+				System.out.println("Previous point name: " + prevPoint.getName());
+				System.out.println("Current point name: " + currPoint.getName());
+				System.out.println("Next point name: " + nextPoint.getName());
 				//The way this code works is first it moves all the points such that the current point
 				//sits at the origin.
-				prevPointX = currPoint.getX() - prevPoint.getX();
+				prevPointX = prevPoint.getX() - currPoint.getX();
 				prevPointY = currPoint.getY() - prevPoint.getY();
 
 				nextPointX = nextPoint.getX() - currPoint.getX();
-				nextPointY = nextPoint.getY() - currPoint.getY();
+				nextPointY = currPoint.getY() - nextPoint.getY();
+				System.out.println("Previous next point Y was : " + nextPointY);
+				System.out.println("Previous Y is: " + prevPointY);
+				
 				//Next, we want to rotate the points around the axis, so the vector from the previous point
 				//to the current point is the Y axis
 				double angleRotate = 0;//Initialize the angle of rotation.
@@ -75,7 +80,7 @@ public class GenTextDir {
 					System.out.println("Next Point X = " + nextPointX);
 					System.out.println("Next Point Y = " + nextPointY);
 				}
-				//System.out.println("Angle of rotation is: " + (180 * angleRotate / Math.PI));
+				System.out.println("Angle of rotation is: " + (180 * angleRotate / Math.PI));
 				//Now, rotate the previous point by the angle of rotation.
 				double tempPrevPointX = (prevPointX * Math.cos(angleRotate)) - (prevPointY * Math.sin(angleRotate));
 				//System.out.println("tempPrevPointX " + tempPrevPointX);
@@ -86,7 +91,7 @@ public class GenTextDir {
 				//Grab those values and store them.
 				prevPointX = Math.floor(tempPrevPointX);
 				prevPointY = tempPrevPointY;
-
+				
 				nextPointX = tempNextPointX;
 				nextPointY = tempNextPointY;
 				if(DEBUG){//testing
@@ -120,18 +125,19 @@ public class GenTextDir {
 				angle = Math.abs(angle);//Set the angle equal to its absolute value (no turning - degrees)
 				String turnAmount;
 				//System.out.println("At " + currPoint.getName() + " the past angle rotate value is: " + (180 * angleRotate / Math.PI));
-				//System.out.println("At " + currPoint.getName() + " the angle value is: " + angle);
-				//System.out.println("At " + currPoint.getName() + " the y value is: " + prevPointY);
-				//System.out.println("At " + currPoint.getName() + " the x value is: " + nextPointX);
+				System.out.println("At " + currPoint.getName() + " the angle value is: " + angle);
+				System.out.println("At " + currPoint.getName() + " the y value is: " + prevPointY);
+				System.out.println("At " + currPoint.getName() + " the x value is: " + nextPointX);
 				if((angle >= -0.1) && (angle <= 0.1)){//if the angle is within some degree of error of 0, we are going straight
 					currString = "Once you reach " + currPoint.getName() + " go straight until " + nextPoint.getName();
 				} else if (nextPointX <= 0){//otherwise, if its X is negative, we are turning left.
-					//System.out.println("At " + currPoint.getName() + " the new y value is: " + nextPointY);
+					System.out.println("At " + currPoint.getName() + " the new y value is: " + nextPointY);
+					
 					if(nextPointY < 0){//if the Y is less than 0, angle is 180-angle
 						angle = 180-angle;
 						//System.out.println("angle at: " + currPoint.getName());
 					}
-					
+					System.out.println("Angle found is: " + angle);
 					if(angle > 0 && angle < 60){
 						turnAmount = "slight left";
 					} else if(angle > 60 && angle < 120){

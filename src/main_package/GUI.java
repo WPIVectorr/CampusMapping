@@ -67,7 +67,10 @@ public class GUI extends JFrame{
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/*
 		// Stub for testing 
+<<<<<<< HEAD
+=======
 
+>>>>>>> refs/remotes/origin/master
 		// Stub for testing 
 		ArrayList<Map> maps = new ArrayList<Map>();
 		Point testPoint1 = new Point (1, "One", 50, 100);
@@ -88,7 +91,6 @@ public class GUI extends JFrame{
 		testArrayList.add(testPoint2);
 		testArrayList.add(testPoint3);
 		testArrayList.add(testPoint4);
-
 		Point testPoint7 = new Point (7, "seven", 100, 500);
 		Point testPoint5 = new Point (5, "Five", 500, 600);
 		Point testPoint6 = new Point (6, "Six", 700, 500);
@@ -110,12 +112,10 @@ System.out.println("mapslistsize: " + maps.get(1).getPointList().size());
 System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 		// Fill building drop down menus with names of points
 		//int pointListSize = maps.get(0).getPointList().size();
-
 		//buildings[0] = "Select a building";
 		//for (int i = 0; i < pointListSize; i++){
 		//buildings[i] = maps.get(0).getPointList().get(i);
 		//}
-
 		//creates string of rooms for dropdown menu
 		String[] rooms = new String[maps.size()];
 		rooms[0] = "Select Map";
@@ -124,7 +124,6 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 			count++;
 			rooms[i] = maps.get(count).getName();
 		}
-
 		/*maps = MappingDatabase.getInstance().getMaps();
     	ArrayList<Map> maps = new ArrayList<Map>();
     	ArrayList<String> buildingsTest = new ArrayList<String>(); 
@@ -219,12 +218,14 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				//System.out.println("inside action listener");
 				buildDestIndex = mapsDropdown.getSelectedIndex();
 				////////////////////////////////////////////////////////////////////////////////
+
 				String mapTitle = maps.get(buildDestIndex-1).getName();
 				//String mapTitle = "AtwaterKent1";
 				File dest = new File("src/VectorMaps");
 				String destInput = dest.getAbsolutePath();
 				//assuming all maps saved in vectorMaps are in jpg
 				destInput = destInput + "/" + mapTitle + ".jpg";
+
 				File destFile = new File(destInput);
 				try{
 					img = ImageIO.read(destFile);
@@ -431,7 +432,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 					windowScale += 1;
 
 				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
-		
+
 
 				if (showRoute && route != null){           
 					for (int i = 1; i < route.size(); i++){
@@ -439,6 +440,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 						g.setColor(Color.RED);
 						g.drawLine(route.get(i-1).getX(), route.get(i-1).getY(), route.get(i).getX(), route.get(i).getY());
 					
+
 					}
 				}
 			}

@@ -134,10 +134,12 @@ public class MapUpdaterGUI extends JFrame {
 		mapDropDown.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				String name = mapDropDown.getSelectedItem().toString();
+
 				
 				File destinationFile = new File("src/VectorMaps/" + name);
 				destinationFile = new File(destinationFile.getAbsolutePath());
 				if (!(name.equals("Select Map"))) {
+
 				
 					ArrayList<Map> mapList = md.getMaps();
 					//System.out.println("mapsize: "+mapList.size());
@@ -165,6 +167,7 @@ public class MapUpdaterGUI extends JFrame {
 				} else {
 					img = null;
 				}
+
 				repaint();
 			}
 		});

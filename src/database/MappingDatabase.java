@@ -482,14 +482,15 @@ public class MappingDatabase
 					edgeSelect = ("idEdge"+String.valueOf(counter+1));
 					edgeId = rs.getString(edgeSelect);
 					boolean foundEdge = false;
+					System.out.println("Searching for edge:"+edgeId);
 					for (edgeCounter = 0; edgeCounter<allEdges.size(); edgeCounter++)
 					{
-						System.out.println("Searching for point edge:"+edgeCounter);
+						System.out.println("Comparing edge at position:"+edgeCounter);
 						if (allEdges.get(edgeCounter).getID().contentEquals(edgeId))
 						{
 							foundEdge = true;
 							newPtEdges.add(allEdges.get(edgeCounter));
-							//System.out.println("found:"+allEdges.get(edgeCounter).getId());
+							System.out.println("found:"+allEdges.get(edgeCounter).getId());
 						}
 					}
 					
@@ -497,6 +498,7 @@ public class MappingDatabase
 					{			
 						throw new PopulateErrorException("Couldn't find edgeId in allEdges");
 					}
+					//System.out.println("Found edge:"+allEdges.get(edgeCounter).getID()+" successfully");
 				}
 				
 				Point newPt = new Point(newPtId, newPtName, newPtX, newPtY, newPtNumberEdges);

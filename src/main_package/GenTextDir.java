@@ -100,7 +100,6 @@ public class GenTextDir {
 					if(DEBUG){
 						System.out.println("The point: " + nextPoint.getName() + " has 0 no change in Y");
 					}
-					
 					if(nextPointX < 0){//If the next point is to the left of current point.
 						angle = Math.PI/2;//Turn left 90 degrees
 					} else {// otherwise
@@ -114,7 +113,6 @@ public class GenTextDir {
 					}
 				}
 				angle = angle * 180 / Math.PI;//Convert the angle found into degrees
-				
 				angle = Math.floor(angle);
 				if(DEBUG){
 					System.out.println("Turn " + angle + " degrees");

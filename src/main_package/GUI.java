@@ -433,7 +433,6 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 
 				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
 
-		
 
 				if (showRoute && route != null){           
 					for (int i = 1; i < route.size(); i++){

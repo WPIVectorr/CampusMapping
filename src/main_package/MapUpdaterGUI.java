@@ -93,9 +93,7 @@ public class MapUpdaterGUI extends JFrame {
 	private JComboBox mapDropDown;
 	private JButton btnNewButton_1;
 	private File mapToAdd;
-	private Component horizontalStrut;
-	private Component horizontalStrut_1;
-	private Component horizontalStrut_2;
+	private JSplitPane splitPane;
 
 	public MapUpdaterGUI() throws IOException {
 		super("MapUpdaterGUI");
@@ -180,9 +178,6 @@ public class MapUpdaterGUI extends JFrame {
 
 		Container contentPane = this.getContentPane();
 		contentPane.add(buttonPanel, BorderLayout.NORTH);
-		
-		horizontalStrut_1 = Box.createHorizontalStrut(20);
-		buttonPanel.add(horizontalStrut_1);
 
 		// adds the starting location label to the line with starting location
 		// options
@@ -200,9 +195,6 @@ public class MapUpdaterGUI extends JFrame {
 		mapName.setText("Map Name");
 		buttonPanel.add(mapName);
 		mapName.setColumns(10);
-		
-		horizontalStrut = Box.createHorizontalStrut(20);
-		buttonPanel.add(horizontalStrut);
 
 		// creates a centered text field that will write back the users info
 		// they typed in
@@ -226,8 +218,20 @@ public class MapUpdaterGUI extends JFrame {
 		buttonPanel.add(txtImageDirectoryPath);
 		txtImageDirectoryPath.setColumns(10);
 		
+				JLabel lblLastPoint = new JLabel("Select a Point to Edit");
+				buttonPanel.add(lblLastPoint);
+
+		rdbtnEditPoints = new JRadioButton("Edit Points");
+		buttonPanel.add(rdbtnEditPoints);
+		modeSelector.add(rdbtnEditPoints);
+
+		/* JButton */
+		
+		splitPane = new JSplitPane();
+		buttonPanel.add(splitPane);
+		
 		JButton findMapFile = new JButton("Add Map From File");
-		buttonPanel.add(findMapFile);
+		splitPane.setLeftComponent(findMapFile);
 		findMapFile.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -246,15 +250,8 @@ public class MapUpdaterGUI extends JFrame {
 			}
 		});
 		
-				JLabel lblLastPoint = new JLabel("Select a Point to Edit");
-				buttonPanel.add(lblLastPoint);
-
-		rdbtnEditPoints = new JRadioButton("Edit Points");
-		buttonPanel.add(rdbtnEditPoints);
-		modeSelector.add(rdbtnEditPoints);
-		
 				JButton btnAddMap = new JButton("Add Map");
-				buttonPanel.add(btnAddMap);
+				splitPane.setRightComponent(btnAddMap);
 				
 						btnAddMap.addActionListener(new ActionListener() {
 				
@@ -265,12 +262,14 @@ public class MapUpdaterGUI extends JFrame {
 								
 								maptitle = maptitle.trim();
 								String mapNameNoExt;
+								String srcInput = "";
 								int l = 0;
 				
 								// check directory to see if it exists
-								String srcInput = mapToAdd.toString();
+								if(!(mapToAdd == null))
+									srcInput = mapToAdd.toString();
 								File srcFile = mapToAdd;
-								if ((maptitle == null || maptitle.equals(""))) {
+								if ((maptitle == null || maptitle.equals("")) || mapToAdd == null) {
 									addingMap = false;
 									System.out.println("Error: Map is invalid");
 								} else {
@@ -354,11 +353,6 @@ public class MapUpdaterGUI extends JFrame {
 								
 							}
 						});
-
-		/* JButton */
-		
-		horizontalStrut_2 = Box.createHorizontalStrut(20);
-		buttonPanel.add(horizontalStrut_2);
 		
 		
 		btnSavePoint = new JButton("No Point Selected");

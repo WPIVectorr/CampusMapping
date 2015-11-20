@@ -96,6 +96,9 @@ public class MapUpdaterGUI extends JFrame {
 	private JButton btnNewButton_1;
 	private File mapToAdd;
 	private JSplitPane splitPane;
+	private JSplitPane splitPane_1;
+	private JToggleButton tglbtnNewToggleButton;
+	private Boolean pathMode = false;
 
 	public MapUpdaterGUI() throws IOException {
 		super("MapUpdaterGUI");
@@ -235,10 +238,32 @@ public class MapUpdaterGUI extends JFrame {
 
 		JLabel lblLastPoint = new JLabel("Select a Point to Edit");
 		buttonPanel.add(lblLastPoint);
+		
+		JSplitPane splitPane_editPoints = new JSplitPane();
+		buttonPanel.add(splitPane_editPoints);
 
 		rdbtnEditPoints = new JRadioButton("Edit Points");
-		buttonPanel.add(rdbtnEditPoints);
+		rdbtnEditPoints.setPreferredSize(new Dimension(125, 23));
+		rdbtnEditPoints.setHorizontalAlignment(SwingConstants.LEFT);
+		splitPane_editPoints.setLeftComponent(rdbtnEditPoints);
 		modeSelector.add(rdbtnEditPoints);
+		
+		JToggleButton pathToggleButton = new JToggleButton("Path Mode Disabled");
+		pathToggleButton.setPreferredSize(new Dimension(85, 23));
+		splitPane_editPoints.setRightComponent(pathToggleButton);
+		pathToggleButton.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent pathtoggled) {
+				if (pathMode){
+					pathMode = false;
+					pathToggleButton.setText("Path Mode Disabled");
+				}
+				else{
+					pathMode = true;
+					pathToggleButton.setText("Path Mode Enabled");
+				}
+			}
+		});
 
 		/* JButton */
 
@@ -522,7 +547,7 @@ public class MapUpdaterGUI extends JFrame {
 				// draw image/map
 				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
 			} else {
-				System.out.println("Image is null");
+				
 			}
 
 
@@ -615,6 +640,12 @@ public class MapUpdaterGUI extends JFrame {
 										}
 									}
 									newClick = false;
+									if(pathMode){
+										editPoint.setName(roomNumber.getText());
+										editPoint = currentPoint;
+										roomNumber.setText(editPoint.getName());
+									}
+									
 								}
 								repaint();
 							}
@@ -638,6 +669,9 @@ public class MapUpdaterGUI extends JFrame {
 
 					for (int j = 0; j < markForDelete.size(); j++) {
 						// remove edges to list
+						for(int kj = 0; kj < markForDelete.get(j).getEdges().size(); kj++){
+							edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+						}
 						markForDelete.get(j).deleteEdges();
 						pointArray.remove(markForDelete.get(j));
 						markForDelete.remove(j);

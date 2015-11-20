@@ -498,7 +498,7 @@ public class MapUpdaterGUI extends JFrame {
 				// draw image/map
 				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
 			} else {
-				System.out.println("Image is null");
+				
 			}
 
 			

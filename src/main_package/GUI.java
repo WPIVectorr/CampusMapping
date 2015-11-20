@@ -18,9 +18,10 @@ import database.MappingDatabase;
 public class GUI extends JFrame{
 	MappingDatabase md = MappingDatabase.getInstance();
 
-	BufferedImage img = null;
+	private BufferedImage img = null;
 
 	//drop down menu of room numbers based off of the building selected on campus
+
 	String rooms[] = {"Select room #", "Please choose building first"};
 
 	private ArrayList<Map> maps = new ArrayList<Map>();
@@ -31,8 +32,6 @@ public class GUI extends JFrame{
 	private Point end;
 	private boolean showRoute;
 	private JTextField textField;
-	private JTextField txtStartingLocation;
-	private JTextField txtDestination;
 	private JPanel buttonPanel;
 	private DrawRoute drawPanel = new DrawRoute();
 	private int windowScale = 2;
@@ -48,7 +47,6 @@ public class GUI extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//  img = ImageIO.read(new File("temp.jpg"));
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		MappingDatabase.initDatabase();
 
@@ -70,6 +68,7 @@ public class GUI extends JFrame{
 <<<<<<< HEAD
 =======
 
+>>>>>>> refs/remotes/origin/master
 >>>>>>> refs/remotes/origin/master
 		// Stub for testing 
 		ArrayList<Map> maps = new ArrayList<Map>();
@@ -104,12 +103,16 @@ public class GUI extends JFrame{
 		Map testMap2 = new Map(testArrayList2, 2, "AK");
 		maps.add(testMap);
 		maps.add(testMap2);
+<<<<<<< HEAD
+
+=======
 		/*System.out.println("```````````````````````````````````````````````````````````");
 	System.out.println(maps.equals(maps1));
 	System.out.println("maps.get(0)/(1) " + maps.get(0).getName() + " " + maps.get(1).getName());
 	System.out.println("maps1.get(0)/(1) " + maps1.get(0).getName() + " " + maps1.get(1).getName());
 System.out.println("mapslistsize: " + maps.get(1).getPointList().size());
 System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
+>>>>>>> refs/remotes/origin/master
 		// Fill building drop down menus with names of points
 		//int pointListSize = maps.get(0).getPointList().size();
 		//buildings[0] = "Select a building";
@@ -315,6 +318,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 						start = (Point) startBuilds.getSelectedItem();
 						end = (Point) destBuilds.getSelectedItem();
 						if(!start.equals(end)){
+
 
 
 

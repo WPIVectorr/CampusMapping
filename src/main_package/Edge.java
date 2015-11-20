@@ -71,5 +71,14 @@ public class Edge {
 	public void setStairs(boolean isStairs) {
 		this.isStairs = isStairs;
 	}
-	
+	public void print()
+	{
+		System.out.println("EdgeID:"+this.id);
+		System.out.println("Point1ID:"+this.point1.getId());
+		System.out.println("Point2ID:"+this.point2.getId());
+		System.out.println("Weight:"+this.weight);
+		System.out.println("Outside:"+this.isOutside);
+		System.out.println("Stairs"+this.isStairs);
+	}
 }
+

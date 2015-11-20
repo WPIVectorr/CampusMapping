@@ -54,6 +54,7 @@ public class MappingDatabase
 	{
 		if (instance == null)
 			instance = new MappingDatabase();
+		initDatabase();
 		return instance;
 	}
 	
@@ -92,6 +93,8 @@ public class MappingDatabase
 	public static void insertMap(Map map) throws AlreadyExistsException, SQLException
 	{
 		int mapId = map.getId();
+		String RELEVANT_TABLE_NAME = "";
+		RELEVANT_TABLE_NAME += ("Map"+map.getId()+"Points");
 		//--------------------------------------------------Add to Database-----------------------------------------------------------------
 
 		try {
@@ -99,7 +102,11 @@ public class MappingDatabase
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30); 
 			
-			ResultSet rs = statement.executeQuery("SELECT * from "+MAP_TABLE_NAME);
+
+			statement.executeUpdate("create table if not exists "+ 								//If does not exist, then create table
+					RELEVANT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
+			
+			ResultSet rs = connection.createStatement().executeQuery("SELECT * from "+MAP_TABLE_NAME);
 			while (rs.next())
 			{
 				int comparisonId = rs.getInt("id");
@@ -194,7 +201,8 @@ public class MappingDatabase
 				{
 					if (DEBUG)
 						System.out.println("Creating table: " + RELEVANT_TABLE_NAME);
-					statement.executeUpdate("create table "+ 								//If does not exist, then create table
+
+					statement.executeUpdate("create table if not exists "+ 								//If does not exist, then create table
 											RELEVANT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
 				}
 				else
@@ -841,6 +849,7 @@ public class MappingDatabase
 				break;
 			}
 		}
+				
 		if (found)
 		{
 			return retPt;
@@ -1120,13 +1129,13 @@ public class MappingDatabase
 			System.out.println(e4.getMessage());
 		}
 		ArrayList<Point> points = new ArrayList<Point>();
-		Point testPoint1 = new Point (1, "One", 50, 100);
-		Point testPoint2 = new Point (2, "Two", 600, 500);
-		Point testPoint3 = new Point (3, "Three", 500, 700);
-		Point testPoint4 = new Point (4, "Four", 200, 200);
-		Point testPoint7 = new Point (7, "seven", 100, 500);
-		Point testPoint5 = new Point (5, "Five", 500, 600);
-		Point testPoint6 = new Point (6, "Six", 700, 500);
+		Point testPoint1 = new Point (15, "One", 50, 100);
+		Point testPoint2 = new Point (30, "Two", 600, 500);
+		Point testPoint3 = new Point (45, "Three", 500, 700);
+		Point testPoint4 = new Point (78, "Four", 200, 200);
+		Point testPoint7 = new Point (109, "seven", 100, 500);
+		Point testPoint5 = new Point (88, "Five", 500, 600);
+		Point testPoint6 = new Point (91, "Six", 700, 500);
 		points.add(testPoint1);
 		points.add(testPoint2);
 		points.add(testPoint3);
@@ -1197,11 +1206,22 @@ public class MappingDatabase
 		}
 		ArrayList<Map>maps = getMaps();
 		System.out.println("Number maps: " + maps.size());
-		System.out.println("First map name:" + maps.get(0).getName());
-		for (z = 0; z<maps.get(0).getPointList().size(); z++)
+		
+		ArrayList<Map> mapList = getMaps();
+		int j = 0;
+		int k = 0;
+		for (j = 0; j<mapList.size(); j++)
 		{
-			maps.get(0).getPointList().get(z).print();
+			Map tempMap = mapList.get(j);
+			System.out.println("Map: "+tempMap);
+			ArrayList<Point> pointList = tempMap.getPointList();
+			for (k = 0; k<pointList.size(); k++)
+			{
+				System.out.println("--------------------Point "+pointList.get(k).getId()+"---------------------------");
+				pointList.get(k).print();
+			}
 		}
+		//System.out.println("maps.size()
 	}
 }	
 

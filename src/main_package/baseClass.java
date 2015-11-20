@@ -43,7 +43,7 @@ public class baseClass {
 		Edge e18 = new Edge(p14, p15, 1);
 		
 		testGenDir();
-		testAStar(p1, p15);
+		testAStar(p1, p8);
 	}
 	public static void testDatabase ()
 	{
@@ -161,6 +161,7 @@ public class baseClass {
 		System.out.println(end);
 		System.out.println("Path Found:");
 		AStar path = new AStar();
+		path.reset();
 		ArrayList<Point> fin = path.PathFind(start, end);
 		for(int i = 0; i < fin.size(); i++){
 			System.out.println(fin.get(i));

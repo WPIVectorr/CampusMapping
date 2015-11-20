@@ -28,15 +28,17 @@ public class MapUpdaterGUI extends JFrame {
 
 	private int lastMousex, lastMousey;
 	private int pointSize = 5;
+	private static int pointCountId = 0;
 	private boolean newClick = false;
 	private boolean editingPoint = false;
 	private boolean addingMap = false;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
 	private ArrayList<Point> markForDelete = new ArrayList<Point>();
+
 	private Point currentPoint;
 	private Point editPoint;
-	
-	private Map currentMap;
+
+	private Map currentMap = null;
 	private MappingDatabase md = MappingDatabase.getInstance();
 
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
@@ -130,35 +132,45 @@ public class MapUpdaterGUI extends JFrame {
 			 */
 			// includes extension
 			if(!(imgList[f].getName().equals(".DS_Store"))){
-					mapDropDown.addItem(imgList[f].getName());
+				mapDropDown.addItem(imgList[f].getName());
 			}
 		}
 
-		mapDropDown.addActionListener(new ActionListener() {
+		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
-				String name = mapDropDown.getSelectedItem().toString();
+				String name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
+				System.out.println("Selected item:"+name);
 
-				
 				File destinationFile = new File("src/VectorMaps/" + name);
 				destinationFile = new File(destinationFile.getAbsolutePath());
-				if (!(name.equals("Select Map"))) {
-
-				
-					ArrayList<Map> mapList = md.getMaps();
-					//System.out.println("mapsize: "+mapList.size());
-					//System.out.println("map Name:"+mapList.get(0).getName());
-					for(int i = 0; i < mapList.size(); i++){
+				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
+					pointArray.clear();
+					edgeArray.clear();
+					ArrayList<Map> mapList = md.getMaps(); //Grab all the maps from the database
+					System.out.println("MapList size is "+mapList.size());//Print out the size of the maps from the database
+					for(int i = 0; i < mapList.size(); i++){//Iterate through the mapList until we find the item we are looking for
 						System.out.println("Trying to find name:"+name);
-						if(name.equals(mapList.get(i).getName()+".jpg"))
+						if(name.equals(mapList.get(i).getName()+".jpg"))//Once we find the map:
 						{
-							currentMap = mapList.get(i);
-							pointArray = currentMap.getPointList();
+							currentMap = mapList.get(i);//Grab the current map at this position.
+							pointArray = currentMap.getPointList();//Populate the point array with all the points found.
+
+							for(int j = 0; j < pointArray.size(); j++){
+								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
+								for(int k = 0; k < tmpEdges.size(); k++){
+									System.out.println(tmpEdges.get(k).getId());
+									edgeArray.add(tmpEdges.get(k));
+								}
+							}
+
+
 							System.out.println("Found map with number of points: "+currentMap.getPointList().size());
+							i = mapList.size();
 						}
-				}
-				
-				
-/*				File destinationFile = new File("src/VectorMaps/" + name);
+					}
+
+
+					/*				File destinationFile = new File("src/VectorMaps/" + name);
 				destinationFile = new File(destinationFile.getAbsolutePath());
 				if (!(name.equals("Select Map"))) {*/
 					try {
@@ -169,8 +181,9 @@ public class MapUpdaterGUI extends JFrame {
 					}
 				} else {
 					img = null;
+					pointArray.clear();
+					edgeArray.clear();
 				}
-
 				repaint();
 			}
 		});
@@ -219,19 +232,19 @@ public class MapUpdaterGUI extends JFrame {
 		txtImageDirectoryPath.setText("Map Image Directory Path");
 		buttonPanel.add(txtImageDirectoryPath);
 		txtImageDirectoryPath.setColumns(10);
-		
-				JLabel lblLastPoint = new JLabel("Select a Point to Edit");
-				buttonPanel.add(lblLastPoint);
+
+		JLabel lblLastPoint = new JLabel("Select a Point to Edit");
+		buttonPanel.add(lblLastPoint);
 
 		rdbtnEditPoints = new JRadioButton("Edit Points");
 		buttonPanel.add(rdbtnEditPoints);
 		modeSelector.add(rdbtnEditPoints);
 
 		/* JButton */
-		
+
 		splitPane = new JSplitPane();
 		buttonPanel.add(splitPane);
-		
+
 		JButton findMapFile = new JButton("Add Map From File");
 		splitPane.setLeftComponent(findMapFile);
 		findMapFile.addActionListener(new ActionListener() {
@@ -251,116 +264,116 @@ public class MapUpdaterGUI extends JFrame {
 				}
 			}
 		});
-		
-				JButton btnAddMap = new JButton("Add Map");
-				splitPane.setRightComponent(btnAddMap);
-				
-						btnAddMap.addActionListener(new ActionListener() {
-				
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								addingMap = true;
-								String maptitle = mapName.getText();
-								
-								maptitle = maptitle.trim();
-								String mapNameNoExt;
-								String srcInput = "";
-								int l = 0;
-				
-								// check directory to see if it exists
-								if(!(mapToAdd == null))
-									srcInput = mapToAdd.toString();
-								File srcFile = mapToAdd;
-								if ((maptitle == null || maptitle.equals("")) || mapToAdd == null) {
-									addingMap = false;
-									System.out.println("Error: Map is invalid");
-								} else {
-									for (int k = 0; k < mapDropDown.getItemCount(); k++) {
-										l = mapDropDown.getItemAt(k).toString().length();
-										mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
-										System.out.println(mapNameNoExt + "           " + (l - 4));
-										if (maptitle.equals(mapNameNoExt)) {
-											addingMap = false;
-											System.out.println("Error: Map invalid");
-										}
-									}
-								}
-				
-								if (addingMap) {
-									// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
-									System.out.println("SavingMap");
-									File dest = new File("src/VectorMaps");
-									// File destAbs = dest.getAbsoluteFile();
-				
-									String destInput = dest.getAbsolutePath();
-									// System.out.println("Destination Input: " + destInput);
-									// System.out.println("Source Input: " + srcInput);
-									destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
-									System.out.println(destInput);
-									File destFile = new File(destInput);
-				
-									// Add the name of the map to the Map Selction Dropdown menu
-									mapDropDown.addItem(maptitle + srcInput.substring(srcInput.length() - 4));
-				
-									// Finds the highest mapID in the database and stores it in
-									// highestID
-									int highestID;
-									if(md.getMaps().isEmpty()){
-										highestID = 0;
-										System.out.print("Database contains no maps so highest ID is 1");
-										
-										
-									}
-									else{
-										//determines the highest mapID from the Maps stored in the database
-										ArrayList<Map> mdMapList = md.getMaps();
-										highestID = mdMapList.get(0).getId();
-										for (int h = 0; h < mdMapList.size(); h++) {
-											if (highestID < mdMapList.get(h).getId()) {
-												highestID = mdMapList.get(h).getId();
-											}
-										}
-									}
-				
-									// Create the Map object to be stored in the database
-									Map m = new Map(highestID + 1, maptitle);
-									
-									highestID++;
-				
-									try {
-										md.insertMap(m);
-									} catch (AlreadyExistsException e1) {
-										System.out.print("Look at me im  an error 1");
-										// TODO Auto-generated catch block
-										e1.printStackTrace();
-									} catch (SQLException e1) {
-										// TODO Auto-generated catch block
-										System.out.print("Look at me im  an error 2");
-										e1.printStackTrace();
-									}
-				
-									try {
-										copyFileUsingStream(srcFile, destFile);
-										img = ImageIO.read(destFile);
-									} catch (IOException a) {
-										System.out.println("invalid copy");
-										a.printStackTrace();
-									}
-									mapDropDown.setSelectedIndex(mapDropDown.getItemCount()-1);
-									System.out.println(mapDropDown.getItemCount());
-									addingMap = false;
-								} else {
-				
-								}
-								
+
+		JButton btnAddMap = new JButton("Add Map");
+		splitPane.setRightComponent(btnAddMap);
+
+		btnAddMap.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				addingMap = true;
+				String maptitle = mapName.getText();
+
+				maptitle = maptitle.trim();
+				String mapNameNoExt;
+				String srcInput = "";
+				int l = 0;
+
+				// check directory to see if it exists
+				if(!(mapToAdd == null))
+					srcInput = mapToAdd.toString();
+				File srcFile = mapToAdd;
+				if ((maptitle == null || maptitle.equals("")) || mapToAdd == null) {
+					addingMap = false;
+					System.out.println("Error: Map is invalid");
+				} else {
+					for (int k = 0; k < mapDropDown.getItemCount(); k++) {
+						l = mapDropDown.getItemAt(k).toString().length();
+						mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
+						System.out.println(mapNameNoExt + "           " + (l - 4));
+						if (maptitle.equals(mapNameNoExt)) {
+							addingMap = false;
+							System.out.println("Error: Map invalid");
+						}
+					}
+				}
+
+				if (addingMap) {
+					// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
+					System.out.println("SavingMap");
+					File dest = new File("src/VectorMaps");
+					// File destAbs = dest.getAbsoluteFile();
+
+					String destInput = dest.getAbsolutePath();
+					// System.out.println("Destination Input: " + destInput);
+					// System.out.println("Source Input: " + srcInput);
+					destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
+					System.out.println(destInput);
+					File destFile = new File(destInput);
+
+					// Add the name of the map to the Map Selction Dropdown menu
+					mapDropDown.addItem(maptitle + srcInput.substring(srcInput.length() - 4));
+
+					// Finds the highest mapID in the database and stores it in
+					// highestID
+					int highestID;
+					if(md.getMaps().isEmpty()){
+						highestID = 0;
+						System.out.print("Database contains no maps so highest ID is 1");
+
+
+					}
+					else{
+						//determines the highest mapID from the Maps stored in the database
+						ArrayList<Map> mdMapList = md.getMaps();
+						highestID = mdMapList.get(0).getId();
+						for (int h = 0; h < mdMapList.size(); h++) {
+							if (highestID < mdMapList.get(h).getId()) {
+								highestID = mdMapList.get(h).getId();
 							}
-						});
-		
-		
+						}
+					}
+
+					// Create the Map object to be stored in the database
+					Map m = new Map(highestID + 1, maptitle);
+
+					highestID++;
+
+					try {
+						md.insertMap(m);
+					} catch (AlreadyExistsException e1) {
+						System.out.print("Look at me im  an error 1");
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						System.out.print("Look at me im  an error 2");
+						e1.printStackTrace();
+					}
+
+					try {
+						copyFileUsingStream(srcFile, destFile);
+						img = ImageIO.read(destFile);
+					} catch (IOException a) {
+						System.out.println("invalid copy");
+						a.printStackTrace();
+					}
+					mapDropDown.setSelectedIndex(mapDropDown.getItemCount()-1);
+					System.out.println(mapDropDown.getItemCount());
+					addingMap = false;
+				} else {
+
+				}
+
+			}
+		});
+
+
 		btnSavePoint = new JButton("No Point Selected");
 		buttonPanel.add(btnSavePoint);
 		btnSaveMap = new JButton("Save Map"); // defined above to change text in
-												// point selector
+		// point selector
 		buttonPanel.add(btnSaveMap);
 		getContentPane().add(drawPanel);
 
@@ -369,7 +382,7 @@ public class MapUpdaterGUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (editingPoint) {
-					System.out.println("SavePoint");
+					System.out.println("Updating changed points");
 					editPoint.setName(roomNumber.getText());
 					roomNumber.setText("Select a Point to Edit");
 					editingPoint = false;
@@ -378,36 +391,47 @@ public class MapUpdaterGUI extends JFrame {
 				}
 			}
 		});
-		
+
 		btnSaveMap.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				for (int i = 0; i < pointArray.size(); i++) {
 					Point storePoint = pointArray.get(i);
-					storePoint.setID(i+currentMap.getId()*500);//CHANGE THIS to reflect ID stuff (AND DELETE THIS COMMENT
-					System.out.println(currentMap.getName());
-						try {
-							md.insertPoint(currentMap, storePoint);
-							System.out.println("AddPointSuccess");
-						} catch (AlreadyExistsException | NoMapException | InsertFailureException | SQLException f) {
-							// TODO Auto-generated catch block
-							System.out.println(f.getMessage());
-							//f.printStackTrace();
-						}
+					System.out.println("currentmap's currentPoint's id:"+currentMap.getId());
+					storePoint.setID(i+currentMap.getId()*500);				//TODO change id assignment
 
+					Point newPoint = new Point(storePoint.getId(), storePoint.getName(),
+							storePoint.getX(), storePoint.getY());
+					System.out.println("Storing point in:"+currentMap.getName());
+					try {
+						MappingDatabase.insertPoint(currentMap, newPoint);
+						System.out.println("AddPointSuccess");
+					} catch (AlreadyExistsException f){
+						System.out.println(f.getMessage());
+					} catch (NoMapException e1) {
+						e1.printStackTrace();
+					} catch (InsertFailureException e1) {
+						e1.printStackTrace();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					} 
 					markForDelete.add(storePoint);
 				}
+				System.out.println("Edge array size is: " + edgeArray.size());
 				for (int i = 0; i < edgeArray.size(); i++) {
 					Edge storeEdge = edgeArray.get(i);
-
-						try {
-							md.insertEdge(storeEdge);
-						} catch (InsertFailureException | AlreadyExistsException | SQLException
-								| DoesNotExistException g) {
-							// TODO Auto-generated catch block
-							System.out.println(g.getMessage());
-						}
+					storeEdge.setId(storeEdge.getPoint1().getId() + "-" + storeEdge.getPoint2().getId());
+					System.out.println("Storing Edge: " + storeEdge.getId());
+					System.out.println("Storing Edge point 1: " + storeEdge.getPoint1().getId());
+					System.out.println("Storing Edge point 2: " + storeEdge.getPoint2().getId());
+					try {
+						MappingDatabase.insertEdge(storeEdge);
+					} catch (InsertFailureException | AlreadyExistsException | SQLException
+							| DoesNotExistException g) {
+						// TODO Auto-generated catch block
+						System.out.println(g.getMessage());
+					}
 				}
 			}
 		});
@@ -458,18 +482,18 @@ public class MapUpdaterGUI extends JFrame {
 	}
 
 	class DrawRoute extends JPanel {
-		
+
 		ArrayList<Point> paintArray = new ArrayList<Point>(); // arraylist of
-																// points
-																// already
-																// painted
+		// points
+		// already
+		// painted
 		// Point editPoint;
 		// Driver values used for testing:
 		int pointID = 0;
 		int numEdges = 0;
 		int edgeWeight = 1;
 
-	
+
 
 		@Override
 		public void paintComponent(Graphics g) {
@@ -501,7 +525,7 @@ public class MapUpdaterGUI extends JFrame {
 				
 			}
 
-			
+
 			//selecting points on the map
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
@@ -522,7 +546,15 @@ public class MapUpdaterGUI extends JFrame {
 					Integer arraySize = pointArray.size();
 					Point point = new Point(arraySize, "Point " + arraySize.toString(), lastMousex, lastMousey,
 							numEdges);
-					pointArray.add(point);
+					boolean shouldAdd = true;
+					for(int k = 0; k < pointArray.size(); k++){
+						if(point.getId() == pointArray.get(k).getId()){
+							shouldAdd = false;
+						}
+					}
+					if(shouldAdd){
+						pointArray.add(point);
+					}
 					repaint();
 				}
 			}
@@ -536,13 +568,22 @@ public class MapUpdaterGUI extends JFrame {
 					//System.out.println("numEdges: "+currentPoint.getNumEdges());
 
 					// add edges to list
-					for (int j = 0; j < currentPoint.getNumEdges(); j++) {
-						edgeArray.add(currentPoint.getEdges().get(j));
-					}
+					/*for (int j = 0; j < currentPoint.getNumEdges(); j++) {
+						Edge tmpEdge = currentPoint.getEdges().get(j);
+						System.out.println("Adding edge: " + currentPoint.getEdges().get(j).getId());
+						boolean shouldAdd = true;
+						for(int k = 0; k < edgeArray.size(); k++){
+							if(tmpEdge.getId() == edgeArray.get(k).getId()){
+								shouldAdd = false;
+							}
+						}
+						if(shouldAdd){
+							edgeArray.add(currentPoint.getEdges().get(j));
+						}
+					}*/
 					// newClick has some interesting storage things going on.
-					// wtf is with Java
 					if (newClick == true) {
-
+						//CHANGE THIS LATER, GOOD FOR TESTING CLICKS
 						MapUpdaterGUI.btnSaveMap.setText("Save Map, X:" + lastMousex + ", Y:" + lastMousey);
 
 						switch (getRadButton()) {
@@ -558,13 +599,19 @@ public class MapUpdaterGUI extends JFrame {
 									editingPoint = true;
 									newClick = false;
 								} else if (newClick == true && editingPoint == true) {
-									currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
-									if (currentPoint.getNumberEdges() > 0)// this has to be caught in an exception later
-									{
-										for (int j = 0; j < currentPoint.getNumberEdges(); j++) {
-											System.out.println("add edge: "
-													+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
-													+ currentPoint.getEdges().get(j).getPoint2().getName());
+									if(editPoint == currentPoint){
+
+									} else {
+										currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
+										System.out.println("Current Edge is: " + currentEdge.getId());
+										edgeArray.add(currentEdge);
+										if (currentPoint.getNumberEdges() > 0)//this has to be caught in an exception later
+										{
+											for (int j = 0; j < currentPoint.getNumberEdges(); j++) {
+												System.out.println("Adding clicked edge between: "
+														+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
+														+ currentPoint.getEdges().get(j).getPoint2().getName());
+											}
 										}
 									}
 									newClick = false;
@@ -588,31 +635,30 @@ public class MapUpdaterGUI extends JFrame {
 							break;
 						}
 					}
-					
+
 					for (int j = 0; j < markForDelete.size(); j++) {
 						// remove edges to list
-						edgeArray.clear();
 						markForDelete.get(j).deleteEdges();
 						pointArray.remove(markForDelete.get(j));
 						markForDelete.remove(j);
 					}
-					
+
 					int drawX = (int) currentPoint.getX();
 					int drawY = (int) currentPoint.getY();
 					// draws the points onto the map.
 					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 
 					//draw lines between points
-					for (int j = 0; j < edgeArray.size(); j++) {
-						g.drawLine(edgeArray.get(j).getPoint1().getX(), edgeArray.get(j).getPoint1().getY(),
-								edgeArray.get(j).getPoint2().getX(), edgeArray.get(j).getPoint2().getY());
+				}
+				for (int j = 0; j < edgeArray.size(); j++) {
+					g.drawLine(edgeArray.get(j).getPoint1().getX(), edgeArray.get(j).getPoint1().getY(),
+							edgeArray.get(j).getPoint2().getX(), edgeArray.get(j).getPoint2().getY());
 
-					}
 				}
 
 			}
 
-/*			for (int i = 0; i < markForDelete.size(); i++) {
+			/*			for (int i = 0; i < markForDelete.size(); i++) {
 				// remove edges to list
 				edgeArray.clear();
 				markForDelete.get(i).deleteEdges();
@@ -645,5 +691,26 @@ public class MapUpdaterGUI extends JFrame {
 		}
 		is.close();
 		os.close();
+	}
+
+	private Map updateCurrentMap(Map map)
+	{
+		int mapId = map.getId();
+		ArrayList<Map> mapList = md.getMaps();
+		boolean foundMap = false;
+		int j = 0;
+		for (j = 0; j<mapList.size(); j++)
+		{
+			if (mapId == mapList.get(j).getId())
+			{
+				foundMap = true;
+				return mapList.get(j);
+			}
+		}
+		if (foundMap == false)
+		{
+			System.out.println("Failed to find and update map");
+		}
+		return null;
 	}
 }

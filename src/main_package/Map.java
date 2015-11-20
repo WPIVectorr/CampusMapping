@@ -14,6 +14,7 @@ public class Map {
 	{
 		this.mapId = mapId;
 		this.mapName = mapName;
+		this.numPoints = 0;
 	}
 	
 	public Map (ArrayList<Point> pointList, int mapId, String mapName)
@@ -25,6 +26,7 @@ public class Map {
 	
 	public Point addPoint(Point a){
 		Points.add(a);
+		numPoints++;
 		//MappingDatabase.getInstance().addToDatabase
 		return a;
 		
@@ -45,6 +47,7 @@ public class Map {
 	public Map (ArrayList<Point> points, int id)
 	{
 		this.Points = points;
+		numPoints = points.size();
 		this.mapId = id;
 	}
 	public ArrayList<Point> getPointList()
@@ -54,6 +57,7 @@ public class Map {
 	public void setPointList(ArrayList<Point> newPoints)
 	{
 		this.Points = newPoints;
+		numPoints = newPoints.size();
 	}
 	public int getId()
 	{
@@ -66,6 +70,12 @@ public class Map {
 	public String getName()
 	{
 		return mapName;
+	}
+	public int getNumPoints(){
+		return numPoints;
+	}
+	public void setNumPoints(int numPoints){
+		this.numPoints = numPoints;
 	}
 
 }

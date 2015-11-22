@@ -35,6 +35,17 @@ public class Point {
 		return id;
 	}
 	public void setID(int x){
+		int j = 0;
+		int oldIdLength = Integer.toString(this.id).length();
+		for (j = 0; j < edges.size(); j++)
+		{
+			Edge currEdge = edges.get(j);
+			if(currEdge.getPoint1() == this){
+				currEdge.setID(x + "-" + Integer.toString(currEdge.getPoint2().getId()));
+			} else {
+				currEdge.setID(Integer.toString(currEdge.getPoint1().getId()) + "-" + x);
+			}
+		}
 		this.id = x;
 	}
 	public String getName()

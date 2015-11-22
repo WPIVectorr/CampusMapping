@@ -36,6 +36,22 @@ public class ServerDB {
 	private static ArrayList<Map> allMaps = new ArrayList<Map>();
 	private static ArrayList<Point> allPoints = new ArrayList<Point>();
 	private static ArrayList<Edge> allEdges = new ArrayList<Edge>();
+	
+	//--------------------------------------------------------Singleton Handling--------------------------------------------------------------
+	private static ServerDB instance;	
+	private ServerDB()
+	{
+			
+	}
+	
+	public static ServerDB getInstance()
+	{
+		if (instance == null)
+			instance = new ServerDB();
+		tryCreateDB();
+		return instance;
+	}
+
 	//-------------------------------------------------------------Functions--------------------------------------------------------------------
 
 	public static void main (String args[])
@@ -422,7 +438,7 @@ public class ServerDB {
 	private static void updatePoint (Point point) throws SQLException, DoesNotExistException
 	{
 		String ptId = point.getId();
-		//---------------------------------------Update database-------------------------------------------------
+		//---------------------------------------------------Update point in database-------------------------------------------------
 		conn = connect();
 		Statement statement = conn.createStatement();
 		statement.setQueryTimeout(5);  											// set timeout to 30 sec.
@@ -451,7 +467,7 @@ public class ServerDB {
 						updateStatement += ("numEdges = "+point.getNumberEdges());
 						updateStatement += ", ";
 						int i = 0;
-						for (i =0; i < point.getNumberEdges(); i++)							//Add number of edges edges to the point
+						for (i =0; i < point.getNumberEdges(); i++)								//Add number of edges edges to the point
 						{
 							updateStatement += ("idEdge"+(i+1)+" = "
 									+"'"+point.getEdges().get(i).getID()+"'");
@@ -464,7 +480,7 @@ public class ServerDB {
 						}
 						updateStatement += ("idEdge"+(i+1)+" = "+"null");						//Formatting, last value must not have comma after it
 						updateStatement +=(" WHERE ID = "+ptId);
-						statement.executeUpdate(updateStatement);									//Insert data
+						statement.executeUpdate(updateStatement);								//Insert data
 						if (DEBUG)
 							System.out.println("Sucessfully updated point:"+ptId+" in database");
 						updateStatement +=("WHERE ID = "+ptId);
@@ -477,6 +493,8 @@ public class ServerDB {
 		{
 			throw new DoesNotExistException("Could not find point in database"); 
 		}
+		//------------------------------------------------Update Edges in database--------------------------------------------------
+		
 		//---------------------------------------------------Update local object----------------------------------------------------
 		int j = 0;
 		boolean foundObject = false;
@@ -494,6 +512,14 @@ public class ServerDB {
 		}
 	}
 
+	public boolean removePoint (Point pt)
+	{
+		//------------------------------------------------------Remove point from DB----------------------------------------------------------
+		
+		//-------------------------------------------------------Remove Edges from DB---------------------------------------------------------
+		return false;
+	}
+	
 	private static void clearDatabase()
 	{
 		if (DEBUG)

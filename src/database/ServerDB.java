@@ -131,9 +131,9 @@ public class ServerDB {
 			insertStatement += ", ";
 			insertStatement += ("'"+map.getMapName()+"'");
 			insertStatement += ", ";
-			insertStatement += map.getxOffset();
+			insertStatement += map.getxTopLeft();
 			insertStatement += ", ";
-			insertStatement += map.getyOffset();
+			insertStatement += map.getyTopLeft();
 			insertStatement += ", ";
 			insertStatement += map.getRotationAngle();
 			insertStatement += ")";

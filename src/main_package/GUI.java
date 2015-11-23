@@ -13,10 +13,10 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import database.AlreadyExistsException;
-import database.MappingDatabase;
+import database.ServerDB;
 
 public class GUI extends JFrame{
-	MappingDatabase md = MappingDatabase.getInstance();
+	ServerDB md = ServerDB.getInstance();
 
 	private BufferedImage img = null;
 
@@ -48,17 +48,14 @@ public class GUI extends JFrame{
 
 		//  img = ImageIO.read(new File("temp.jpg"));
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		MappingDatabase.initDatabase();
-
-		md.initDatabase();
 		//md.testMaps();
-		maps = md.getMaps();
+		maps = md.getMapsFromLocal();
 		System.out.println("-------------------------------------------");
 		System.out.println("maps size:"+maps.size());
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//System.out.println("testMaps: " + md.getMaps().size());
-		maps = md.getMaps();
+		maps = md.getMapsFromLocal();
 		System.out.println("------------------edges check-------------------");
 		maps.get(0).getPointList().get(0).print();
 		//maps.get(index)
@@ -188,7 +185,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 		lblStartingLocation.setBounds(6, 31, 119, 16);
 		mapsDropdown.addItem("Select Map");
 		for(int i = 0; i < maps.size(); i++){	
-			mapsDropdown.addItem(maps.get(i).getName());
+			mapsDropdown.addItem(maps.get(i).getMapName());
 		}
 
 		//creates drop down box with building names
@@ -222,7 +219,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				buildDestIndex = mapsDropdown.getSelectedIndex();
 				////////////////////////////////////////////////////////////////////////////////
 
-				String mapTitle = maps.get(buildDestIndex-1).getName();
+				String mapTitle = maps.get(buildDestIndex-1).getMapName();
 				//String mapTitle = "AtwaterKent1";
 				File dest = new File("src/VectorMaps");
 				String destInput = dest.getAbsolutePath();

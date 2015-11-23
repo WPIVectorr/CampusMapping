@@ -1,3 +1,4 @@
+/*
 package database;
 
 import java.sql.Connection;
@@ -18,7 +19,7 @@ import main_package.*;
  * Cleanup print database and print objects
  * Adjust populate to work with edges
  * TODO
- */
+ *
 public class MappingDatabase 
 {
 	//-----------------------------------------------------------Constants--------------------------------------------------------------------
@@ -77,7 +78,7 @@ public class MappingDatabase
 			/*System.out.println("Dropping old tables");
 			statement.executeUpdate("drop table if exists "+MAP_TABLE_NAME);
 			statement.executeUpdate("drop table if exists "+POINT_TABLE_NAME);
-			statement.executeUpdate("drop table if exists "+EDGE_TABLE_NAME); */
+			statement.executeUpdate("drop table if exists "+EDGE_TABLE_NAME); *
 			System.out.println("Creating new tables");
 			statement.executeUpdate("create table if not exists "+ MAP_TABLE_NAME +" ("+ MAP_SCHEMA + ")");
 			//statement.executeUpdate("create table "+ POINT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
@@ -948,7 +949,7 @@ public class MappingDatabase
 	{
 		
 	}
-	*/
+	*
 	
 	private void printPoint(int ptId) throws DoesNotExistException
 	{
@@ -1231,3 +1232,4 @@ public class MappingDatabase
 	}
 }	
 
+*/

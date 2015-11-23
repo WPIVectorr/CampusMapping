@@ -3,7 +3,7 @@ package main_package;
 import java.util.ArrayList;
 
 public class Point {
-	private int id;
+	private String id;
 	private String name;
 	private int x;
 	private int y;
@@ -14,7 +14,7 @@ public class Point {
 	{
 		
 	}
-	public Point(int id, String name, int x, int y) {
+	public Point(String id, String name, int x, int y) {
 		this.id = id;
 		this.name = name;
 		this.x = x;
@@ -22,7 +22,7 @@ public class Point {
 		this.numberEdges = 0;
 	}
 	
-	public Point(int id, String name, int x, int y, int numberEdges) {
+	public Point(String id, String name, int x, int y, int numberEdges) {
 		this.id = id;
 		this.name = name;
 		this.x = x;
@@ -31,19 +31,19 @@ public class Point {
 	}
 	
 	
-	public int getId() {
+	public String getId() {
 		return id;
 	}
-	public void setID(int x){
+	public void setID(String x){
 		int j = 0;
-		int oldIdLength = Integer.toString(this.id).length();
+		int oldIdLength = this.id.length();
 		for (j = 0; j < edges.size(); j++)
 		{
 			Edge currEdge = edges.get(j);
 			if(currEdge.getPoint1() == this){
-				currEdge.setID(x + "-" + Integer.toString(currEdge.getPoint2().getId()));
+				currEdge.setID(x + "-" + (currEdge.getPoint2().getId()));
 			} else {
-				currEdge.setID(Integer.toString(currEdge.getPoint1().getId()) + "-" + x);
+				currEdge.setID((currEdge.getPoint1().getId()) + "-" + x);
 			}
 		}
 		this.id = x;

@@ -49,13 +49,13 @@ public class GUI extends JFrame{
 		//  img = ImageIO.read(new File("temp.jpg"));
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//md.testMaps();
-		maps = md.getMaps();
+		maps = md.getMapsFromLocal();
 		System.out.println("-------------------------------------------");
 		System.out.println("maps size:"+maps.size());
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//System.out.println("testMaps: " + md.getMaps().size());
-		maps = md.getMaps();
+		maps = md.getMapsFromLocal();
 		System.out.println("------------------edges check-------------------");
 		maps.get(0).getPointList().get(0).print();
 		//maps.get(index)

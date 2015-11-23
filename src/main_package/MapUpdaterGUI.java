@@ -424,7 +424,7 @@ public class MapUpdaterGUI extends JFrame {
 				for (int i = 0; i < pointArray.size(); i++) {
 					Point storePoint = pointArray.get(i);
 					System.out.println("currentmap's currentPoint's id:"+currentMap.getMapId());
-					storePoint.setID(i+currentMap.getMapId()*500);				//TODO change id assignment
+					storePoint.setID((String)(currentMap.getMapId() + "." + i));				
 
 					Point newPoint = new Point(storePoint.getId(), storePoint.getName(),
 							storePoint.getX(), storePoint.getY());
@@ -569,8 +569,8 @@ public class MapUpdaterGUI extends JFrame {
 				if (getRadButton() == 1) // if addpoint
 				{
 					Integer arraySize = pointArray.size();
-					Point point = new Point(arraySize, "Point " + arraySize.toString(), lastMousex, lastMousey,
-							numEdges);
+					Point point = new Point((String)(currentMap.getMapId() + "."+ arraySize), 
+							"Point " + arraySize.toString(), lastMousex, lastMousey, numEdges);
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){

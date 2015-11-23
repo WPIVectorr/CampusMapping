@@ -5,9 +5,17 @@ public class Edge {
 	private Point point1;
 	private Point point2;
 	private int weight;
-	private boolean isOutside;
-	private boolean isStairs;
+	private boolean isOutside = false;
+	private boolean isStairs = false;
 	
+	public Edge(Point point1, Point point2){
+		this.id = (point1.getId() + "-" + point2.getId());
+		this.point1 = point1;
+		this.point2 = point2;
+		this.weight = (int)Math.sqrt((double)((point1.getGlobX()-point2.getGlobX())^2)+((point1.getGlobY()-point2.getGlobY())^2));
+		point1.addEdge(this);								//TODO this may be duplicating edges
+		point2.addEdge(this);
+	}
 	public Edge(Point point1, Point point2, int weight){
 		this.id = (point1.getId() + "-" + point2.getId());
 		this.point1 = point1;

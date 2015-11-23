@@ -122,7 +122,7 @@ public class Map {
 		//the x and y coordinates inputted
 		 for (int count = 0; count < Points.size(); count++){
 			 Point temp = Points.get(count);
-			 if(temp.getX() == xcoord && temp.getY() == ycoord){
+			 if(temp.getLocX() == xcoord && temp.getLocY() == ycoord){
 				 return temp;
 			 }
 		 }

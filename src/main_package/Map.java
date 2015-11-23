@@ -8,9 +8,12 @@ public class Map {
 	private int mapId;
 	private int numPoints;
 	private String mapName;
-	private double xOffset;
-	private double yOffset;
+	private double xTopLeft;
+	private double yTopLeft;
+	private double xBotRight;
+	private double yBotRight;
 	private double rotationAngle;
+	private int pointIDIndex = 0;
 	
 	/*
 	public Map (ArrayList<Point> pointList, int mapId, String mapName)
@@ -20,26 +23,26 @@ public class Map {
 		this.mapName = mapName;
 	}
 	*/
-	
-	public Map (int mapId, String mapName, int xOffset, int yOffset, double rotationAngle)
+	//TODO UPdate Constructors
+	public Map (int mapId, String mapName, int xTopLeft, int yTopLeft, double rotationAngle)
 	{
 		this.Points = new ArrayList<Point>();
 		this.mapId = mapId;
 		this.numPoints = 0;
 		this.mapName = mapName;
-		this.xOffset = xOffset;
-		this.yOffset = yOffset;
+		this.xTopLeft = xTopLeft;
+		this.yTopLeft = yTopLeft;
 		this.rotationAngle = rotationAngle;
 	}
 	
-	public Map (ArrayList<Point> points, int mapId, String mapName, int xOffset, int yOffset, double rotationAngle)
+	public Map (ArrayList<Point> points, int mapId, String mapName, int xTopLeft, int yTopLeft, double rotationAngle)
 	{
 		this.Points = points;
 		this.mapId = mapId;
 		this.numPoints = points.size();
 		this.mapName = mapName;
-		this.xOffset = xOffset;
-		this.yOffset = yOffset;
+		this.xTopLeft = xTopLeft;
+		this.yTopLeft = yTopLeft;
 		this.rotationAngle = rotationAngle;
 	}
 	
@@ -67,20 +70,36 @@ public class Map {
 		this.mapName = mapName;
 	}
 
-	public double getxOffset() {
-		return xOffset;
+	public double getxTopLeft() {
+		return xTopLeft;
 	}
 
-	public void setxOffset(double xOffset) {
-		this.xOffset = xOffset;
+	public void setxTopLeft(double xTopLeft) {
+		this.xTopLeft = xTopLeft;
 	}
 
-	public double getyOffset() {
-		return yOffset;
+	public double getyTopLeft() {
+		return yTopLeft;
 	}
 
-	public void setyOffset(double yOffset) {
-		this.yOffset = yOffset;
+	public void setyTopLeft(double yTopLeft) {
+		this.yTopLeft = yTopLeft;
+	}
+	
+	public double getxBotRight() {
+		return xBotRight;
+	}
+
+	public void setxBotRight(double xBotRight) {
+		this.xBotRight = xBotRight;
+	}
+
+	public double getyBotRight() {
+		return yBotRight;
+	}
+
+	public void setyBotRight(double yBotRight) {
+		this.yBotRight = yBotRight;
 	}
 
 	public double getRotationAngle() {
@@ -101,6 +120,7 @@ public class Map {
 	public boolean addPoint(Point a){
 		Points.add(a);
 		numPoints++;
+		pointIDIndex++;
 		int j = 0;
 		boolean added = false;
 		for (j = 0; j <Points.size(); j++)
@@ -117,7 +137,7 @@ public class Map {
 	}
 	
 	public Point getPoint(int xcoord, int ycoord){
-		//TODO change this to account for offsets
+		//TODO change this to account for Offsets
 		//goes through arraylist Points and returns the Point with
 		//the x and y coordinates inputted
 		 for (int count = 0; count < Points.size(); count++){
@@ -138,5 +158,8 @@ public class Map {
 	{
 		this.Points = newPoints;
 		numPoints = newPoints.size();
+	}
+	public int getPointIDIndex(){
+		return pointIDIndex;
 	}
 }

@@ -4,19 +4,26 @@ import java.util.ArrayList;
 
 public class GenTextDir {
 	boolean DEBUG = false;//Debug variable for printouts
-	public String[] genTextDir(ArrayList<Point> listPoints){
+	public ArrayList<Directions> genTextDir(ArrayList<Point> listPoints){
 		if(listPoints.size() <= 1){//checks to make certain there are enough points (Origin and Destination are not the same)
-			String[] retString = new String[1];
-			retString[0] = "Invalid Points entered."; //If they are, return an error array.
-			return retString;
+			return null;
 		} else { //If the origin and destination are not the same, then continue
 			Point[] arrPoints = new Point[listPoints.size()];//First, convert the array list to an array.
+			
+			ArrayList<Directions> retDir = new ArrayList<Directions>();//EVENTUAL RETURN VALUE
+			
 			for (int i = 0; i < listPoints.size(); i++){
 				arrPoints[i] = listPoints.get(i);
 			}
-			String[] retString = new String[arrPoints.length + 1];//Our return array is going to be one larger than the given point array
-			retString[0] = "Start your path at " + arrPoints[arrPoints.length - 1].getName();//Give it a start message as the beginning direction
-			retString[1] = "Travel towards: " + arrPoints[arrPoints.length - 2].getName();//Give it a point to travel towards as the second direction
+			double dist = 0;//Now find out the last direction
+			dist = PythagTheorem(arrPoints[1].getX() - arrPoints[0].getX(), arrPoints[1].getY() - arrPoints[0].getY());//CONVERT TO FEET
+			dist = dist * 10;
+			dist = Math.floor(dist);
+			dist = dist / 10;
+			Directions retDirFirst = new Directions("straight", dist, true, dist, arrPoints[0], arrPoints[1]);
+			retDir.add(retDirFirst);
+			
+			
 			Point prevPoint = null;//Initialize previous, current, and next points
 			Point currPoint = null;
 			Point nextPoint = null;
@@ -27,8 +34,7 @@ public class GenTextDir {
 			double nextPointY;
 
 			double angle = 0;//Store the angle to turn as a double
-
-			String currString;//Initialize the string to input at the current spot.
+			Directions currDir;//VARIABLE WILL BE USED AS THE RETURN LATER, IN ARRAYLIST FORM
 			for(int i = 1; i < arrPoints.length - 1; i++){//Iterate over the array of points given
 				prevPoint = arrPoints[arrPoints.length-i];//Grab the previous point the user was at
 				currPoint = arrPoints[arrPoints.length-(i+1)];//Grab the current point the user is at
@@ -129,7 +135,14 @@ public class GenTextDir {
 				System.out.println("At " + currPoint.getName() + " the y value is: " + prevPointY);
 				System.out.println("At " + currPoint.getName() + " the x value is: " + nextPointX);
 				if((angle >= -0.1) && (angle <= 0.1)){//if the angle is within some degree of error of 0, we are going straight
-					currString = "Once you reach " + currPoint.getName() + " go straight until " + nextPoint.getName();
+					dist = 0;//Now find out the last direction
+					dist = PythagTheorem(nextPoint.getX() - currPoint.getX(), nextPoint.getY() - currPoint.getY());//CONVERT TO FEET
+					dist = dist * 10;
+					dist = Math.floor(dist);
+					dist = dist / 10;
+					currDir = new Directions("straight", dist, false, dist, currPoint, nextPoint);
+					
+				
 				} else if (nextPointX <= 0){//otherwise, if its X is negative, we are turning left.
 					System.out.println("At " + currPoint.getName() + " the new y value is: " + nextPointY);
 					
@@ -145,7 +158,12 @@ public class GenTextDir {
 					} else {
 						turnAmount = "sharp left";
 					}
-					currString = "Turn a " + turnAmount + " at " + currPoint.getName() + " towards " + nextPoint.getName();
+					dist = 0;//Now find out the last direction
+					dist = PythagTheorem(nextPoint.getX() - currPoint.getX(), nextPoint.getY() - currPoint.getY());//CONVERT TO FEET
+					dist = dist * 10;
+					dist = Math.floor(dist);
+					dist = dist / 10;
+					currDir = new Directions(turnAmount, dist, false, dist, currPoint, nextPoint);
 				} else {//otherwise, do the same, but we are turning right
 					if(nextPointY < 0){
 						angle = 180-angle;
@@ -157,15 +175,22 @@ public class GenTextDir {
 					} else {
 						turnAmount = "sharp right";
 					}
-					currString = "Turn a " + turnAmount + " at " + currPoint.getName() + " towards " + nextPoint.getName();
+					
+					dist = 0;//Now find out the last direction
+					dist = PythagTheorem(nextPoint.getX() - currPoint.getX(), nextPoint.getY() - currPoint.getY());//CONVERT TO FEET
+					dist = dist * 10;
+					dist = Math.floor(dist);
+					dist = dist / 10;
+					currDir = new Directions(turnAmount, dist, false, dist, currPoint, nextPoint);
+					
 				}
-				retString[i+1] = currString;//put the current string in the return array.
 				if(DEBUG){
 					System.out.println("");
 					System.out.println("");
 				}
+				retDir.add(currDir);
 			}
-			double dist = 0;//Now find out the last direction
+			dist = 0;//Now find out the last direction
 			if(nextPoint != null){//Figure out the distance to the last point
 				dist = PythagTheorem(nextPoint.getX() - currPoint.getX(), nextPoint.getY() - currPoint.getY());//CONVERT TO FEET
 			} else {
@@ -174,18 +199,79 @@ public class GenTextDir {
 			dist = dist * 10;
 			dist = Math.floor(dist);
 			dist = dist / 10;
-			if(dist == 1){//Print out the dist value (also, check if its feet or foot)
-				//retString[retString.length - 1] = "Go forward " + Double.toString(dist) + " foot to your destination";
-				retString[retString.length - 1] = "Go forward to your destination";
-
-			} else {
-				//retString[retString.length - 1] = "Go forward " + Double.toString(dist) + " feet to your destination";
-				retString[retString.length - 1] = "Go forward to your destination";
-			}
-			return retString;//return retString
+			currDir = new Directions("straight", dist, false, dist, currPoint, nextPoint);
+			retDir.add(currDir);
+			
+			return retDir;//return retDir
 		}
 	}
 	private double PythagTheorem(double x, double y){
 		return Math.sqrt(x*x + y*y);
 	}
+	public ArrayList<Directions> generateDirections(ArrayList<Directions> directions) throws MalformedDirectionException{
+		ArrayList<Directions> retDirections = new ArrayList<Directions>();
+		Directions currDir;
+		int i = 0;
+		while(i < directions.size()){
+			if(directions.get(i).getTurn().equals("slight left")){
+				currDir = directions.get(i);
+				i++;
+			} else if (directions.get(i).getTurn().equals("left")) {
+				currDir = directions.get(i);
+				i++;
+			} else if (directions.get(i).getTurn().equals("sharp left")) {
+				currDir = directions.get(i);
+				i++;
+			} else if (directions.get(i).getTurn().equals("slight right")) {
+				currDir = directions.get(i);
+				i++;
+			} else if (directions.get(i).getTurn().equals("right")) {
+				currDir = directions.get(i);
+				i++;
+			} else if (directions.get(i).getTurn().equals("sharp right")) {
+				currDir = directions.get(i);
+				i++;
+			} else if (directions.get(i).getTurn().equals("straight")) {
+				currDir = directions.get(i);
+				i++;
+				while(directions.get(i).isStraight()){
+					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
+					currDir.setDistance(currDir.getTime() + directions.get(i).getTime());
+					currDir.setDestination(directions.get(i).getDestination());
+					i++;
+				}
+			} else {
+				throw new MalformedDirectionException("This direction has the wrong turn information" + directions.get(i).getTurn());
+			}
+			retDirections.add(currDir);
+		}
+		return retDirections;
+	}
+	
+	public String[] genDirStrings(ArrayList<Directions> directions) throws MalformedDirectionException{
+		String[] retString = new String[directions.size()];
+		Directions currDir;
+		for(int i = 0; i < directions.size(); i++){
+			currDir = directions.get(i);
+			if(currDir.getTurn().equals("slight left")){
+				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+			} else if (currDir.getTurn().equals("left")) {
+				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+			} else if (currDir.getTurn().equals("sharp left")) {
+				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+			} else if (currDir.getTurn().equals("slight right")) {
+				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+			} else if (currDir.getTurn().equals("right")) {
+				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+			} else if (currDir.getTurn().equals("sharp right")) {
+				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+			} else if (currDir.getTurn().equals("straight")) {
+				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " go " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+			} else {
+				throw new MalformedDirectionException("This direction has the wrong turn information" + directions.get(i).getTurn());
+			}
+		}
+		return retString;
+	}
+	
 }

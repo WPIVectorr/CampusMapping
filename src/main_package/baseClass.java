@@ -68,7 +68,7 @@ public class baseClass {
 		testPoints.add(b);
 		testPoints.add(a);
 		GenTextDir testGenTestDir = new GenTextDir(); 
-		String[] testOneString = testGenTestDir.genTextDir(testPoints);
+		/*String[] testOneString = testGenTestDir.genTextDir(testPoints);
 		System.out.println(testOneString[0]);
 		System.out.println(testOneString[1]);
 		System.out.println(testOneString[2]);
@@ -151,7 +151,7 @@ public class baseClass {
 		System.out.println(testOneString[2]);
 		System.out.println(testOneString[3]);
 		System.out.println(testOneString[4]);
-		System.out.println(testOneString[5]);
+		System.out.println(testOneString[5]);*/
 		//int id, String name, int x, int y, int numberEdges
 	}
 	public static void testAStar(Point start, Point end){

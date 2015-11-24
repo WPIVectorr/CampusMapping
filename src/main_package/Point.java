@@ -5,12 +5,13 @@ import java.util.ArrayList;
 public class Point {
 	private String id;
 	private String name;
+	private int index;
 	private int locX;
 	private int locY;
-	private ArrayList<Edge> edges = new ArrayList<Edge>();
-	private int numberEdges;
 	private int globX;
 	private int globY;
+	private ArrayList<Edge> edges = new ArrayList<Edge>();
+	private int numberEdges;
 	
 	public Point()
 	{
@@ -23,6 +24,7 @@ public class Point {
 		this.locX = x;
 		this.locY = y;
 		this.numberEdges = 0;
+		this.index = 0;
 		this.globX = x;
 		this.globY = y;
 	}
@@ -30,6 +32,18 @@ public class Point {
 	public Point(String id, String name, int x, int y, int numberEdges) {
 		this.id = id;
 		this.name = name;
+		this.locX = x;
+		this.locY = y;
+		this.numberEdges = numberEdges;
+		this.index = 0;
+		this.globX = x;
+		this.globY = y;
+	}
+	
+	public Point(String id, String name, int index, int x, int y, int numberEdges) {
+		this.id = id;
+		this.name = name;
+		this.index = index;
 		this.locX = x;
 		this.locY = y;
 		this.numberEdges = numberEdges;
@@ -118,8 +132,9 @@ public class Point {
 	}
 	public void print()
 	{
-		System.out.println ("Name:"+this.name);
+		System.out.println ("----------Printing Point:"+this.name+"----------");
 		System.out.println ("ID:"+this.id);
+		System.out.println ("Index:"+this.index);
 		System.out.println ("Local X:"+this.locX);
 		System.out.println ("Local Y:"+this.locY);
 		System.out.println ("Global X:"+this.globX);
@@ -132,5 +147,11 @@ public class Point {
 			this.edges.get(i).print();
 			//System.out.println("Edge"+(i+1)+"id:"+this.edges.get(i).getId());
 		}
+	}
+	public int getIndex() {
+		return index;
+	}
+	public void setIndex(int index) {
+		this.index = index;
 	}
 }

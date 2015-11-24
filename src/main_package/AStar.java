@@ -62,7 +62,7 @@ public class AStar {
 	}
 	
 	private static int CostEstimate(Point a, Point b){ // Find distance from point a to point b
-		return (int)Math.sqrt((double)((a.getX()-b.getX())^2)+((a.getY()-b.getY())^2)); // Pythagorean theorum
+		return (int)Math.sqrt((double)((a.getGlobX()-b.getGlobX())^2)+((a.getGlobY()-b.getGlobY())^2)); // Pythagorean theorum
 	}
 	private static void OpenAdd(Point addPoint){ // Add a point to the open list
 		for(int i = 0; i < Open.size(); i++){ // Check for each point in open

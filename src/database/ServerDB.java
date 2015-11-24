@@ -133,9 +133,9 @@ public class ServerDB {
 			insertStatement += ", ";
 			insertStatement += ("'"+map.getMapName()+"'");
 			insertStatement += ", ";
-			insertStatement += map.getxOffset();
+			insertStatement += map.getxTopLeft();
 			insertStatement += ", ";
-			insertStatement += map.getyOffset();
+			insertStatement += map.getyTopLeft();
 			insertStatement += ", ";
 			insertStatement += map.getRotationAngle();
 			insertStatement += ")";
@@ -196,8 +196,8 @@ public class ServerDB {
 		int counter = 0;
 		String pointID = pt.getId();
 		String ptName = pt.getName();
-		int ptX = pt.getX();
-		int ptY = pt.getY();
+		int ptX = pt.getLocX();
+		int ptY = pt.getLocY();
 		ArrayList<Edge> edgeArray = pt.getEdges();
 		int numberEdges = pt.getNumberEdges();
 
@@ -466,9 +466,9 @@ public class ServerDB {
 						String updateStatement = ("UPDATE "+rs1.getString("table_name")+" SET ");
 						updateStatement += ("name ="+"'"+point.getName()+"'");										
 						updateStatement += ", ";
-						updateStatement += ("x = "+ point.getX());
+						updateStatement += ("x = "+ point.getLocX());
 						updateStatement += ", ";
-						updateStatement += ("y = "+point.getY());
+						updateStatement += ("y = "+point.getLocY());
 						updateStatement += ", ";
 						updateStatement += ("numEdges = "+point.getNumberEdges());
 						updateStatement += ", ";

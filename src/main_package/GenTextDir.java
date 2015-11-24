@@ -44,11 +44,11 @@ public class GenTextDir {
 				System.out.println("Next point name: " + nextPoint.getName());
 				//The way this code works is first it moves all the points such that the current point
 				//sits at the origin.
-				prevPointX = prevPoint.getX() - currPoint.getX();
-				prevPointY = currPoint.getY() - prevPoint.getY();
+				prevPointX = prevPoint.getGlobX() - currPoint.getGlobX();
+				prevPointY = currPoint.getGlobY() - prevPoint.getGlobY();
 
-				nextPointX = nextPoint.getX() - currPoint.getX();
-				nextPointY = currPoint.getY() - nextPoint.getY();
+				nextPointX = nextPoint.getGlobX() - currPoint.getGlobX();
+				nextPointY = currPoint.getGlobY() - nextPoint.getGlobY();
 				System.out.println("Previous next point Y was : " + nextPointY);
 				System.out.println("Previous Y is: " + prevPointY);
 				
@@ -192,9 +192,9 @@ public class GenTextDir {
 			}
 			dist = 0;//Now find out the last direction
 			if(nextPoint != null){//Figure out the distance to the last point
-				dist = PythagTheorem(nextPoint.getX() - currPoint.getX(), nextPoint.getY() - currPoint.getY());//CONVERT TO FEET
+				dist = PythagTheorem(nextPoint.getGlobX() - currPoint.getGlobX(), nextPoint.getGlobY() - currPoint.getGlobY());//CONVERT TO FEET
 			} else {
-				dist = PythagTheorem(arrPoints[1].getX() - arrPoints[0].getX(), arrPoints[1].getY() - arrPoints[0].getY());
+				dist = PythagTheorem(arrPoints[1].getGlobX() - arrPoints[0].getGlobX(), arrPoints[1].getGlobY() - arrPoints[0].getGlobY());
 			}
 			dist = dist * 10;
 			dist = Math.floor(dist);

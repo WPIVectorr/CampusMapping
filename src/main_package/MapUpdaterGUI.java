@@ -427,7 +427,7 @@ public class MapUpdaterGUI extends JFrame {
 					storePoint.setID((String)(currentMap.getMapId() + "." + i));				
 
 					Point newPoint = new Point(storePoint.getId(), storePoint.getName(),
-							storePoint.getX(), storePoint.getY());
+							storePoint.getLocX(), storePoint.getLocY());
 					System.out.println("Storing point in:"+currentMap.getMapName());
 					try {
 						ServerDB.insertPoint(currentMap, newPoint);
@@ -613,10 +613,10 @@ public class MapUpdaterGUI extends JFrame {
 
 						switch (getRadButton()) {
 						case 2:// edit points
-							if ((lastMousex > currentPoint.getX() - (pointSize + 5)
-									&& lastMousex < currentPoint.getX() + (pointSize + 5))
-									&& (lastMousey > currentPoint.getY() - (pointSize + 5)
-											&& lastMousey < currentPoint.getY() + (pointSize + 5))) {
+							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
+									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
+									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
+											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
 								if (newClick == true && editingPoint == false) {
 									editPoint = currentPoint;
 									roomNumber.setText(editPoint.getName());
@@ -651,10 +651,10 @@ public class MapUpdaterGUI extends JFrame {
 							}
 							break;
 						case 3:// remove points
-							if ((lastMousex > currentPoint.getX() - (pointSize + 5)
-									&& lastMousex < currentPoint.getX() + (pointSize + 5))
-									&& (lastMousey > currentPoint.getY() - (pointSize + 5)
-											&& lastMousey < currentPoint.getY() + (pointSize + 5))) {
+							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
+									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
+									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
+											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
 								if (newClick == true)
 									markForDelete.add(currentPoint);
 
@@ -677,16 +677,16 @@ public class MapUpdaterGUI extends JFrame {
 						markForDelete.remove(j);
 					}
 
-					int drawX = (int) currentPoint.getX();
-					int drawY = (int) currentPoint.getY();
+					int drawX = (int) currentPoint.getLocX();
+					int drawY = (int) currentPoint.getLocY();
 					// draws the points onto the map.
 					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 
 					//draw lines between points
 				}
 				for (int j = 0; j < edgeArray.size(); j++) {
-					g.drawLine(edgeArray.get(j).getPoint1().getX(), edgeArray.get(j).getPoint1().getY(),
-							edgeArray.get(j).getPoint2().getX(), edgeArray.get(j).getPoint2().getY());
+					g.drawLine(edgeArray.get(j).getPoint1().getLocX(), edgeArray.get(j).getPoint1().getLocY(),
+							edgeArray.get(j).getPoint2().getLocX(), edgeArray.get(j).getPoint2().getLocY());
 
 				}
 

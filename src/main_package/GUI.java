@@ -451,7 +451,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 					for (int i = 1; i < route.size(); i++){
 						//System.out.println(route.get(i));
 						g.setColor(Color.RED);
-						g.drawLine(route.get(i-1).getX(), route.get(i-1).getY(), route.get(i).getX(), route.get(i).getY());
+						g.drawLine(route.get(i-1).getLocX(), route.get(i-1).getLocY(), route.get(i).getLocX(), route.get(i).getLocY());
 					
 
 					}

@@ -1,3 +1,4 @@
+/*
 package database;
 
 import java.sql.Connection;
@@ -18,7 +19,7 @@ import main_package.*;
  * Cleanup print database and print objects
  * Adjust populate to work with edges
  * TODO
- */
+ *
 public class MappingDatabase 
 {
 	//-----------------------------------------------------------Constants--------------------------------------------------------------------
@@ -77,7 +78,7 @@ public class MappingDatabase
 			/*System.out.println("Dropping old tables");
 			statement.executeUpdate("drop table if exists "+MAP_TABLE_NAME);
 			statement.executeUpdate("drop table if exists "+POINT_TABLE_NAME);
-			statement.executeUpdate("drop table if exists "+EDGE_TABLE_NAME); */
+			statement.executeUpdate("drop table if exists "+EDGE_TABLE_NAME); *
 			System.out.println("Creating new tables");
 			statement.executeUpdate("create table if not exists "+ MAP_TABLE_NAME +" ("+ MAP_SCHEMA + ")");
 			//statement.executeUpdate("create table "+ POINT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
@@ -93,6 +94,8 @@ public class MappingDatabase
 	public static void insertMap(Map map) throws AlreadyExistsException, SQLException
 	{
 		int mapId = map.getId();
+		String RELEVANT_TABLE_NAME = "";
+		RELEVANT_TABLE_NAME += ("Map"+map.getId()+"Points");
 		//--------------------------------------------------Add to Database-----------------------------------------------------------------
 
 		try {
@@ -100,7 +103,11 @@ public class MappingDatabase
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30); 
 			
-			ResultSet rs = statement.executeQuery("SELECT * from "+MAP_TABLE_NAME);
+
+			statement.executeUpdate("create table if not exists "+ 								//If does not exist, then create table
+					RELEVANT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
+			
+			ResultSet rs = connection.createStatement().executeQuery("SELECT * from "+MAP_TABLE_NAME);
 			while (rs.next())
 			{
 				int comparisonId = rs.getInt("id");
@@ -195,7 +202,8 @@ public class MappingDatabase
 				{
 					if (DEBUG)
 						System.out.println("Creating table: " + RELEVANT_TABLE_NAME);
-					statement.executeUpdate("create table "+ 								//If does not exist, then create table
+
+					statement.executeUpdate("create table if not exists "+ 								//If does not exist, then create table
 											RELEVANT_TABLE_NAME +" ("+ POINT_SCHEMA + ")");
 				}
 				else
@@ -453,6 +461,9 @@ public class MappingDatabase
 			int newPtNumberEdges;
 			ArrayList<Edge> newPtEdges = new ArrayList<Edge>();
 			
+			System.out.println("Populating from database");
+			populateFromDatabase();
+			printObjects(true, true, true);
 			ResultSet rs = statement.executeQuery("SELECT * FROM "+TABLE_NAME);
 			while (rs.next())
 			{
@@ -472,13 +483,15 @@ public class MappingDatabase
 					edgeSelect = ("idEdge"+String.valueOf(counter+1));
 					edgeId = rs.getString(edgeSelect);
 					boolean foundEdge = false;
+					System.out.println("Searching for edge:"+edgeId);
 					for (edgeCounter = 0; edgeCounter<allEdges.size(); edgeCounter++)
 					{
+						System.out.println("Comparing edge at position:"+edgeCounter);
 						if (allEdges.get(edgeCounter).getID().contentEquals(edgeId))
 						{
 							foundEdge = true;
 							newPtEdges.add(allEdges.get(edgeCounter));
-							//System.out.println("found:"+allEdges.get(edgeCounter).getId());
+							System.out.println("found:"+allEdges.get(edgeCounter).getId());
 						}
 					}
 					
@@ -486,6 +499,7 @@ public class MappingDatabase
 					{			
 						throw new PopulateErrorException("Couldn't find edgeId in allEdges");
 					}
+					//System.out.println("Found edge:"+allEdges.get(edgeCounter).getID()+" successfully");
 				}
 				
 				Point newPt = new Point(newPtId, newPtName, newPtX, newPtY, newPtNumberEdges);
@@ -842,6 +856,7 @@ public class MappingDatabase
 				break;
 			}
 		}
+				
 		if (found)
 		{
 			return retPt;
@@ -934,7 +949,7 @@ public class MappingDatabase
 	{
 		
 	}
-	*/
+	*
 	
 	private void printPoint(int ptId) throws DoesNotExistException
 	{
@@ -1217,3 +1232,4 @@ public class MappingDatabase
 	}
 }	
 
+*/

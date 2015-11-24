@@ -13,14 +13,15 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import database.AlreadyExistsException;
-import database.MappingDatabase;
+import database.ServerDB;
 
 public class GUI extends JFrame{
-	MappingDatabase md = MappingDatabase.getInstance();
+	ServerDB md = ServerDB.getInstance();
 
-	BufferedImage img = null;
+	private BufferedImage img = null;
 
 	//drop down menu of room numbers based off of the building selected on campus
+
 	String rooms[] = {"Select room #", "Please choose building first"};
 
 	private ArrayList<Map> maps = new ArrayList<Map>();
@@ -31,8 +32,6 @@ public class GUI extends JFrame{
 	private Point end;
 	private boolean showRoute;
 	private JTextField textField;
-	private JTextField txtStartingLocation;
-	private JTextField txtDestination;
 	private JPanel buttonPanel;
 	private DrawRoute drawPanel = new DrawRoute();
 	private int windowScale = 2;
@@ -48,26 +47,26 @@ public class GUI extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//  img = ImageIO.read(new File("temp.jpg"));
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		MappingDatabase.initDatabase();
-
-		md.initDatabase();
-		md.testMaps();
-		maps = md.getMaps();
+		//md.testMaps();
+		maps = md.getMapsFromLocal();
 		System.out.println("-------------------------------------------");
 		System.out.println("maps size:"+maps.size());
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//System.out.println("testMaps: " + md.getMaps().size());
-		maps = md.getMaps();
+		maps = md.getMapsFromLocal();
 		System.out.println("------------------edges check-------------------");
 		maps.get(0).getPointList().get(0).print();
 		//maps.get(index)
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/*
 		// Stub for testing 
+<<<<<<< HEAD
+=======
 
+>>>>>>> refs/remotes/origin/master
+>>>>>>> refs/remotes/origin/master
 		// Stub for testing 
 		ArrayList<Map> maps = new ArrayList<Map>();
 		Point testPoint1 = new Point (1, "One", 50, 100);
@@ -88,7 +87,6 @@ public class GUI extends JFrame{
 		testArrayList.add(testPoint2);
 		testArrayList.add(testPoint3);
 		testArrayList.add(testPoint4);
-
 		Point testPoint7 = new Point (7, "seven", 100, 500);
 		Point testPoint5 = new Point (5, "Five", 500, 600);
 		Point testPoint6 = new Point (6, "Six", 700, 500);
@@ -102,20 +100,22 @@ public class GUI extends JFrame{
 		Map testMap2 = new Map(testArrayList2, 2, "AK");
 		maps.add(testMap);
 		maps.add(testMap2);
+<<<<<<< HEAD
+
+=======
 		/*System.out.println("```````````````````````````````````````````````````````````");
 	System.out.println(maps.equals(maps1));
 	System.out.println("maps.get(0)/(1) " + maps.get(0).getName() + " " + maps.get(1).getName());
 	System.out.println("maps1.get(0)/(1) " + maps1.get(0).getName() + " " + maps1.get(1).getName());
 System.out.println("mapslistsize: " + maps.get(1).getPointList().size());
 System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
+>>>>>>> refs/remotes/origin/master
 		// Fill building drop down menus with names of points
 		//int pointListSize = maps.get(0).getPointList().size();
-
 		//buildings[0] = "Select a building";
 		//for (int i = 0; i < pointListSize; i++){
 		//buildings[i] = maps.get(0).getPointList().get(i);
 		//}
-
 		//creates string of rooms for dropdown menu
 		String[] rooms = new String[maps.size()];
 		rooms[0] = "Select Map";
@@ -124,7 +124,6 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 			count++;
 			rooms[i] = maps.get(count).getName();
 		}
-
 		/*maps = MappingDatabase.getInstance().getMaps();
     	ArrayList<Map> maps = new ArrayList<Map>();
     	ArrayList<String> buildingsTest = new ArrayList<String>(); 
@@ -151,8 +150,6 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 		// for (int i=0; i < buildings.length; i++){
 		//	startBuilds.addItem(buildings[i]);
 		//}
-
-
 
 
 		/*adds the room numbers based off of building name
@@ -188,7 +185,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 		lblStartingLocation.setBounds(6, 31, 119, 16);
 		mapsDropdown.addItem("Select Map");
 		for(int i = 0; i < maps.size(); i++){	
-			mapsDropdown.addItem(maps.get(i).getName());
+			mapsDropdown.addItem(maps.get(i).getMapName());
 		}
 
 		//creates drop down box with building names
@@ -221,22 +218,28 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				//System.out.println("inside action listener");
 				buildDestIndex = mapsDropdown.getSelectedIndex();
 				////////////////////////////////////////////////////////////////////////////////
-				//String mapTitle = maps.get(buildDestIndex).getName();
-				String mapTitle = "AtwaterKent1";
+
+				String mapTitle = maps.get(buildDestIndex-1).getMapName();
+				//String mapTitle = "AtwaterKent1";
 				File dest = new File("src/VectorMaps");
 				String destInput = dest.getAbsolutePath();
 				//assuming all maps saved in vectorMaps are in jpg
 				destInput = destInput + "/" + mapTitle + ".jpg";
+
 				File destFile = new File(destInput);
 				try{
 					img = ImageIO.read(destFile);
 				}
 				catch(IOException a){
+					System.out.println("Could not find file:"+destInput);
 					a.printStackTrace();
 				}
 
-
-
+				System.out.println("DIe die: " +maps.get(0).getPointList().size());
+				System.out.println("points: ");
+				for(int count = 0; count < maps.get(0).getPointList().size(); count++){
+					System.out.println(maps.get(0).getPointList().get(count).getName());
+				}
 				//if(buildDestIndex == -1)
 				//buildDestIndex = 0;
 				//System.out.println("buildDest: " + buildDestIndex);
@@ -248,6 +251,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 					//System.out.println("building size: " + buildings.length);
 					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
 						startBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
+						System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
 						//System.out.println("buildings[i] " + buildings[i]);
 
 						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
@@ -311,6 +315,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 						start = (Point) startBuilds.getSelectedItem();
 						end = (Point) destBuilds.getSelectedItem();
 						if(!start.equals(end)){
+
 
 
 
@@ -433,7 +438,10 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				if (showRoute && route != null){           
 					for (int i = 1; i < route.size(); i++){
 						//System.out.println(route.get(i));
-						g.drawLine(route.get(i-1).getX(), route.get(i-1).getY(), route.get(i).getX(), route.get(i).getY());
+						g.setColor(Color.RED);
+						g.drawLine(route.get(i-1).getLocX(), route.get(i-1).getLocY(), route.get(i).getLocX(), route.get(i).getLocY());
+					
+
 					}
 				}
 			}

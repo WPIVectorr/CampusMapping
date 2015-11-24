@@ -5,36 +5,172 @@ import java.util.ArrayList;
 
 public class Map {
 	private ArrayList<Point> Points; 
-	private ArrayList<Edge> Edges;
 	private int mapId;
 	private int numPoints;
 	private String mapName;
+	private double xTopLeft;
+	private double yTopLeft;
+	private double xBotRight;
+	private double yBotRight;
+	private double rotationAngle;
+	private int pointIDIndex = 0;
 	
-	public Map (int mapId, String mapName)
-	{
-		this.mapId = mapId;
-		this.mapName = mapName;
-	}
-	
+	/*
 	public Map (ArrayList<Point> pointList, int mapId, String mapName)
 	{
 		this.Points = pointList;
 		this.mapId = mapId;
 		this.mapName = mapName;
 	}
-	
-	public Point addPoint(Point a){
-		Points.add(a);
-		//MappingDatabase.getInstance().addToDatabase
-		return a;
-		
+	*/
+	//TODO UPdate Constructors
+	public Map (int mapId, String mapName)
+	{
+		this.mapId = mapId;
+		this.mapName = mapName;
+		this.numPoints = 0;
+		this.Points = new ArrayList<Point>();
 	}
+	
+	public Map (int mapId, String mapName, double xTopLeft, double yTopLeft, double rotationAngle)
+	{
+		this.Points = new ArrayList<Point>();
+		this.mapId = mapId;
+		this.numPoints = 0;
+		this.mapName = mapName;
+		this.xTopLeft = xTopLeft;
+		this.yTopLeft = yTopLeft;
+		this.rotationAngle = rotationAngle;
+	}
+	
+	public Map (ArrayList<Point> points, int mapId, String mapName, double xTopLeft, double yTopLeft, double rotationAngle)
+	{
+		this.Points = points;
+		this.mapId = mapId;
+		this.numPoints = points.size();
+		this.mapName = mapName;
+		this.xTopLeft = xTopLeft;
+		this.yTopLeft = yTopLeft;
+		this.rotationAngle = rotationAngle;
+	}
+	
+	public Map (int mapId, String mapName, double xTopLeft, double yTopLeft, double xBotRight, double yBotRight, double rotationAngle, int pointIDIndex)
+	{
+		this.Points = new ArrayList<Point>();
+		this.mapId = mapId;
+		this.numPoints = 0;
+		this.mapName = mapName;
+		this.xTopLeft = xTopLeft;
+		this.yTopLeft = yTopLeft;
+		this.xBotRight = xBotRight;
+		this.yBotRight = yBotRight;
+		this.rotationAngle = rotationAngle;
+		this.pointIDIndex = pointIDIndex;
+	}
+	public ArrayList<Point> getPoints() {
+		return Points;
+	}
+
+	public void setPoints(ArrayList<Point> points) {
+		Points = points;
+	}
+
+	public int getMapId() {
+		return mapId;
+	}
+
+	public void setMapId(int mapId) {
+		this.mapId = mapId;
+	}
+
+	public String getMapName() {
+		return mapName;
+	}
+
+	public void setMapName(String mapName) {
+		this.mapName = mapName;
+	}
+
+	public double getxTopLeft() {
+		return xTopLeft;
+	}
+
+	public void setxTopLeft(double xTopLeft) {
+		this.xTopLeft = xTopLeft;
+	}
+
+	public double getyTopLeft() {
+		return yTopLeft;
+	}
+
+	public void setyTopLeft(double yTopLeft) {
+		this.yTopLeft = yTopLeft;
+	}
+	
+	public double getxBotRight() {
+		return xBotRight;
+	}
+
+	public void setxBotRight(double xBotRight) {
+		this.xBotRight = xBotRight;
+	}
+
+	public double getyBotRight() {
+		return yBotRight;
+	}
+
+	public void setyBotRight(double yBotRight) {
+		this.yBotRight = yBotRight;
+	}
+
+	public double getRotationAngle() {
+		return rotationAngle;
+	}
+
+	public void setRotationAngle(double rotationAngle) {
+		this.rotationAngle = rotationAngle;
+	}
+	
+	public boolean addPoint(Point a){
+		if (a == null)
+		{
+			System.out.println("Point to add is null");
+			return false;
+		}
+		if (this.Points == null)
+		{
+			System.out.println("Current point list is null");
+			return false;
+		}
+		this.Points.add(a);
+		numPoints++;
+		pointIDIndex++;
+		int j = 0;
+		boolean added = false;
+		for (j = 0; j <Points.size(); j++)
+		{
+			if (Points.get(j).getId().contentEquals(a.getId()))
+			{
+				added = true;
+			}
+		}
+		if (this.Points == null)
+		{
+			System.out.println("STILL NULL AHSJDHBLASHDLASD");
+		}
+		if (added)
+			return true;
+		else
+			return false;
+	}
+	
 	public Point getPoint(int xcoord, int ycoord){
+		//TODO change this to account for Offsets
 		//goes through arraylist Points and returns the Point with
 		//the x and y coordinates inputted
 		 for (int count = 0; count < Points.size(); count++){
 			 Point temp = Points.get(count);
-			 if(temp.getX() == xcoord && temp.getY() == ycoord){
+			 if(temp.getLocX() == xcoord && temp.getLocY() == ycoord){
 				 return temp;
 			 }
 		 }
@@ -42,11 +178,6 @@ public class Map {
 		 return null;
 	}
 	
-	public Map (ArrayList<Point> points, int id)
-	{
-		this.Points = points;
-		this.mapId = id;
-	}
 	public ArrayList<Point> getPointList()
 	{
 		return Points;
@@ -54,18 +185,55 @@ public class Map {
 	public void setPointList(ArrayList<Point> newPoints)
 	{
 		this.Points = newPoints;
+		numPoints = newPoints.size();
 	}
-	public int getId()
+	public int getPointIDIndex(){
+		return pointIDIndex;
+	}
+	
+	public void printMap()
 	{
-		return mapId;
+		System.out.println("--------------------Printing Map:"+this.mapName+"--------------------");
+		System.out.println("Map id:" + this.mapId);
+		System.out.println("xTopLeft:"+this.xTopLeft);
+		System.out.println("yTopLeft:"+this.yTopLeft);
+		System.out.println("xBotRight:"+this.xBotRight);
+		System.out.println("yBotRight:"+this.yBotRight);
+		System.out.println("rotation angle:"+this.rotationAngle);
+		System.out.println("pointIDindex:"+this.pointIDIndex);
+		System.out.println("numPoints:"+this.numPoints);
+		int j = 0;
+		for (j = 0; j < Points.size(); j++)
+		{
+			Points.get(j).print();
+		}
 	}
-	public void setId(int newId)
+	
+	public int getNewPointIndex()
 	{
-		this.mapId = newId;
+		this.pointIDIndex++;
+		return this.pointIDIndex;
 	}
-	public String getName()
+	
+	public String getNewPointID()
 	{
-		return mapName;
+		int index = getNewPointIndex();
+		String retVal = "";
+		retVal+=this.mapId;
+		retVal+=".";
+		retVal+=index;
+		return retVal;
 	}
-
+	
+	public Point assignNewPointID(Point pt)
+	{
+		int index = getNewPointIndex();
+		String newID = "";
+		newID+=this.mapId;
+		newID+=".";
+		newID+=index;
+		pt.setID(newID);
+		pt.setIndex(index);
+		return pt;
+	}
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Point {
 	private String id;
 	private String name;
+	private int index;										//The Point's index on the map
 	private int x;
 	private int y;
 	private ArrayList<Edge> edges = new ArrayList<Edge>();
@@ -20,6 +21,7 @@ public class Point {
 		this.x = x;
 		this.y = y;
 		this.numberEdges = 0;
+		this.index = 0;
 	}
 	
 	public Point(String id, String name, int x, int y, int numberEdges) {
@@ -28,6 +30,7 @@ public class Point {
 		this.x = x;
 		this.y = y;
 		this.numberEdges = numberEdges;
+		this.index = 0;
 	}
 	
 	
@@ -101,6 +104,7 @@ public class Point {
 	{
 		System.out.println ("Name:"+this.name);
 		System.out.println ("ID:"+this.id);
+		System.out.println ("Index:"+this.index);
 		System.out.println ("X:"+this.x);
 		System.out.println ("Y:"+this.y);
 		System.out.println ("NumEdges:"+this.numberEdges);
@@ -111,5 +115,11 @@ public class Point {
 			this.edges.get(i).print();
 			//System.out.println("Edge"+(i+1)+"id:"+this.edges.get(i).getId());
 		}
+	}
+	public int getIndex() {
+		return index;
+	}
+	public void setIndex(int index) {
+		this.index = index;
 	}
 }

@@ -99,7 +99,17 @@ public class Map {
 	}
 	
 	public boolean addPoint(Point a){
-		Points.add(a);
+		if (a == null)
+		{
+			System.out.println("Point to add is null");
+			return false;
+		}
+		if (this.Points == null)
+		{
+			System.out.println("Current point list is null");
+			return false;
+		}
+		this.Points.add(a);
 		numPoints++;
 		int j = 0;
 		boolean added = false;

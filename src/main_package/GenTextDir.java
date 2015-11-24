@@ -16,7 +16,7 @@ public class GenTextDir {
 				arrPoints[i] = listPoints.get(i);
 			}
 			double dist = 0;//Now find out the last direction
-			dist = PythagTheorem(arrPoints[1].getX() - arrPoints[0].getX(), arrPoints[1].getY() - arrPoints[0].getY());//CONVERT TO FEET
+			dist = PythagTheorem(arrPoints[1].getGlobX() - arrPoints[0].getGlobX(), arrPoints[1].getGlobY() - arrPoints[0].getGlobY());//CONVERT TO FEET
 			dist = dist * 10;
 			dist = Math.floor(dist);
 			dist = dist / 10;
@@ -136,7 +136,7 @@ public class GenTextDir {
 				System.out.println("At " + currPoint.getName() + " the x value is: " + nextPointX);
 				if((angle >= -0.1) && (angle <= 0.1)){//if the angle is within some degree of error of 0, we are going straight
 					dist = 0;//Now find out the last direction
-					dist = PythagTheorem(nextPoint.getX() - currPoint.getX(), nextPoint.getY() - currPoint.getY());//CONVERT TO FEET
+					dist = PythagTheorem(nextPoint.getGlobX() - currPoint.getGlobX(), nextPoint.getGlobY() - currPoint.getGlobY());//CONVERT TO FEET
 					dist = dist * 10;
 					dist = Math.floor(dist);
 					dist = dist / 10;
@@ -159,7 +159,7 @@ public class GenTextDir {
 						turnAmount = "sharp left";
 					}
 					dist = 0;//Now find out the last direction
-					dist = PythagTheorem(nextPoint.getX() - currPoint.getX(), nextPoint.getY() - currPoint.getY());//CONVERT TO FEET
+					dist = PythagTheorem(nextPoint.getGlobX() - currPoint.getGlobX(), nextPoint.getGlobY() - currPoint.getGlobY());//CONVERT TO FEET
 					dist = dist * 10;
 					dist = Math.floor(dist);
 					dist = dist / 10;
@@ -177,7 +177,7 @@ public class GenTextDir {
 					}
 					
 					dist = 0;//Now find out the last direction
-					dist = PythagTheorem(nextPoint.getX() - currPoint.getX(), nextPoint.getY() - currPoint.getY());//CONVERT TO FEET
+					dist = PythagTheorem(nextPoint.getGlobX() - currPoint.getGlobX(), nextPoint.getGlobY() - currPoint.getGlobY());//CONVERT TO FEET
 					dist = dist * 10;
 					dist = Math.floor(dist);
 					dist = dist / 10;

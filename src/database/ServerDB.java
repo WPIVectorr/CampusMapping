@@ -33,7 +33,7 @@ public class ServerDB {
 	private static String EDGE_SCHEMA = "id VARCHAR(30), idPoint1 VARCHAR(30), idPoint2 VARCHAR(30), weight INTEGER, isOutside BOOLEAN, isStairs INTEGER";
 	//-------------------------------------------------------------Variables-----------------------------------------------------------------------
 	private static Connection conn = null;
-	public final static boolean DEBUG = true;
+	public final static boolean DEBUG = false;
 
 	private static ArrayList<Map> allMaps = new ArrayList<Map>();
 	private static ArrayList<Point> allPoints = new ArrayList<Point>();
@@ -60,8 +60,8 @@ public class ServerDB {
 	{
 		tryCreateDB();
 		conn = connect();
-		testInsert();
-		testRetrieval();
+		//testInsert();
+		//testRetrieval();
 		System.out.println("Done testing");
 	}
 
@@ -646,14 +646,16 @@ public class ServerDB {
 					edgeSelect = ("idEdge"+String.valueOf(counter+1));
 					edgeId = rs.getString(edgeSelect);
 					boolean foundEdge = false;
-					System.out.println("Searching for edge:"+edgeId);
+					if (DEBUG)
+						System.out.println("Searching for edge:"+edgeId);
 					for (edgeCounter = 0; edgeCounter<allEdges.size(); edgeCounter++)
 					{
 						if (allEdges.get(edgeCounter).getID().contentEquals(edgeId))
 						{
 							foundEdge = true;
 							newPtEdges.add(allEdges.get(edgeCounter));
-							System.out.println("found:"+allEdges.get(edgeCounter).getId());
+							if (DEBUG)
+								System.out.println("found:"+allEdges.get(edgeCounter).getId());
 						}
 					}
 

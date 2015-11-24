@@ -57,6 +57,9 @@ public class MapUpdaterGUI extends JFrame {
 	private static JRadioButton rdbtnAddPoints;
 	private static JRadioButton rdbtnEditPoints;
 	private static JRadioButton rdbtnRemovePoints;
+	
+	//---------------------------------
+	private static boolean DEBUG = true;
 
 	// drop down menu of buildings on campus
 	String buildings[] = { "Select Building", "Atwater Kent", "Boynton Hall", "Campus Center", "Gordon Library",
@@ -162,7 +165,8 @@ public class MapUpdaterGUI extends JFrame {
 							for(int j = 0; j < pointArray.size(); j++){
 								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
 								for(int k = 0; k < tmpEdges.size(); k++){
-									System.out.println(tmpEdges.get(k).getId());
+									if (DEBUG)
+										System.out.println(tmpEdges.get(k).getId());
 									edgeArray.add(tmpEdges.get(k));
 								}
 							}

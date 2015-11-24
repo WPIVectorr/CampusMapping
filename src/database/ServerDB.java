@@ -25,7 +25,8 @@ public class ServerDB {
 	private static String POINT_TABLE_NAME = "Points";
 	private static String EDGE_TABLE_NAME = "WeightedEdges";
 
-	private static String MAP_SCHEMA = "id INTEGER, name VARCHAR(30), xOffset INTEGER, yOffset INTEGER, rotation DOUBLE";
+	private static String MAP_SCHEMA = "id INTEGER, name VARCHAR(30), xTopLeft DOUBLE, yTopLeft DOUBLE, "
+			+ " xBotRight DOUBLE, yBotRight DOUBLE, rotation DOUBLE, pointIDIndex INTEGER";
 	private static String POINT_SCHEMA = "id VARCHAR(30), name VARCHAR(30), localIndex INTEGER, x INTEGER, y INTEGER, numEdges INTEGER, idEdge1 VARCHAR(30),"
 			+ " idEdge2 VARCHAR(30), idEdge3 VARCHAR(30), idEdge4 VARCHAR(30), idEdge5 VARCHAR(30), idEdge6 VARCHAR(30), idEdge7 VARCHAR(30), idEdge8 VARCHAR(30),"
 			+ "idEdge9 VARCHAR(30), idEdge10 VARCHAR(30)";
@@ -60,7 +61,7 @@ public class ServerDB {
 		tryCreateDB();
 		conn = connect();
 		testInsert();
-		//getNewPointIndex();
+		testRetrieval();
 		System.out.println("Done testing");
 	}
 
@@ -137,7 +138,13 @@ public class ServerDB {
 			insertStatement += ", ";
 			insertStatement += map.getyTopLeft();
 			insertStatement += ", ";
+			insertStatement += map.getxBotRight();
+			insertStatement += ", ";
+			insertStatement += map.getyBotRight();
+			insertStatement += ", ";
 			insertStatement += map.getRotationAngle();
+			insertStatement += ", ";
+			insertStatement += map.getPointIDIndex();
 			insertStatement += ")";
 			statement.executeUpdate(insertStatement);
 			//---------------------------------------------Finish inserting-------------------------------------------------------------------
@@ -203,8 +210,9 @@ public class ServerDB {
 
 		RELEVANT_TABLE_NAME += ("Map"+map.getMapId()+"Points");
 
+		/*
 		int index = getNewPointIndex(map);
-		pt.setIndex(index);
+		pt.setIndex(index);*/
 		{
 			//--------------------------------------------------Add to Database--------------------------------------------------------
 			try {
@@ -235,7 +243,7 @@ public class ServerDB {
 				insertStatement += ", ";													//Add commas for formatting reasons
 				insertStatement += ("'"+ptName+"'");										
 				insertStatement += ", ";
-				insertStatement += index;
+				insertStatement += pt.getIndex();
 				insertStatement += ", ";
 				insertStatement += ptX;
 				insertStatement += ", ";
@@ -542,7 +550,7 @@ public class ServerDB {
 	}
 	//----------------------------------------------------------Retrieval Functions------------------------------------------------------------
 
-	public ArrayList<Map> getMapsFromLocal()
+	public static ArrayList<Map> getMapsFromLocal()
 	{
 		try {
 			populateFromDatabase();
@@ -724,7 +732,14 @@ public class ServerDB {
 					{
 						int newMapId = rs4.getInt("id");
 						String newMapName = rs4.getString("name");
-						Map newMap = new Map(newMapId, newMapName);
+						double newXTopLeft = rs4.getDouble("xTopLeft");
+						double newYTopLeft = rs4.getDouble("yTopLeft");
+						double newXBotRight = rs4.getDouble("xBotRight");
+						double newYBotRight = rs4.getDouble("yBotRight");
+						double newRotationAngle = rs4.getDouble("rotation");
+						int newPointIDIndex = rs4.getInt("pointIDIndex");
+						Map newMap = new Map(newMapId, newMapName, newXTopLeft, newYTopLeft, newXBotRight, newYBotRight,
+								newRotationAngle, newPointIDIndex);
 						allMaps.add(newMap);
 					}
 					rs4.close();
@@ -758,7 +773,7 @@ public class ServerDB {
 						newPtIndex = rs2.getInt("localIndex");
 						newPtX = rs2.getInt("x");
 						newPtY = rs2.getInt("y");
-						newPtNumberEdges = rs2.getInt("numEdges");
+						newPtNumberEdges = 0;															//This should be automatically rectified when adding in edges
 						Point newPt = new Point(newPtId, newPtName, newPtX, newPtY, newPtNumberEdges);
 						newPt.setIndex(newPtIndex);
 						currentMap.addPoint(newPt);
@@ -1028,6 +1043,7 @@ public class ServerDB {
 			return 0;
 		}
 	}
+	
 	//---------------------------------------------------------------Test Functions----------------------------------------------------------------
 	
 	public static void testInsert()
@@ -1036,12 +1052,13 @@ public class ServerDB {
 		System.out.println("Database cleared");
 		ArrayList<Point> insertablePoints = new ArrayList<Point>();
 		ArrayList<Edge> insertableEdges = new ArrayList<Edge>();
-		Point p1 = new Point("1-1", "p1", 0, 1, 0);
-		Point p2 = new Point("1-2", "p2", 0, 1);
-		Point p3 = new Point("1-3", "p3", 1, 0);
-		Point p4 = new Point("1-4", "p4", 2, 0);
-		Point p5 = new Point("1-5", "p5", 23, 90);
-		Point p6 = new Point("1-6", "p6", 27, 90);
+		Map testMap = new Map(1, "testMap", 12, 20, 45, 60, 12.6, 0);
+		Point p1 = new Point(testMap.getNewPointID(), "p1", testMap.getPointIDIndex(), 0, 1, 0);
+		Point p2 = new Point(testMap.getNewPointID(), "p2", testMap.getPointIDIndex(), 0, 1);
+		Point p3 = new Point(testMap.getNewPointID(), "p3", testMap.getPointIDIndex(), 1, 0);
+		Point p4 = new Point(testMap.getNewPointID(), "p4", testMap.getPointIDIndex(), 2, 0);
+		Point p5 = new Point(testMap.getNewPointID(), "p5", testMap.getPointIDIndex(), 23, 90);
+		Point p6 = new Point(testMap.getNewPointID(), "p6", testMap.getPointIDIndex(), 27, 90);
 		Edge e1 = new Edge(p1, p2, 1);
 		Edge e2 = new Edge(p2, p5, 1);
 		Edge e3 = new Edge(p2, p3, 1);
@@ -1049,8 +1066,6 @@ public class ServerDB {
 		Edge e5 = new Edge(p3, p5, 1);
 		Edge e6 = new Edge(p4, p5, 1);
 		Edge[] emptyArray = null;
-		ArrayList<Point> emptyPointArrayList = new ArrayList<Point>();
-		Map testMap = new Map(1, "testMap", 0, 20, 12.6);
 		//--------------------------------------------------Add points to insert arraylist--------------------------------
 		insertablePoints.add(p1);
 		insertablePoints.add(p2);
@@ -1140,6 +1155,13 @@ public class ServerDB {
 
 	public static void testRetrieval()
 	{
-		
+		System.out.println("--------------------Testing Retrieval--------------------");
+		ArrayList<Map> retrievedMaps = getMapsFromLocal();
+		int j = 0;
+		for (j = 0; j<retrievedMaps.size(); j++)
+		{
+			retrievedMaps.get(j).printMap();
+		}
+		System.out.println("--------------------Finished Testing Retrieval--------------------");
 	}
 }

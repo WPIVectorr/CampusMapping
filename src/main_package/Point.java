@@ -8,10 +8,10 @@ public class Point {
 	private int index;
 	private int locX;
 	private int locY;
-	private ArrayList<Edge> edges = new ArrayList<Edge>();
-	private int numberEdges;
 	private int globX;
 	private int globY;
+	private ArrayList<Edge> edges = new ArrayList<Edge>();
+	private int numberEdges;
 	
 	public Point()
 	{
@@ -36,6 +36,17 @@ public class Point {
 		this.locY = y;
 		this.numberEdges = numberEdges;
 		this.index = 0;
+		this.globX = x;
+		this.globY = y;
+	}
+	
+	public Point(String id, String name, int index, int x, int y, int numberEdges) {
+		this.id = id;
+		this.name = name;
+		this.index = index;
+		this.locX = x;
+		this.locY = y;
+		this.numberEdges = numberEdges;
 		this.globX = x;
 		this.globY = y;
 	}
@@ -121,7 +132,7 @@ public class Point {
 	}
 	public void print()
 	{
-		System.out.println ("Name:"+this.name);
+		System.out.println ("----------Printing Point:"+this.name+"----------");
 		System.out.println ("ID:"+this.id);
 		System.out.println ("Index:"+this.index);
 		System.out.println ("Local X:"+this.locX);

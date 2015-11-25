@@ -15,13 +15,12 @@ import javax.swing.*;
 import database.AlreadyExistsException;
 import database.MappingDatabase;
 
-public class GUI extends JFrame{
+public class GUI{
 	MappingDatabase md = MappingDatabase.getInstance();
 
 	private BufferedImage img = null;
 
-	//drop down menu of room numbers based off of the building selected on campus
-
+	// Array of strings to initally populate dropdown menus with
 	String rooms[] = {"Select room #", "Please choose building first"};
 
 	private ArrayList<Map> maps = new ArrayList<Map>();
@@ -32,8 +31,10 @@ public class GUI extends JFrame{
 	private Point start;
 	private Point end;
 	private boolean showRoute;
-	private JTextField textField;
-	private JPanel buttonPanel;
+	private JTextField directionsText;
+	private JPanel mainMenu;
+	private JPanel navMenu;
+	private JPanel menus;
 	private DrawRoute drawPanel = new DrawRoute();
 	private int windowScale = 2;
 	private int windowSizeX = 932;
@@ -42,120 +43,39 @@ public class GUI extends JFrame{
 	private int buildStartIndex;
 	private int buildDestIndex;
 
-	public GUI() throws IOException, AlreadyExistsException, SQLException{
-		super("GUI");
-		setSize(932, 778);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	private JFrame frame = new JFrame("Directions with Magnitude");
 
-		//  img = ImageIO.read(new File("temp.jpg"));
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
+		
+		frame.setSize(932, 778);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 		MappingDatabase.initDatabase();
 
 		md.initDatabase();
-		//md.testMaps();
 		maps = md.getMaps();
-		System.out.println("-------------------------------------------");
-		System.out.println("maps size:"+maps.size());
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//System.out.println("-------------------------------------------");
+		//System.out.println("maps size:"+maps.size());
 
-		//System.out.println("testMaps: " + md.getMaps().size());
-		//maps = md.getMaps();
-		System.out.println("------------------edges check-------------------");
+		//System.out.println("------------------edges check-------------------");
 		maps.get(0).getPointList().get(0).print();
-		//maps.get(index)
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/*
-		// Stub for testing 
-<<<<<<< HEAD
-=======
 
->>>>>>> refs/remotes/origin/master
->>>>>>> refs/remotes/origin/master
-		// Stub for testing 
-		ArrayList<Map> maps = new ArrayList<Map>();
-		Point testPoint1 = new Point (1, "One", 50, 100);
-		Point testPoint2 = new Point (2, "Two", 600, 500);
-		Point testPoint3 = new Point (3, "Three", 500, 700);
-		Point testPoint4 = new Point (4, "Four", 200, 200);
-		Edge e1 = new Edge(testPoint1, testPoint2, 1);
-		Edge e2 = new Edge(testPoint2, testPoint3, 1);
-		Edge e3 = new Edge(testPoint1, testPoint4, 1);
-		//testPoint1.addEdge(e1);
-		//testPoint1.addEdge(e3);
-		//testPoint2.addEdge(e1);
-		//testPoint2.addEdge(e2);
-		//testPoint3.addEdge(e2);
-		//testPoint4.addEdge(e3);
-		ArrayList<Point> testArrayList = new ArrayList<Point>();
-		testArrayList.add(testPoint1);
-		testArrayList.add(testPoint2);
-		testArrayList.add(testPoint3);
-		testArrayList.add(testPoint4);
-		Point testPoint7 = new Point (7, "seven", 100, 500);
-		Point testPoint5 = new Point (5, "Five", 500, 600);
-		Point testPoint6 = new Point (6, "Six", 700, 500);
-		Edge e7 = new Edge(testPoint7, testPoint6, 1);
-		//testPoint7.addEdge(e7);
-		ArrayList<Point> testArrayList2 = new ArrayList<Point>();
-		testArrayList2.add(testPoint7);
-		testArrayList2.add(testPoint5);
-		testArrayList2.add(testPoint6);
-		Map testMap = new Map(testArrayList, 1, "Campus");
-		Map testMap2 = new Map(testArrayList2, 2, "AK");
-		maps.add(testMap);
-		maps.add(testMap2);
-<<<<<<< HEAD
-
-=======
-		/*System.out.println("```````````````````````````````````````````````````````````");
-	System.out.println(maps.equals(maps1));
-	System.out.println("maps.get(0)/(1) " + maps.get(0).getName() + " " + maps.get(1).getName());
-	System.out.println("maps1.get(0)/(1) " + maps1.get(0).getName() + " " + maps1.get(1).getName());
-System.out.println("mapslistsize: " + maps.get(1).getPointList().size());
-System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
->>>>>>> refs/remotes/origin/master
-		// Fill building drop down menus with names of points
-		//int pointListSize = maps.get(0).getPointList().size();
-		//buildings[0] = "Select a building";
-		//for (int i = 0; i < pointListSize; i++){
-		//buildings[i] = maps.get(0).getPointList().get(i);
-		//}
-		//creates string of rooms for dropdown menu
-		String[] rooms = new String[maps.size()];
-		rooms[0] = "Select Map";
-		int count = -1;
-		for(int i = 1; i < maps.size(); i++){
-			count++;
-			rooms[i] = maps.get(count).getName();
-		}
-		/*maps = MappingDatabase.getInstance().getMaps();
-    	ArrayList<Map> maps = new ArrayList<Map>();
-    	ArrayList<String> buildingsTest = new ArrayList<String>(); 
-    	Point testPoint1 = new Point (1, "One", 50, 100);
-    	Point testPoint2 = new Point (2, "Two", 50, 100);
-    	Point testPoint3 = new Point (3, "Three", 50, 100);
-    	ArrayList<Point> testArrayList = new ArrayList<Point>();
-    	testArrayList.add(testPoint1);
-    	testArrayList.add(testPoint2);
-    	testArrayList.add(testPoint3);
-    	Map testMap = new Map(testArrayList, 1, "Test");
-    	maps.add(testMap);
-    	String[] buildings = new String[maps.size()];
-    	for (int i = 0; i < maps.size(); i++){
-    		buildings[i] = maps.get(i).getName();
-    	}*/
-
-		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new GridLayout(4, 0, 10, 10));
-		buttonPanel.setBackground(new Color(255, 235, 205));
-
-		Container contentPane = this.getContentPane();
-		contentPane.add(buttonPanel, BorderLayout.NORTH);
-		// for (int i=0; i < buildings.length; i++){
-		//	startBuilds.addItem(buildings[i]);
-		//}
-
-
+		mainMenu = new JPanel();
+		mainMenu.setLayout(new GridLayout(4, 0, 10, 10));
+		mainMenu.setBackground(new Color(255, 235, 205));
+		
+		navMenu = new JPanel();
+		navMenu.setLayout(new GridLayout(2, 3, 10, 10));
+		navMenu.setBackground(new Color(255, 235, 205));
+		
+		menus = new JPanel(new CardLayout());
+		menus.add(mainMenu, "Main Menu");
+		menus.add(navMenu, "Nav Menu");
+		CardLayout menuLayout = (CardLayout) menus.getLayout();
+		
+		Container contentPane = frame.getContentPane();
+		contentPane.add(menus, BorderLayout.NORTH);
+		
 		/*adds the room numbers based off of building name
         startBuilds.addActionListener (new ActionListener () {
             public void actionPerformed(ActionEvent e) {
@@ -181,11 +101,11 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 
 		JLabel lblMaps = new JLabel("Select Map:");
 		lblMaps.setHorizontalAlignment(SwingConstants.CENTER);
-		buttonPanel.add(lblMaps);
+		mainMenu.add(lblMaps);
 
 		//adds the starting location label to the line with starting location options
 		JLabel lblStartingLocation = new JLabel("Starting Location:");
-		buttonPanel.add(lblStartingLocation);
+		mainMenu.add(lblStartingLocation);
 		lblStartingLocation.setBounds(6, 31, 119, 16);
 		mapsDropdown.addItem("Select Map");
 		for(int i = 0; i < maps.size(); i++){	
@@ -193,21 +113,21 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 		}
 
 		//creates drop down box with building names
-		buttonPanel.add(startBuilds);
+		mainMenu.add(startBuilds);
 		startBuilds.setBounds(122, 30, 148, 20);
 
 
 
 		//creates a dropdown menu with map names
-		buttonPanel.add(mapsDropdown);
+		mainMenu.add(mapsDropdown);
 
 		//adds the destination label to the line with destination location options
 		JLabel lblDestination = new JLabel("Destination:");
-		buttonPanel.add(lblDestination);
+		mainMenu.add(lblDestination);
 		lblDestination.setBounds(6, 68, 85, 44);
 		lblDestination.setLabelFor(destBuilds);
 		//adds destBuilds to the dropdown for destination
-		buttonPanel.add(destBuilds);
+		mainMenu.add(destBuilds);
 		destBuilds.setBounds(122, 30, 148, 20);
 		/*for (int i=0; i < buildings.length; i++){
 			destBuilds.addItem(buildings[i]);
@@ -219,12 +139,9 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 		//adds the correct points for the building specified
 		mapsDropdown.addActionListener (new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
-				//System.out.println("inside action listener");
 				buildDestIndex = mapsDropdown.getSelectedIndex();
-				////////////////////////////////////////////////////////////////////////////////
-
+				
 				String mapTitle = maps.get(buildDestIndex-1).getName();
-				//String mapTitle = "AtwaterKent1";
 				File dest = new File("src/VectorMaps");
 				String destInput = dest.getAbsolutePath();
 				//assuming all maps saved in vectorMaps are in jpg
@@ -233,6 +150,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				File destFile = new File(destInput);
 				try{
 					img = ImageIO.read(destFile);
+					frame.repaint();
 				}
 				catch(IOException a){
 					System.out.println("Could not find file:"+destInput);
@@ -244,11 +162,7 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				for(int count = 0; count < maps.get(0).getPointList().size(); count++){
 					System.out.println(maps.get(0).getPointList().get(count).getName());
 				}
-				//if(buildDestIndex == -1)
-				//buildDestIndex = 0;
-				//System.out.println("buildDest: " + buildDestIndex);
-				//int pointListSize = maps.get(buildDestIndex).getPointList().size();
-				//Point[] buildings = new Point[pointListSize];
+				
 				startBuilds.removeAllItems();
 				destBuilds.removeAllItems();
 				if(buildDestIndex!=0){
@@ -278,39 +192,14 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				//}
 			}
 		});
-		/*
-		JLabel lblMaps = new JLabel("Select Map:");
-		lblMaps.setHorizontalAlignment(SwingConstants.CENTER);
-		buttonPanel.add(lblMaps);
-		//adds the starting location label to the line with starting location options
-		JLabel lblStartingLocation = new JLabel("Starting Location:");
-		buttonPanel.add(lblStartingLocation);
-		lblStartingLocation.setBounds(6, 31, 119, 16);
-		mapsDropdown.addItem("Select Map");
-		for(int i = 0; i < maps.size(); i++){	
-			mapsDropdown.addItem(maps.get(i).getName());
-		}*/
-		/*for (int i=0; i < buildings.length; i++){
-			System.out.println("buildings[i] match: " + buildings[i]);
-			startBuilds.addItem(buildings[i]);
-		}*/
 
-
-
-		//JComboBox destRooms = new JComboBox(rooms);
-
-
-		//creates the drop down of room numbers for destination (initially waits for the building to have 
-		//the specific buildings room numbers)
-		//	buttonPanel.add(destRooms);
-		//destRooms.setBounds(296, 80, 148, 20);
-
-
+		// Empty componenet for formatting
 		Component horizontalStrut = Box.createHorizontalStrut(20);
-		buttonPanel.add(horizontalStrut);
+		mainMenu.add(horizontalStrut);
 
+		// Button that generates a route and switches to nav display
 		JButton directionsButton = new JButton("Directions");
-		buttonPanel.add(directionsButton);
+		mainMenu.add(directionsButton);
 		directionsButton.setBackground(new Color(0, 255, 127));
 		directionsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -327,29 +216,27 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 
 
 
-					System.out.println("--------------------astar--------------------------------");
-					start.print();
-					end.print();
+					//System.out.println("--------------------astar--------------------------------");
+					//start.print();
+					//end.print();
 					AStar astar = new AStar();
 					astar.reset();
-					/*for (int i=0; i<route.size();i++){
- 		  			route.set(i, null);
- 		  		}*/
+					
 					route = astar.PathFind(start, end);
 					// Array is stored end to start, so step 1 is actually the last step
 					// Also arrays start at 0, so need to subtract 1
 					currentStep = route.size() - 1;
-					System.out.println("route variable: " + (route == null));
-					System.out.println("Hey");
+					//System.out.println("route variable: " + (route == null));
+			
 					if(route != null){
-						System.out.println("route: ");
+						/*System.out.println("route: ");
 						for(int i = route.size() - 1; i >= 0; i--){
 							System.out.println(route.get(i));
-						}
+						}*/
 					}
 					showRoute = true;
 					if (route == null){
-						textField.setText(start.getName() + "->" + end.getName());
+						directionsText.setText(start.getName() + "->" + end.getName());
 					}
 					else{
 						//System.out.println(route.size());
@@ -359,16 +246,17 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 						for(int i = 0; i < textDir.length; i++){
 							//System.out.println(directions[i]);
 						}
-						textField.setText(textDir[0]);
+						directionsText.setText(textDir[0]);
 
 					}
 
-					repaint();
+					frame.repaint();
+					menuLayout.show(menus, "Nav Menu");
 				}
 				//if the points are identical, asks the user to input different points
 				else{
-					textField.setText("Pick two different points");
-					repaint();
+					directionsText.setText("Pick two different points");
+					frame.repaint();
 				}
 			}
 		});
@@ -376,9 +264,11 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 
 		directionsButton.setBounds(187, 132, 94, 30);
 
+		// For formatting
 		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
-		buttonPanel.add(horizontalStrut_1);
-
+		mainMenu.add(horizontalStrut_1);
+		
+		// Button to get previous step in directions
 		JButton btnPrevious = new JButton("Previous");
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -387,27 +277,28 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				}
 				else{
 					textPos--;
-					textField.setText(textDir[textPos]);
+					directionsText.setText(textDir[textPos]);
 				}
 				// Routes are stored end to beginning, so increment to "step backward"
 				if(currentStep != route.size() - 1){
 					currentStep++;
 				}
-				repaint();
+				frame.repaint();
 			}
 		});
-		buttonPanel.add(btnPrevious);
+		navMenu.add(btnPrevious);
 
 
 
 		//creates a centered text field that will write back the users info they typed in
-		textField = new JTextField();
-		buttonPanel.add(textField);
-		textField.setHorizontalAlignment(JTextField.CENTER);
-		textField.setToolTipText("");
-		textField.setBounds(6, 174, 438, 30);
-		textField.setColumns(1);
+		directionsText = new JTextField();
+		directionsText.setHorizontalAlignment(JTextField.CENTER);
+		directionsText.setToolTipText("");
+		directionsText.setBounds(6, 174, 438, 30);
+		directionsText.setColumns(1);
+		navMenu.add(directionsText);
 
+		// Button to get next step in directions
 		JButton btnNext = new JButton("Next");
 		btnNext.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
@@ -416,31 +307,74 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 				}
 				else {
 					textPos++;
-					textField.setText(textDir[textPos]);
+					directionsText.setText(textDir[textPos]);
 				}
 				// Routes are stored end to beginning, so decrement to "step forward"
 				if(currentStep != 0){
 					currentStep--;
 				}
-				repaint();
+				frame.repaint();
 			}
 		});
-		buttonPanel.add(btnNext);
+		navMenu.add(btnNext);
 
-		getContentPane().add(drawPanel);
 
+		Component horizontalStrut2 = Box.createHorizontalStrut(20);
+		navMenu.add(horizontalStrut2);
+		
+		// Button to return to main menu
+		JButton btnReturn = new JButton("Select New Route");
+		btnReturn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Return to main menu, don't show route anymore
+				menuLayout.show(menus, "Main Menu");
+				showRoute = false;
+				frame.repaint();
+			}
+		});
+		navMenu.add(btnReturn);
+
+		Component horizontalStrut3 = Box.createHorizontalStrut(20);
+		navMenu.add(horizontalStrut3);
+		
+		// Add panel for drawing
+		frame.getContentPane().add(drawPanel);
+		// Make frame visible after initializing everything
+		frame.setVisible(true);
 	}
+
+
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
-		GUI myTest = new GUI();
-		myTest.setVisible(true);
+		//GUI myTest = new GUI();
+		//myTest.setVisible(true);
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				GUI gui = new GUI();
+				try {
+					gui.createAndShowGUI();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (AlreadyExistsException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 	}
+
+
 
 	class DrawRoute extends JPanel {
 
 		@Override
 		public void paintComponent(Graphics g) {
-			super.paintComponent(g);
 			Graphics2D g2 = (Graphics2D) g;
 			double wScale;
 			if(img != null){

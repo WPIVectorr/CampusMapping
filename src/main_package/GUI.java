@@ -343,8 +343,20 @@ System.out.println("maps1listSize " + maps1.get(1).getPointList().size());/*
 							else{
 								//System.out.println(route.size());
 								GenTextDir gentextdir = new GenTextDir();
-								String[] directions; // = new String[route.size() + 1];
-								textDir = gentextdir.genTextDir(route);
+								ArrayList<Directions> tempDir = gentextdir.genTextDir(route);
+								ArrayList<Directions> finalDir = null;
+								try {
+									finalDir = gentextdir.generateDirections(tempDir);
+								} catch (MalformedDirectionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								try {
+									textDir = gentextdir.genDirStrings(finalDir);
+								} catch (MalformedDirectionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 								for(int i = 0; i < textDir.length; i++){
 									//System.out.println(directions[i]);
 								}

@@ -16,7 +16,7 @@ import database.AlreadyExistsException;
 import database.ServerDB;
 
 public class GUI{
-	
+
 	ServerDB md = ServerDB.getInstance();
 
 	private BufferedImage img = null;
@@ -28,7 +28,6 @@ public class GUI{
 	private ArrayList<Point> route;
 	private String[] textDir;
 	private int textPos;
-	private int currentStep;
 	private Point start;
 	private Point end;
 	private boolean showRoute;
@@ -40,7 +39,7 @@ public class GUI{
 	private int windowScale = 2;
 	private int windowSizeX = 932;
 	private int windowSizeY = 778;
-
+	private ArrayList<Directions> finalDir = null;
 	private int buildStartIndex;
 	private int buildDestIndex;
 
@@ -48,7 +47,7 @@ public class GUI{
 
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
-		
+
 		frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -63,19 +62,19 @@ public class GUI{
 		mainMenu = new JPanel();
 		mainMenu.setLayout(new GridLayout(4, 0, 10, 10));
 		mainMenu.setBackground(new Color(255, 235, 205));
-		
+
 		navMenu = new JPanel();
 		navMenu.setLayout(new GridLayout(2, 3, 10, 10));
 		navMenu.setBackground(new Color(255, 235, 205));
-		
+
 		menus = new JPanel(new CardLayout());
 		menus.add(mainMenu, "Main Menu");
 		menus.add(navMenu, "Nav Menu");
 		CardLayout menuLayout = (CardLayout) menus.getLayout();
-		
+
 		Container contentPane = frame.getContentPane();
 		contentPane.add(menus, BorderLayout.NORTH);
-		
+
 		/*adds the room numbers based off of building name
         startBuilds.addActionListener (new ActionListener () {
             public void actionPerformed(ActionEvent e) {
@@ -143,7 +142,7 @@ public class GUI{
 
 				String mapTitle = maps.get(buildDestIndex-1).getMapName();
 				//String mapTitle = "AtwaterKent1";
-				
+
 				File dest = new File("src/VectorMaps");
 				String destInput = dest.getAbsolutePath();
 				//assuming all maps saved in vectorMaps are in jpg
@@ -164,7 +163,7 @@ public class GUI{
 				for(int count = 0; count < maps.get(0).getPointList().size(); count++){
 					System.out.println(maps.get(0).getPointList().get(count).getName());
 				}
-				
+
 				startBuilds.removeAllItems();
 				destBuilds.removeAllItems();
 				if(buildDestIndex!=0){
@@ -222,13 +221,10 @@ public class GUI{
 					//end.print();
 					AStar astar = new AStar();
 					astar.reset();
-					
+
 					route = astar.PathFind(start, end);
-					// Array is stored end to start, so step 1 is actually the last step
-					// Also arrays start at 0, so need to subtract 1
-					currentStep = route.size() - 1;
 					//System.out.println("route variable: " + (route == null));
-			
+
 					if(route != null){
 						/*System.out.println("route: ");
 						for(int i = route.size() - 1; i >= 0; i--){
@@ -244,7 +240,7 @@ public class GUI{
 						//System.out.println(route.size());
 						GenTextDir gentextdir = new GenTextDir();
 						ArrayList<Directions> tempDir = gentextdir.genTextDir(route);
-						ArrayList<Directions> finalDir = null;
+						//ArrayList<Directions> finalDir = null;
 						try {
 							finalDir = gentextdir.generateDirections(tempDir);
 						} catch (MalformedDirectionException e) {
@@ -281,7 +277,7 @@ public class GUI{
 		// For formatting
 		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
 		mainMenu.add(horizontalStrut_1);
-		
+
 		// Button to get previous step in directions
 		JButton btnPrevious = new JButton("Previous");
 		btnPrevious.addActionListener(new ActionListener() {
@@ -292,10 +288,6 @@ public class GUI{
 				else{
 					textPos--;
 					directionsText.setText(textDir[textPos]);
-				}
-				// Routes are stored end to beginning, so increment to "step backward"
-				if(currentStep != route.size() - 1){
-					currentStep++;
 				}
 				frame.repaint();
 			}
@@ -323,10 +315,6 @@ public class GUI{
 					textPos++;
 					directionsText.setText(textDir[textPos]);
 				}
-				// Routes are stored end to beginning, so decrement to "step forward"
-				if(currentStep != 0){
-					currentStep--;
-				}
 				frame.repaint();
 			}
 		});
@@ -335,7 +323,7 @@ public class GUI{
 
 		Component horizontalStrut2 = Box.createHorizontalStrut(20);
 		navMenu.add(horizontalStrut2);
-		
+
 		// Button to return to main menu
 		JButton btnReturn = new JButton("Select New Route");
 		btnReturn.addActionListener(new ActionListener() {
@@ -350,7 +338,7 @@ public class GUI{
 
 		Component horizontalStrut3 = Box.createHorizontalStrut(20);
 		navMenu.add(horizontalStrut3);
-		
+
 		// Add panel for drawing
 		frame.getContentPane().add(drawPanel);
 		// Make frame visible after initializing everything
@@ -406,26 +394,22 @@ public class GUI{
 
 
 				if (showRoute && route != null){
-					// Draw green lines for all points up to currentStep point
+					// Draw green lines for all points up to current point
 					g.setColor(Color.GREEN);
 					g2.setStroke(new BasicStroke(3));
-					for (int i = currentStep + 1; i < route.size(); i++){
-						g2.drawLine(route.get(i).getLocX(), route.get(i).getLocY(), route.get(i-1).getLocX(), route.get(i-1).getLocY());
-
-
+					for (int i = 0; i < textPos; i++){
+						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
 					}
-					// Special case for currentStep = 0, don't draw line or array out of bounds error
-					// Otherwise, draw yellow line from currentStep point to previous point
-					if (currentStep != 0){
-						g2.setStroke(new BasicStroke(6));
-						g.setColor(Color.YELLOW);
-						g2.drawLine(route.get(currentStep).getLocX(), route.get(currentStep).getLocY(), route.get(currentStep-1).getLocX(), route.get(currentStep-1).getLocY());
-						g2.setStroke(new BasicStroke(3));
-					}
-					// Draw red lines for rest of points
-					g2.setColor(Color.RED);
-					for (int i = 0; i < currentStep - 1; i++){
-						g2.drawLine(route.get(i).getLocX(), route.get(i).getLocY(), route.get(i+1).getLocX(), route.get(i+1).getLocY());
+					// Draw a thicker yellow line for the current step in the directions
+					g2.setStroke(new BasicStroke(6));
+					g.setColor(Color.YELLOW);
+					g2.drawLine(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY(), finalDir.get(textPos).getDestination().getLocX(), finalDir.get(textPos).getDestination().getLocY());
+					g2.setStroke(new BasicStroke(3));
+
+					// Draw red lines for all points until the end
+					g.setColor(Color.RED);
+					for (int i = textPos + 1; i < finalDir.size(); i++){
+						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
 					}
 				}
 			}

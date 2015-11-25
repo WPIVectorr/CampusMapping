@@ -13,10 +13,11 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import database.AlreadyExistsException;
-import database.MappingDatabase;
+import database.ServerDB;
 
 public class GUI{
-	MappingDatabase md = MappingDatabase.getInstance();
+	
+	ServerDB md = ServerDB.getInstance();
 
 	private BufferedImage img = null;
 
@@ -45,19 +46,18 @@ public class GUI{
 
 	private JFrame frame = new JFrame("Directions with Magnitude");
 
+
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 		
 		frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		MappingDatabase.initDatabase();
+		maps = md.getMapsFromLocal();
 
-		md.initDatabase();
-		maps = md.getMaps();
-		//System.out.println("-------------------------------------------");
-		//System.out.println("maps size:"+maps.size());
 
 		//System.out.println("------------------edges check-------------------");
+
+
 		maps.get(0).getPointList().get(0).print();
 
 		mainMenu = new JPanel();
@@ -109,7 +109,7 @@ public class GUI{
 		lblStartingLocation.setBounds(6, 31, 119, 16);
 		mapsDropdown.addItem("Select Map");
 		for(int i = 0; i < maps.size(); i++){	
-			mapsDropdown.addItem(maps.get(i).getName());
+			mapsDropdown.addItem(maps.get(i).getMapName());
 		}
 
 		//creates drop down box with building names
@@ -140,8 +140,10 @@ public class GUI{
 		mapsDropdown.addActionListener (new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
 				buildDestIndex = mapsDropdown.getSelectedIndex();
+
+				String mapTitle = maps.get(buildDestIndex-1).getMapName();
+				//String mapTitle = "AtwaterKent1";
 				
-				String mapTitle = maps.get(buildDestIndex-1).getName();
 				File dest = new File("src/VectorMaps");
 				String destInput = dest.getAbsolutePath();
 				//assuming all maps saved in vectorMaps are in jpg
@@ -215,7 +217,6 @@ public class GUI{
 
 
 
-
 					//System.out.println("--------------------astar--------------------------------");
 					//start.print();
 					//end.print();
@@ -233,6 +234,7 @@ public class GUI{
 						for(int i = route.size() - 1; i >= 0; i--){
 							System.out.println(route.get(i));
 						}*/
+
 					}
 					showRoute = true;
 					if (route == null){
@@ -241,8 +243,20 @@ public class GUI{
 					else{
 						//System.out.println(route.size());
 						GenTextDir gentextdir = new GenTextDir();
-						String[] directions; // = new String[route.size() + 1];
-						textDir = gentextdir.genTextDir(route);
+						ArrayList<Directions> tempDir = gentextdir.genTextDir(route);
+						ArrayList<Directions> finalDir = null;
+						try {
+							finalDir = gentextdir.generateDirections(tempDir);
+						} catch (MalformedDirectionException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						try {
+							textDir = gentextdir.genDirStrings(finalDir);
+						} catch (MalformedDirectionException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						for(int i = 0; i < textDir.length; i++){
 							//System.out.println(directions[i]);
 						}
@@ -396,7 +410,7 @@ public class GUI{
 					g.setColor(Color.GREEN);
 					g2.setStroke(new BasicStroke(3));
 					for (int i = currentStep + 1; i < route.size(); i++){
-						g2.drawLine(route.get(i).getX(), route.get(i).getY(), route.get(i-1).getX(), route.get(i-1).getY());
+						g2.drawLine(route.get(i).getLocX(), route.get(i).getLocY(), route.get(i-1).getLocX(), route.get(i-1).getLocY());
 
 
 					}
@@ -405,13 +419,13 @@ public class GUI{
 					if (currentStep != 0){
 						g2.setStroke(new BasicStroke(6));
 						g.setColor(Color.YELLOW);
-						g2.drawLine(route.get(currentStep).getX(), route.get(currentStep).getY(), route.get(currentStep-1).getX(), route.get(currentStep-1).getY());
+						g2.drawLine(route.get(currentStep).getLocX(), route.get(currentStep).getLocY(), route.get(currentStep-1).getLocX(), route.get(currentStep-1).getLocY());
 						g2.setStroke(new BasicStroke(3));
 					}
 					// Draw red lines for rest of points
 					g2.setColor(Color.RED);
 					for (int i = 0; i < currentStep - 1; i++){
-						g2.drawLine(route.get(i).getX(), route.get(i).getY(), route.get(i+1).getX(), route.get(i+1).getY());
+						g2.drawLine(route.get(i).getLocX(), route.get(i).getLocY(), route.get(i+1).getLocX(), route.get(i+1).getLocY());
 					}
 				}
 			}

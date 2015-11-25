@@ -12,8 +12,8 @@ public class AStar {
 	static HashMap<String, Integer> fscore = new HashMap<String, Integer>(); // Estimated time from each node to end
 	
 	public static ArrayList<Point> PathFind(Point start, Point end) {		
-		gscore.put(Integer.toString(start.getId()), 0); // Initialize scores
-		fscore.put(Integer.toString(start.getId()), CostEstimate(start, end));
+		gscore.put(start.getId(), 0); // Initialize scores
+		fscore.put(start.getId(), CostEstimate(start, end));
 		
 		Open.add(start); // Initialize Open
 		System.out.println("----------------------------open true in astar: " + !Open.isEmpty());
@@ -22,23 +22,23 @@ public class AStar {
 			if(Current.equals(end)){
 				return ReconstructPath(end); // Found the Exit
 			}
-			Closed.add(Integer.toString(Current.getId())); // Add it to Closed
+			Closed.add(Current.getId()); // Add it to Closed
 			
 			for(int i = 0; i < Current.getNumEdges(); i++) { // Check the points on each edge
-				if(Closed.contains(Integer.toString(Current.getEdges().get(i).getPoint1().getId())) && !Current.getEdges().get(i).getPoint1().equals(Current)){
+				if(Closed.contains(Current.getEdges().get(i).getPoint1().getId()) && !Current.getEdges().get(i).getPoint1().equals(Current)){
 					//If point1 on this edge isnt this one and is already closed, dont do things
 				}
-				else if(Closed.contains(Integer.toString(Current.getEdges().get(i).getPoint2().getId())) && !Current.getEdges().get(i).getPoint2().equals(Current)){
+				else if(Closed.contains(Current.getEdges().get(i).getPoint2().getId()) && !Current.getEdges().get(i).getPoint2().equals(Current)){
 					//If point2 on this edge isnt this one and is already closed, dont do things
 				}
 				else{ //This edge has a new point on it
-					int tentGScore = gscore.get(Integer.toString(Current.getId())) + Current.getEdges().get(i).getWeight(); // How far we have gone to get to this point
+					int tentGScore = gscore.get(Current.getId()) + Current.getEdges().get(i).getWeight(); // How far we have gone to get to this point
 					if(Current.getEdges().get(i).getPoint1().equals(Current)){ // Check which point is the new one
 						// Point2 is the new point
-						if(!Open.contains(Current.getEdges().get(i).getPoint2()) || gscore.get(Integer.toString(Current.getEdges().get(i).getPoint2().getId())) > tentGScore){ // If the point is not on the open list OR this is a faster route to it
-							CameFrom.put(Integer.toString(Current.getEdges().get(i).getPoint2().getId()), Current); // Update how we got here
-							gscore.put(Integer.toString(Current.getEdges().get(i).getPoint2().getId()), tentGScore);// Update how far we have gone
-							fscore.put(Integer.toString(Current.getEdges().get(i).getPoint2().getId()), tentGScore + CostEstimate(Current.getEdges().get(i).getPoint2(), end)); // Update how far we will go to get to the end
+						if(!Open.contains(Current.getEdges().get(i).getPoint2()) || gscore.get(Current.getEdges().get(i).getPoint2().getId()) > tentGScore){ // If the point is not on the open list OR this is a faster route to it
+							CameFrom.put(Current.getEdges().get(i).getPoint2().getId(), Current); // Update how we got here
+							gscore.put(Current.getEdges().get(i).getPoint2().getId(), tentGScore);// Update how far we have gone
+							fscore.put(Current.getEdges().get(i).getPoint2().getId(), tentGScore + CostEstimate(Current.getEdges().get(i).getPoint2(), end)); // Update how far we will go to get to the end
 							if(!Open.contains(Current.getEdges().get(i).getPoint2())) { // If it isnt on the open list
 								OpenAdd(Current.getEdges().get(i).getPoint2());         // Add it to the open list
 							}
@@ -46,10 +46,10 @@ public class AStar {
 					}
 					else if(Current.getEdges().get(i).getPoint2().equals(Current)){
 						// Point1 is the new point
-						if(!Open.contains(Current.getEdges().get(i).getPoint1()) || gscore.get(Integer.toString(Current.getEdges().get(i).getPoint1().getId())) > tentGScore){ // If the point is not on the open list OR this is a faster route to it
-							CameFrom.put(Integer.toString(Current.getEdges().get(i).getPoint1().getId()), Current); // Update how we got here
-							gscore.put(Integer.toString(Current.getEdges().get(i).getPoint1().getId()), tentGScore);// Update how far we have gone
-							fscore.put(Integer.toString(Current.getEdges().get(i).getPoint1().getId()), tentGScore + CostEstimate(Current.getEdges().get(i).getPoint1(), end)); // Update how far we will go to get to the end
+						if(!Open.contains(Current.getEdges().get(i).getPoint1()) || gscore.get(Current.getEdges().get(i).getPoint1().getId()) > tentGScore){ // If the point is not on the open list OR this is a faster route to it
+							CameFrom.put(Current.getEdges().get(i).getPoint1().getId(), Current); // Update how we got here
+							gscore.put(Current.getEdges().get(i).getPoint1().getId(), tentGScore);// Update how far we have gone
+							fscore.put(Current.getEdges().get(i).getPoint1().getId(), tentGScore + CostEstimate(Current.getEdges().get(i).getPoint1(), end)); // Update how far we will go to get to the end
 							if(!Open.contains(Current.getEdges().get(i).getPoint1())) { // If it isnt on the open list
 								OpenAdd(Current.getEdges().get(i).getPoint1());         // Add it to the open list
 							}
@@ -62,11 +62,11 @@ public class AStar {
 	}
 	
 	private static int CostEstimate(Point a, Point b){ // Find distance from point a to point b
-		return (int)Math.sqrt((double)((a.getX()-b.getX())^2)+((a.getY()-b.getY())^2)); // Pythagorean theorum
+		return (int)Math.sqrt((double)((a.getGlobX()-b.getGlobX())^2)+((a.getGlobY()-b.getGlobY())^2)); // Pythagorean theorum
 	}
 	private static void OpenAdd(Point addPoint){ // Add a point to the open list
 		for(int i = 0; i < Open.size(); i++){ // Check for each point in open
-			if(fscore.get(Integer.toString(Open.get(i).getId())) > fscore.get(Integer.toString(addPoint.getId()))){ // If point at i in open has a larger fscore than the point being added
+			if(fscore.get(Open.get(i).getId()) > fscore.get(addPoint.getId())){ // If point at i in open has a larger fscore than the point being added
 				Open.add(i, addPoint); // Insert the point at i
 				return;
 			}
@@ -77,9 +77,9 @@ public class AStar {
 		Point Current = PathEnd; // Initialize current
 		ArrayList<Point> ReturnPath = new ArrayList<Point>();
 
-		while(CameFrom.containsKey(Integer.toString(Current.getId()))){ // While the current point has one it came from
+		while(CameFrom.containsKey(Current.getId())){ // While the current point has one it came from
 			ReturnPath.add(Current); // Add the current one
-			Current = CameFrom.get(Integer.toString(Current.getId())); // Find the next one
+			Current = CameFrom.get(Current.getId()); // Find the next one
 		}
 		ReturnPath.add(Current); // Add the last one
 		return ReturnPath;

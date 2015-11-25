@@ -21,7 +21,7 @@ import javax.swing.Box;
 import database.AlreadyExistsException;
 import database.DoesNotExistException;
 import database.InsertFailureException;
-import database.MappingDatabase;
+import database.ServerDB;
 import database.NoMapException;
 
 public class MapUpdaterGUI extends JFrame {
@@ -39,7 +39,7 @@ public class MapUpdaterGUI extends JFrame {
 	private Point editPoint;
 
 	private Map currentMap = null;
-	private MappingDatabase md = MappingDatabase.getInstance();
+	private ServerDB md = ServerDB.getInstance();
 
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private Edge currentEdge;
@@ -115,15 +115,15 @@ public class MapUpdaterGUI extends JFrame {
 		buttonPanel.add(mapDropDown);
 		mapDropDown.addItem("Select Map");
 
-		// When the Updater opens the software the list will be poulated with
-		// teh files in
+		// When the Updater opens the software the list will be populated with
+		// the files in
 		// the VectorMapps resource folder
 		File vectorMapDir = new File("src/VectorMaps");
 		vectorMapDir = new File(vectorMapDir.getAbsolutePath());
 
 		// Truncates the extensions off of the map name so only the name is
 		// displayed in the
-		// dropdown menu for selecting a map
+		// drop-down menu for selecting a map
 		File[] imgList = vectorMapDir.listFiles();
 		String tempMapName;
 		int nameLength = 0;
@@ -149,14 +149,15 @@ public class MapUpdaterGUI extends JFrame {
 				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
 					pointArray.clear();
 					edgeArray.clear();
-					ArrayList<Map> mapList = md.getMaps(); //Grab all the maps from the database
+					ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
 					System.out.println("MapList size is "+mapList.size());//Print out the size of the maps from the database
 					for(int i = 0; i < mapList.size(); i++){//Iterate through the mapList until we find the item we are looking for
 						System.out.println("Trying to find name:"+name);
-						if(name.equals(mapList.get(i).getName()+".jpg"))//Once we find the map:
+						if(name.equals(mapList.get(i).getMapName()+".jpg"))//Once we find the map:
 						{
 							currentMap = mapList.get(i);//Grab the current map at this position.
 							pointArray = currentMap.getPointList();//Populate the point array with all the points found.
+							System.out.println(mapList.size());
 
 							for(int j = 0; j < pointArray.size(); j++){
 								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
@@ -343,7 +344,7 @@ public class MapUpdaterGUI extends JFrame {
 					// Finds the highest mapID in the database and stores it in
 					// highestID
 					int highestID;
-					if(md.getMaps().isEmpty()){
+					if(md.getMapsFromLocal().isEmpty()){
 						highestID = 0;
 						System.out.print("Database contains no maps so highest ID is 1");
 
@@ -351,11 +352,11 @@ public class MapUpdaterGUI extends JFrame {
 					}
 					else{
 						//determines the highest mapID from the Maps stored in the database
-						ArrayList<Map> mdMapList = md.getMaps();
-						highestID = mdMapList.get(0).getId();
+						ArrayList<Map> mdMapList = md.getMapsFromLocal();
+						highestID = mdMapList.get(0).getMapId();
 						for (int h = 0; h < mdMapList.size(); h++) {
-							if (highestID < mdMapList.get(h).getId()) {
-								highestID = mdMapList.get(h).getId();
+							if (highestID < mdMapList.get(h).getMapId()) {
+								highestID = mdMapList.get(h).getMapId();
 							}
 						}
 					}
@@ -423,14 +424,14 @@ public class MapUpdaterGUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				for (int i = 0; i < pointArray.size(); i++) {
 					Point storePoint = pointArray.get(i);
-					System.out.println("currentmap's currentPoint's id:"+currentMap.getId());
-					storePoint.setID(i+currentMap.getId()*500);				//TODO change id assignment
+					System.out.println("currentmap's currentPoint's id:"+currentMap.getMapId());
+					storePoint.setID((String)(currentMap.getMapId() + "." + i));				
 
 					Point newPoint = new Point(storePoint.getId(), storePoint.getName(),
-							storePoint.getX(), storePoint.getY());
-					System.out.println("Storing point in:"+currentMap.getName());
+							storePoint.getLocX(), storePoint.getLocY());
+					System.out.println("Storing point in:"+currentMap.getMapName());
 					try {
-						MappingDatabase.insertPoint(currentMap, newPoint);
+						ServerDB.insertPoint(currentMap, newPoint);
 						System.out.println("AddPointSuccess");
 					} catch (AlreadyExistsException f){
 						System.out.println(f.getMessage());
@@ -451,7 +452,7 @@ public class MapUpdaterGUI extends JFrame {
 					System.out.println("Storing Edge point 1: " + storeEdge.getPoint1().getId());
 					System.out.println("Storing Edge point 2: " + storeEdge.getPoint2().getId());
 					try {
-						MappingDatabase.insertEdge(storeEdge);
+						ServerDB.insertEdge(storeEdge);
 					} catch (InsertFailureException | AlreadyExistsException | SQLException
 							| DoesNotExistException g) {
 						// TODO Auto-generated catch block
@@ -569,8 +570,9 @@ public class MapUpdaterGUI extends JFrame {
 				if (getRadButton() == 1) // if addpoint
 				{
 					Integer arraySize = pointArray.size();
-					Point point = new Point(arraySize, "Point " + arraySize.toString(), lastMousex, lastMousey,
-							numEdges);
+					System.out.println(currentMap.getMapId());
+					Point point = new Point((String)(currentMap.getMapId() + "."+ arraySize), 
+							"Point " + arraySize.toString(), lastMousex, lastMousey, numEdges);
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){
@@ -613,10 +615,10 @@ public class MapUpdaterGUI extends JFrame {
 
 						switch (getRadButton()) {
 						case 2:// edit points
-							if ((lastMousex > currentPoint.getX() - (pointSize + 5)
-									&& lastMousex < currentPoint.getX() + (pointSize + 5))
-									&& (lastMousey > currentPoint.getY() - (pointSize + 5)
-											&& lastMousey < currentPoint.getY() + (pointSize + 5))) {
+							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
+									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
+									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
+											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
 								if (newClick == true && editingPoint == false) {
 									editPoint = currentPoint;
 									roomNumber.setText(editPoint.getName());
@@ -651,10 +653,10 @@ public class MapUpdaterGUI extends JFrame {
 							}
 							break;
 						case 3:// remove points
-							if ((lastMousex > currentPoint.getX() - (pointSize + 5)
-									&& lastMousex < currentPoint.getX() + (pointSize + 5))
-									&& (lastMousey > currentPoint.getY() - (pointSize + 5)
-											&& lastMousey < currentPoint.getY() + (pointSize + 5))) {
+							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
+									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
+									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
+											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
 								if (newClick == true)
 									markForDelete.add(currentPoint);
 
@@ -677,16 +679,16 @@ public class MapUpdaterGUI extends JFrame {
 						markForDelete.remove(j);
 					}
 
-					int drawX = (int) currentPoint.getX();
-					int drawY = (int) currentPoint.getY();
+					int drawX = (int) currentPoint.getLocX();
+					int drawY = (int) currentPoint.getLocY();
 					// draws the points onto the map.
 					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 
 					//draw lines between points
 				}
 				for (int j = 0; j < edgeArray.size(); j++) {
-					g.drawLine(edgeArray.get(j).getPoint1().getX(), edgeArray.get(j).getPoint1().getY(),
-							edgeArray.get(j).getPoint2().getX(), edgeArray.get(j).getPoint2().getY());
+					g.drawLine(edgeArray.get(j).getPoint1().getLocX(), edgeArray.get(j).getPoint1().getLocY(),
+							edgeArray.get(j).getPoint2().getLocX(), edgeArray.get(j).getPoint2().getLocY());
 
 				}
 
@@ -729,13 +731,13 @@ public class MapUpdaterGUI extends JFrame {
 
 	private Map updateCurrentMap(Map map)
 	{
-		int mapId = map.getId();
-		ArrayList<Map> mapList = md.getMaps();
+		int mapId = map.getMapId();
+		ArrayList<Map> mapList = md.getMapsFromLocal();
 		boolean foundMap = false;
 		int j = 0;
 		for (j = 0; j<mapList.size(); j++)
 		{
-			if (mapId == mapList.get(j).getId())
+			if (mapId == mapList.get(j).getMapId())
 			{
 				foundMap = true;
 				return mapList.get(j);

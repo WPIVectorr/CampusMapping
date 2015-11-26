@@ -42,9 +42,9 @@ public class GUI{
 	private ArrayList<Directions> finalDir = null;
 	private int buildStartIndex;
 	private int buildDestIndex;
-	private Color previousColor = Color.RED;
+	private Color previousColor = new Color(255, 102, 102);
 	private Color currentColor = Color.YELLOW;
-	private Color nextColor = Color.GREEN;
+	private Color nextColor = new Color(51, 255, 51);
 
 	private JFrame frame = new JFrame("Directions with Magnitude");
 
@@ -53,6 +53,7 @@ public class GUI{
 
 		frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setBackground(new Color(255, 235, 205));
 
 		maps = md.getMapsFromLocal();
 
@@ -320,7 +321,7 @@ public class GUI{
 		directionsText.setColumns(1);
 		GridBagConstraints gbc_directionsText = new GridBagConstraints();
 		gbc_directionsText.gridwidth = 3;
-		gbc_directionsText.fill = GridBagConstraints.BOTH;
+		gbc_directionsText.fill = GridBagConstraints.HORIZONTAL;
 		gbc_directionsText.insets = new Insets(0, 0, 5, 0);
 		gbc_directionsText.gridx = 0;
 		gbc_directionsText.gridy = 1;
@@ -380,9 +381,9 @@ public class GUI{
 					nextColor = new Color(0, 146, 146);
 				}
 				else{
-					previousColor = Color.RED;
+					previousColor = new Color(255, 102, 102);
 					currentColor = Color.YELLOW;
-					nextColor = Color.GREEN;
+					nextColor = new Color(51, 255, 51);
 				}
 				btnPrevious.setColor(previousColor);
 				btnNext.setColor(nextColor);

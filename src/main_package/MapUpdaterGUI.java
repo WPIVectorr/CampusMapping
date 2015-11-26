@@ -48,7 +48,8 @@ public class MapUpdaterGUI extends JFrame {
 	private int windowScale = 2;
 	private int windowSizeX = 932;
 	private int windowSizeY = 778;
-	BufferedImage img;
+
+	BufferedImage img ;
 	// ---------------------------------
 
 	private JPanel contentPane;
@@ -123,6 +124,7 @@ public class MapUpdaterGUI extends JFrame {
 		// the VectorMapps resource folder
 		File vectorMapDir = new File("src/VectorMaps");
 		vectorMapDir = new File(vectorMapDir.getAbsolutePath());
+		//System.out.println("Vectormap abs path: " + vectorMapDir.getAbsolutePath());
 
 		// Truncates the extensions off of the map name so only the name is
 		// displayed in the
@@ -141,6 +143,16 @@ public class MapUpdaterGUI extends JFrame {
 				mapDropDown.addItem(imgList[f].getName());
 			}
 		}
+		File logo = new File("src/VectorLogo/VectorrLogo.png");
+		logo = new File(logo.getAbsolutePath());
+		//System.out.println("logoFinal: " + logo);
+		try{
+			img = ImageIO.read(logo);
+		}
+		catch(IOException g){
+			System.out.println("Invalid logo1");
+			g.printStackTrace();
+		}
 
 		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
@@ -149,6 +161,8 @@ public class MapUpdaterGUI extends JFrame {
 
 				File destinationFile = new File("src/VectorMaps/" + name);
 				destinationFile = new File(destinationFile.getAbsolutePath());
+
+
 				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
 					pointArray.clear();
 					edgeArray.clear();
@@ -188,7 +202,16 @@ public class MapUpdaterGUI extends JFrame {
 						g.printStackTrace();
 					}
 				} else {
-					img = null;
+					File logo = new File("src/VectorLogo/VectorrLogo.png");
+					File logoFinal = new File(logo.getAbsolutePath());
+					//System.out.println("logoFinal: " + logoFinal);
+					try{
+						img = ImageIO.read(logoFinal);
+					}
+					catch(IOException g){
+						System.out.println("Invalid logo");
+						g.printStackTrace();
+					}
 					pointArray.clear();
 					edgeArray.clear();
 				}
@@ -243,7 +266,7 @@ public class MapUpdaterGUI extends JFrame {
 
 		JLabel lblLastPoint = new JLabel("Select a Point to Edit");
 		buttonPanel.add(lblLastPoint);
-		
+
 		JSplitPane splitPane_editPoints = new JSplitPane();
 		buttonPanel.add(splitPane_editPoints);
 
@@ -252,7 +275,7 @@ public class MapUpdaterGUI extends JFrame {
 		rdbtnEditPoints.setHorizontalAlignment(SwingConstants.LEFT);
 		splitPane_editPoints.setLeftComponent(rdbtnEditPoints);
 		modeSelector.add(rdbtnEditPoints);
-		
+
 		JToggleButton pathToggleButton = new JToggleButton("Path Mode Disabled");
 		pathToggleButton.setPreferredSize(new Dimension(85, 23));
 		splitPane_editPoints.setRightComponent(pathToggleButton);
@@ -542,17 +565,26 @@ public class MapUpdaterGUI extends JFrame {
 				if (img.getHeight() >= img.getWidth()) {
 					wScale = (double) img.getHeight() / (double) windowSizeY;
 					windowScale = img.getHeight() / windowSizeY;
-				} else {
+				} 
+
+				else {
 					wScale = (double) img.getHeight() / (double) windowSizeY;
 					windowScale = img.getWidth() / windowSizeX;
 				}
 				if (wScale > windowScale)
 					windowScale += 1;
 
-				// draw image/map
-				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
+				//sets the correct dimensions for logo
+				if(img.getHeight() < windowSizeY && img.getWidth() < windowSizeX){
+					g.drawImage(img,  0,  0,  windowSizeX, img.getHeight(), null);
+				}
+				//sets the correct dimensions for maps
+				else{
+					// draw image/map
+					g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
+				}
 			} else {
-				
+				//System.out.println("Reaching here---------------------------------");
 			}
 
 
@@ -651,7 +683,7 @@ public class MapUpdaterGUI extends JFrame {
 										editPoint = currentPoint;
 										roomNumber.setText(editPoint.getName());
 									}
-									
+
 								}
 								repaint();
 							}

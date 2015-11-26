@@ -42,6 +42,9 @@ public class GUI{
 	private ArrayList<Directions> finalDir = null;
 	private int buildStartIndex;
 	private int buildDestIndex;
+	private Color previousColor = Color.RED;
+	private Color currentColor = Color.YELLOW;
+	private Color nextColor = Color.GREEN;
 
 	private JFrame frame = new JFrame("Directions with Magnitude");
 
@@ -64,8 +67,15 @@ public class GUI{
 		mainMenu.setBackground(new Color(255, 235, 205));
 
 		navMenu = new JPanel();
-		navMenu.setLayout(new GridLayout(2, 3, 10, 10));
 		navMenu.setBackground(new Color(255, 235, 205));
+
+		GridBagLayout gbl_navMenu = new GridBagLayout();
+		gbl_navMenu.columnWidths = new int[]{298, 298, 298, 0};
+		gbl_navMenu.rowHeights = new int[]{0, 56, 56, 0};
+		gbl_navMenu.columnWeights = new double[]{0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		navMenu.setLayout(gbl_navMenu);
+
 
 		menus = new JPanel(new CardLayout());
 		menus.add(mainMenu, "Main Menu");
@@ -199,9 +209,8 @@ public class GUI{
 		mainMenu.add(horizontalStrut);
 
 		// Button that generates a route and switches to nav display
-		JButton directionsButton = new JButton("Directions");
+		GradientButton directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
 		mainMenu.add(directionsButton);
-		directionsButton.setBackground(new Color(0, 255, 127));
 		directionsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// reset text position index
@@ -278,8 +287,47 @@ public class GUI{
 		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
 		mainMenu.add(horizontalStrut_1);
 
+		// Button to return to main menu
+		JButton btnReturn = new JButton("Select New Route");
+		btnReturn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Return to main menu, don't show route anymore
+				menuLayout.show(menus, "Main Menu");
+				showRoute = false;
+				frame.repaint();
+			}
+		});
+		GridBagConstraints gbc_btnReturn = new GridBagConstraints();
+		gbc_btnReturn.insets = new Insets(0, 0, 5, 5);
+		gbc_btnReturn.gridx = 1;
+		gbc_btnReturn.gridy = 0;
+		navMenu.add(btnReturn, gbc_btnReturn);
+
+		JCheckBox chckbxColorBlindMode = new JCheckBox("Color Blind Mode");
+		GridBagConstraints gbc_chckbxColorBlindMode = new GridBagConstraints();
+		gbc_chckbxColorBlindMode.insets = new Insets(0, 0, 5, 0);
+		gbc_chckbxColorBlindMode.gridx = 2;
+		gbc_chckbxColorBlindMode.gridy = 0;
+		navMenu.add(chckbxColorBlindMode, gbc_chckbxColorBlindMode);
+
+
+
+		//creates a centered text field that will write back the users info they typed in
+		directionsText = new JTextField();
+		directionsText.setHorizontalAlignment(JTextField.CENTER);
+		directionsText.setToolTipText("");
+		directionsText.setBounds(6, 174, 438, 30);
+		directionsText.setColumns(1);
+		GridBagConstraints gbc_directionsText = new GridBagConstraints();
+		gbc_directionsText.gridwidth = 3;
+		gbc_directionsText.fill = GridBagConstraints.BOTH;
+		gbc_directionsText.insets = new Insets(0, 0, 5, 0);
+		gbc_directionsText.gridx = 0;
+		gbc_directionsText.gridy = 1;
+		navMenu.add(directionsText, gbc_directionsText);
+
 		// Button to get previous step in directions
-		JButton btnPrevious = new JButton("Previous");
+		GradientButton btnPrevious = new GradientButton("Previous", previousColor);
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(textPos == 0 || textDir == null){
@@ -292,20 +340,16 @@ public class GUI{
 				frame.repaint();
 			}
 		});
-		navMenu.add(btnPrevious);
-
-
-
-		//creates a centered text field that will write back the users info they typed in
-		directionsText = new JTextField();
-		directionsText.setHorizontalAlignment(JTextField.CENTER);
-		directionsText.setToolTipText("");
-		directionsText.setBounds(6, 174, 438, 30);
-		directionsText.setColumns(1);
-		navMenu.add(directionsText);
+		GridBagConstraints gbc_btnPrevious = new GridBagConstraints();
+		gbc_btnPrevious.anchor = GridBagConstraints.NORTH;
+		gbc_btnPrevious.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnPrevious.insets = new Insets(0, 0, 0, 5);
+		gbc_btnPrevious.gridx = 0;
+		gbc_btnPrevious.gridy = 2;
+		navMenu.add(btnPrevious, gbc_btnPrevious);
 
 		// Button to get next step in directions
-		JButton btnNext = new JButton("Next");
+		GradientButton btnNext = new GradientButton("Next", nextColor);
 		btnNext.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				if(textDir == null || textPos == textDir.length - 1){
@@ -318,26 +362,33 @@ public class GUI{
 				frame.repaint();
 			}
 		});
-		navMenu.add(btnNext);
-
-
-		Component horizontalStrut2 = Box.createHorizontalStrut(20);
-		navMenu.add(horizontalStrut2);
-
-		// Button to return to main menu
-		JButton btnReturn = new JButton("Select New Route");
-		btnReturn.addActionListener(new ActionListener() {
+		GridBagConstraints gbc_btnNext = new GridBagConstraints();
+		gbc_btnNext.anchor = GridBagConstraints.NORTH;
+		gbc_btnNext.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnNext.gridx = 2;
+		gbc_btnNext.gridy = 2;
+		navMenu.add(btnNext, gbc_btnNext);
+		
+		// Add action listener to swap color palette, needs to be set after buttons are initialized
+		chckbxColorBlindMode.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// Return to main menu, don't show route anymore
-				menuLayout.show(menus, "Main Menu");
-				showRoute = false;
+				// If checkbox is selected, switch to color blind friendly colors
+				// Otherwise if it is unselected, switch to default colors
+				if (chckbxColorBlindMode.isSelected()){
+					previousColor = new Color(182, 109, 255);
+					currentColor = new Color(219, 209, 0);
+					nextColor = new Color(0, 146, 146);
+				}
+				else{
+					previousColor = Color.RED;
+					currentColor = Color.YELLOW;
+					nextColor = Color.GREEN;
+				}
+				btnPrevious.setColor(previousColor);
+				btnNext.setColor(nextColor);
 				frame.repaint();
 			}
 		});
-		navMenu.add(btnReturn);
-
-		Component horizontalStrut3 = Box.createHorizontalStrut(20);
-		navMenu.add(horizontalStrut3);
 
 		// Add panel for drawing
 		frame.getContentPane().add(drawPanel);
@@ -348,8 +399,14 @@ public class GUI{
 
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
-		//GUI myTest = new GUI();
-		//myTest.setVisible(true);
+
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException
+				| IllegalAccessException | UnsupportedLookAndFeelException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -394,20 +451,21 @@ public class GUI{
 
 
 				if (showRoute && route != null){
-					// Draw green lines for all points up to current point
-					g.setColor(Color.GREEN);
+					// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)
+					// Draw lines for all points up to current point, use nextColor (same color as "Next" button)
+					g.setColor(nextColor);
 					g2.setStroke(new BasicStroke(3));
 					for (int i = 0; i < textPos; i++){
 						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
 					}
-					// Draw a thicker yellow line for the current step in the directions
+					// Draw a thicker line for the current step in the directions, use currentColor
 					g2.setStroke(new BasicStroke(6));
-					g.setColor(Color.YELLOW);
+					g.setColor(currentColor);
 					g2.drawLine(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY(), finalDir.get(textPos).getDestination().getLocX(), finalDir.get(textPos).getDestination().getLocY());
 					g2.setStroke(new BasicStroke(3));
 
-					// Draw red lines for all points until the end
-					g.setColor(Color.RED);
+					// Draw lines for all points until the end, use previousColor (same color as "Previous" button)
+					g.setColor(previousColor);
 					for (int i = textPos + 1; i < finalDir.size(); i++){
 						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
 					}

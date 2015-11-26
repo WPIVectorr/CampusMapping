@@ -209,9 +209,8 @@ public class GUI{
 		mainMenu.add(horizontalStrut);
 
 		// Button that generates a route and switches to nav display
-		JButton directionsButton = new JButton("Directions");
+		GradientButton directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
 		mainMenu.add(directionsButton);
-		directionsButton.setBackground(new Color(0, 255, 127));
 		directionsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// reset text position index
@@ -309,23 +308,6 @@ public class GUI{
 		gbc_chckbxColorBlindMode.insets = new Insets(0, 0, 5, 0);
 		gbc_chckbxColorBlindMode.gridx = 2;
 		gbc_chckbxColorBlindMode.gridy = 0;
-		chckbxColorBlindMode.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// If checkbox is selected, switch to color blind friendly colors
-				// Otherwise if it is unselected, switch to default colors
-				if (chckbxColorBlindMode.isSelected()){
-					previousColor = new Color(219, 209, 0);
-					currentColor = new Color(182, 109, 255);
-					nextColor = new Color(0, 146, 146);
-				}
-				else{
-					previousColor = Color.RED;
-					currentColor = Color.YELLOW;
-					nextColor = Color.GREEN;
-				}
-				frame.repaint();
-			}
-		});
 		navMenu.add(chckbxColorBlindMode, gbc_chckbxColorBlindMode);
 
 
@@ -345,7 +327,7 @@ public class GUI{
 		navMenu.add(directionsText, gbc_directionsText);
 
 		// Button to get previous step in directions
-		JButton btnPrevious = new JButton("Previous");
+		GradientButton btnPrevious = new GradientButton("Previous", previousColor);
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(textPos == 0 || textDir == null){
@@ -367,7 +349,7 @@ public class GUI{
 		navMenu.add(btnPrevious, gbc_btnPrevious);
 
 		// Button to get next step in directions
-		JButton btnNext = new JButton("Next");
+		GradientButton btnNext = new GradientButton("Next", nextColor);
 		btnNext.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				if(textDir == null || textPos == textDir.length - 1){
@@ -386,6 +368,27 @@ public class GUI{
 		gbc_btnNext.gridx = 2;
 		gbc_btnNext.gridy = 2;
 		navMenu.add(btnNext, gbc_btnNext);
+		
+		// Add action listener to swap color palette, needs to be set after buttons are initialized
+		chckbxColorBlindMode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// If checkbox is selected, switch to color blind friendly colors
+				// Otherwise if it is unselected, switch to default colors
+				if (chckbxColorBlindMode.isSelected()){
+					previousColor = new Color(182, 109, 255);
+					currentColor = new Color(219, 209, 0);
+					nextColor = new Color(0, 146, 146);
+				}
+				else{
+					previousColor = Color.RED;
+					currentColor = Color.YELLOW;
+					nextColor = Color.GREEN;
+				}
+				btnPrevious.setColor(previousColor);
+				btnNext.setColor(nextColor);
+				frame.repaint();
+			}
+		});
 
 		// Add panel for drawing
 		frame.getContentPane().add(drawPanel);
@@ -396,8 +399,14 @@ public class GUI{
 
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
-		//GUI myTest = new GUI();
-		//myTest.setVisible(true);
+
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException
+				| IllegalAccessException | UnsupportedLookAndFeelException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -442,19 +451,20 @@ public class GUI{
 
 
 				if (showRoute && route != null){
-					// Draw green lines for all points up to current point
+					// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)
+					// Draw lines for all points up to current point, use nextColor (same color as "Next" button)
 					g.setColor(nextColor);
 					g2.setStroke(new BasicStroke(3));
 					for (int i = 0; i < textPos; i++){
 						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
 					}
-					// Draw a thicker yellow line for the current step in the directions
+					// Draw a thicker line for the current step in the directions, use currentColor
 					g2.setStroke(new BasicStroke(6));
 					g.setColor(currentColor);
 					g2.drawLine(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY(), finalDir.get(textPos).getDestination().getLocX(), finalDir.get(textPos).getDestination().getLocY());
 					g2.setStroke(new BasicStroke(3));
 
-					// Draw red lines for all points until the end
+					// Draw lines for all points until the end, use previousColor (same color as "Previous" button)
 					g.setColor(previousColor);
 					for (int i = textPos + 1; i < finalDir.size(); i++){
 						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());

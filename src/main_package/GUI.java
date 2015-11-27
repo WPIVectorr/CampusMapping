@@ -142,9 +142,21 @@ public class GUI{
 		/*for (int i=0; i < buildings.length; i++){
 			destBuilds.addItem(buildings[i]);
 		}*/
+		
 		//buttonPanel.add(destBuilds);
 		destBuilds.setBounds(122, 80, 148, 20);
-
+		
+		//adds the logo to the front screen of the window
+		File logo = new File("src/VectorLogo/VectorrLogo.png");
+		logo = new File(logo.getAbsolutePath());
+		//System.out.println("logoFinal: " + logo);
+		try{
+			img = ImageIO.read(logo);
+		}
+		catch(IOException g){
+			System.out.println("Invalid logo1");
+			g.printStackTrace();
+		}
 
 		//adds the correct points for the building specified
 		mapsDropdown.addActionListener (new ActionListener () {

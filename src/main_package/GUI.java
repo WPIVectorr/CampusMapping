@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 
 import database.AlreadyExistsException;
 import database.ServerDB;
@@ -48,13 +49,12 @@ public class GUI{
 
 	private JFrame frame = new JFrame("Directions with Magnitude");
 
-
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
 		frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
-
+		
 		maps = md.getMapsFromLocal();
 
 
@@ -208,6 +208,15 @@ public class GUI{
 		// Empty componenet for formatting
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		mainMenu.add(horizontalStrut);
+		
+		// Text box for full list of directions, initially invisible, appears when directions button pressed
+		JTextPane txtpnFullTextDir = new JTextPane();
+		txtpnFullTextDir.setText("Full List of Directions:");
+		frame.getContentPane().add(txtpnFullTextDir, BorderLayout.WEST);
+		txtpnFullTextDir.setVisible(false);
+		txtpnFullTextDir.setEditable(false);
+		Border textBorder = BorderFactory.createLineBorder(Color.BLACK, 2);
+		txtpnFullTextDir.setBorder(textBorder);
 
 		// Button that generates a route and switches to nav display
 		GradientButton directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
@@ -266,8 +275,12 @@ public class GUI{
 						for(int i = 0; i < textDir.length; i++){
 							//System.out.println(directions[i]);
 						}
+						String fullText = "Full List of Directions:\n";
 						directionsText.setText(textDir[0]);
-
+						for (int i=0; i < textDir.length; i++){
+							fullText += i + ". " + textDir[i] + "\n\n";
+						}
+						txtpnFullTextDir.setText(fullText);						
 					}
 
 					frame.repaint();
@@ -287,22 +300,38 @@ public class GUI{
 		// For formatting
 		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
 		mainMenu.add(horizontalStrut_1);
-
-		// Button to return to main menu
-		JButton btnReturn = new JButton("Select New Route");
-		btnReturn.addActionListener(new ActionListener() {
+		
+				// Button to return to main menu
+				JButton btnReturn = new JButton("Select New Route");
+				btnReturn.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						// Return to main menu, don't show route anymore
+						menuLayout.show(menus, "Main Menu");
+						showRoute = false;
+						frame.repaint();
+					}
+				});
+				GridBagConstraints gbc_btnReturn = new GridBagConstraints();
+				gbc_btnReturn.insets = new Insets(0, 0, 5, 5);
+				gbc_btnReturn.gridx = 0;
+				gbc_btnReturn.gridy = 0;
+				navMenu.add(btnReturn, gbc_btnReturn);
+		
+		JButton btnFullTextDirections = new JButton("Full Text Directions");
+		GridBagConstraints gbc_btnFullTextDirections = new GridBagConstraints();
+		gbc_btnFullTextDirections.insets = new Insets(0, 0, 5, 5);
+		gbc_btnFullTextDirections.gridx = 1;
+		gbc_btnFullTextDirections.gridy = 0;
+		navMenu.add(btnFullTextDirections, gbc_btnFullTextDirections);
+		btnFullTextDirections.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// Return to main menu, don't show route anymore
-				menuLayout.show(menus, "Main Menu");
-				showRoute = false;
-				frame.repaint();
+				if(txtpnFullTextDir.isVisible()){
+					txtpnFullTextDir.setVisible(false);
+				}
+				else
+					txtpnFullTextDir.setVisible(true);
 			}
 		});
-		GridBagConstraints gbc_btnReturn = new GridBagConstraints();
-		gbc_btnReturn.insets = new Insets(0, 0, 5, 5);
-		gbc_btnReturn.gridx = 1;
-		gbc_btnReturn.gridy = 0;
-		navMenu.add(btnReturn, gbc_btnReturn);
 
 		JCheckBox chckbxColorBlindMode = new JCheckBox("Color Blind Mode");
 		GridBagConstraints gbc_chckbxColorBlindMode = new GridBagConstraints();
@@ -326,6 +355,7 @@ public class GUI{
 		gbc_directionsText.gridx = 0;
 		gbc_directionsText.gridy = 1;
 		navMenu.add(directionsText, gbc_directionsText);
+		
 
 		// Button to get previous step in directions
 		GradientButton btnPrevious = new GradientButton("Previous", previousColor);
@@ -401,6 +431,7 @@ public class GUI{
 
 		// Add panel for drawing
 		frame.getContentPane().add(drawPanel);
+		
 		// Make frame visible after initializing everything
 		frame.setVisible(true);
 	}

@@ -469,9 +469,15 @@ public class GUI{
 				}
 				if (wScale > windowScale)
 					windowScale += 1;
-
-				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
-
+				
+				//sets the correct dimensions for logo
+				if(img.getHeight() < windowSizeY && img.getWidth() < windowSizeX){
+					g.drawImage(img,  0,  0,  windowSizeX, img.getHeight(), null);
+				}
+				else{
+					//draws a map based off of scale dimensions found above
+					g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
+				}
 
 				if (showRoute && route != null){
 					// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)

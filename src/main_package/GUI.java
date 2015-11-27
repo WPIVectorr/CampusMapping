@@ -181,7 +181,7 @@ public class GUI{
 					a.printStackTrace();
 				}
 
-				System.out.println("DIe die: " +maps.get(0).getPointList().size());
+				System.out.println("DIe die: " +maps.get(2).getPointList().size());
 				System.out.println("points: ");
 				for(int count = 0; count < maps.get(0).getPointList().size(); count++){
 					System.out.println(maps.get(0).getPointList().get(count).getName());
@@ -341,7 +341,7 @@ public class GUI{
 
 		// Button to get previous step in directions
 		//sets the previous button color to green
-		GradientButton btnPrevious = new GradientButton("Previous", new Color(51, 255, 51));
+		GradientButton btnPrevious = new GradientButton("Previous", previousColor);
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(textPos == 0 || textDir == null){
@@ -364,7 +364,7 @@ public class GUI{
 
 		// Button to get next step in directions
 		//sets the next button color to red
-		GradientButton btnNext = new GradientButton("Next", new Color(255, 75, 75));
+		GradientButton btnNext = new GradientButton("Next", nextColor);
 		btnNext.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				if (textDir == null){

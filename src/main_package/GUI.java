@@ -340,7 +340,8 @@ public class GUI{
 		navMenu.add(directionsText, gbc_directionsText);
 
 		// Button to get previous step in directions
-		GradientButton btnPrevious = new GradientButton("Previous", previousColor);
+		//sets the previous button color to green
+		GradientButton btnPrevious = new GradientButton("Previous", new Color(51, 255, 51));
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(textPos == 0 || textDir == null){
@@ -362,7 +363,8 @@ public class GUI{
 		navMenu.add(btnPrevious, gbc_btnPrevious);
 
 		// Button to get next step in directions
-		GradientButton btnNext = new GradientButton("Next", nextColor);
+		//sets the next button color to red
+		GradientButton btnNext = new GradientButton("Next", new Color(255, 75, 75));
 		btnNext.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				if (textDir == null){

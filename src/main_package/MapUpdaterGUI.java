@@ -89,7 +89,7 @@ public class MapUpdaterGUI extends JFrame {
 	private JTextField txtStartingLocation;
 	private JTextField txtDestination;
 	private JPanel buttonPanel;
-	private DrawRoute drawPanel = new DrawRoute();
+	private UpdateMap drawPanel = new UpdateMap();
 	private JTextField mapName;
 	private JButton btnNewButton;
 	private JTextField txtImageDirectoryPath;
@@ -424,7 +424,7 @@ public class MapUpdaterGUI extends JFrame {
 		btnSaveMap = new JButton("Save Map"); // defined above to change text in
 		// point selector
 		buttonPanel.add(btnSaveMap);
-		getContentPane().add(drawPanel);
+		//getContentPane().add(drawPanel);
 
 		btnSavePoint.addActionListener(new ActionListener() {
 
@@ -530,7 +530,7 @@ public class MapUpdaterGUI extends JFrame {
 
 	}
 
-	class DrawRoute extends JPanel {
+	class UpdateMap extends JPanel {
 
 		ArrayList<Point> paintArray = new ArrayList<Point>(); // arraylist of
 		// points

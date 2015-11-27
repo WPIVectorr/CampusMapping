@@ -27,7 +27,8 @@ public class ServerDB {
 
 	private static String MAP_SCHEMA = "id INTEGER, name VARCHAR(30), xTopLeft DOUBLE, yTopLeft DOUBLE, "
 			+ " xBotRight DOUBLE, yBotRight DOUBLE, rotation DOUBLE, pointIDIndex INTEGER";
-	private static String POINT_SCHEMA = "id VARCHAR(30), name VARCHAR(30), localIndex INTEGER, x INTEGER, y INTEGER, numEdges INTEGER, idEdge1 VARCHAR(30),"
+	private static String POINT_SCHEMA = "id VARCHAR(30), name VARCHAR(30), localIndex INTEGER, "
+			+ "locX INTEGER, locY INTEGER, globX INTEGER, globY INTEGER, numEdges INTEGER, idEdge1 VARCHAR(30),"
 			+ " idEdge2 VARCHAR(30), idEdge3 VARCHAR(30), idEdge4 VARCHAR(30), idEdge5 VARCHAR(30), idEdge6 VARCHAR(30), idEdge7 VARCHAR(30), idEdge8 VARCHAR(30),"
 			+ "idEdge9 VARCHAR(30), idEdge10 VARCHAR(30)";
 	private static String EDGE_SCHEMA = "id VARCHAR(30), idPoint1 VARCHAR(30), idPoint2 VARCHAR(30), weight INTEGER, isOutside BOOLEAN, isStairs INTEGER";
@@ -245,9 +246,13 @@ public class ServerDB {
 				insertStatement += ", ";
 				insertStatement += pt.getIndex();
 				insertStatement += ", ";
-				insertStatement += ptX;
+				insertStatement += pt.getLocX();
 				insertStatement += ", ";
-				insertStatement += ptY;
+				insertStatement += pt.getLocY();
+				insertStatement += ", ";
+				insertStatement += pt.getGlobX();
+				insertStatement += ", ";
+				insertStatement += pt.getGlobY();
 				insertStatement += ", ";
 				insertStatement += numberEdges;
 				insertStatement += ", ";
@@ -618,8 +623,10 @@ public class ServerDB {
 			String newPtId;
 			String newPtName;
 			int newPtIndex;
-			int newPtX;
-			int newPtY;
+			int newPtLocX;
+			int newPtLocY;
+			int newPtGlobX;
+			int newPtGlobY;
 			int newPtNumberEdges;
 			ArrayList<Edge> newPtEdges = new ArrayList<Edge>();
 
@@ -632,8 +639,10 @@ public class ServerDB {
 				newPtId = rs.getString("id");
 				newPtName = rs.getString("name");
 				newPtIndex = rs.getInt("localIndex");
-				newPtX = rs.getInt("x");
-				newPtY = rs.getInt("y");
+				newPtLocX = rs.getInt("locX");
+				newPtLocY = rs.getInt("locY");
+				newPtGlobX = rs.getInt("globX");
+				newPtGlobY = rs.getInt("globY");
 				newPtNumberEdges = rs.getInt("numEdges");
 				newPtEdges = new ArrayList<Edge>();
 
@@ -665,7 +674,7 @@ public class ServerDB {
 					}
 				}
 
-				Point newPt = new Point(newPtId, newPtName, newPtX, newPtY, newPtNumberEdges);
+				Point newPt = new Point(newPtId, newPtName, newPtLocX, newPtLocY, newPtGlobX, newPtGlobY, newPtNumberEdges);
 				newPt.setIndex(newPtIndex);
 				newPt.setEdges(newPtEdges);
 				retArray.add(newPt);
@@ -690,8 +699,10 @@ public class ServerDB {
 			String newPtId;
 			String newPtName;
 			int newPtIndex;
-			int newPtX;
-			int newPtY;
+			int newPtLocX;
+			int newPtLocY;
+			int newPtGlobX;
+			int newPtGlobY;
 			int newPtNumberEdges;
 
 			String newEdgeId;
@@ -773,10 +784,12 @@ public class ServerDB {
 						newPtId = rs2.getString("id");
 						newPtName = rs2.getString("name");
 						newPtIndex = rs2.getInt("localIndex");
-						newPtX = rs2.getInt("x");
-						newPtY = rs2.getInt("y");
+						newPtLocX = rs2.getInt("locX");
+						newPtLocY = rs2.getInt("locY");
+						newPtGlobX = rs2.getInt("globX");
+						newPtGlobY = rs2.getInt("globY");
 						newPtNumberEdges = 0;															//This should be automatically rectified when adding in edges
-						Point newPt = new Point(newPtId, newPtName, newPtX, newPtY, newPtNumberEdges);
+						Point newPt = new Point(newPtId, newPtName, newPtLocX, newPtLocY, newPtGlobX, newPtGlobY, newPtNumberEdges);
 						newPt.setIndex(newPtIndex);
 						currentMap.addPoint(newPt);
 						allPoints.add(newPt);
@@ -975,64 +988,6 @@ public class ServerDB {
 		}
 	}
 
-	public static int getNewPointIndex(Map map)
-	{
-		if (DEBUG)
-			System.out.println("getNewPointIndex called");
-		ArrayList<Point> pointsInMap = new ArrayList<Point>();
-		try {
-			conn = connect();
-			Statement statement = conn.createStatement();
-			statement.setQueryTimeout(30);  											// set timeout to 30 sec.
-			String TABLE_NAME = "";
-			TABLE_NAME += ("Map"+map.getMapId()+"Points");
-
-			String newPtId;
-			String newPtName;
-			int newPtIndex;
-			int newPtX;
-			int newPtY;
-		
-			ResultSet rs = statement.executeQuery("SELECT * FROM "+TABLE_NAME);
-			while (rs.next())
-			{
-				newPtId = rs.getString("id");
-				newPtName = rs.getString("name");
-				newPtIndex = rs.getInt("localIndex");
-				newPtX = rs.getInt("x");
-				newPtY = rs.getInt("y");
-
-
-				Point newPt = new Point(newPtId, newPtName, newPtX, newPtY, 0);
-				newPt.setIndex(newPtIndex);;
-				pointsInMap.add(newPt);
-			}
-			rs.close();
-			if (DEBUG)
-				System.out.println("Finished getting points");																			//TODO add error handling
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		int j = 0;
-		System.out.println("Unsorted");
-		for (j = 0; j < pointsInMap.size(); j++)
-		{
-			System.out.println("Point index:"+pointsInMap.get(j).getIndex());
-		}
-		Collections.sort(pointsInMap, new pointComparator());
-		System.out.println("Sorted");
-		for (j = 0; j < pointsInMap.size(); j++)
-		{
-			System.out.println("Point index:"+pointsInMap.get(j).getIndex());
-		}
-		for (j = 0; j < pointsInMap.size(); j++)
-		{
-			if (pointsInMap.get(j).getIndex() != j)
-				return j;
-		}
-		return j;
-	}
-	
 	public static class pointComparator implements Comparator<Point>
 	{
 		@Override
@@ -1056,11 +1011,11 @@ public class ServerDB {
 		ArrayList<Edge> insertableEdges = new ArrayList<Edge>();
 		Map testMap = new Map(1, "testMap", 12, 20, 45, 60, 12.6, 0);
 		Point p1 = new Point(testMap.getNewPointID(), "p1", testMap.getPointIDIndex(), 0, 1, 0);
-		Point p2 = new Point(testMap.getNewPointID(), "p2", testMap.getPointIDIndex(), 0, 1);
-		Point p3 = new Point(testMap.getNewPointID(), "p3", testMap.getPointIDIndex(), 1, 0);
-		Point p4 = new Point(testMap.getNewPointID(), "p4", testMap.getPointIDIndex(), 2, 0);
-		Point p5 = new Point(testMap.getNewPointID(), "p5", testMap.getPointIDIndex(), 23, 90);
-		Point p6 = new Point(testMap.getNewPointID(), "p6", testMap.getPointIDIndex(), 27, 90);
+		Point p2 = new Point(testMap.getNewPointID(), "p2", testMap.getPointIDIndex(), 0, 1, 0);
+		Point p3 = new Point(testMap.getNewPointID(), "p3", testMap.getPointIDIndex(), 1, 0, 0);
+		Point p4 = new Point(testMap.getNewPointID(), "p4", testMap.getPointIDIndex(), 2, 0, 0);
+		Point p5 = new Point(testMap.getNewPointID(), "p5", testMap.getPointIDIndex(), 23, 90, 0);
+		Point p6 = new Point(testMap.getNewPointID(), "p6", testMap.getPointIDIndex(), 27, 90, 0);
 		Edge e1 = new Edge(p1, p2, 1);
 		Edge e2 = new Edge(p2, p5, 1);
 		Edge e3 = new Edge(p2, p3, 1);

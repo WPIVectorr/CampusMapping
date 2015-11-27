@@ -42,7 +42,7 @@ public class GUI{
 	private ArrayList<Directions> finalDir = null;
 	private int buildStartIndex;
 	private int buildDestIndex;
-	private Color previousColor = new Color(255, 102, 102);
+	private Color previousColor = new Color(255, 75, 75);
 	private Color currentColor = Color.YELLOW;
 	private Color nextColor = new Color(51, 255, 51);
 
@@ -353,13 +353,21 @@ public class GUI{
 		GradientButton btnNext = new GradientButton("Next", nextColor);
 		btnNext.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				if(textDir == null || textPos == textDir.length - 1){
+				if (textDir == null){
 
 				}
-				else {
-					textPos++;
-					directionsText.setText(textDir[textPos]);
-				}
+				else
+					// Checks if incrementing textPos will set the array out of bounds
+					// If it will, the user is at the end, display a message accordingly
+					if(textPos < textDir.length - 1){
+						textPos++;
+						directionsText.setText(textDir[textPos]);
+					}
+					else {
+						textPos = textDir.length; // For route coloring 
+						directionsText.setText("You have arrived at your destination");
+					}
+
 				frame.repaint();
 			}
 		});
@@ -369,7 +377,7 @@ public class GUI{
 		gbc_btnNext.gridx = 2;
 		gbc_btnNext.gridy = 2;
 		navMenu.add(btnNext, gbc_btnNext);
-		
+
 		// Add action listener to swap color palette, needs to be set after buttons are initialized
 		chckbxColorBlindMode.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -381,7 +389,7 @@ public class GUI{
 					nextColor = new Color(0, 146, 146);
 				}
 				else{
-					previousColor = new Color(255, 102, 102);
+					previousColor = new Color(255, 75, 75);
 					currentColor = Color.YELLOW;
 					nextColor = new Color(51, 255, 51);
 				}
@@ -460,10 +468,12 @@ public class GUI{
 						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
 					}
 					// Draw a thicker line for the current step in the directions, use currentColor
-					g2.setStroke(new BasicStroke(6));
-					g.setColor(currentColor);
-					g2.drawLine(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY(), finalDir.get(textPos).getDestination().getLocX(), finalDir.get(textPos).getDestination().getLocY());
-					g2.setStroke(new BasicStroke(3));
+					if (textPos != finalDir.size()){
+						g2.setStroke(new BasicStroke(6));
+						g.setColor(currentColor);
+						g2.drawLine(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY(), finalDir.get(textPos).getDestination().getLocX(), finalDir.get(textPos).getDestination().getLocY());
+						g2.setStroke(new BasicStroke(3));
+					}
 
 					// Draw lines for all points until the end, use previousColor (same color as "Previous" button)
 					g.setColor(previousColor);

@@ -142,9 +142,21 @@ public class GUI{
 		/*for (int i=0; i < buildings.length; i++){
 			destBuilds.addItem(buildings[i]);
 		}*/
+		
 		//buttonPanel.add(destBuilds);
 		destBuilds.setBounds(122, 80, 148, 20);
-
+		
+		//adds the logo to the front screen of the window
+		File logo = new File("src/VectorLogo/VectorrLogo.png");
+		logo = new File(logo.getAbsolutePath());
+		//System.out.println("logoFinal: " + logo);
+		try{
+			img = ImageIO.read(logo);
+		}
+		catch(IOException g){
+			System.out.println("Invalid logo1");
+			g.printStackTrace();
+		}
 
 		//adds the correct points for the building specified
 		mapsDropdown.addActionListener (new ActionListener () {
@@ -168,7 +180,6 @@ public class GUI{
 					System.out.println("Could not find file:"+destInput);
 					a.printStackTrace();
 				}
-
 
 				startBuilds.removeAllItems();
 				destBuilds.removeAllItems();
@@ -357,6 +368,7 @@ public class GUI{
 		
 
 		// Button to get previous step in directions
+		//sets the previous button color to green
 		GradientButton btnPrevious = new GradientButton("Previous", previousColor);
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -379,6 +391,7 @@ public class GUI{
 		navMenu.add(btnPrevious, gbc_btnPrevious);
 
 		// Button to get next step in directions
+		//sets the next button color to red
 		GradientButton btnNext = new GradientButton("Next", nextColor);
 		btnNext.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
@@ -485,9 +498,16 @@ public class GUI{
 				}
 				if (wScale > windowScale)
 					windowScale += 1;
-
-				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
 				
+				//sets the correct dimensions for logo
+				if(img.getHeight() < windowSizeY && img.getWidth() < windowSizeX){
+					g.drawImage(img,  0,  0,  windowSizeX, img.getHeight(), null);
+				}
+				else{
+					//draws a map based off of scale dimensions found above
+					g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
+				}
+
 				if (showRoute && route != null){
 
 					// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)

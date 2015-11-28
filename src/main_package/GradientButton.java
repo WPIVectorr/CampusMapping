@@ -29,7 +29,7 @@ public class GradientButton extends JButton{
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         // Sets gradient paint
-        GradientPaint gp = new GradientPaint(0, 0, baseColor, 0, getHeight(), baseColor.darker());
+        GradientPaint gp = new GradientPaint(0, 0, baseColor.brighter(), 0, getHeight(), baseColor.darker());
 
         g2d.setPaint(gp);
 

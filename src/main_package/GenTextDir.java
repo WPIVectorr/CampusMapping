@@ -316,19 +316,19 @@ public class GenTextDir {
 		for(int i = 0; i < retString.length; i++){
 			currDir = directions.get(i);
 			if(currDir.getTurn().equals("slight left")){
-				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
 			} else if (currDir.getTurn().equals("left")) {
-				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
 			} else if (currDir.getTurn().equals("sharp left")) {
-				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
 			} else if (currDir.getTurn().equals("slight right")) {
-				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
 			} else if (currDir.getTurn().equals("right")) {
-				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
 			} else if (currDir.getTurn().equals("sharp right")) {
-				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " turn a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
 			} else if (currDir.getTurn().equals("straight")) {
-				retString[i] = "Once you reach " + currDir.getOrigin().getName() + " go " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
+				retString[i] = "From " + currDir.getOrigin().getName() + " go " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
 			} else {
 				throw new MalformedDirectionException("This direction has the wrong turn information" + directions.get(i).getTurn());
 			}

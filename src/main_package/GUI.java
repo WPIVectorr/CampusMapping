@@ -169,11 +169,6 @@ public class GUI{
 					a.printStackTrace();
 				}
 
-				System.out.println("DIe die: " +maps.get(0).getPointList().size());
-				System.out.println("points: ");
-				for(int count = 0; count < maps.get(0).getPointList().size(); count++){
-					System.out.println(maps.get(0).getPointList().get(count).getName());
-				}
 
 				startBuilds.removeAllItems();
 				destBuilds.removeAllItems();
@@ -272,13 +267,10 @@ public class GUI{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						for(int i = 0; i < textDir.length; i++){
-							//System.out.println(directions[i]);
-						}
-						String fullText = "Full List of Directions:\n";
+						String fullText = " Full List of Directions:\n";
 						directionsText.setText(textDir[0]);
 						for (int i=0; i < textDir.length; i++){
-							fullText += i + ". " + textDir[i] + "\n\n";
+							fullText += " " + (i + 1) + ". " + textDir[i] + "\n\n";
 						}
 						txtpnFullTextDir.setText(fullText);						
 					}
@@ -301,6 +293,9 @@ public class GUI{
 		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
 		mainMenu.add(horizontalStrut_1);
 		
+		// Initalize this button first so it can be used in return button
+		JButton btnFullTextDirections = new JButton("Show Full Text Directions");
+		
 				// Button to return to main menu
 				JButton btnReturn = new JButton("Select New Route");
 				btnReturn.addActionListener(new ActionListener() {
@@ -308,6 +303,8 @@ public class GUI{
 						// Return to main menu, don't show route anymore
 						menuLayout.show(menus, "Main Menu");
 						showRoute = false;
+						txtpnFullTextDir.setVisible(false);
+						btnFullTextDirections.setText("Show Full Text Directions");
 						frame.repaint();
 					}
 				});
@@ -317,7 +314,6 @@ public class GUI{
 				gbc_btnReturn.gridy = 0;
 				navMenu.add(btnReturn, gbc_btnReturn);
 		
-		JButton btnFullTextDirections = new JButton("Full Text Directions");
 		GridBagConstraints gbc_btnFullTextDirections = new GridBagConstraints();
 		gbc_btnFullTextDirections.insets = new Insets(0, 0, 5, 5);
 		gbc_btnFullTextDirections.gridx = 1;
@@ -327,9 +323,12 @@ public class GUI{
 			public void actionPerformed(ActionEvent e) {
 				if(txtpnFullTextDir.isVisible()){
 					txtpnFullTextDir.setVisible(false);
+					btnFullTextDirections.setText("Show Full Text Directions");
 				}
-				else
+				else{
 					txtpnFullTextDir.setVisible(true);
+					btnFullTextDirections.setText("Hide Full Text Directions");
+				}
 			}
 		});
 
@@ -488,9 +487,9 @@ public class GUI{
 					windowScale += 1;
 
 				g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
-
-
+				
 				if (showRoute && route != null){
+
 					// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)
 					// Draw lines for all points up to current point, use nextColor (same color as "Next" button)
 					g.setColor(nextColor);
@@ -504,6 +503,12 @@ public class GUI{
 						g.setColor(currentColor);
 						g2.drawLine(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY(), finalDir.get(textPos).getDestination().getLocX(), finalDir.get(textPos).getDestination().getLocY());
 						g2.setStroke(new BasicStroke(3));
+						// Prints a rectangle indicating where the user currently is, needs refinement
+						g.setColor(Color.MAGENTA);
+						g.fillRect(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY() - 20, 65, 15);
+						g.setColor(Color.BLACK);
+						g.drawRect(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY() - 20, 65, 15);
+						g.drawString("You are Here", finalDir.get(textPos).getOrigin().getLocX() + 2, finalDir.get(textPos).getOrigin().getLocY() - 10);
 					}
 
 					// Draw lines for all points until the end, use previousColor (same color as "Previous" button)
@@ -511,6 +516,19 @@ public class GUI{
 					for (int i = textPos + 1; i < finalDir.size(); i++){
 						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
 					}
+					
+					// Draws ovals with black borders at each of the points along the path, needs to use an offset
+					for (int i = 0; i < finalDir.size(); i++){
+						g.setColor(Color.ORANGE);
+						g.fillOval(finalDir.get(i).getOrigin().getLocX() - 6, finalDir.get(i).getOrigin().getLocY() -6, 12, 12);
+						g.setColor(Color.BLACK);
+						g.drawOval(finalDir.get(i).getOrigin().getLocX() - 6, finalDir.get(i).getOrigin().getLocY() -6, 12, 12);						
+					}
+					// Draws final oval in path
+					g.setColor(Color.ORANGE);
+					g.fillOval(finalDir.get(finalDir.size()-1).getDestination().getLocX() - 6, finalDir.get(finalDir.size()-1).getDestination().getLocY() -6, 12, 12);
+					g.setColor(Color.BLACK);
+					g.drawOval(finalDir.get(finalDir.size()-1).getDestination().getLocX() - 6, finalDir.get(finalDir.size()-1).getDestination().getLocY() -6, 12, 12);	
 				}
 			}
 		}

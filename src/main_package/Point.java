@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Point {
 	private String id;
+	private int mapId;
 	private String name;
 	private int index;
 	private int locX;
@@ -107,9 +108,7 @@ public class Point {
 	}
 	public void setEdges(ArrayList<Edge> edges) {
 		this.edges = edges;
-	}
-	public int getNumberEdges() {
-		return edges.size();
+		this.numberEdges = edges.size();
 	}
 	//adds one edge
 	public void addEdge(Edge addMe){
@@ -154,5 +153,13 @@ public class Point {
 	}
 	public void setIndex(int index) {
 		this.index = index;
+	}
+	public int getMapId()
+	{
+		return this.mapId;
+	}
+	public void setMapId(int mapId)
+	{
+		this.mapId = mapId;
 	}
 }

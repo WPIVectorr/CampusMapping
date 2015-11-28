@@ -16,7 +16,8 @@ public class Point {
 	{
 		
 	}
-	//TODO UPdate Constructors
+	
+	
 	public Point(String id, String name, int x, int y) {
 		this.id = id;
 		this.name = name;
@@ -35,6 +36,28 @@ public class Point {
 		this.numberEdges = numberEdges;
 		this.globX = x;
 		this.globY = y;
+	}
+	
+	
+	//TODO UPdate Constructors
+	public Point(String id, String name, int x, int y, int globX, int globY) {
+		this.id = id;
+		this.name = name;
+		this.locX = x;
+		this.locY = y;
+		this.numberEdges = 0;
+		this.globX = globX;
+		this.globY = globY;
+	}
+	
+	public Point(String id, String name, int x, int y, int globX, int globY, int numberEdges) {
+		this.id = id;
+		this.name = name;
+		this.locX = x;
+		this.locY = y;
+		this.numberEdges = numberEdges;
+		this.globX = globX;
+		this.globY = globY;
 	}
 	
 	

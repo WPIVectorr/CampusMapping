@@ -425,9 +425,9 @@ public class MapUpdaterGUI extends JFrame {
 					Point storePoint = pointArray.get(i);
 					System.out.println("currentmap's currentPoint's id:"+currentMap.getMapId());
 					storePoint.setID((String)(currentMap.getMapId() + "." + i));				
-
+					
 					Point newPoint = new Point(storePoint.getId(), storePoint.getName(),
-							storePoint.getLocX(), storePoint.getLocY());
+							storePoint.getLocX(), storePoint.getLocY(), storePoint.getGlobX(), storePoint.getGlobY());
 					System.out.println("Storing point in:"+currentMap.getMapName());
 					try {
 						ServerDB.insertPoint(currentMap, newPoint);
@@ -569,8 +569,33 @@ public class MapUpdaterGUI extends JFrame {
 				if (getRadButton() == 1) // if addpoint
 				{
 					Integer arraySize = pointArray.size();
+					//Converts local coordinates to global coordinates accounting for rotation
+					
+					double ourRotation = currentMap.getRotationAngle();
+					ourRotation = 2 * Math.PI - ourRotation;
+					
+					double globalMapWidth = 
+					double globalMapHeight = 
+					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight());
+					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight());
+					double tempPreRotateX = lastMousex;
+					double tempPreRotateY = lastMousey;
+					
+					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
+					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
+					tempPreRotateX = tempPreRotateX/img.getWidth() * 
+					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
+					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+					
+					
+					
+					int finalGlobX = (int) Math.round(rotateX + (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2);
+					int finalGlobY = (int) Math.round(rotateY + (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2);
+					
+					
+					
 					Point point = new Point((String)(currentMap.getMapId() + "."+ arraySize), 
-							"Point " + arraySize.toString(), lastMousex, lastMousey, numEdges);
+							"Point " + arraySize.toString(), lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){

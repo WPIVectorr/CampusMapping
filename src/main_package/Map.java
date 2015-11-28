@@ -13,6 +13,8 @@ public class Map {
 	private double xBotRight;
 	private double yBotRight;
 	private double rotationAngle;
+	private double width;
+	private double height;
 	private int pointIDIndex = 0;
 	
 	/*
@@ -32,7 +34,10 @@ public class Map {
 		this.mapName = mapName;
 		this.xTopLeft = xTopLeft;
 		this.yTopLeft = yTopLeft;
+		
 		this.rotationAngle = rotationAngle;
+		
+		
 	}
 	
 	public Map (ArrayList<Point> points, int mapId, String mapName, int xTopLeft, int yTopLeft, double rotationAngle)

@@ -605,6 +605,9 @@ public class ServerDB {
 			String newPtName;
 			int newPtX;
 			int newPtY;
+			asdsdfsdfdsfdsfsdfs;
+			int newPtGlobX;//NEED ALEXI TO CHECK THIS PART. HOW DO?
+			int newPtGlobY;
 			int newPtNumberEdges;
 			ArrayList<Edge> newPtEdges = new ArrayList<Edge>();
 
@@ -618,6 +621,8 @@ public class ServerDB {
 				newPtName = rs.getString("name");
 				newPtX = rs.getInt("x");
 				newPtY = rs.getInt("y");
+				newPtGlobX = rs.getInt("globX");//GLOBAL X AND Y VALUES
+				newPtGlobY = rs.getInt("globY");
 				newPtNumberEdges = rs.getInt("numEdges");
 				newPtEdges = new ArrayList<Edge>();
 
@@ -647,7 +652,7 @@ public class ServerDB {
 					}
 				}
 
-				Point newPt = new Point(newPtId, newPtName, newPtX, newPtY, newPtNumberEdges);
+				Point newPt = new Point(newPtId, newPtName, newPtX, newPtY, newPtGlobX, newPtGlobY, newPtNumberEdges);
 				newPt.setEdges(newPtEdges);
 				retArray.add(newPt);
 			}

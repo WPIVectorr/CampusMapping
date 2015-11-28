@@ -574,8 +574,8 @@ public class MapUpdaterGUI extends JFrame {
 					double ourRotation = currentMap.getRotationAngle();
 					ourRotation = 2 * Math.PI - ourRotation;
 					
-					double globalMapWidth = 
-					double globalMapHeight = 
+					double globalMapWidth;
+					double globalMapHeight; 
 					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight());
 					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight());
 					double tempPreRotateX = lastMousex;
@@ -583,7 +583,7 @@ public class MapUpdaterGUI extends JFrame {
 					
 					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
 					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
-					tempPreRotateX = tempPreRotateX/img.getWidth() * 
+					//tempPreRotateX = tempPreRotateX/img.getWidth() * 
 					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
 					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
 					

@@ -605,7 +605,7 @@ public class ServerDB {
 			String newPtName;
 			int newPtX;
 			int newPtY;
-			asdsdfsdfdsfdsfsdfs;
+			
 			int newPtGlobX;//NEED ALEXI TO CHECK THIS PART. HOW DO?
 			int newPtGlobY;
 			int newPtNumberEdges;

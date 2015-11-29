@@ -579,8 +579,7 @@ public class MapUpdaterGUI{
 				{
 					Integer arraySize = pointArray.size();
 					System.out.println(currentMap.getMapId());
-					Point point = new Point((String)(currentMap.getMapId() + "."+ arraySize), 
-							"Point " + arraySize.toString(), lastMousex, lastMousey, numEdges);
+					Point point = new Point( "Point " + arraySize.toString(), lastMousex, lastMousey); //TODO BRIAAAAAANNN Please deal with the global x/y
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){
@@ -640,9 +639,9 @@ public class MapUpdaterGUI{
 										currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
 										System.out.println("Current Edge is: " + currentEdge.getId());
 										edgeArray.add(currentEdge);
-										if (currentPoint.getNumberEdges() > 0)//this has to be caught in an exception later
+										if (currentPoint.getNumEdges() > 0)//this has to be caught in an exception later
 										{
-											for (int j = 0; j < currentPoint.getNumberEdges(); j++) {
+											for (int j = 0; j < currentPoint.getNumEdges(); j++) {
 												System.out.println("Adding clicked edge between: "
 														+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
 														+ currentPoint.getEdges().get(j).getPoint2().getName());

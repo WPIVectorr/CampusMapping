@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Point {
 	private String id;
+	private int mapId;
 	private String name;
 	private int index;
 	private int locX;
@@ -29,15 +30,37 @@ public class Point {
 		this.globY = y;
 	}
 	
-	public Point(String id, String name, int x, int y, int numberEdges) {
-		this.id = id;
+	public Point(String name, int x, int y) {
+		this.id = null;
 		this.name = name;
 		this.locX = x;
 		this.locY = y;
-		this.numberEdges = numberEdges;
+		this.numberEdges = 0;
 		this.index = 0;
 		this.globX = x;
 		this.globY = y;
+	}
+	
+	public Point(String name, int locX, int locY, int globX, int globY) {
+		this.id = null;
+		this.name = name;
+		this.locX = locX;
+		this.locY = locY;
+		this.numberEdges = 0;
+		this.index = 0;
+		this.globX = globX;
+		this.globY = globY;
+	}
+	
+	public Point(String id, String name, int locX, int locY, int globX, int globY, int numberEdges) {
+		this.id = id;
+		this.name = name;
+		this.locX = locX;
+		this.locY = locY;
+		this.numberEdges = numberEdges;
+		this.index = 0;
+		this.globX = globX;
+		this.globY = globY;
 	}
 	
 	public Point(String id, String name, int index, int x, int y, int numberEdges) {
@@ -51,10 +74,10 @@ public class Point {
 		this.globY = y;
 	}
 	
-	
 	public String getId() {
 		return id;
 	}
+	
 	public void setID(String x){
 		int j = 0;
 		int oldIdLength = this.id.length();
@@ -69,6 +92,7 @@ public class Point {
 		}
 		this.id = x;
 	}
+	
 	public String getName()
 	{
 		return this.name;
@@ -106,9 +130,7 @@ public class Point {
 	}
 	public void setEdges(ArrayList<Edge> edges) {
 		this.edges = edges;
-	}
-	public int getNumberEdges() {
-		return edges.size();
+		this.numberEdges = edges.size();
 	}
 	//adds one edge
 	public void addEdge(Edge addMe){
@@ -153,5 +175,13 @@ public class Point {
 	}
 	public void setIndex(int index) {
 		this.index = index;
+	}
+	public int getMapId()
+	{
+		return this.mapId;
+	}
+	public void setMapId(int mapId)
+	{
+		this.mapId = mapId;
 	}
 }

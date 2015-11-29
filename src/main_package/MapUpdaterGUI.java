@@ -578,8 +578,9 @@ public class MapUpdaterGUI{
 				if (getRadButton() == 1) // if addpoint
 				{
 					Integer arraySize = pointArray.size();
-					System.out.println(currentMap.getMapId());
-					Point point = new Point( "Point " + arraySize.toString(), lastMousex, lastMousey); //TODO BRIAAAAAANNN Please deal with the global x/y
+					Point point = new Point(currentMap.getNewPointID(), 
+							"Point " + arraySize.toString(), currentMap.getPointIDIndex(), lastMousex, lastMousey); 
+					//TODO BRIAAAAAANNN Please deal with the global x/y
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){
@@ -589,6 +590,7 @@ public class MapUpdaterGUI{
 					if(shouldAdd){
 						pointArray.add(point);
 					}
+					//System.out.println("add point to map: "+currentMap.getMapId()+" Point Array size: "+pointArray.size());
 					repaint();
 				}
 			}

@@ -59,9 +59,10 @@ public class ServerDB {
 
 	public static void main (String args[])
 	{
-		tryCreateDB();
+		clearDatabase();
+		//tryCreateDB();
 		conn = connect();
-		testDB();
+		//testDB();
 		System.out.println("Done testing");
 	}
 

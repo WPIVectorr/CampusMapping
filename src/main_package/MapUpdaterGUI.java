@@ -57,6 +57,9 @@ public class MapUpdaterGUI{
 	private static JRadioButton rdbtnAddPoints;
 	private static JRadioButton rdbtnEditPoints;
 	private static JRadioButton rdbtnRemovePoints;
+	
+	//---------------------------------
+	private static boolean DEBUG = true;
 
 	String point1;
 	String point2;
@@ -149,7 +152,8 @@ public class MapUpdaterGUI{
 							for(int j = 0; j < pointArray.size(); j++){
 								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
 								for(int k = 0; k < tmpEdges.size(); k++){
-									System.out.println(tmpEdges.get(k).getId());
+									if (DEBUG)
+										System.out.println(tmpEdges.get(k).getId());
 									edgeArray.add(tmpEdges.get(k));
 								}
 							}
@@ -574,9 +578,9 @@ public class MapUpdaterGUI{
 				if (getRadButton() == 1) // if addpoint
 				{
 					Integer arraySize = pointArray.size();
-					System.out.println(currentMap.getMapId());
-					Point point = new Point((String)(currentMap.getMapId() + "."+ arraySize), 
-							"Point " + arraySize.toString(), lastMousex, lastMousey, numEdges);
+					Point point = new Point(currentMap.getNewPointID(), 
+							"Point " + arraySize.toString(), currentMap.getPointIDIndex(), lastMousex, lastMousey); 
+					//TODO BRIAAAAAANNN Please deal with the global x/y
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){
@@ -586,6 +590,7 @@ public class MapUpdaterGUI{
 					if(shouldAdd){
 						pointArray.add(point);
 					}
+					//System.out.println("add point to map: "+currentMap.getMapId()+" Point Array size: "+pointArray.size());
 					repaint();
 				}
 			}
@@ -636,9 +641,9 @@ public class MapUpdaterGUI{
 										currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
 										System.out.println("Current Edge is: " + currentEdge.getId());
 										edgeArray.add(currentEdge);
-										if (currentPoint.getNumberEdges() > 0)//this has to be caught in an exception later
+										if (currentPoint.getNumEdges() > 0)//this has to be caught in an exception later
 										{
-											for (int j = 0; j < currentPoint.getNumberEdges(); j++) {
+											for (int j = 0; j < currentPoint.getNumEdges(); j++) {
 												System.out.println("Adding clicked edge between: "
 														+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
 														+ currentPoint.getEdges().get(j).getPoint2().getName());

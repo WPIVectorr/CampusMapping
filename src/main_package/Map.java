@@ -225,15 +225,4 @@ public class Map {
 		return retVal;
 	}
 	
-	public Point assignNewPointID(Point pt)
-	{
-		int index = getNewPointIndex();
-		String newID = "";
-		newID+=this.mapId;
-		newID+=".";
-		newID+=index;
-		pt.setID(newID);
-		pt.setIndex(index);
-		return pt;
-	}
 }

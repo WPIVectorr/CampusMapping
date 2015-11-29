@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import javafx.scene.shape.*;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Box;
@@ -24,11 +25,10 @@ import database.InsertFailureException;
 import database.ServerDB;
 import database.NoMapException;
 
-public class MapUpdaterGUI extends JFrame {
+public class MapUpdaterGUI{
 
 	private int lastMousex, lastMousey;
 	private int pointSize = 5;
-	private static int pointCountId = 0;
 	private boolean newClick = false;
 	private boolean editingPoint = false;
 	private boolean addingMap = false;
@@ -49,66 +49,41 @@ public class MapUpdaterGUI extends JFrame {
 	private int windowSizeX = 932;
 	private int windowSizeY = 778;
 
-	BufferedImage img ;
+	private BufferedImage img = null;
 	// ---------------------------------
 
-	private JPanel contentPane;
 	private static JButton btnSaveMap;
 	private static JButton btnSavePoint;
 	private static JRadioButton rdbtnAddPoints;
 	private static JRadioButton rdbtnEditPoints;
 	private static JRadioButton rdbtnRemovePoints;
 
-	// drop down menu of buildings on campus
-	String buildings[] = { "Select Building", "Atwater Kent", "Boynton Hall", "Campus Center", "Gordon Library",
-			"Higgins House", "Project Center", "Stratton Hall" };
-
-	// drop down menu of room numbers based off of the building selected on
-	// campus
-	String rooms[] = { "Select room #", "Please choose building first" };
-	String[] akRooms = { "Select room #", "10", "20", "30", "40" };
-	String[] bhRooms = { "Select room #", "11", "21", "31", "41" };
-	String[] ccRooms = { "Select room #", "12", "22", "32", "42" };
-	String[] glRooms = { "Select room #", "13", "23", "33", "43" };
-	String[] hhRooms = { "Select room #", "14", "24", "34", "44" };
-	String[] pcRooms = { "Select room #", "15", "25", "35", "45" };
-	String[] shRooms = { "Select room #", "16", "26", "36", "46" };
-
-	int[][] coordTest1 = { { 30, 30 }, { 100, 300 }, { 800, 300 }, { 100, 200 } };
-	int[][] coordTest2 = { { 500, 500 }, { 300, 100 }, { 800, 500 }, { 100, 200 } };
-	int[][] coordTest3 = { { 400, 200 }, { 50, 30 }, { 8, 300 }, { 10, 20 } };
-
 	String point1;
 	String point2;
 	String point3;
 	String point4;
-	private boolean showRoute;
-	private boolean showRoute2;
-	private boolean showRoute3;
 	private JTextField roomNumber;
-	private JTextField txtStartingLocation;
-	private JTextField txtDestination;
 	private JPanel buttonPanel;
-	private DrawRoute drawPanel = new DrawRoute();
+	private DrawPanel drawPanel = new DrawPanel();
 	private JTextField mapName;
-	private JButton btnNewButton;
 	private JTextField txtImageDirectoryPath;
 	private JComboBox mapDropDown;
-	private JButton btnNewButton_1;
 	private File mapToAdd;
 	private JSplitPane splitPane;
-	private JSplitPane splitPane_1;
-	private JToggleButton tglbtnNewToggleButton;
 	private Boolean pathMode = false;
 
-	public MapUpdaterGUI() throws IOException {
-		super("MapUpdaterGUI");
-		setSize(932, 778);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	private JFrame frame = new JFrame("Map Updater");
+
+	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
+
+		frame.setSize(932, 778);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setBackground(new Color(255, 235, 205));
 
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridLayout(4, 0, 10, 10));
 		buttonPanel.setBackground(new Color(255, 235, 205));
+		Color buttonColor = new Color(153, 204, 255);
 
 		// Map Drop Down List
 		mapDropDown = new JComboBox();
@@ -127,8 +102,6 @@ public class MapUpdaterGUI extends JFrame {
 		// displayed in the
 		// drop-down menu for selecting a map
 		File[] imgList = vectorMapDir.listFiles();
-		String tempMapName;
-		int nameLength = 0;
 		for (int f = 0; f < imgList.length; f++) {
 			/*
 			 * tempMapName = imgList[f].getName(); nameLength =
@@ -211,14 +184,14 @@ public class MapUpdaterGUI extends JFrame {
 					pointArray.clear();
 					edgeArray.clear();
 				}
-				repaint();
+				frame.repaint();
 			}
 		});
 		// List that stores the name of every Map in the database
 
 		// mapList.add("Select Map");
 
-		Container contentPane = this.getContentPane();
+		Container contentPane = frame.getContentPane();
 		contentPane.add(buttonPanel, BorderLayout.NORTH);
 
 		// adds the starting location label to the line with starting location
@@ -254,7 +227,7 @@ public class MapUpdaterGUI extends JFrame {
 
 		/* JButton Add Map */
 
-		getContentPane().add(drawPanel);
+		contentPane.add(drawPanel);
 		txtImageDirectoryPath = new JTextField();
 		txtImageDirectoryPath.setText("Map Image Directory Path");
 		buttonPanel.add(txtImageDirectoryPath);
@@ -294,7 +267,7 @@ public class MapUpdaterGUI extends JFrame {
 		splitPane = new JSplitPane();
 		buttonPanel.add(splitPane);
 
-		JButton findMapFile = new JButton("Add Map From File");
+		GradientButton findMapFile = new GradientButton("Add Map From File", buttonColor);
 		splitPane.setLeftComponent(findMapFile);
 		findMapFile.addActionListener(new ActionListener() {
 
@@ -314,7 +287,7 @@ public class MapUpdaterGUI extends JFrame {
 			}
 		});
 
-		JButton btnAddMap = new JButton("Add Map");
+		GradientButton btnAddMap = new GradientButton("Add Map", buttonColor);
 		splitPane.setRightComponent(btnAddMap);
 
 		btnAddMap.addActionListener(new ActionListener() {
@@ -419,12 +392,12 @@ public class MapUpdaterGUI extends JFrame {
 		});
 
 
-		btnSavePoint = new JButton("No Point Selected");
+		btnSavePoint = new GradientButton("No Point Selected", buttonColor);
 		buttonPanel.add(btnSavePoint);
-		btnSaveMap = new JButton("Save Map"); // defined above to change text in
+		btnSaveMap = new GradientButton("Save Map", buttonColor); // defined above to change text in
 		// point selector
 		buttonPanel.add(btnSaveMap);
-		getContentPane().add(drawPanel);
+		contentPane.add(drawPanel);
 
 		btnSavePoint.addActionListener(new ActionListener() {
 
@@ -484,7 +457,8 @@ public class MapUpdaterGUI extends JFrame {
 				}
 			}
 		});
-
+		// Show the frame after everything has been initalized
+		frame.setVisible(true);
 	}
 
 	/*
@@ -502,35 +476,33 @@ public class MapUpdaterGUI extends JFrame {
 		return activeButton;
 	}
 
-	// assigns the selected building name to have the string of room
-	// numbers based off of the building selected
-	public String[] generateRoomNums(String select) {
-		switch (select) {
-		case "Atwater Kent":
-			return akRooms;
-		case "Boynton Hall":
-			return bhRooms;
-		case "Campus Center":
-			return ccRooms;
-		case "Gordon Library":
-			return glRooms;
-		case "Higgins House":
-			return hhRooms;
-		case "Project Center":
-			return pcRooms;
-		case "Stratton Hall":
-			return shRooms;
+	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException {
+
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException
+				| IllegalAccessException | UnsupportedLookAndFeelException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-		return rooms;
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				MapUpdaterGUI mapUpdater = new MapUpdaterGUI();
+				try {
+					mapUpdater.createAndShowGUI();
+				} catch (IOException | AlreadyExistsException | SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
-	public static void main(String[] args) throws IOException {
-		MapUpdaterGUI myTest = new MapUpdaterGUI();
-		myTest.setVisible(true);
 
-	}
 
-	class DrawRoute extends JPanel {
+	class DrawPanel extends JPanel {
 
 		ArrayList<Point> paintArray = new ArrayList<Point>(); // arraylist of
 		// points
@@ -735,10 +707,11 @@ public class MapUpdaterGUI extends JFrame {
 			}*/
 
 			newClick = false;
-
 		}
 
 	}
+
+
 
 	/*
 	 * Takes an input file directory path and a target directory path and copies
@@ -781,4 +754,5 @@ public class MapUpdaterGUI extends JFrame {
 		}
 		return null;
 	}
+
 }

@@ -532,7 +532,7 @@ public class ServerDB {
 		}
 	}
 
-	public static boolean removePoint (Point pt)
+	public static void removePoint (Point pt) throws DoesNotExistException
 	{
 		//------------------------------------------------------Remove Edges from DB---------------------------------------------------------
 		
@@ -541,8 +541,8 @@ public class ServerDB {
 		for (j = edges.size(); j > 0; j--)
 		{
 			try {
-				System.out.println("REMOVING EDGE:"+edges.get(j).getID());
-				removeEdge(edges.get(j));
+				System.out.println("REMOVING EDGE:"+edges.get(j-1).getID());
+				removeEdge(edges.get(j-1));
 			} catch (DoesNotExistException e) {
 				e.printStackTrace();
 			}
@@ -552,20 +552,41 @@ public class ServerDB {
 		System.out.println("Number of edges after retrieval:"+edges.size());
 		
 		//------------------------------------------------------Remove point from DB----------------------------------------------------------
-		
-		
+		String ptId = pt.getId();
+		conn = connect();
+		boolean found = false;
+		Statement statement;
+		try {
+			statement = conn.createStatement();
+			statement.setQueryTimeout(5);  											// set timeout to 30 sec.
+			String tableName = "Map"+pt.getMapId()+"Points";
+			
+			ResultSet rs2 = conn.createStatement().executeQuery("SELECT * FROM "+tableName);
+			while (rs2.next())
+			{
+				if (rs2.getString("id").contentEquals(ptId))
+				{
+					found = true;
+					String deleteStatement = ("DELETE FROM "+tableName+" WHERE id = '"+ptId+"'");
+					int result = statement.executeUpdate(deleteStatement);
+					break;
+				}
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		if (found == false)
+		{
+			throw new DoesNotExistException("Could not find point in database");
+		}
 		//------------------------------------------------------Refresh local objects---------------------------------------------------------
 		try {
 			populateFromDatabase();
 		} catch (PopulateErrorException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		return false;
 	}
 	
 	public static void removeEdge(Edge edge) throws DoesNotExistException
@@ -590,7 +611,7 @@ public class ServerDB {
 				break;
 			}
 		}
-		if (found1 = false)																			//Make sure that edge was successfully found
+		if (found1 == false)																			//Make sure that edge was successfully found
 		{
 			throw new DoesNotExistException("Could not find edge in first point");
 		} else																						//If so, update the point information in the database
@@ -612,7 +633,7 @@ public class ServerDB {
 				break;
 			}
 		}
-		if (found2 = false)																			//Make sure that the edge was successfully found
+		if (found2 == false)																			//Make sure that the edge was successfully found
 		{
 			throw new DoesNotExistException("Could not find edge in second point");
 		} else																						//If so, update the point information in the database
@@ -649,7 +670,7 @@ public class ServerDB {
 							break;
 						}
 					}
-					if (found3 = false)
+					if (found3 == false)
 					{
 						throw new DoesNotExistException("Could not find edge in table:"+tableName);
 					}
@@ -1252,21 +1273,18 @@ public class ServerDB {
 		try {
 			printDatabase(false, true, true);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("----------Removing edge e1----------");
 		try {
 			removeEdge(e1);
 		} catch (DoesNotExistException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Database after removing e1");
 		try {
 			printDatabase(true, true, true);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("--------------------Finished edge removal--------------------");
@@ -1275,16 +1293,18 @@ public class ServerDB {
 		try {
 			printDatabase(false, true, true);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("----------Removing point p2----------");
-		removePoint(p2);
+		try {
+			removePoint(p2);
+		} catch (DoesNotExistException e7) {
+			e7.printStackTrace();
+		}
 		System.out.println("Database after removing p2");
 		try {
 			printDatabase(true, true, true);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("--------------------Finished Point removal--------------------");

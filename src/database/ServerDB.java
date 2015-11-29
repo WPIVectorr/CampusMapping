@@ -16,8 +16,8 @@ import main_package.Point;
 
 public class ServerDB {
 	//------------------------------------------------------------Constants--------------------------------------------------------------------
-	private static String DATABASE_URL = "jdbc:mysql://campusmapping.c5bohpl1biax.us-west-2.rds.amazonaws.com:3306/";	
-	private static String DATABASE_NAME = "test_campusMapping_db";
+	private static String DATABASE_URL = "jdbc:mysql://testcm.c5bohpl1biax.us-west-2.rds.amazonaws.com:3306/";	
+	private static String DATABASE_NAME = "campusMapping_db";
 	private static String userName = "Vectorr";
 	private static String password = "mag";
 
@@ -62,8 +62,6 @@ public class ServerDB {
 		tryCreateDB();
 		conn = connect();
 		testDB();
-		//testInsert();
-		//testRetrieval();
 		System.out.println("Done testing");
 	}
 
@@ -466,8 +464,7 @@ public class ServerDB {
 		Statement statement = conn.createStatement();
 		statement.setQueryTimeout(5);  											// set timeout to 30 sec.
 		String tableName = "Map"+point.getMapId()+"Points";
-		ResultSet rs1 = conn.createStatement().executeQuery("SELECT table_name FROM information_schema.tables WHERE table_name = '"+tableName+"'");
-
+		
 		boolean found = false;
 		ResultSet rs2 = conn.createStatement().executeQuery("SELECT * FROM "+tableName);
 		while (rs2.next())
@@ -475,7 +472,7 @@ public class ServerDB {
 			if (rs2.getString("id").contentEquals(ptId))
 			{
 				found = true;
-				String updateStatement = ("UPDATE "+rs1.getString("table_name")+" SET ");
+				String updateStatement = ("UPDATE "+tableName+" SET ");
 				updateStatement += ("name ="+"'"+point.getName()+"'");										
 				updateStatement += ", ";
 				updateStatement += ("localIndex = "+ point.getIndex());
@@ -504,12 +501,12 @@ public class ServerDB {
 				}
 				updateStatement += ("idEdge"+(i+1)+" = "+"null");						//Formatting, last value must not have comma after it
 				updateStatement +=(" WHERE ID = "+ptId);
-				System.out.println(updateStatement);
 				statement.executeUpdate(updateStatement);								//Insert data
 				if (DEBUG)
 					System.out.println("Sucessfully updated point:"+ptId+" in database");
 			}
 		}
+		rs2.close();
 		conn.close();
 		if (found == false)
 		{

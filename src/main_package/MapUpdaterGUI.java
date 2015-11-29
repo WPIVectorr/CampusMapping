@@ -171,7 +171,7 @@ public class MapUpdaterGUI extends JFrame {
 						{
 							currentMap = mapList.get(i);//Grab the current map at this position.
 							pointArray = currentMap.getPointList();//Populate the point array with all the points found.
-							System.out.println(mapList.size());
+							System.out.println("Map list size:"+mapList.size());
 
 							for(int j = 0; j < pointArray.size(); j++){
 								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();

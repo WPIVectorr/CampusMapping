@@ -532,12 +532,29 @@ public class ServerDB {
 		}
 	}
 
-	public boolean removePoint (Point pt)
+	public static boolean removePoint (Point pt)
 	{
 		//------------------------------------------------------Remove Edges from DB---------------------------------------------------------
 		
+		ArrayList<Edge> edges = pt.getEdges();
+		int j =0;
+		for (j = 0; j < edges.size(); j++)
+		{
+			try {
+				System.out.println("REMOVING EDGE:"+edges.get(j).getID());
+				removeEdge(edges.get(j));
+			} catch (DoesNotExistException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		edges = pt.getEdges();
+		System.out.println("Number of edges after retrieval:"+edges.size());
+		
 		//------------------------------------------------------Remove point from DB----------------------------------------------------------
 		
+		
+		//------------------------------------------------------Refresh local objects---------------------------------------------------------
 		try {
 			populateFromDatabase();
 		} catch (PopulateErrorException e) {
@@ -627,8 +644,8 @@ public class ServerDB {
 						if (rs2.getString("id").contentEquals(edge.getID()))
 						{
 							found3 = true;
-							String deleteStatement = ("DELETE FROM "+tableName+" WHERE id = "+edge.getID() + " LIMIT 1");
-							conn.createStatement().executeUpdate(deleteStatement);
+							String deleteStatement = ("DELETE FROM "+tableName+" WHERE id = '"+edge.getID()+"'");
+							int x = conn.createStatement().executeUpdate(deleteStatement);
 							break;
 						}
 					}
@@ -1233,7 +1250,7 @@ public class ServerDB {
 		System.out.println("--------------------Testing edge removal--------------------");
 		System.out.println("Database before removing edge e1");
 		try {
-			printDatabase(true, true, true);
+			printDatabase(false, true, true);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1253,6 +1270,24 @@ public class ServerDB {
 			e.printStackTrace();
 		}
 		System.out.println("--------------------Finished edge removal--------------------");
+		System.out.println("--------------------Testing Point removal--------------------");
+		System.out.println("Database before removing point p2");
+		try {
+			printDatabase(false, true, true);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("----------Removing point p2----------");
+		removePoint(p2);
+		System.out.println("Database after removing p2");
+		try {
+			printDatabase(true, true, true);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("--------------------Finished Point removal--------------------");
 	}
 
 	public static void testRetrieval()

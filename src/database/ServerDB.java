@@ -58,7 +58,7 @@ public class ServerDB {
 
 	public static void main (String args[])
 	{
-		clearDatabase();
+		//clearDatabase();
 		//tryCreateDB();
 		conn = connect();
 		//testInsert();

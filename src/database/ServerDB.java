@@ -34,7 +34,7 @@ public class ServerDB {
 	private static String EDGE_SCHEMA = "id VARCHAR(30), idPoint1 VARCHAR(30), idPoint2 VARCHAR(30), weight INTEGER, isOutside BOOLEAN, isStairs INTEGER";
 	//-------------------------------------------------------------Variables-----------------------------------------------------------------------
 	private static Connection conn = null;
-	public final static boolean DEBUG = false;
+	public final static boolean DEBUG = true;
 
 	private static ArrayList<Map> allMaps = new ArrayList<Map>();
 	private static ArrayList<Point> allPoints = new ArrayList<Point>();
@@ -615,7 +615,7 @@ public class ServerDB {
 			statement = conn.createStatement();
 			statement.setQueryTimeout(5);  											// set timeout to 30 sec.
 
-			ResultSet rs1 = conn.createStatement().executeQuery("SELECT table_name FROM information_schema.tables WHERE table_name = "+EDGE_TABLE_NAME);
+			ResultSet rs1 = conn.createStatement().executeQuery("SELECT table_name FROM information_schema.tables WHERE table_name = '"+EDGE_TABLE_NAME+"'");
 			while (rs1.next())
 			{
 				if (rs1.getString("table_name").contentEquals(EDGE_TABLE_NAME))
@@ -1045,8 +1045,8 @@ public class ServerDB {
 							System.out.println("name = " + rs.getString("name"));
 							System.out.println("id = " + rs.getString("id"));
 							System.out.println("index = " + rs.getInt("localIndex"));
-							System.out.print("xCoord = " + rs.getInt("x"));
-							System.out.println(", yCoord = " + rs.getInt("y"));
+							System.out.print("LocalX = " + rs.getInt("locX"));
+							System.out.println("LocalY = " + rs.getInt("locY"));
 							System.out.println("numEdges = "+rs.getInt("numEdges"));
 						}
 						rs.close();

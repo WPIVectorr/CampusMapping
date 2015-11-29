@@ -2,18 +2,23 @@ package main_package;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import main_package.MapUpdaterGUI.UpdateMap;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import java.awt.Panel;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -24,20 +29,46 @@ public class MapInserterGUI extends JFrame{
 	private static int lastMousex = 0;
 	private static int lastMousey = 0;
 	private MapInsertion drawPanel = new MapInsertion();
+	private MapInserterGUIButtonPanel buttonPanel;
 	private ArrayList<Point> alignmentPoints;
 	private int cornerNum;
 	private int pointSize = 5;
 	private boolean remove =false;
 
 	public MapInserterGUI() {
-		// TODO Auto-generated constructor stub
 		super("MapInserterGUI");
+		try {
+			   // Set to cross-platform Java Look and Feel (also called "Metal")
+			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+			} catch (UnsupportedLookAndFeelException e) {
+			   e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+			   e.printStackTrace();
+			} catch (InstantiationException e) {
+			   e.printStackTrace();
+			} catch (IllegalAccessException e) {
+			   e.printStackTrace();
+			}
+		// TODO Auto-generated constructor stub
+		
 		setSize(932, 778);
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		Dimension screenSize = tk.getScreenSize();
+		int screenHeight = screenSize.height;
+		int screenWidth = screenSize.width;
+		setSize(screenWidth / 2, screenHeight / 2);
+		setLocation(screenWidth / 4, screenHeight / 4);
+		
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().add(drawPanel);
 		//getContentPane().setLayout(null);
+		MapInserterGUIButtonPanel buttonPanel = new MapInserterGUIButtonPanel(getLocation(),getSize());
+		buttonPanel.setVisible(true);
 
-
+    
+	
+	
 		cornerNum = 0;
 		alignmentPoints = new ArrayList<Point>();
 
@@ -104,7 +135,22 @@ public class MapInserterGUI extends JFrame{
 			newClick =false;
 		}	
 
-
+		private void setImage(){
+			
+			int answer = JOptionPane.showConfirmDialog(null, "Is the image aligned properly?",
+		            "Image Alignment", JOptionPane.YES_NO_OPTION);
+			
+			switch (answer) {
+			case 0:
+				//yes break and close image insterter
+				break;
+			case 1:
+				//no go back to inserter
+				break;
+			default:
+				break;
+			}
+		}
 
 
 		@Override

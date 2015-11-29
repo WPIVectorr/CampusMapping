@@ -103,6 +103,19 @@ public class MapUpdaterGUI extends JFrame {
 
 	public MapUpdaterGUI() throws IOException {
 		super("MapUpdaterGUI");
+		
+		try {
+			   // Set to cross-platform Java Look and Feel (also called "Metal")
+			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+			} catch (UnsupportedLookAndFeelException e) {
+			   e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+			   e.printStackTrace();
+			} catch (InstantiationException e) {
+			   e.printStackTrace();
+			} catch (IllegalAccessException e) {
+			   e.printStackTrace();
+			}
 		setSize(932, 778);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -265,7 +278,9 @@ public class MapUpdaterGUI extends JFrame {
 
 		JSplitPane splitPane_editPoints = new JSplitPane();
 		buttonPanel.add(splitPane_editPoints);
+		splitPane_editPoints.setEnabled( false );
 
+		
 		rdbtnEditPoints = new JRadioButton("Edit Points");
 		rdbtnEditPoints.setPreferredSize(new Dimension(125, 23));
 		rdbtnEditPoints.setHorizontalAlignment(SwingConstants.LEFT);
@@ -293,6 +308,7 @@ public class MapUpdaterGUI extends JFrame {
 
 		splitPane = new JSplitPane();
 		buttonPanel.add(splitPane);
+		splitPane.setEnabled( false );
 
 		JButton findMapFile = new JButton("Add Map From File");
 		splitPane.setLeftComponent(findMapFile);

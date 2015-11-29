@@ -30,28 +30,18 @@ public class Point {
 		this.globY = y;
 	}
 	
-	public Point(String name, int x, int y) {
-		this.id = null;
+	public Point(String id, String name, int index, int x, int y) {
+		this.id = id;
 		this.name = name;
 		this.locX = x;
 		this.locY = y;
 		this.numberEdges = 0;
-		this.index = 0;
+		this.index = index;
 		this.globX = x;
 		this.globY = y;
 	}
 	
-	public Point(String name, int locX, int locY, int globX, int globY) {
-		this.id = null;
-		this.name = name;
-		this.locX = locX;
-		this.locY = locY;
-		this.numberEdges = 0;
-		this.index = 0;
-		this.globX = globX;
-		this.globY = globY;
-	}
-	
+
 	public Point(String id, String name, int locX, int locY, int globX, int globY, int numberEdges) {
 		this.id = id;
 		this.name = name;

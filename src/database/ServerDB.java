@@ -538,7 +538,7 @@ public class ServerDB {
 		
 		ArrayList<Edge> edges = pt.getEdges();
 		int j =0;
-		for (j = 0; j < edges.size(); j++)
+		for (j = edges.size(); j > 0; j--)
 		{
 			try {
 				System.out.println("REMOVING EDGE:"+edges.get(j).getID());

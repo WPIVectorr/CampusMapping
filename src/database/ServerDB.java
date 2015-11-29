@@ -58,10 +58,11 @@ public class ServerDB {
 
 	public static void main (String args[])
 	{
-		tryCreateDB();
+		clearDatabase();
+		//tryCreateDB();
 		conn = connect();
-		testInsert();
-		testRetrieval();
+		//testInsert();
+		//testRetrieval();
 		System.out.println("Done testing");
 	}
 
@@ -566,7 +567,9 @@ public class ServerDB {
 		{
 			Map tempMap = allMaps.get(counter);
 			try {
-				tempMap.setPointList(getPointsFromServer(tempMap));
+				ArrayList<Point> points = getPointsFromServer(tempMap);
+				tempMap.setPointList(points);
+				System.out.println("Returning map:"+tempMap.getMapName()+" with "+points.size() + " points");
 			} catch (PopulateErrorException e) {
 				System.out.println("Failed to get points for map:"+allMaps.get(counter).getMapId());
 				e.printStackTrace();

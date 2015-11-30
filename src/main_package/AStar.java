@@ -16,7 +16,6 @@ public class AStar {
 		fscore.put(start.getId(), CostEstimate(start, end));
 		
 		Open.add(start); // Initialize Open
-		System.out.println("----------------------------open true in astar: " + !Open.isEmpty());
 		while(!Open.isEmpty()){
 			Point Current = Open.removeFirst(); // Working with lowest element in Open
 			if(Current.equals(end)){

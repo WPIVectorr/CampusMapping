@@ -26,7 +26,15 @@ public class Map {
 	}
 	*/
 	//TODO UPdate Constructors
-	public Map (int mapId, String mapName, int xTopLeft, int yTopLeft, double rotationAngle)
+	public Map (int mapId, String mapName)
+	{
+		this.mapId = mapId;
+		this.mapName = mapName;
+		this.numPoints = 0;
+		this.Points = new ArrayList<Point>();
+	}
+	
+	public Map (int mapId, String mapName, double xTopLeft, double yTopLeft, double rotationAngle)
 	{
 		this.Points = new ArrayList<Point>();
 		this.mapId = mapId;
@@ -38,9 +46,11 @@ public class Map {
 		this.rotationAngle = rotationAngle;
 		
 		
+		
+		
 	}
 	
-	public Map (ArrayList<Point> points, int mapId, String mapName, int xTopLeft, int yTopLeft, double rotationAngle)
+	public Map (ArrayList<Point> points, int mapId, String mapName, double xTopLeft, double yTopLeft, double rotationAngle)
 	{
 		this.Points = points;
 		this.mapId = mapId;
@@ -51,6 +61,43 @@ public class Map {
 		this.rotationAngle = rotationAngle;
 	}
 	
+	public Map (int mapId, String mapName, double xTopLeft, double yTopLeft, double xBotRight, double yBotRight, double rotationAngle, int pointIDIndex)
+	{
+		this.Points = new ArrayList<Point>();
+		this.mapId = mapId;
+		this.numPoints = 0;
+		this.mapName = mapName;
+		this.xTopLeft = xTopLeft;
+		this.yTopLeft = yTopLeft;
+		this.xBotRight = xBotRight;
+		this.yBotRight = yBotRight;
+		this.rotationAngle = rotationAngle;
+		this.pointIDIndex = pointIDIndex;
+		double ourRotate = (Math.PI * 2) - rotationAngle;
+		double xTopLeftDeRotate = xTopLeft * Math.cos(ourRotate) - yTopLeft * Math.sin(ourRotate);
+		double xBotRightDeRotate = xBotRight * Math.cos(ourRotate) - yBotRight * Math.sin(ourRotate);
+		this.width = Math.abs(xTopLeftDeRotate - xBotRightDeRotate);
+		
+		double yTopLeftDeRotate = yTopLeft * Math.cos(ourRotate) + xTopLeft * Math.sin(ourRotate);
+		double yBotRightDeRotate = yBotRight * Math.cos(ourRotate) + xBotRight * Math.sin(ourRotate);
+		this.height = Math.abs(yTopLeftDeRotate - yBotRightDeRotate);
+	}
+	public double getWidth() {
+		return width;
+	}
+
+	public double getHeight() {
+		return height;
+	}
+
+	public void setWidth(double width) {
+		this.width = width;
+	}
+
+	public void setHeight(double height) {
+		this.height = height;
+	}
+
 	public ArrayList<Point> getPoints() {
 		return Points;
 	}
@@ -114,16 +161,19 @@ public class Map {
 	public void setRotationAngle(double rotationAngle) {
 		this.rotationAngle = rotationAngle;
 	}
-
-	public Map (int mapId, String mapName)
-	{
-		this.mapId = mapId;
-		this.mapName = mapName;
-		this.numPoints = 0;
-	}
 	
 	public boolean addPoint(Point a){
-		Points.add(a);
+		if (a == null)
+		{
+			System.out.println("Point to add is null");
+			return false;
+		}
+		if (this.Points == null)
+		{
+			System.out.println("Current point list is null");
+			return false;
+		}
+		this.Points.add(a);
 		numPoints++;
 		pointIDIndex++;
 		int j = 0;
@@ -134,6 +184,10 @@ public class Map {
 			{
 				added = true;
 			}
+		}
+		if (this.Points == null)
+		{
+			System.out.println("STILL NULL AHSJDHBLASHDLASD");
 		}
 		if (added)
 			return true;
@@ -166,5 +220,51 @@ public class Map {
 	}
 	public int getPointIDIndex(){
 		return pointIDIndex;
+	}
+	
+	public void printMap()
+	{
+		System.out.println("--------------------Printing Map:"+this.mapName+"--------------------");
+		System.out.println("Map id:" + this.mapId);
+		System.out.println("xTopLeft:"+this.xTopLeft);
+		System.out.println("yTopLeft:"+this.yTopLeft);
+		System.out.println("xBotRight:"+this.xBotRight);
+		System.out.println("yBotRight:"+this.yBotRight);
+		System.out.println("rotation angle:"+this.rotationAngle);
+		System.out.println("pointIDindex:"+this.pointIDIndex);
+		System.out.println("numPoints:"+this.numPoints);
+		int j = 0;
+		for (j = 0; j < Points.size(); j++)
+		{
+			Points.get(j).print();
+		}
+	}
+	
+	public int getNewPointIndex()
+	{
+		this.pointIDIndex++;
+		return this.pointIDIndex;
+	}
+	
+	public String getNewPointID()
+	{
+		int index = getNewPointIndex();
+		String retVal = "";
+		retVal+=this.mapId;
+		retVal+=".";
+		retVal+=index;
+		return retVal;
+	}
+	
+	public Point assignNewPointID(Point pt)
+	{
+		int index = getNewPointIndex();
+		String newID = "";
+		newID+=this.mapId;
+		newID+=".";
+		newID+=index;
+		pt.setID(newID);
+		pt.setIndex(index);
+		return pt;
 	}
 }

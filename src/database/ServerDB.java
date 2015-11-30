@@ -465,7 +465,7 @@ public class ServerDB {
 		Statement statement = conn.createStatement();
 		statement.setQueryTimeout(5);  											// set timeout to 30 sec.
 		String tableName = "Map"+point.getMapId()+"Points";
-		
+		System.out.println("point mapId: "+point.getMapId());
 		boolean found = false;
 		ResultSet rs2 = conn.createStatement().executeQuery("SELECT * FROM "+tableName);
 		while (rs2.next())
@@ -501,7 +501,7 @@ public class ServerDB {
 					updateStatement += ", ";
 				}
 				updateStatement += ("idEdge"+(i+1)+" = "+"null");						//Formatting, last value must not have comma after it
-				updateStatement +=(" WHERE ID = "+ptId);
+				updateStatement +=(" WHERE ID = '"+ptId+"'");
 				statement.executeUpdate(updateStatement);								//Insert data
 				if (DEBUG)
 					System.out.println("Sucessfully updated point:"+ptId+" in database");

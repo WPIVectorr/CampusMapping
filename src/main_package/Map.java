@@ -220,7 +220,7 @@ public class Map {
 		int index = getNewPointIndex();
 		String retVal = "";
 		retVal+=this.mapId;
-		retVal+=".";
+		retVal+="_";
 		retVal+=index;
 		return retVal;
 	}

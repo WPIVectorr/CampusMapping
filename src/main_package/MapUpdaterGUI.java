@@ -57,6 +57,9 @@ public class MapUpdaterGUI{
 	private static JRadioButton rdbtnAddPoints;
 	private static JRadioButton rdbtnEditPoints;
 	private static JRadioButton rdbtnRemovePoints;
+	
+	//---------------------------------
+	private static boolean DEBUG = true;
 
 	String point1;
 	String point2;
@@ -170,7 +173,8 @@ public class MapUpdaterGUI{
 							for(int j = 0; j < pointArray.size(); j++){
 								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
 								for(int k = 0; k < tmpEdges.size(); k++){
-									System.out.println(tmpEdges.get(k).getId());
+									if (DEBUG)
+										System.out.println(tmpEdges.get(k).getId());
 									edgeArray.add(tmpEdges.get(k));
 								}
 							}
@@ -450,9 +454,7 @@ public class MapUpdaterGUI{
 			public void actionPerformed(ActionEvent e) {
 				for (int i = 0; i < pointArray.size(); i++) {
 					Point storePoint = pointArray.get(i);
-					System.out.println("currentmap's currentPoint's id:"+currentMap.getMapId());
-					storePoint.setID((String)(currentMap.getMapId() + "." + i));				
-
+					
 					Point newPoint = new Point(storePoint.getId(), storePoint.getName(),
 							storePoint.getLocX(), storePoint.getLocY());
 					System.out.println("Storing point in:"+currentMap.getMapName());
@@ -604,10 +606,30 @@ public class MapUpdaterGUI{
 				//System.out.println(newClick);
 				if (getRadButton() == 1) // if addpoint
 				{
-					Integer arraySize = pointArray.size();
-					System.out.println(currentMap.getMapId());
-					Point point = new Point((String)(currentMap.getMapId() + "."+ arraySize), 
-							"Point " + arraySize.toString(), lastMousex, lastMousey, numEdges);
+					Integer nameNumber = pointArray.size()+1;
+					double ourRotation = currentMap.getRotationAngle();
+					//ourRotation = 2 * Math.PI - ourRotation;
+					
+					
+					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;
+					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
+					double tempPreRotateX = lastMousex;
+					double tempPreRotateY = lastMousey;
+					
+					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
+					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
+					tempPreRotateX = (tempPreRotateX/img.getWidth()) * currentMap.getWidth();
+					tempPreRotateY = (tempPreRotateY/img.getHeight()) * currentMap.getHeight();
+					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
+					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+					
+					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
+					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
+				
+					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
+							"Point " + nameNumber.toString(), currentMap.getPointIDIndex(),
+							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
+
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){
@@ -617,6 +639,7 @@ public class MapUpdaterGUI{
 					if(shouldAdd){
 						pointArray.add(point);
 					}
+					//System.out.println("add point to map: "+currentMap.getMapId()+" Point Array size: "+pointArray.size());
 					repaint();
 				}
 			}
@@ -667,9 +690,9 @@ public class MapUpdaterGUI{
 										currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
 										System.out.println("Current Edge is: " + currentEdge.getId());
 										edgeArray.add(currentEdge);
-										if (currentPoint.getNumberEdges() > 0)//this has to be caught in an exception later
+										if (currentPoint.getNumEdges() > 0)//this has to be caught in an exception later
 										{
-											for (int j = 0; j < currentPoint.getNumberEdges(); j++) {
+											for (int j = 0; j < currentPoint.getNumEdges(); j++) {
 												System.out.println("Adding clicked edge between: "
 														+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
 														+ currentPoint.getEdges().get(j).getPoint2().getName());
@@ -709,7 +732,13 @@ public class MapUpdaterGUI{
 						for(int kj = 0; kj < markForDelete.get(j).getEdges().size(); kj++){
 							edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
 						}
+						/*try {
+							ServerDB.removePoint(markForDelete.get(j));
+						} catch (DoesNotExistException e1) {
+							System.out.println("Attempted to delete point that doesn;t exist in the database. Not an error");
+						}*/
 						markForDelete.get(j).deleteEdges();
+						pointArray.remove(markForDelete.get(j));
 						pointArray.remove(markForDelete.get(j));
 						markForDelete.remove(j);
 					}

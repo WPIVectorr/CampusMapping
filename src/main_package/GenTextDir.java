@@ -44,7 +44,7 @@ public class GenTextDir {
 				//System.out.println("Next point name: " + nextPoint.getName());
 				//The way this code works is first it moves all the points such that the current point
 				//sits at the origin.
-				prevPointX = prevPoint.getGlobX() - currPoint.getGlobX();
+				prevPointX = prevPoint.getGlobX() - currPoint.getGlobX();//THIS IS BECAUSE (0,0) IS THE TOP LEFT
 				prevPointY = currPoint.getGlobY() - prevPoint.getGlobY();
 
 				nextPointX = nextPoint.getGlobX() - currPoint.getGlobX();
@@ -72,12 +72,14 @@ public class GenTextDir {
 				} else {
 					if(prevPointX > 0){
 						angleRotate = Math.PI + Math.atan(Math.abs(prevPointX) / Math.abs(prevPointY));
-					} else if (prevPointX < 0){
+					} else if (prevPointX <= 0){
 						angleRotate = Math.PI - Math.atan(Math.abs(prevPointX) / Math.abs(prevPointY));
 					} else {
 						angleRotate = 0;
 					}
 				}
+				System.out.println("Previous Point X value at " + currPoint.getName() + " is: " + prevPointX);
+				System.out.println("Previous Point Y value at " + currPoint.getName() + " is: " + prevPointY);
 				if(DEBUG){//testing
 					System.out.println("Tan Value is: " + Math.atan(-1 / -1) * 4);
 					System.out.println("Angle of rotation is: " + angleRotate * 180 / Math.PI);
@@ -128,6 +130,14 @@ public class GenTextDir {
 				if(DEBUG){
 					System.out.println("Turn " + angle + " degrees");
 				}
+				System.out.println("Angle found at " + currPoint.getName() + " is: " + angle);
+				/*if(angle < 0){
+					if(nextPointX > 0){
+						nextPointX = -nextPointX;
+					}
+				}*/
+				System.out.println("Angle Rotate found at " + currPoint.getName() + " is " + angleRotate);
+				
 				angle = Math.abs(angle);//Set the angle equal to its absolute value (no turning - degrees)
 				String turnAmount;
 				//System.out.println("At " + currPoint.getName() + " the past angle rotate value is: " + (180 * angleRotate / Math.PI));
@@ -151,7 +161,7 @@ public class GenTextDir {
 						//System.out.println("angle at: " + currPoint.getName());
 					}
 					System.out.println("X found at " + currPoint.getName() + " is: " + nextPointX);
-					System.out.println("Angle found at " + currPoint.getName() + " is: " + angle);
+					
 					if(angle > 0 && angle < 60){
 						turnAmount = "slight left";
 					} else if(angle > 60 && angle < 120){
@@ -222,7 +232,7 @@ public class GenTextDir {
 			if(shouldAdd && directions.get(i).getTurn().equals("slight left")){
 				currDir = directions.get(i);
 				i++;
-				shouldAdd = false;
+				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
 				while(i < directions.size() && directions.get(i).isStraight()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
@@ -234,6 +244,7 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
+				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
 				while(i < directions.size() && directions.get(i).isStraight()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
@@ -245,6 +256,7 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
+				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
 				while(i < directions.size() && directions.get(i).isStraight()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
@@ -256,6 +268,7 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
+				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
 				while(i < directions.size() && directions.get(i).isStraight()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
@@ -267,6 +280,7 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
+				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
 				while(i < directions.size() && directions.get(i).isStraight()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
@@ -278,6 +292,7 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
+				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
 				while(i < directions.size() && directions.get(i).isStraight()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
@@ -291,6 +306,7 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
+				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
 				while(i < directions.size() && directions.get(i).isStraight()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());

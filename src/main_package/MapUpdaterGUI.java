@@ -576,9 +576,27 @@ public class MapUpdaterGUI{
 				if (getRadButton() == 1) // if addpoint
 				{
 					Integer arraySize = pointArray.size();
-					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
-							"Point " + arraySize.toString(), currentMap.getPointIDIndex(), lastMousex, lastMousey); 
-					//TODO BRIAAAAAANNN Please deal with the global x/y
+					double ourRotation = currentMap.getRotationAngle();
+					//ourRotation = 2 * Math.PI - ourRotation;
+					
+					
+					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;
+					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
+					double tempPreRotateX = lastMousex;
+					double tempPreRotateY = lastMousey;
+					
+					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
+					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
+					tempPreRotateX = (tempPreRotateX/img.getWidth()) * currentMap.getWidth();
+					tempPreRotateY = (tempPreRotateY/img.getHeight()) * currentMap.getHeight();
+					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
+					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+					
+					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
+					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
+				
+					Point point = new Point((String)(currentMap.getMapId() + "."+ arraySize), 
+							"Point " + arraySize.toString(), lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){

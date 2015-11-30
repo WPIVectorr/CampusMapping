@@ -162,14 +162,14 @@ public class MapInserterGUI extends JFrame{
 				}
 			}
 			
-			if(remove == false && alignmentPoints.size()<=4)
+			if(remove == false && alignmentPoints.size()<=3)
 			{
 				System.out.println("Adding a point.");
 				alignmentPoints.add(getCornerNum(), cornerPoint);
 				cornerNum = alignmentPoints.size();
 				frame.repaint();
 
-				if(alignmentPoints.size()==4 && !imageSet)
+				if(alignmentPoints.size()==3 && !imageSet)
 					setImage();
 			}else if(remove == true)
 			{
@@ -263,27 +263,30 @@ public class MapInserterGUI extends JFrame{
 			}
 			AddingMap = MapInserterGUIButtonPanel.getAddingMap();
 			if (!(AddingMap == null) || (!(alignmentPoints == null))) {
-				if (alignmentPoints.size() >= 3){
+				if (alignmentPoints.size() >= 2){
 					Point point1 = alignmentPoints.get(0);
 					Point point2 = alignmentPoints.get(1);
-					Point point3 = alignmentPoints.get(2);
 					int ImageHeight = Math.abs((int)Math.sqrt(Math.pow((point1.getLocX()-point2.getLocX()),2)+Math.pow((point1.getLocY()-point2.getLocY()),2)));
-					double HeightScale = (double)ImageHeight/(double)AddingMap.getHeight();
-					System.out.println("Image Height " + ImageHeight);
-					int ImageWidth = Math.abs((int)Math.sqrt(Math.pow((point2.getLocX()-point3.getLocX()),2)+Math.pow((point2.getLocY()-point3.getLocY()),2)));
-					double WidthScale = ((double)ImageWidth/(double)AddingMap.getWidth());
+					double WidthScale2 = (double)AddingMap.getWidth()/(double)AddingMap.getHeight();
+					int ImageWidth = (int) (ImageHeight*WidthScale2);
+					
 					System.out.println("Original Width " + AddingMap.getWidth());
 					System.out.println("Image Width " + ImageWidth);
-					System.out.println("Image Scale " + WidthScale);
-					double Rotation = Math.atan2(point3.getLocY()-point2.getLocY(), point3.getLocX()-point2.getLocX());
+					//System.out.println("Image Scale Height " + HeightScale);
+					//System.out.println("Image Scale Width " + WidthScale);
+					double Rotation = -Math.atan2(point1.getLocY()-point2.getLocY(), point1.getLocX()-point2.getLocX())-Math.toRadians(90);
 					System.out.println(Math.toDegrees(Rotation));
-					AffineTransform tx = AffineTransform.getScaleInstance(WidthScale, HeightScale);
-					AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-					AddingMap = op.filter(AddingMap, null);
-					AffineTransform tx1 = AffineTransform.getRotateInstance(Rotation);
-					AffineTransformOp op1 = new AffineTransformOp(tx1, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-					// Drawing the rotated image at the required drawing locations
-					g.drawImage(op1.filter(AddingMap, null), point1.getLocX(), point1.getLocY(), null);
+					
+					double HeightScale = Math.abs((double)ImageHeight/(double)AddingMap.getHeight());
+					double WidthScale = Math.abs((double)ImageWidth/(double)AddingMap.getWidth());
+					
+					AffineTransform tx = AffineTransform.getTranslateInstance((point1.getLocX()), (point1.getLocY()));
+					tx.rotate(-Rotation);
+					tx.scale(WidthScale, HeightScale);
+					
+					Graphics2D g2d = (Graphics2D) g;
+					
+					g2d.drawImage(AddingMap, tx, null);
 				}
 			}
 		}

@@ -38,6 +38,7 @@ public class MapUpdaterGUI{
 
 	private Point currentPoint;
 	private Point editPoint;
+	private int editPointIndex;
 
 	private Map currentMap = null;
 	private ServerDB md = ServerDB.getInstance();
@@ -165,7 +166,7 @@ public class MapUpdaterGUI{
 									edgeArray.add(tmpEdges.get(k));
 								}
 							}
-
+							System.out.println("Size of edge array after opening map:"+edgeArray.size());
 
 							System.out.println("Found map with number of points: "+currentMap.getPointList().size());
 							i = mapList.size();
@@ -433,11 +434,9 @@ public class MapUpdaterGUI{
 				for (int i = 0; i < pointArray.size(); i++) {
 					Point storePoint = pointArray.get(i);
 					
-					Point newPoint = new Point(storePoint.getId(), storePoint.getName(),
-							storePoint.getLocX(), storePoint.getLocY());
 					System.out.println("Storing point in:"+currentMap.getMapName());
 					try {
-						ServerDB.insertPoint(currentMap, newPoint);
+						ServerDB.insertPoint(currentMap, pointArray.get(i));
 						System.out.println("AddPointSuccess");
 					} catch (AlreadyExistsException f){
 						System.out.println(f.getMessage());
@@ -645,7 +644,7 @@ public class MapUpdaterGUI{
 					}*/
 					// newClick has some interesting storage things going on.
 					if (newClick == true) {
-						//CHANGE THIS LATER, GOOD FOR TESTING CLICKS
+						//TODO CHANGE THIS LATER, GOOD FOR TESTING CLICKS
 						MapUpdaterGUI.btnSaveMap.setText("Save Map, X:" + lastMousex + ", Y:" + lastMousey);
 
 						switch (getRadButton()) {
@@ -656,15 +655,20 @@ public class MapUpdaterGUI{
 											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
 								if (newClick == true && editingPoint == false) {
 									editPoint = currentPoint;
+									editPointIndex = i;
 									roomNumber.setText(editPoint.getName());
 									btnSavePoint.setText("Save Point Changes");
 									editingPoint = true;
 									newClick = false;
 								} else if (newClick == true && editingPoint == true) {
-									if(editPoint == currentPoint){
+									if(editPoint.getId().contentEquals(currentPoint.getId())){
 
 									} else {
 										currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
+										pointArray.set(editPointIndex, editPoint);
+										pointArray.set(i, currentPoint);
+										System.out.println("Edge sizes- editPoint:"+pointArray.get(editPointIndex).getEdges().size()+
+												" currentPoint:"+pointArray.get(i).getEdges().size());
 										System.out.println("Current Edge is: " + currentEdge.getId());
 										edgeArray.add(currentEdge);
 										if (currentPoint.getNumEdges() > 0)//this has to be caught in an exception later
@@ -678,8 +682,11 @@ public class MapUpdaterGUI{
 									}
 									newClick = false;
 									if(pathMode){
-										editPoint.setName(roomNumber.getText());
+										Point tempEditPoint = pointArray.get(editPointIndex);
+										tempEditPoint.setName(roomNumber.getText());
+										pointArray.set(editPointIndex, tempEditPoint);
 										editPoint = currentPoint;
+										editPointIndex = i;
 										roomNumber.setText(editPoint.getName());
 									}
 
@@ -688,16 +695,36 @@ public class MapUpdaterGUI{
 							}
 							break;
 						case 3:// remove points
+							System.out.println("Remove point called.");
+							System.out.println("Size of edgeArray:"+edgeArray.size());
+							for (int j = 0; j < pointArray.size(); j++)
+							{
+								System.out.println("Number of edges in point "
+										+pointArray.get(j).getId()+": "+pointArray.get(j).getEdges().size());
+							}
 							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
 									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
 									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
 											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
 								if (newClick == true){
-									int l = 0;
-									while(currentPoint.getId() != pointArray.get(l).getId()){
-										l++;
-									}
-									currentPoint = pointArray.get(l);
+									/* The error lies in the fact that edges, when created, are not being added to the points in the pointArray,
+									 * as a result, the code breaks when trying to remove said edge. The code below is the first half of a quick
+									 * fix, but we are going to try to address the underlying issue first.
+									int j = 0;
+									for (j = 0; j<edgeArray.size(); j++)
+									{
+										Edge currEdge = edgeArray.get(j);
+										if (currEdge.getPoint1().getId().contentEquals(currentPoint.getId()))
+										{
+											System.out.println("--Adding edge:"+currEdge.getId()+" to currPoint--");
+											currentPoint.addEdge(currEdge);
+										}
+										else if (currEdge.getPoint2().getId().contentEquals(currentPoint.getId()))
+										{
+											System.out.println("--Adding edge:"+currEdge.getId()+" to currPoint--");
+											currentPoint.addEdge(currEdge);
+										}
+									}*/
 									try{
 										System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
 										ServerDB.removePoint(currentPoint);
@@ -706,21 +733,49 @@ public class MapUpdaterGUI{
 										e1.printStackTrace();
 									}
 									
-									
-										//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+									//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
 									for(int kj = 0; kj < currentPoint.getEdges().size(); kj++){
 										//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
 										while(edgeArray.contains(currentPoint.getEdges().get(kj))){
 											edgeArray.remove(currentPoint.getEdges().get(kj));
 										}
+										Edge edgeRemoving = currentPoint.getEdges().get(kj);
+										
+										if(currentPoint.getId().contentEquals(edgeRemoving.getPoint1().getId()))
+										{
+											for(int f = 0; f < pointArray.size(); f++){
+												if(pointArray.get(f).getId().contentEquals(edgeRemoving.getPoint2().getId())){
+													for(int o = 0; o < pointArray.get(f).getEdges().size(); o++){
+														if(pointArray.get(f).getEdges().get(o).getId().contentEquals(edgeRemoving.getId())){
+															Point tmpPoint = pointArray.get(f);
+															tmpPoint.getEdges().remove(edgeRemoving);
+															tmpPoint.setNumEdges(tmpPoint.getNumEdges() - 1);
+															pointArray.set(f, tmpPoint);
+														}
+													}
+												}
+											}
+										}
+										else
+										{
+											for(int f = 0; f < pointArray.size(); f++){
+												if(pointArray.get(f).getId().contentEquals(edgeRemoving.getPoint1().getId())){
+													for(int o = 0; o < pointArray.get(f).getEdges().size(); o++){
+														if(pointArray.get(f).getEdges().get(o).getId().contentEquals(edgeRemoving.getId())){
+															Point tmpPoint = pointArray.get(f);
+															tmpPoint.getEdges().remove(edgeRemoving);
+															tmpPoint.setNumEdges(tmpPoint.getNumEdges() - 1);
+															pointArray.set(f, tmpPoint);
+														}
+													}
+												}
+											}
+										}
 									}
-									
 									
 									currentPoint.deleteEdges();
 									pointArray.remove(currentPoint);
 									pointArray.remove(currentPoint);
-									
-									
 								}
 								newClick = false;
 								repaint();

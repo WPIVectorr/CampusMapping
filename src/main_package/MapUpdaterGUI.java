@@ -67,7 +67,7 @@ public class MapUpdaterGUI{
 	String point4;
 	private JTextField roomNumber;
 	private JPanel buttonPanel;
-	private DrawPanel drawPanel = new DrawPanel();
+	private UpdateMap drawPanel = new UpdateMap();
 	private JTextField mapName;
 	private JTextField txtImageDirectoryPath;
 	private JComboBox mapDropDown;
@@ -75,13 +75,34 @@ public class MapUpdaterGUI{
 	private JSplitPane splitPane;
 	private Boolean pathMode = false;
 
+
 	private JFrame frame = new JFrame("Map Updater");
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
 
 		frame.setSize(932, 778);
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		Dimension screenSize = tk.getScreenSize();
+		int screenHeight = screenSize.height;
+		int screenWidth = screenSize.width;
+		//frame.setSize(screenWidth / 2, screenHeight / 2);
+		frame.setLocation(screenWidth / 4, screenHeight / 4);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBackground(new Color(255, 235, 205));
+
+
+		try {
+			   // Set to cross-platform Java Look and Feel (also called "Metal")
+			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+			} catch (UnsupportedLookAndFeelException e) {
+			   e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+			   e.printStackTrace();
+			} catch (InstantiationException e) {
+			   e.printStackTrace();
+			} catch (IllegalAccessException e) {
+			   e.printStackTrace();
+			}
 
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridLayout(4, 0, 10, 10));
@@ -242,7 +263,9 @@ public class MapUpdaterGUI{
 
 		JSplitPane splitPane_editPoints = new JSplitPane();
 		buttonPanel.add(splitPane_editPoints);
+		splitPane_editPoints.setEnabled( false );
 
+		
 		rdbtnEditPoints = new JRadioButton("Edit Points");
 		rdbtnEditPoints.setPreferredSize(new Dimension(125, 23));
 		rdbtnEditPoints.setHorizontalAlignment(SwingConstants.LEFT);
@@ -270,6 +293,7 @@ public class MapUpdaterGUI{
 
 		splitPane = new JSplitPane();
 		buttonPanel.add(splitPane);
+		splitPane.setEnabled( false );
 
 		GradientButton findMapFile = new GradientButton("Add Map From File", buttonColor);
 		splitPane.setLeftComponent(findMapFile);
@@ -324,7 +348,13 @@ public class MapUpdaterGUI{
 						}
 					}
 				}
-
+				addingMap = true;
+				if (addingMap){
+					new MapInserterGUI();
+					addingMap = false;
+				}
+				
+				addingMap = false;
 				if (addingMap) {
 					// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
 					System.out.println("SavingMap");
@@ -400,7 +430,7 @@ public class MapUpdaterGUI{
 		buttonPanel.add(btnSavePoint);
 		btnSaveMap = new GradientButton("Save Map", buttonColor); // defined above to change text in
 		// point selector
-		buttonPanel.add(btnSaveMap);
+
 		contentPane.add(drawPanel);
 
 		btnSavePoint.addActionListener(new ActionListener() {
@@ -504,7 +534,8 @@ public class MapUpdaterGUI{
 
 
 
-	class DrawPanel extends JPanel {
+	class UpdateMap extends JPanel {
+
 
 		ArrayList<Point> paintArray = new ArrayList<Point>(); // arraylist of
 		// points

@@ -78,6 +78,12 @@ public class MapUpdaterGUI{
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
 
 		frame.setSize(932, 778);
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		Dimension screenSize = tk.getScreenSize();
+		int screenHeight = screenSize.height;
+		int screenWidth = screenSize.width;
+		//frame.setSize(screenWidth / 2, screenHeight / 2);
+		frame.setLocation(screenWidth / 4, screenHeight / 4);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBackground(new Color(255, 235, 205));
 

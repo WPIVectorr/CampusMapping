@@ -62,7 +62,7 @@ public class GUI{
 
 
 		System.out.println(maps.get(0).getMapName());
-		maps.get(0).getPointList().get(0).print();
+		//maps.get(0).getPointList().get(0).print();
 
 		mainMenu = new JPanel();
 		mainMenu.setLayout(new GridLayout(4, 0, 10, 10));

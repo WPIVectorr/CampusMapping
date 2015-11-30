@@ -687,6 +687,7 @@ public class MapUpdaterGUI{
 											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
 								if (newClick == true){
 									try{
+										System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
 										ServerDB.removePoint(currentPoint);
 									} catch (DoesNotExistException e1){
 										System.out.println("Reached Here");

@@ -54,6 +54,18 @@ public class Point {
 		this.globY = globY;
 	}
 	
+	public Point(String id, int mapId, String name, int index, int locX, int locY, int globX, int globY, int numberEdges) {
+		this.id = id;
+		this.mapId = mapId;
+		this.name = name;
+		this.locX = locX;
+		this.locY = locY;
+		this.numberEdges = numberEdges;
+		this.index = index;
+		this.globX = globX;
+		this.globY = globY;
+	}
+	
 	public Point(String id, String name, int index, int x, int y, int numberEdges) {
 		this.id = id;
 		this.name = name;

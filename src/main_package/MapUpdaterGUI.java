@@ -575,10 +575,30 @@ public class MapUpdaterGUI{
 				//System.out.println(newClick);
 				if (getRadButton() == 1) // if addpoint
 				{
-					Integer arraySize = pointArray.size()+1;
+					Integer nameNumber = pointArray.size()+1;
+					
+					double ourRotation = currentMap.getRotationAngle();
+					ourRotation = 2 * Math.PI - ourRotation;
+					
+					
+					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight());
+					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight());
+					double tempPreRotateX = lastMousex;
+					double tempPreRotateY = lastMousey;
+					
+					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
+					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
+					//tempPreRotateX = tempPreRotateX/img.getWidth() * 
+					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
+					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+					
+					int finalGlobX = (int) Math.round(rotateX + (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2);
+					int finalGlobY = (int) Math.round(rotateY + (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2);
+					
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
-							"Point " + arraySize.toString(), currentMap.getPointIDIndex(), lastMousex, lastMousey); 
-					//TODO BRIAAAAAANNN Please deal with the global x/y
+							"Point " + nameNumber.toString(), currentMap.getPointIDIndex(),
+							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
+					
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){
@@ -681,7 +701,13 @@ public class MapUpdaterGUI{
 						for(int kj = 0; kj < markForDelete.get(j).getEdges().size(); kj++){
 							edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
 						}
+						/*try {
+							ServerDB.removePoint(markForDelete.get(j));
+						} catch (DoesNotExistException e1) {
+							System.out.println("Attempted to delete point that doesn;t exist in the database. Not an error");
+						}*/
 						markForDelete.get(j).deleteEdges();
+						pointArray.remove(markForDelete.get(j));
 						pointArray.remove(markForDelete.get(j));
 						markForDelete.remove(j);
 					}

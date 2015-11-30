@@ -34,6 +34,7 @@ public class MapUpdaterGUI{
 	private boolean addingMap = false;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
 	private ArrayList<Point> markForDelete = new ArrayList<Point>();
+	
 
 	private Point currentPoint;
 	private Point editPoint;
@@ -684,9 +685,30 @@ public class MapUpdaterGUI{
 									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
 									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
 											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
-								if (newClick == true)
-									markForDelete.add(currentPoint);
-
+								if (newClick == true){
+									try{
+										ServerDB.removePoint(currentPoint);
+									} catch (DoesNotExistException e1){
+										System.out.println("Reached Here");
+										e1.printStackTrace();
+									}
+									
+									
+										//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+									for(int kj = 0; kj < currentPoint.getEdges().size(); kj++){
+										//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+										while(edgeArray.contains(currentPoint.getEdges().get(kj))){
+											edgeArray.remove(currentPoint.getEdges().get(kj));
+										}
+									}
+									
+									
+									currentPoint.deleteEdges();
+									pointArray.remove(currentPoint);
+									pointArray.remove(currentPoint);
+									
+									
+								}
 								newClick = false;
 								repaint();
 							}
@@ -698,11 +720,7 @@ public class MapUpdaterGUI{
 
 					for (int j = 0; j < markForDelete.size(); j++) {
 						// remove edges to list
-						try{
-							ServerDB.removePoint(markForDelete.get(j));
-						} catch (DoesNotExistException e1){
-							e1.printStackTrace();
-						}
+						
 						
 						for(int kj = 0; kj < markForDelete.get(j).getEdges().size(); kj++){
 							//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));

@@ -538,6 +538,7 @@ public class ServerDB {
 		//------------------------------------------------------Remove Edges from DB---------------------------------------------------------
 		
 		ArrayList<Edge> edges = pt.getEdges();
+		System.out.println("Number of edges after retrieval:"+edges.size());
 		int j =0;
 		for (j = edges.size(); j > 0; j--)
 		{
@@ -550,7 +551,7 @@ public class ServerDB {
 		}
 		
 		edges = pt.getEdges();
-		System.out.println("Number of edges after retrieval:"+edges.size());
+		
 		
 		//------------------------------------------------------Remove point from DB----------------------------------------------------------
 		String ptId = pt.getId();

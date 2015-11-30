@@ -114,7 +114,14 @@ public class MapUpdaterGUI{
 			 */
 			// includes extension
 			if(!(imgList[f].getName().equals(".DS_Store"))){
-				mapDropDown.addItem(imgList[f].getName());
+				//checks to make sure the names populating the drop down are in both the vector maps package and 
+				//the database
+				for(int count = 0; count < md.getMapsFromLocal().size(); count++){
+					if(md.getMapsFromLocal().get(count).getMapName().compareTo(imgList[f].getName()) == 0){
+						mapDropDown.addItem(imgList[f].getName());
+					}
+				}
+				
 			}
 		}
 		File logo = new File("src/VectorLogo/VectorrLogo.png");
@@ -686,6 +693,11 @@ public class MapUpdaterGUI{
 									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
 											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
 								if (newClick == true){
+									int l = 0;
+									while(currentPoint.getId() != pointArray.get(l).getId()){
+										l++;
+									}
+									currentPoint = pointArray.get(l);
 									try{
 										ServerDB.removePoint(currentPoint);
 									} catch (DoesNotExistException e1){

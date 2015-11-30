@@ -14,6 +14,8 @@ public class Map {
 	private double yBotRight;
 	private double rotationAngle;
 	private int pointIDIndex = 0;
+	private double width;
+	private double height;
 	
 	/*
 	public Map (ArrayList<Point> pointList, int mapId, String mapName)
@@ -66,6 +68,29 @@ public class Map {
 		this.yBotRight = yBotRight;
 		this.rotationAngle = rotationAngle;
 		this.pointIDIndex = pointIDIndex;
+		double ourRotate = (Math.PI * 2) - rotationAngle;
+		double xTopLeftDeRotate = xTopLeft * Math.cos(ourRotate) - yTopLeft * Math.sin(ourRotate);
+		double xBotRightDeRotate = xBotRight * Math.cos(ourRotate) - yBotRight * Math.sin(ourRotate);
+		this.width = Math.abs(xTopLeftDeRotate - xBotRightDeRotate);
+		
+		double yTopLeftDeRotate = yTopLeft * Math.cos(ourRotate) + xTopLeft * Math.sin(ourRotate);
+		double yBotRightDeRotate = yBotRight * Math.cos(ourRotate) + xBotRight * Math.sin(ourRotate);
+		this.height = Math.abs(yTopLeftDeRotate - yBotRightDeRotate);
+	}
+	public double getWidth() {
+		return width;
+	}
+
+	public double getHeight() {
+		return height;
+	}
+
+	public void setWidth(double width) {
+		this.width = width;
+	}
+
+	public void setHeight(double height) {
+		this.height = height;
 	}
 	public ArrayList<Point> getPoints() {
 		return Points;

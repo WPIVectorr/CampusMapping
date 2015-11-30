@@ -576,29 +576,29 @@ public class MapUpdaterGUI{
 				if (getRadButton() == 1) // if addpoint
 				{
 					Integer nameNumber = pointArray.size()+1;
-					
 					double ourRotation = currentMap.getRotationAngle();
-					ourRotation = 2 * Math.PI - ourRotation;
+					//ourRotation = 2 * Math.PI - ourRotation;
 					
 					
-					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight());
-					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight());
+					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;
+					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
 					double tempPreRotateX = lastMousex;
 					double tempPreRotateY = lastMousey;
 					
 					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
 					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
-					//tempPreRotateX = tempPreRotateX/img.getWidth() * 
+					tempPreRotateX = (tempPreRotateX/img.getWidth()) * currentMap.getWidth();
+					tempPreRotateY = (tempPreRotateY/img.getHeight()) * currentMap.getHeight();
 					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
 					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
 					
-					int finalGlobX = (int) Math.round(rotateX + (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2);
-					int finalGlobY = (int) Math.round(rotateY + (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2);
-					
+					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
+					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
+				
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
 							"Point " + nameNumber.toString(), currentMap.getPointIDIndex(),
 							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
-					
+
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){

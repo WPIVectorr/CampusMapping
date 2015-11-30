@@ -575,7 +575,7 @@ public class MapUpdaterGUI{
 				//System.out.println(newClick);
 				if (getRadButton() == 1) // if addpoint
 				{
-					Integer arraySize = pointArray.size();
+					Integer arraySize = pointArray.size()+1;
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
 							"Point " + arraySize.toString(), currentMap.getPointIDIndex(), lastMousex, lastMousey); 
 					//TODO BRIAAAAAANNN Please deal with the global x/y

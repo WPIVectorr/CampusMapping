@@ -12,6 +12,7 @@ import main_package.MapUpdaterGUI.UpdateMap;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -42,6 +43,7 @@ public class MapInserterGUI extends JFrame{
 	private static boolean newClick = false;
 	private static int lastMousex = 0;
 	private static int lastMousey = 0;
+	private static int numSelectionPoints = 2;
 	//private MapInsertion drawPanel = new MapInsertion();
 	private MapInserterGUIButtonPanel buttonPanel;
 	private ArrayList<Point> alignmentPoints;
@@ -59,17 +61,16 @@ public class MapInserterGUI extends JFrame{
 	int screenWidth = screenSize.width;
 	private int windowSizeX = 0;
 	private int windowSizeY = 0;
-	
+	private boolean alignedProperly = false;
 	private static JFrame frame = new JFrame("Add to Campus Map");
 
 	public MapInserterGUI() {
 		//super("Add to Campus Map");
 		
 		createAndShowGUI();	
-	
 		cornerNum = 0;
 		alignmentPoints = new ArrayList<Point>();
-		frame.repaint();
+		doRepaint();
 	}
 
 	private void createAndShowGUI()
@@ -108,9 +109,8 @@ public class MapInserterGUI extends JFrame{
 		//getContentPane().setLayout(null);
 		windowSizeX = frame.getContentPane().getWidth();
 		windowSizeY = frame.getContentPane().getHeight();
-
 		System.out.println(frame.getSize());
-		MapInserterGUIButtonPanel buttonPanel = new MapInserterGUIButtonPanel(frame.getLocation(),frame.getSize());
+		buttonPanel = new MapInserterGUIButtonPanel(frame.getLocation(),frame.getSize());
 		buttonPanel.setVisible(true);
 
 	}
@@ -142,13 +142,14 @@ public class MapInserterGUI extends JFrame{
 		Integer numberCorner = getCornerNum();
 		
 		Point cornerPoint = new Point(numberCorner.toString(), "AlignmentPoint",lastMousex,lastMousey);
-		System.out.println("add Alignment #"+cornerNum +" X: "+cornerPoint.getLocX()+" Y: "+cornerPoint.getLocY());
 
-		if(alignmentPoints.size() == 0)
+		if(alignmentPoints.size() == 0 && !buttonPanel.getSelectedMap().contentEquals("Select Map"))
 		{//if there isn't anything in the array, the foreach won't run.
 			alignmentPoints.add(getCornerNum(), cornerPoint);
 			cornerNum = alignmentPoints.size();
-		}else {
+			System.out.println("add Alignment #"+cornerNum +" X: "+cornerPoint.getLocX()+" Y: "+cornerPoint.getLocY());
+
+		}else if(!buttonPanel.getSelectedMap().contentEquals("Select Map")){
 			for (Point currentPoint : alignmentPoints) {
 				if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
 						&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
@@ -161,16 +162,18 @@ public class MapInserterGUI extends JFrame{
 					break;
 				}
 			}
-			
-			if(remove == false && alignmentPoints.size()<=3)
+
+			if(remove == false && alignmentPoints.size()<numSelectionPoints && !buttonPanel.getSelectedMap().contentEquals("Select Map"))
 			{
 				System.out.println("Adding a point.");
 				alignmentPoints.add(getCornerNum(), cornerPoint);
 				cornerNum = alignmentPoints.size();
-				frame.repaint();
+				System.out.println("add Alignment #"+cornerNum +" X: "+cornerPoint.getLocX()+" Y: "+cornerPoint.getLocY());
 
-				if(alignmentPoints.size()==3 && !imageSet)
-					setImage();
+				doRepaint();
+				
+
+				
 			}else if(remove == true)
 			{
 				alignmentPoints.remove(cornerNum);
@@ -178,8 +181,11 @@ public class MapInserterGUI extends JFrame{
 				imageSet = false;
 			}
 		}
-		frame.repaint();
+
+		doRepaint();
 		newClick =false;
+		if(alignmentPoints.size()==numSelectionPoints && !imageSet)
+			setImage();
 	}	
 
 	private void setImage(){
@@ -190,12 +196,14 @@ public class MapInserterGUI extends JFrame{
 		switch (answer) {
 		case 0:
 			imageSet = true;
+			doRepaint();
 			//yes break and close image inserter
 			break;
 		case 1:
 			//no go back to inserter
 			alignmentPoints.clear();
 			cornerNum = 0;
+			doRepaint();
 			break;
 		default:
 			break;
@@ -208,7 +216,10 @@ public class MapInserterGUI extends JFrame{
 		public void paintComponent(Graphics g) {
 
 			super.paintComponents(g);
-
+			
+			
+			g.setFont(new Font("arial", Font.BOLD, 16));
+			
 			// selecting points on the map
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
@@ -218,20 +229,12 @@ public class MapInserterGUI extends JFrame{
 						lastMousey = e.getY();
 						newClick = true;
 					}
-					frame.repaint();
+					doRepaint();
 				}
 			});
 
 			if (newClick == true) {
 				addPoints();
-
-				for (Point currentPoint : alignmentPoints) {
-					System.out.println("paint");
-					int drawX = (int) currentPoint.getLocX();
-					int drawY = (int) currentPoint.getLocY();
-					System.out.println(drawY);
-					g.drawString(currentPoint.getId(), drawX, drawY);
-				}
 			}
 			CampusMap = MapInserterGUIButtonPanel.getCampusMap();
 			if (!(CampusMap == null)) {
@@ -252,18 +255,10 @@ public class MapInserterGUI extends JFrame{
 				// sets the correct dimensions for logo
 				g.drawImage(CampusMap, imagelocationx, imagelocationy, (int)(CampusMap.getWidth()/wScale), (int)(CampusMap.getHeight()/wScale), null);
 			}
-			if (!(alignmentPoints == null)){
-				for (int i = 0; i < alignmentPoints.size(); i++) {
-					int drawX = (int) alignmentPoints.get(i).getLocX();
-					int drawY = (int) alignmentPoints.get(i).getLocY();
-					// draws the points onto the map
-					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
-					System.out.println(alignmentPoints.size());
-				}
-			}
+
 			AddingMap = MapInserterGUIButtonPanel.getAddingMap();
 			if (!(AddingMap == null) || (!(alignmentPoints == null))) {
-				if (alignmentPoints.size() >= 2){
+				if (imageSet){
 					Point point1 = alignmentPoints.get(0);
 					Point point2 = alignmentPoints.get(1);
 					int ImageHeight = Math.abs((int)Math.sqrt(Math.pow((point1.getLocX()-point2.getLocX()),2)+Math.pow((point1.getLocY()-point2.getLocY()),2)));
@@ -288,7 +283,20 @@ public class MapInserterGUI extends JFrame{
 					
 					g2d.drawImage(AddingMap, tx, null);
 				}
+				
 			}
+			if (!(alignmentPoints == null)){
+				for (Point currentPoint : alignmentPoints) {
+					int drawX = (int) currentPoint.getLocX();
+					int drawY = (int) currentPoint.getLocY();
+					// draws the points onto the map
+					Integer drawNum = Integer.parseInt(currentPoint.getId())+1;
+					g.drawString(drawNum.toString(), drawX-pointSize, drawY+pointSize);
+					//g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
+					System.out.println(alignmentPoints.size());
+				}
+			}
+			
 		}
 	}
 }

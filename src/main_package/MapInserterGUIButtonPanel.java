@@ -229,6 +229,12 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		CampusMap = campusMap;
 	}
 
+	public String getSelectedMap()
+	{
+		String selectedMap = mapDropDown.getSelectedItem().toString();	
+		
+		return selectedMap;
+	}
 
 	public static BufferedImage getAddingMap() {
 		return AddingMap;

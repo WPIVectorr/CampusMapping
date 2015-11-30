@@ -678,14 +678,23 @@ public class MapUpdaterGUI{
 
 					for (int j = 0; j < markForDelete.size(); j++) {
 						// remove edges to list
+						try{
+							ServerDB.removePoint(markForDelete.get(j));
+						} catch (DoesNotExistException e1){
+							e1.printStackTrace();
+						}
+						
 						for(int kj = 0; kj < markForDelete.get(j).getEdges().size(); kj++){
-							edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							while(edgeArray.contains(markForDelete.get(j).getEdges().get(kj))){
+								edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							}
 						}
 						markForDelete.get(j).deleteEdges();
 						pointArray.remove(markForDelete.get(j));
 						markForDelete.remove(j);
 					}
-
+					
 					int drawX = (int) currentPoint.getLocX();
 					int drawY = (int) currentPoint.getLocY();
 					// draws the points onto the map.

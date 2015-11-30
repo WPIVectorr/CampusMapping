@@ -699,6 +699,7 @@ public class MapUpdaterGUI{
 									}
 									currentPoint = pointArray.get(l);
 									try{
+										System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
 										ServerDB.removePoint(currentPoint);
 									} catch (DoesNotExistException e1){
 										System.out.println("Reached Here");

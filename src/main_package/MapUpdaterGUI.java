@@ -575,7 +575,7 @@ public class MapUpdaterGUI{
 				//System.out.println(newClick);
 				if (getRadButton() == 1) // if addpoint
 				{
-					Integer arraySize = pointArray.size();
+					Integer nameNumber = pointArray.size()+1;
 					double ourRotation = currentMap.getRotationAngle();
 					//ourRotation = 2 * Math.PI - ourRotation;
 					
@@ -595,8 +595,10 @@ public class MapUpdaterGUI{
 					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
 					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
 				
-					Point point = new Point((String)(currentMap.getMapId() + "."+ arraySize), 
-							"Point " + arraySize.toString(), lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
+					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
+							"Point " + nameNumber.toString(), currentMap.getPointIDIndex(),
+							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
+
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){
@@ -699,7 +701,13 @@ public class MapUpdaterGUI{
 						for(int kj = 0; kj < markForDelete.get(j).getEdges().size(); kj++){
 							edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
 						}
+						/*try {
+							ServerDB.removePoint(markForDelete.get(j));
+						} catch (DoesNotExistException e1) {
+							System.out.println("Attempted to delete point that doesn;t exist in the database. Not an error");
+						}*/
 						markForDelete.get(j).deleteEdges();
+						pointArray.remove(markForDelete.get(j));
 						pointArray.remove(markForDelete.get(j));
 						markForDelete.remove(j);
 					}

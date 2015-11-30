@@ -668,6 +668,7 @@ public class ServerDB {
 							found3 = true;
 							String deleteStatement = ("DELETE FROM "+tableName+" WHERE id = '"+edge.getID()+"'");
 							int x = conn.createStatement().executeUpdate(deleteStatement);
+							System.out.println("==========REMOVING :"+edge.getID()+"==========");
 							break;
 						}
 					}

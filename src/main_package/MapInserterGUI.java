@@ -14,6 +14,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -26,10 +27,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.lang.Math;
 
 
 public class MapInserterGUI extends JFrame{
@@ -43,8 +49,18 @@ public class MapInserterGUI extends JFrame{
 	private int pointSize = 5;
 	private boolean remove =false;
 	private boolean imageSet = false;
+	private BufferedImage CampusMap = null;
+	private BufferedImage AddingMap = null;
+	private int windowScale = 0;
 	
-	private JFrame frame= new JFrame("Add to Campus Map");;
+	Toolkit tk = Toolkit.getDefaultToolkit();
+	Dimension screenSize = tk.getScreenSize();
+	int screenHeight = screenSize.height;
+	int screenWidth = screenSize.width;
+	private int windowSizeX = 0;
+	private int windowSizeY = 0;
+	
+	private static JFrame frame = new JFrame("Add to Campus Map");
 
 	public MapInserterGUI() {
 		//super("Add to Campus Map");
@@ -58,13 +74,13 @@ public class MapInserterGUI extends JFrame{
 
 	private void createAndShowGUI()
 	{
-		
 		//frame.add(pointFrame);
 		PaintFrame pointFrame = new PaintFrame();
 		//Container contentPane = frame.getContentPane();
 		frame.getContentPane().add(pointFrame);
 		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MapInserterGUI.class.getResource("/VectorLogo/VectorrLogo.png")));
+
 		try {
 			   // Set to cross-platform Java Look and Feel (also called "Metal")
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -90,7 +106,10 @@ public class MapInserterGUI extends JFrame{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//frame.getContentPane().add(frame);
 		//getContentPane().setLayout(null);
+		windowSizeX = frame.getContentPane().getWidth();
+		windowSizeY = frame.getContentPane().getHeight();
 
+		System.out.println(frame.getSize());
 		MapInserterGUIButtonPanel buttonPanel = new MapInserterGUIButtonPanel(frame.getLocation(),frame.getSize());
 		buttonPanel.setVisible(true);
 
@@ -113,7 +132,9 @@ public class MapInserterGUI extends JFrame{
 		return cornerNum;
 	}
 
-	
+	public static void doRepaint(){
+		frame.repaint();
+	}
 
 	//sets the alignment point on the image with the correct number.
 	private void addPoints() {
@@ -140,7 +161,7 @@ public class MapInserterGUI extends JFrame{
 					break;
 				}
 			}
-				
+			
 			if(remove == false && alignmentPoints.size()<=4)
 			{
 				System.out.println("Adding a point.");
@@ -173,6 +194,8 @@ public class MapInserterGUI extends JFrame{
 			break;
 		case 1:
 			//no go back to inserter
+			alignmentPoints.clear();
+			cornerNum = 0;
 			break;
 		default:
 			break;
@@ -183,36 +206,86 @@ public class MapInserterGUI extends JFrame{
 
 		@Override
 		public void paintComponent(Graphics g) {
-	
+
 			super.paintComponents(g);
-			
-			//selecting points on the map
+
+			// selecting points on the map
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
-	
-					if(newClick == false)
-					{
+
+					if (newClick == false) {
 						lastMousex = e.getX();
 						lastMousey = e.getY();
 						newClick = true;
-					}	
+					}
 					frame.repaint();
 				}
 			});
-	
-	
-			if(newClick == true)
-			{
+
+			if (newClick == true) {
 				addPoints();
-	
-				for(Point currentPoint: alignmentPoints) {
+
+				for (Point currentPoint : alignmentPoints) {
 					System.out.println("paint");
 					int drawX = (int) currentPoint.getLocX();
 					int drawY = (int) currentPoint.getLocY();
 					System.out.println(drawY);
-					g.drawString(currentPoint.getId(),drawX,drawY);
+					g.drawString(currentPoint.getId(), drawX, drawY);
 				}
-			}			
+			}
+			CampusMap = MapInserterGUIButtonPanel.getCampusMap();
+			if (!(CampusMap == null)) {
+				// Scale the image to the appropriate screen size
+				double wScale;
+
+				if (CampusMap.getHeight() >= CampusMap.getWidth()) {
+					wScale = (double) CampusMap.getHeight() / (double) windowSizeY;
+					windowScale = CampusMap.getHeight() / windowSizeY;
+				}
+
+				else {
+					wScale = (double) CampusMap.getHeight() / (double) windowSizeY;
+					windowScale = CampusMap.getWidth() / windowSizeX;
+				}
+				int imagelocationx = (windowSizeX/2)-((int)(CampusMap.getWidth()/wScale)/2);
+				int imagelocationy = (windowSizeY/2)-((int)(CampusMap.getHeight()/wScale)/2);
+				// sets the correct dimensions for logo
+				g.drawImage(CampusMap, imagelocationx, imagelocationy, (int)(CampusMap.getWidth()/wScale), (int)(CampusMap.getHeight()/wScale), null);
+			}
+			if (!(alignmentPoints == null)){
+				for (int i = 0; i < alignmentPoints.size(); i++) {
+					int drawX = (int) alignmentPoints.get(i).getLocX();
+					int drawY = (int) alignmentPoints.get(i).getLocY();
+					// draws the points onto the map
+					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
+					System.out.println(alignmentPoints.size());
+				}
+			}
+			AddingMap = MapInserterGUIButtonPanel.getAddingMap();
+			if (!(AddingMap == null) || (!(alignmentPoints == null))) {
+				if (alignmentPoints.size() >= 3){
+					Point point1 = alignmentPoints.get(0);
+					Point point2 = alignmentPoints.get(1);
+					Point point3 = alignmentPoints.get(2);
+					int ImageHeight = Math.abs((int)Math.sqrt(Math.pow((point1.getLocX()-point2.getLocX()),2)+Math.pow((point1.getLocY()-point2.getLocY()),2)));
+					double HeightScale = (double)ImageHeight/(double)AddingMap.getHeight();
+					System.out.println("Image Height " + ImageHeight);
+					int ImageWidth = Math.abs((int)Math.sqrt(Math.pow((point2.getLocX()-point3.getLocX()),2)+Math.pow((point2.getLocY()-point3.getLocY()),2)));
+					double WidthScale = ((double)ImageWidth/(double)AddingMap.getWidth());
+					System.out.println("Original Width " + AddingMap.getWidth());
+					System.out.println("Image Width " + ImageWidth);
+					System.out.println("Image Scale " + WidthScale);
+					double Rotation = Math.atan2(point3.getLocY()-point2.getLocY(), point3.getLocX()-point2.getLocX());
+					System.out.println(Math.toDegrees(Rotation));
+					AffineTransform tx = AffineTransform.getScaleInstance(WidthScale, HeightScale);
+					AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+					AddingMap = op.filter(AddingMap, null);
+					AffineTransform tx1 = AffineTransform.getRotateInstance(Rotation);
+					AffineTransformOp op1 = new AffineTransformOp(tx1, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+					// Drawing the rotated image at the required drawing locations
+					g.drawImage(op1.filter(AddingMap, null), point1.getLocX(), point1.getLocY(), null);
+				}
+			}
 		}
 	}
 }

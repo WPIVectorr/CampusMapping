@@ -344,7 +344,13 @@ public class MapUpdaterGUI{
 						}
 					}
 				}
-
+				addingMap = true;
+				if (addingMap){
+					new MapInserterGUI();
+					addingMap = false;
+				}
+				
+				addingMap = false;
 				if (addingMap) {
 					// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
 					System.out.println("SavingMap");

@@ -5,6 +5,7 @@ import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import main_package.MapInserterGUI.PaintFrame;
 import main_package.MapUpdaterGUI.UpdateMap;
 
 import java.awt.BorderLayout;
@@ -32,11 +33,16 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 
 
-public class MapInserterGUIButtonPanel extends JFrame{
+public class MapInserterGUIButtonPanel extends JFrame {
 
 	private InserterButtonPanel ButtonPanel = new InserterButtonPanel();
 	private JComboBox mapDropDown;
-	private BufferedImage img = null;
+	private JComboBox secondMap;
+	private static BufferedImage CampusMap = null;
+	private static BufferedImage AddingMap = null;
+	private int windowSizeX = 0;
+	private int windowSizeY = 0;
+	private int windowScale = 0;
 
 	public MapInserterGUIButtonPanel(java.awt.Point inserterLocation, Dimension windowSize) {
 		super("MapInserterGUIButtonPanel");
@@ -63,13 +69,12 @@ public class MapInserterGUIButtonPanel extends JFrame{
 		getContentPane().setName("Vectorr");
 		getContentPane().setLayout(null);
 		
-		JButton DeleteMap = new JButton("Delete Map");
-		DeleteMap.setBounds(10, 109, 126, 23);
-		getContentPane().add(DeleteMap);
+		//JButton DeleteMap = new JButton("Delete Map");
+		//DeleteMap.setBounds(10, 109, 126, 23);
+		//getContentPane().add(DeleteMap);
 		
 		
-		
-		JComboBox mapDropDown = new JComboBox();
+		mapDropDown = new JComboBox();
 		mapDropDown.setBounds(168, 13, 211, 26);
 		getContentPane().add(mapDropDown);
 		mapDropDown.addItem("Select Map");
@@ -90,7 +95,7 @@ public class MapInserterGUIButtonPanel extends JFrame{
 				
 				if (!(name.equals("Select Map"))) {
 					try {
-						img = ImageIO.read(destinationFile);
+						setCampusMap(ImageIO.read(destinationFile));
 					} catch (IOException g) {
 						System.out.println("Invalid Map Selection");
 						g.printStackTrace();
@@ -100,7 +105,7 @@ public class MapInserterGUIButtonPanel extends JFrame{
 					File logoFinal = new File(logo.getAbsolutePath());
 					//System.out.println("logoFinal: " + logoFinal);
 					try{
-						img = ImageIO.read(logoFinal);
+						setCampusMap(ImageIO.read(logoFinal));
 					}
 					catch(IOException g){
 						System.out.println("Invalid logo");
@@ -108,32 +113,11 @@ public class MapInserterGUIButtonPanel extends JFrame{
 					}
 
 				}
-				repaint();
+				MapInserterGUI.doRepaint();
 			}
 		});
 
-		// When the Updater opens the software the list will be populated with
-		// the files in
-		// the VectorMapps resource folder
-		File vectorMapDir = new File("src/VectorMaps");
-		vectorMapDir = new File(vectorMapDir.getAbsolutePath());
-		//System.out.println("Vectormap abs path: " + vectorMapDir.getAbsolutePath());
-
-		// Truncates the extensions off of the map name so only the name is
-		// displayed in the
-		// drop-down menu for selecting a map
-		File[] imgList = vectorMapDir.listFiles();
-		for (int f = 0; f < imgList.length; f++) {
-			/*
-			 * tempMapName = imgList[f].getName(); nameLength =
-			 * tempMapName.length();
-			 * mapDropDown.addItem(tempMapName.substring(0, nameLength - 4));
-			 */
-			// includes extension
-			if(!(imgList[f].getName().equals(".DS_Store"))){
-				mapDropDown.addItem(imgList[f].getName());
-			}
-		}
+		
 		
 		
 		JComboBox secondMap = new JComboBox();
@@ -144,6 +128,13 @@ public class MapInserterGUIButtonPanel extends JFrame{
 		JLabel lblSelectSecondMap = new JLabel("Select Map to Add:");
 		lblSelectSecondMap.setBounds(10, 58, 178, 20);
 		getContentPane().add(lblSelectSecondMap);
+		
+		JPanel panel = new InserterButtonPanel();
+		panel.setBounds(0, 178, 394, 394);
+		getContentPane().add(panel);
+		
+		windowSizeX = panel.getWidth();
+		windowSizeY = panel.getHeight();
 		
 		secondMap.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
@@ -156,7 +147,7 @@ public class MapInserterGUIButtonPanel extends JFrame{
 				
 				if (!(name.equals("Select Map"))) {
 					try {
-						img = ImageIO.read(destinationFile);
+						setAddingMap(ImageIO.read(destinationFile));
 					} catch (IOException g) {
 						System.out.println("Invalid Map Selection");
 						g.printStackTrace();
@@ -166,17 +157,42 @@ public class MapInserterGUIButtonPanel extends JFrame{
 					File logoFinal = new File(logo.getAbsolutePath());
 					//System.out.println("logoFinal: " + logoFinal);
 					try{
-						img = ImageIO.read(logoFinal);
+						setAddingMap(ImageIO.read(logoFinal));
 					}
 					catch(IOException g){
 						System.out.println("Invalid logo");
 						g.printStackTrace();
 					}
-
 				}
-				repaint();
+				panel.repaint();
+				System.out.println("painting");
 			}
 		});
+		
+		// When the Updater opens the software the list will be populated with
+				// the files in
+				// the VectorMapps resource folder
+				File vectorMapDir = new File("src/VectorMaps");
+				vectorMapDir = new File(vectorMapDir.getAbsolutePath());
+				//System.out.println("Vectormap abs path: " + vectorMapDir.getAbsolutePath());
+
+				// Truncates the extensions off of the map name so only the name is
+				// displayed in the
+				// drop-down menu for selecting a map
+				File[] imgList = vectorMapDir.listFiles();
+				for (int f = 0; f < imgList.length; f++) {
+					/*
+					 * tempMapName = imgList[f].getName(); nameLength =
+					 * tempMapName.length();
+					 * mapDropDown.addItem(tempMapName.substring(0, nameLength - 4));
+					 */
+					// includes extension
+					if(!(imgList[f].getName().equals(".DS_Store"))){
+						
+						secondMap.addItem(imgList[f].getName());
+						mapDropDown.addItem(imgList[f].getName());
+					}
+				}
 
 /*		// When the Updater opens the software the list will be populated with
 		// the files in
@@ -204,17 +220,46 @@ public class MapInserterGUIButtonPanel extends JFrame{
 	}
 
 
+	public static BufferedImage getCampusMap() {
+		return CampusMap;
+	}
 
+
+	public void setCampusMap(BufferedImage campusMap) {
+		CampusMap = campusMap;
+	}
+
+
+	public static BufferedImage getAddingMap() {
+		return AddingMap;
+	}
+
+
+	public static void setAddingMap(BufferedImage addingMap) {
+		AddingMap = addingMap;
+	}
 
 
 	class InserterButtonPanel extends JPanel {
-
-
-
-
+		
 		@Override
 		public void paintComponent(Graphics g) {
+			super.paintComponents(g);
+			
+			if (!(AddingMap == null)){
+				double wScale;
 
+				if (AddingMap.getHeight() >= AddingMap.getWidth()) {
+					wScale = (double) AddingMap.getHeight() / (double) windowSizeY;
+				}
+
+				else {
+					wScale = (double) AddingMap.getHeight() / (double) windowSizeY;
+				}
+				int imagelocationx = (windowSizeX/2)-((int)(AddingMap.getWidth()/wScale)/2);
+				int imagelocationy = (windowSizeY/2)-((int)(AddingMap.getHeight()/wScale)/2);
+				g.drawImage(AddingMap, imagelocationx, imagelocationy, (int)(AddingMap.getWidth()/wScale), (int)(AddingMap.getHeight()/wScale), null);
+			}
 		}
 	}
 }

@@ -424,9 +424,7 @@ public class MapUpdaterGUI{
 			public void actionPerformed(ActionEvent e) {
 				for (int i = 0; i < pointArray.size(); i++) {
 					Point storePoint = pointArray.get(i);
-					System.out.println("currentmap's currentPoint's id:"+currentMap.getMapId());
-					storePoint.setID((String)(currentMap.getMapId() + "." + i));				
-
+					
 					Point newPoint = new Point(storePoint.getId(), storePoint.getName(),
 							storePoint.getLocX(), storePoint.getLocY());
 					System.out.println("Storing point in:"+currentMap.getMapName());
@@ -578,7 +576,7 @@ public class MapUpdaterGUI{
 				if (getRadButton() == 1) // if addpoint
 				{
 					Integer arraySize = pointArray.size();
-					Point point = new Point(currentMap.getNewPointID(), 
+					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
 							"Point " + arraySize.toString(), currentMap.getPointIDIndex(), lastMousex, lastMousey); 
 					//TODO BRIAAAAAANNN Please deal with the global x/y
 					boolean shouldAdd = true;

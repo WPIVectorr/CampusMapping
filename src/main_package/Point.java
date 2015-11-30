@@ -30,8 +30,9 @@ public class Point {
 		this.globY = y;
 	}
 	
-	public Point(String id, String name, int index, int x, int y) {
+	public Point(String id, int mapId, String name, int index, int x, int y) {
 		this.id = id;
+		this.mapId = mapId;
 		this.name = name;
 		this.locX = x;
 		this.locY = y;

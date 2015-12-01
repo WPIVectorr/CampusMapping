@@ -59,10 +59,16 @@ public class ServerDB {
 
 	public static void main (String args[])
 	{
-		clearDatabase();
+		//clearDatabase();
 		//tryCreateDB();
 		conn = connect();
 		//testDB();
+		try {
+			printDatabase(true, true, true);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println("Done testing");
 	}
 
@@ -457,7 +463,7 @@ public class ServerDB {
 
 	//---------------------------------------------------------Modifying Functions-------------------------------------------------------=---
 
-	private static void updatePoint (Point point) throws SQLException, DoesNotExistException
+	public static void updatePoint (Point point) throws SQLException, DoesNotExistException
 	{
 		String ptId = point.getId();
 		//---------------------------------------------------Update point in database-------------------------------------------------

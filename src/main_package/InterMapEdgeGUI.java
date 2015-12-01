@@ -1,5 +1,6 @@
 package main_package;
 
+
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.UIManager;
@@ -72,6 +73,7 @@ public class InterMapEdgeGUI extends JFrame {
 
 	private Map currentMap = null;
 	private ServerDB md = ServerDB.getInstance();
+	private dbAccess database;
 
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private Edge currentEdge;
@@ -79,6 +81,9 @@ public class InterMapEdgeGUI extends JFrame {
 	
 	public InterMapEdgeGUI(Map destMap, Point srcPoint) {
 		super("Connect Two Maps");
+		
+		database = new dbAccess(md);
+		
 		try {
 			   // Set to cross-platform Java Look and Feel (also called "Metal")
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -170,32 +175,8 @@ public class InterMapEdgeGUI extends JFrame {
 		windowSizeX = buttonPanel.getWidth();
 		windowSizeY = buttonPanel.getHeight();
 
-		mapDropDown.addItem("Select Map");
-		// When the Updater opens the software the list will be populated with
-				// the files in
-				// the VectorMapps resource folder
-				File vectorMapDir = new File("src/VectorMaps");
-				vectorMapDir = new File(vectorMapDir.getAbsolutePath());
-				//System.out.println("Vectormap abs path: " + vectorMapDir.getAbsolutePath());
-
-				// Truncates the extensions off of the map name so only the name is
-				// displayed in the
-				// drop-down menu for selecting a map
-				File[] imgList = vectorMapDir.listFiles();
-				for (int f = 0; f < imgList.length; f++) {
-					/*
-					 * tempMapName = imgList[f].getName(); nameLength =
-					 * tempMapName.length();
-					 * mapDropDown.addItem(tempMapName.substring(0, nameLength - 4));
-					 */
-					// includes extension
-					if(!(imgList[f].getName().equals(".DS_Store"))){
-						
-						//secondMap.addItem(imgList[f].getName());
-						mapDropDown.addItem(imgList[f].getName());
-					}
-				}
-
+		
+		mapDropDown = database.getMapDropDown();
 				mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 					public void actionPerformed(ActionEvent a) {
 						name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected

@@ -172,8 +172,10 @@ public class MapUpdaterGUI{
 		{
 			public void run()
 			{
+				System.out.println("Calling run");
 				MapUpdaterGUI mapUpdater = new MapUpdaterGUI();
 				try {
+					System.out.println("Calling create and show GUI");
 					mapUpdater.createAndShowGUI();
 				} catch (IOException | AlreadyExistsException | SQLException e) {
 					// TODO Auto-generated catch block

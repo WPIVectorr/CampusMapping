@@ -63,7 +63,7 @@ public class GUI{
 		//System.out.println("------------------edges check-------------------");
 
 
-		//System.out.println(maps.get(0).getMapName());
+
 		//maps.get(0).getPointList().get(0).print();
 
 		mainMenu = new JPanel();

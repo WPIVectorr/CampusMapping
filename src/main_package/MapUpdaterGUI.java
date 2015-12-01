@@ -36,8 +36,13 @@ public class MapUpdaterGUI{
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
 	private ArrayList<Point> markForDelete = new ArrayList<Point>();
 
+
 	private Point currentPoint;
 	private Point editPoint;
+	private int editPointIndex;
+	String name;
+	File destinationFile;
+	File logo;
 
 	private Map currentMap = null;
 	private ServerDB md = ServerDB.getInstance();
@@ -58,6 +63,9 @@ public class MapUpdaterGUI{
 	private static JRadioButton rdbtnAddPoints;
 	private static JRadioButton rdbtnEditPoints;
 	private static JRadioButton rdbtnRemovePoints;
+
+	//---------------------------------
+	private static boolean DEBUG = true;
 
 	String point1;
 	String point2;
@@ -184,7 +192,14 @@ public class MapUpdaterGUI{
 			 */
 			// includes extension
 			if(!(imgList[f].getName().equals(".DS_Store"))){
-				mapDropDown.addItem(imgList[f].getName());
+				//checks to make sure the names populating the drop down are in both the vector maps package and 
+				//the database
+				for(int count = 0; count < md.getMapsFromLocal().size(); count++){
+					if(md.getMapsFromLocal().get(count).getMapName().compareTo(imgList[f].getName()) == 0){
+						mapDropDown.addItem(imgList[f].getName());
+					}
+				}
+
 			}
 		}
 		File logo = new File("src/VectorLogo/VectorrLogo.png");
@@ -221,6 +236,77 @@ public class MapUpdaterGUI{
 		gbc_txtImageDirectoryPath.gridy = 1;
 		mapsPanel.add(txtImageDirectoryPath, gbc_txtImageDirectoryPath);
 		txtImageDirectoryPath.setColumns(10);
+
+		mapDropDown.addItem("Select Map");
+
+		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
+			public void actionPerformed(ActionEvent a) {
+				name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
+				System.out.println("Selected item:"+name);
+
+				destinationFile = new File("src/VectorMaps/" + name);
+				destinationFile = new File(destinationFile.getAbsolutePath());
+
+
+				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
+					pointArray.clear();
+					edgeArray.clear();
+					ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
+					System.out.println("MapList size is "+mapList.size());//Print out the size of the maps from the database
+					for(int i = 0; i < mapList.size(); i++){//Iterate through the mapList until we find the item we are looking for
+						System.out.println("Trying to find name:"+name);
+						if(name.equals(mapList.get(i).getMapName()+".jpg"))//Once we find the map:
+						{
+							currentMap = mapList.get(i);//Grab the current map at this position.
+							pointArray = currentMap.getPointList();//Populate the point array with all the points found.
+							System.out.println("Map list size:"+mapList.size());
+
+							for(int j = 0; j < pointArray.size(); j++){
+								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
+								for(int k = 0; k < tmpEdges.size(); k++){
+									System.out.println(tmpEdges.get(k).getId());
+									edgeArray.add(tmpEdges.get(k));
+								}
+							}
+
+
+							System.out.println("Found map with number of points: "+currentMap.getPointList().size());
+							i = mapList.size();
+						}
+					}
+
+
+					/*				File destinationFile = new File("src/VectorMaps/" + name);
+													destinationFile = new File(destinationFile.getAbsolutePath());
+													if (!(name.equals("Select Map"))) {*/
+					try {
+						img = ImageIO.read(destinationFile);
+					} catch (IOException g) {
+						System.out.println("Invalid Map Selection");
+						g.printStackTrace();
+					}
+				} else {
+					File logo = new File("src/VectorLogo/VectorrLogo.png");
+					File logoFinal = new File(logo.getAbsolutePath());
+					//System.out.println("logoFinal: " + logoFinal);
+					try{
+						img = ImageIO.read(logoFinal);
+					}
+					catch(IOException g){
+						System.out.println("Invalid logo");
+						g.printStackTrace();
+					}
+					pointArray.clear();
+					edgeArray.clear();
+				}
+				frame.repaint();
+			}
+		});
+
+		
+		// List that stores the name of every Map in the database
+
+		// mapList.add("Select Map");
 
 
 		mapName = new JTextField();
@@ -376,71 +462,7 @@ public class MapUpdaterGUI{
 		gbc_mapDropDown.gridx = 2;
 		gbc_mapDropDown.gridy = 2;
 		mapsPanel.add(mapDropDown, gbc_mapDropDown);
-		mapDropDown.addItem("Select Map");
 
-		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
-			public void actionPerformed(ActionEvent a) {
-				String name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
-				System.out.println("Selected item:"+name);
-
-				File destinationFile = new File("src/VectorMaps/" + name);
-				destinationFile = new File(destinationFile.getAbsolutePath());
-
-
-				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
-					pointArray.clear();
-					edgeArray.clear();
-					ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
-					System.out.println("MapList size is "+mapList.size());//Print out the size of the maps from the database
-					for(int i = 0; i < mapList.size(); i++){//Iterate through the mapList until we find the item we are looking for
-						System.out.println("Trying to find name:"+name);
-						if(name.equals(mapList.get(i).getMapName()+".jpg"))//Once we find the map:
-						{
-							currentMap = mapList.get(i);//Grab the current map at this position.
-							pointArray = currentMap.getPointList();//Populate the point array with all the points found.
-							System.out.println("Map list size:"+mapList.size());
-
-							for(int j = 0; j < pointArray.size(); j++){
-								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
-								for(int k = 0; k < tmpEdges.size(); k++){
-									System.out.println(tmpEdges.get(k).getId());
-									edgeArray.add(tmpEdges.get(k));
-								}
-							}
-
-
-							System.out.println("Found map with number of points: "+currentMap.getPointList().size());
-							i = mapList.size();
-						}
-					}
-
-
-					/*				File destinationFile = new File("src/VectorMaps/" + name);
-													destinationFile = new File(destinationFile.getAbsolutePath());
-													if (!(name.equals("Select Map"))) {*/
-					try {
-						img = ImageIO.read(destinationFile);
-					} catch (IOException g) {
-						System.out.println("Invalid Map Selection");
-						g.printStackTrace();
-					}
-				} else {
-					File logo = new File("src/VectorLogo/VectorrLogo.png");
-					File logoFinal = new File(logo.getAbsolutePath());
-					//System.out.println("logoFinal: " + logoFinal);
-					try{
-						img = ImageIO.read(logoFinal);
-					}
-					catch(IOException g){
-						System.out.println("Invalid logo");
-						g.printStackTrace();
-					}
-					pointArray.clear();
-					edgeArray.clear();
-				}
-				frame.repaint();
-			}
-		});
 
 		return mapsPanel;
 	}
@@ -459,7 +481,7 @@ public class MapUpdaterGUI{
 
 		/* Initialization of the radio buttons */
 		ButtonGroup modeSelector = new ButtonGroup();
-		
+
 		verticalStrut = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
 		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
@@ -579,14 +601,10 @@ public class MapUpdaterGUI{
 			public void actionPerformed(ActionEvent e) {
 				for (int i = 0; i < pointArray.size(); i++) {
 					Point storePoint = pointArray.get(i);
-					System.out.println("currentmap's currentPoint's id:"+currentMap.getMapId());
-					storePoint.setID((String)(currentMap.getMapId() + "." + i));				
 
-					Point newPoint = new Point(storePoint.getId(), storePoint.getName(),
-							storePoint.getLocX(), storePoint.getLocY());
 					System.out.println("Storing point in:"+currentMap.getMapName());
 					try {
-						ServerDB.insertPoint(currentMap, newPoint);
+						ServerDB.insertPoint(currentMap, pointArray.get(i));
 						System.out.println("AddPointSuccess");
 					} catch (AlreadyExistsException f){
 						System.out.println(f.getMessage());
@@ -696,10 +714,30 @@ public class MapUpdaterGUI{
 				//System.out.println(newClick);
 				if (getRadButton() == 1) // if addpoint
 				{
-					Integer arraySize = pointArray.size();
-					System.out.println(currentMap.getMapId());
-					Point point = new Point((String)(currentMap.getMapId() + "."+ arraySize), 
-							"Point " + arraySize.toString(), lastMousex, lastMousey, numEdges);
+					Integer nameNumber = pointArray.size()+1;
+					double ourRotation = currentMap.getRotationAngle();
+					//ourRotation = 2 * Math.PI - ourRotation;
+
+
+					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;
+					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
+					double tempPreRotateX = lastMousex;
+					double tempPreRotateY = lastMousey;
+
+					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
+					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
+					tempPreRotateX = (tempPreRotateX/img.getWidth()) * currentMap.getWidth();
+					tempPreRotateY = (tempPreRotateY/img.getHeight()) * currentMap.getHeight();
+					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
+					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+
+					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
+					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
+
+					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
+							"Point " + nameNumber.toString(), currentMap.getPointIDIndex(),
+							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
+
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){
@@ -709,6 +747,7 @@ public class MapUpdaterGUI{
 					if(shouldAdd){
 						pointArray.add(point);
 					}
+					//System.out.println("add point to map: "+currentMap.getMapId()+" Point Array size: "+pointArray.size());
 					repaint();
 				}
 			}
@@ -737,7 +776,7 @@ public class MapUpdaterGUI{
 					}*/
 					// newClick has some interesting storage things going on.
 					if (newClick == true) {
-						//CHANGE THIS LATER, GOOD FOR TESTING CLICKS
+						//TODO CHANGE THIS LATER, GOOD FOR TESTING CLICKS
 						MapUpdaterGUI.btnSaveMap.setText("Save Map, X:" + lastMousex + ", Y:" + lastMousey);
 
 						switch (getRadButton()) {
@@ -748,20 +787,25 @@ public class MapUpdaterGUI{
 											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
 								if (newClick == true && editingPoint == false) {
 									editPoint = currentPoint;
+									editPointIndex = i;
 									roomNumber.setText(editPoint.getName());
 									btnSavePoint.setText("Unselect Current Point");
 									editingPoint = true;
 									newClick = false;
 								} else if (newClick == true && editingPoint == true) {
-									if(editPoint == currentPoint){
+									if(editPoint.getId().contentEquals(currentPoint.getId())){
 
 									} else {
 										currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
+										pointArray.set(editPointIndex, editPoint);
+										pointArray.set(i, currentPoint);
+										System.out.println("Edge sizes- editPoint:"+pointArray.get(editPointIndex).getEdges().size()+
+												" currentPoint:"+pointArray.get(i).getEdges().size());
 										System.out.println("Current Edge is: " + currentEdge.getId());
 										edgeArray.add(currentEdge);
-										if (currentPoint.getNumberEdges() > 0)//this has to be caught in an exception later
+										if (currentPoint.getNumEdges() > 0)//this has to be caught in an exception later
 										{
-											for (int j = 0; j < currentPoint.getNumberEdges(); j++) {
+											for (int j = 0; j < currentPoint.getNumEdges(); j++) {
 												System.out.println("Adding clicked edge between: "
 														+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
 														+ currentPoint.getEdges().get(j).getPoint2().getName());
@@ -770,8 +814,11 @@ public class MapUpdaterGUI{
 									}
 									newClick = false;
 									if(pathMode){
-										editPoint.setName(roomNumber.getText());
+										Point tempEditPoint = pointArray.get(editPointIndex);
+										tempEditPoint.setName(roomNumber.getText());
+										pointArray.set(editPointIndex, tempEditPoint);
 										editPoint = currentPoint;
+										editPointIndex = i;
 										roomNumber.setText(editPoint.getName());
 									}
 
@@ -780,13 +827,88 @@ public class MapUpdaterGUI{
 							}
 							break;
 						case 3:// remove points
+							System.out.println("Remove point called.");
+							System.out.println("Size of edgeArray:"+edgeArray.size());
+							for (int j = 0; j < pointArray.size(); j++)
+							{
+								System.out.println("Number of edges in point "
+										+pointArray.get(j).getId()+": "+pointArray.get(j).getEdges().size());
+							}
 							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
 									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
 									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
 											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
-								if (newClick == true)
-									markForDelete.add(currentPoint);
+								if (newClick == true){
+									/* The error lies in the fact that edges, when created, are not being added to the points in the pointArray,
+									 * as a result, the code breaks when trying to remove said edge. The code below is the first half of a quick
+									 * fix, but we are going to try to address the underlying issue first.
+									int j = 0;
+									for (j = 0; j<edgeArray.size(); j++)
+									{
+										Edge currEdge = edgeArray.get(j);
+										if (currEdge.getPoint1().getId().contentEquals(currentPoint.getId()))
+										{
+											System.out.println("--Adding edge:"+currEdge.getId()+" to currPoint--");
+											currentPoint.addEdge(currEdge);
+										}
+										else if (currEdge.getPoint2().getId().contentEquals(currentPoint.getId()))
+										{
+											System.out.println("--Adding edge:"+currEdge.getId()+" to currPoint--");
+											currentPoint.addEdge(currEdge);
+										}
+									}*/
+									try{
+										System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
+										ServerDB.removePoint(currentPoint);
+									} catch (DoesNotExistException e1){
+										System.out.println("Reached Here");
+										e1.printStackTrace();
+									}
 
+									//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+									for(int kj = 0; kj < currentPoint.getEdges().size(); kj++){
+										//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+										while(edgeArray.contains(currentPoint.getEdges().get(kj))){
+											edgeArray.remove(currentPoint.getEdges().get(kj));
+										}
+										Edge edgeRemoving = currentPoint.getEdges().get(kj);
+
+										if(currentPoint.getId().contentEquals(edgeRemoving.getPoint1().getId()))
+										{
+											for(int f = 0; f < pointArray.size(); f++){
+												if(pointArray.get(f).getId().contentEquals(edgeRemoving.getPoint2().getId())){
+													for(int o = 0; o < pointArray.get(f).getEdges().size(); o++){
+														if(pointArray.get(f).getEdges().get(o).getId().contentEquals(edgeRemoving.getId())){
+															Point tmpPoint = pointArray.get(f);
+															tmpPoint.getEdges().remove(edgeRemoving);
+															tmpPoint.setNumEdges(tmpPoint.getNumEdges() - 1);
+															pointArray.set(f, tmpPoint);
+														}
+													}
+												}
+											}
+										}
+										else
+										{
+											for(int f = 0; f < pointArray.size(); f++){
+												if(pointArray.get(f).getId().contentEquals(edgeRemoving.getPoint1().getId())){
+													for(int o = 0; o < pointArray.get(f).getEdges().size(); o++){
+														if(pointArray.get(f).getEdges().get(o).getId().contentEquals(edgeRemoving.getId())){
+															Point tmpPoint = pointArray.get(f);
+															tmpPoint.getEdges().remove(edgeRemoving);
+															tmpPoint.setNumEdges(tmpPoint.getNumEdges() - 1);
+															pointArray.set(f, tmpPoint);
+														}
+													}
+												}
+											}
+										}
+									}
+
+									currentPoint.deleteEdges();
+									pointArray.remove(currentPoint);
+									pointArray.remove(currentPoint);
+								}
 								newClick = false;
 								repaint();
 							}
@@ -798,10 +920,21 @@ public class MapUpdaterGUI{
 
 					for (int j = 0; j < markForDelete.size(); j++) {
 						// remove edges to list
+
+
 						for(int kj = 0; kj < markForDelete.get(j).getEdges().size(); kj++){
-							edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							while(edgeArray.contains(markForDelete.get(j).getEdges().get(kj))){
+								edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							}
 						}
+						/*try {
+							ServerDB.removePoint(markForDelete.get(j));
+						} catch (DoesNotExistException e1) {
+							System.out.println("Attempted to delete point that doesn;t exist in the database. Not an error");
+						}*/
 						markForDelete.get(j).deleteEdges();
+						pointArray.remove(markForDelete.get(j));
 						pointArray.remove(markForDelete.get(j));
 						markForDelete.remove(j);
 					}

@@ -18,6 +18,7 @@ import javafx.scene.shape.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Box;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import database.AlreadyExistsException;
 import database.DoesNotExistException;
@@ -35,8 +36,13 @@ public class MapUpdaterGUI{
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
 	private ArrayList<Point> markForDelete = new ArrayList<Point>();
 
+
 	private Point currentPoint;
 	private Point editPoint;
+	private int editPointIndex;
+	String name;
+	File destinationFile;
+	File logo;
 
 	private Map currentMap = null;
 	private ServerDB md = ServerDB.getInstance();
@@ -57,7 +63,7 @@ public class MapUpdaterGUI{
 	private static JRadioButton rdbtnAddPoints;
 	private static JRadioButton rdbtnEditPoints;
 	private static JRadioButton rdbtnRemovePoints;
-	
+
 	//---------------------------------
 	private static boolean DEBUG = true;
 
@@ -66,33 +72,104 @@ public class MapUpdaterGUI{
 	String point3;
 	String point4;
 	private JTextField roomNumber;
-	private JPanel buttonPanel;
 	private DrawPanel drawPanel = new DrawPanel();
 	private JTextField mapName;
 	private JTextField txtImageDirectoryPath;
 	private JComboBox mapDropDown;
 	private File mapToAdd;
-	private JSplitPane splitPane;
 	private Boolean pathMode = false;
 
+	private Color buttonColor = new Color(153, 204, 255);
+
 	private JFrame frame = new JFrame("Map Updater");
+	private JLabel lblMapImageDirectory;
+	private JLabel lblMapName;
+	private Component verticalStrut;
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
 
 		frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setBackground(new Color(255, 235, 205));
 
-		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new GridLayout(4, 0, 10, 10));
-		buttonPanel.setBackground(new Color(255, 235, 205));
-		Color buttonColor = new Color(153, 204, 255);
+		frame.setMinimumSize(new Dimension(800, 600));
+		frame.getContentPane().setBackground(new Color(255, 235, 205));
 
-		// Map Drop Down List
-		mapDropDown = new JComboBox();
-		mapDropDown.setToolTipText("Select Map");
-		buttonPanel.add(mapDropDown);
-		mapDropDown.addItem("Select Map");
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BorderLayout());
+		frame.getContentPane().add(buttonPanel, BorderLayout.NORTH);
+
+		JTabbedPane tabs = new JTabbedPane();
+		tabs.addTab("Maps", createMapsPanel());
+		tabs.addTab("Points", createPointsPanel());
+
+		buttonPanel.add(tabs, BorderLayout.NORTH);
+
+		frame.getContentPane().add(drawPanel);
+
+		// Show the frame after everything has been initalized
+		frame.setVisible(true);
+	}
+
+
+	/*
+	 * Returns the currently selected radbutton in the form of an int. 1 for
+	 * addPoint, 2 for editPoint, 3 for removePoint
+	 */
+	public int getRadButton() {
+		int activeButton = 0;
+		if (rdbtnAddPoints.isSelected())
+			activeButton = 1;
+		if (rdbtnEditPoints.isSelected())
+			activeButton = 2;
+		if (rdbtnRemovePoints.isSelected())
+			activeButton = 3;
+		return activeButton;
+	}
+
+	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException {
+
+		try {
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception e) {
+			// If Nimbus is not available, use lookAndFeel of current system
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException | InstantiationException
+					| IllegalAccessException | UnsupportedLookAndFeelException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				MapUpdaterGUI mapUpdater = new MapUpdaterGUI();
+				try {
+					mapUpdater.createAndShowGUI();
+				} catch (IOException | AlreadyExistsException | SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+
+	public JComponent createMapsPanel(){
+		JPanel mapsPanel = new JPanel();
+		mapsPanel.setBackground(new Color(255, 235, 205));
+		GridBagLayout gbl_mapsPanel = new GridBagLayout();
+		gbl_mapsPanel.rowHeights = new int[] {0, 30, 30};
+		gbl_mapsPanel.columnWidths = new int[] {280, 280, 280};
+		gbl_mapsPanel.columnWeights = new double[]{0.0, 0.0, 0.0};
+		gbl_mapsPanel.rowWeights = new double[]{0.0, 0.0, 0.0};
+		mapsPanel.setLayout(gbl_mapsPanel);
 
 		// When the Updater opens the software the list will be populated with
 		// the files in
@@ -100,6 +177,8 @@ public class MapUpdaterGUI{
 		File vectorMapDir = new File("src/VectorMaps");
 		vectorMapDir = new File(vectorMapDir.getAbsolutePath());
 		//System.out.println("Vectormap abs path: " + vectorMapDir.getAbsolutePath());
+
+		mapDropDown = new JComboBox();
 
 		// Truncates the extensions off of the map name so only the name is
 		// displayed in the
@@ -113,7 +192,14 @@ public class MapUpdaterGUI{
 			 */
 			// includes extension
 			if(!(imgList[f].getName().equals(".DS_Store"))){
-				mapDropDown.addItem(imgList[f].getName());
+				//checks to make sure the names populating the drop down are in both the vector maps package and 
+				//the database
+				for(int count = 0; count < md.getMapsFromLocal().size(); count++){
+					if(md.getMapsFromLocal().get(count).getMapName().compareTo(imgList[f].getName()) == 0){
+						mapDropDown.addItem(imgList[f].getName());
+					}
+				}
+
 			}
 		}
 		File logo = new File("src/VectorLogo/VectorrLogo.png");
@@ -127,12 +213,38 @@ public class MapUpdaterGUI{
 			g.printStackTrace();
 		}
 
+		lblMapImageDirectory = new JLabel("Map Image Directory Path");
+		GridBagConstraints gbc_lblMapImageDirectory = new GridBagConstraints();
+		gbc_lblMapImageDirectory.insets = new Insets(0, 0, 5, 5);
+		gbc_lblMapImageDirectory.gridx = 0;
+		gbc_lblMapImageDirectory.gridy = 0;
+		mapsPanel.add(lblMapImageDirectory, gbc_lblMapImageDirectory);
+
+		lblMapName = new JLabel("Map Name");
+		GridBagConstraints gbc_lblMapName = new GridBagConstraints();
+		gbc_lblMapName.insets = new Insets(0, 0, 5, 5);
+		gbc_lblMapName.gridx = 1;
+		gbc_lblMapName.gridy = 0;
+		mapsPanel.add(lblMapName, gbc_lblMapName);
+
+		txtImageDirectoryPath = new JTextField();
+		txtImageDirectoryPath.setText("Map Image Directory Path");
+		GridBagConstraints gbc_txtImageDirectoryPath = new GridBagConstraints();
+		gbc_txtImageDirectoryPath.fill = GridBagConstraints.BOTH;
+		gbc_txtImageDirectoryPath.insets = new Insets(0, 0, 5, 5);
+		gbc_txtImageDirectoryPath.gridx = 0;
+		gbc_txtImageDirectoryPath.gridy = 1;
+		mapsPanel.add(txtImageDirectoryPath, gbc_txtImageDirectoryPath);
+		txtImageDirectoryPath.setColumns(10);
+
+		mapDropDown.addItem("Select Map");
+
 		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
-				String name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
+				name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
 				System.out.println("Selected item:"+name);
 
-				File destinationFile = new File("src/VectorMaps/" + name);
+				destinationFile = new File("src/VectorMaps/" + name);
 				destinationFile = new File(destinationFile.getAbsolutePath());
 
 
@@ -152,8 +264,7 @@ public class MapUpdaterGUI{
 							for(int j = 0; j < pointArray.size(); j++){
 								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
 								for(int k = 0; k < tmpEdges.size(); k++){
-									if (DEBUG)
-										System.out.println(tmpEdges.get(k).getId());
+									System.out.println(tmpEdges.get(k).getId());
 									edgeArray.add(tmpEdges.get(k));
 								}
 							}
@@ -166,8 +277,8 @@ public class MapUpdaterGUI{
 
 
 					/*				File destinationFile = new File("src/VectorMaps/" + name);
-				destinationFile = new File(destinationFile.getAbsolutePath());
-				if (!(name.equals("Select Map"))) {*/
+													destinationFile = new File(destinationFile.getAbsolutePath());
+													if (!(name.equals("Select Map"))) {*/
 					try {
 						img = ImageIO.read(destinationFile);
 					} catch (IOException g) {
@@ -191,88 +302,30 @@ public class MapUpdaterGUI{
 				frame.repaint();
 			}
 		});
+
+		
 		// List that stores the name of every Map in the database
 
 		// mapList.add("Select Map");
 
-		Container contentPane = frame.getContentPane();
-		contentPane.add(buttonPanel, BorderLayout.NORTH);
-
-		// adds the starting location label to the line with starting location
-		// options
-		JLabel lblStartingLocation = new JLabel("Room Number");
-		buttonPanel.add(lblStartingLocation);
-		lblStartingLocation.setBounds(6, 31, 119, 16);
-
-		/* Initialization of the radio buttons */
-		ButtonGroup modeSelector = new ButtonGroup();
-		rdbtnAddPoints = new JRadioButton("Add Points", true);
-		buttonPanel.add(rdbtnAddPoints);
-		modeSelector.add(rdbtnAddPoints);
 
 		mapName = new JTextField();
 		mapName.setText("Map Name");
-		buttonPanel.add(mapName);
+		GridBagConstraints gbc_mapName = new GridBagConstraints();
+		gbc_mapName.fill = GridBagConstraints.BOTH;
+		gbc_mapName.insets = new Insets(0, 0, 5, 5);
+		gbc_mapName.gridx = 1;
+		gbc_mapName.gridy = 1;
+		mapsPanel.add(mapName, gbc_mapName);
 		mapName.setColumns(10);
 
-		// creates a centered text field that will write back the users info
-		// they typed in
-		roomNumber = new JTextField();
-		buttonPanel.add(roomNumber);
-		roomNumber.setHorizontalAlignment(JTextField.CENTER);
-		roomNumber.setText("Select a Point to Edit");
-		roomNumber.setToolTipText("");
-		roomNumber.setBounds(6, 174, 438, 30);
-		roomNumber.setColumns(1);
-
-		rdbtnRemovePoints = new JRadioButton("Remove Points");
-		buttonPanel.add(rdbtnRemovePoints);
-		modeSelector.add(rdbtnRemovePoints);
-
-		/* JButton Add Map */
-
-		contentPane.add(drawPanel);
-		txtImageDirectoryPath = new JTextField();
-		txtImageDirectoryPath.setText("Map Image Directory Path");
-		buttonPanel.add(txtImageDirectoryPath);
-		txtImageDirectoryPath.setColumns(10);
-
-		JLabel lblLastPoint = new JLabel("Select a Point to Edit");
-		buttonPanel.add(lblLastPoint);
-
-		JSplitPane splitPane_editPoints = new JSplitPane();
-		buttonPanel.add(splitPane_editPoints);
-
-		rdbtnEditPoints = new JRadioButton("Edit Points");
-		rdbtnEditPoints.setPreferredSize(new Dimension(125, 23));
-		rdbtnEditPoints.setHorizontalAlignment(SwingConstants.LEFT);
-		splitPane_editPoints.setLeftComponent(rdbtnEditPoints);
-		modeSelector.add(rdbtnEditPoints);
-
-		JToggleButton pathToggleButton = new JToggleButton("Path Mode Disabled");
-		pathToggleButton.setPreferredSize(new Dimension(85, 23));
-		splitPane_editPoints.setRightComponent(pathToggleButton);
-		pathToggleButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent pathtoggled) {
-				if (pathMode){
-					pathMode = false;
-					pathToggleButton.setText("Path Mode Disabled");
-				}
-				else{
-					pathMode = true;
-					pathToggleButton.setText("Path Mode Enabled");
-				}
-			}
-		});
-
-		/* JButton */
-
-		splitPane = new JSplitPane();
-		buttonPanel.add(splitPane);
-
 		GradientButton findMapFile = new GradientButton("Add Map From File", buttonColor);
-		splitPane.setLeftComponent(findMapFile);
+		GridBagConstraints gbc_findMapFile = new GridBagConstraints();
+		gbc_findMapFile.fill = GridBagConstraints.BOTH;
+		gbc_findMapFile.insets = new Insets(0, 0, 0, 5);
+		gbc_findMapFile.gridx = 0;
+		gbc_findMapFile.gridy = 2;
+		mapsPanel.add(findMapFile, gbc_findMapFile);
 		findMapFile.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -292,7 +345,14 @@ public class MapUpdaterGUI{
 		});
 
 		GradientButton btnAddMap = new GradientButton("Add Map", buttonColor);
-		splitPane.setRightComponent(btnAddMap);
+		GridBagConstraints gbc_btnAddMap = new GridBagConstraints();
+		gbc_btnAddMap.fill = GridBagConstraints.BOTH;
+		gbc_btnAddMap.insets = new Insets(0, 0, 0, 5);
+		gbc_btnAddMap.gridx = 1;
+		gbc_btnAddMap.gridy = 2;
+		mapsPanel.add(btnAddMap, gbc_btnAddMap);
+
+
 
 		btnAddMap.addActionListener(new ActionListener() {
 
@@ -395,13 +455,115 @@ public class MapUpdaterGUI{
 			}
 		});
 
+		// Map Drop Down List
+		mapDropDown.setToolTipText("Select Map");
+		GridBagConstraints gbc_mapDropDown = new GridBagConstraints();
+		gbc_mapDropDown.fill = GridBagConstraints.BOTH;
+		gbc_mapDropDown.gridx = 2;
+		gbc_mapDropDown.gridy = 2;
+		mapsPanel.add(mapDropDown, gbc_mapDropDown);
+
+
+		return mapsPanel;
+	}
+
+
+	public JComponent createPointsPanel(){
+
+		JPanel pointsPanel = new JPanel();
+		pointsPanel.setBackground(new Color(255, 235, 205));
+		GridBagLayout gbl_pointsPanel = new GridBagLayout();
+		gbl_pointsPanel.columnWidths = new int[]{140, 91, 297, 297, 0, 0};
+		gbl_pointsPanel.rowHeights = new int[]{0, 23, 23, 0, 0, 8, 0};
+		gbl_pointsPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_pointsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		pointsPanel.setLayout(gbl_pointsPanel);
+
+		/* Initialization of the radio buttons */
+		ButtonGroup modeSelector = new ButtonGroup();
+
+		verticalStrut = Box.createVerticalStrut(20);
+		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
+		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
+		gbc_verticalStrut.gridx = 2;
+		gbc_verticalStrut.gridy = 0;
+		pointsPanel.add(verticalStrut, gbc_verticalStrut);
+		rdbtnAddPoints = new JRadioButton("Add Points", true);
+		GridBagConstraints gbc_rdbtnAddPoints = new GridBagConstraints();
+		gbc_rdbtnAddPoints.fill = GridBagConstraints.BOTH;
+		gbc_rdbtnAddPoints.insets = new Insets(0, 0, 5, 5);
+		gbc_rdbtnAddPoints.gridx = 1;
+		gbc_rdbtnAddPoints.gridy = 1;
+		pointsPanel.add(rdbtnAddPoints, gbc_rdbtnAddPoints);
+		modeSelector.add(rdbtnAddPoints);
+
+		// adds the starting location label to the line with starting location
+		// options
+		JLabel lblStartingLocation = new JLabel("Point Name");
+		GridBagConstraints gbc_lblStartingLocation = new GridBagConstraints();
+		gbc_lblStartingLocation.fill = GridBagConstraints.VERTICAL;
+		gbc_lblStartingLocation.insets = new Insets(0, 0, 5, 5);
+		gbc_lblStartingLocation.gridx = 3;
+		gbc_lblStartingLocation.gridy = 1;
+		pointsPanel.add(lblStartingLocation, gbc_lblStartingLocation);
+		lblStartingLocation.setBounds(6, 31, 119, 16);
+
+		rdbtnEditPoints = new JRadioButton("Edit Points");
+		rdbtnEditPoints.setPreferredSize(new Dimension(125, 23));
+		rdbtnEditPoints.setHorizontalAlignment(SwingConstants.LEFT);
+		GridBagConstraints gbc_rdbtnEditPoints = new GridBagConstraints();
+		gbc_rdbtnEditPoints.fill = GridBagConstraints.BOTH;
+		gbc_rdbtnEditPoints.insets = new Insets(0, 0, 5, 5);
+		gbc_rdbtnEditPoints.gridx = 1;
+		gbc_rdbtnEditPoints.gridy = 2;
+		pointsPanel.add(rdbtnEditPoints, gbc_rdbtnEditPoints);
+		modeSelector.add(rdbtnEditPoints);
+
+		JCheckBox chckbxPathMode = new JCheckBox("Path Mode");
+		GridBagConstraints gbc_chckbxPathMode= new GridBagConstraints();
+		gbc_chckbxPathMode.insets = new Insets(0, 0, 5, 5);
+		gbc_chckbxPathMode.gridx = 2;
+		gbc_chckbxPathMode.gridy = 2;
+		pointsPanel.add(chckbxPathMode, gbc_chckbxPathMode);
+		chckbxPathMode.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				if (chckbxPathMode.isSelected()){
+					pathMode = true;
+				}
+				else{
+					pathMode = false;
+				}
+			}
+		});
+
+
+		// creates a centered text field that will write back the users info
+		// they typed in
+		roomNumber = new JTextField();
+		GridBagConstraints gbc_roomNumber = new GridBagConstraints();
+		gbc_roomNumber.fill = GridBagConstraints.BOTH;
+		gbc_roomNumber.insets = new Insets(0, 0, 5, 5);
+		gbc_roomNumber.gridx = 3;
+		gbc_roomNumber.gridy = 2;
+		pointsPanel.add(roomNumber, gbc_roomNumber);
+		roomNumber.setHorizontalAlignment(JTextField.CENTER);
+		roomNumber.setText("Select a Point to Edit");
+		roomNumber.setToolTipText("");
+		roomNumber.setBounds(6, 174, 438, 30);
+		roomNumber.setColumns(1);
+
+		rdbtnRemovePoints = new JRadioButton("Remove Points");
+		GridBagConstraints gbc_rdbtnRemovePoints = new GridBagConstraints();
+		gbc_rdbtnRemovePoints.fill = GridBagConstraints.BOTH;
+		gbc_rdbtnRemovePoints.insets = new Insets(0, 0, 5, 5);
+		gbc_rdbtnRemovePoints.gridx = 1;
+		gbc_rdbtnRemovePoints.gridy = 3;
+		pointsPanel.add(rdbtnRemovePoints, gbc_rdbtnRemovePoints);
+		modeSelector.add(rdbtnRemovePoints);
 
 		btnSavePoint = new GradientButton("No Point Selected", buttonColor);
-		buttonPanel.add(btnSavePoint);
-		btnSaveMap = new GradientButton("Save Map", buttonColor); // defined above to change text in
-		// point selector
-		buttonPanel.add(btnSaveMap);
-		contentPane.add(drawPanel);
+
 
 		btnSavePoint.addActionListener(new ActionListener() {
 
@@ -417,6 +579,21 @@ public class MapUpdaterGUI{
 				}
 			}
 		});
+		GridBagConstraints gbc_btnSavePoint = new GridBagConstraints();
+		gbc_btnSavePoint.fill = GridBagConstraints.BOTH;
+		gbc_btnSavePoint.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSavePoint.gridx = 3;
+		gbc_btnSavePoint.gridy = 3;
+		pointsPanel.add(btnSavePoint, gbc_btnSavePoint);
+
+		btnSaveMap = new GradientButton("Save Map", buttonColor); // defined above to change text in
+		// point selector
+		GridBagConstraints gbc_btnSaveMap = new GridBagConstraints();
+		gbc_btnSaveMap.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSaveMap.fill = GridBagConstraints.BOTH;
+		gbc_btnSaveMap.gridx = 2;
+		gbc_btnSaveMap.gridy = 4;
+		pointsPanel.add(btnSaveMap, gbc_btnSaveMap);
 
 		btnSaveMap.addActionListener(new ActionListener() {
 
@@ -424,12 +601,10 @@ public class MapUpdaterGUI{
 			public void actionPerformed(ActionEvent e) {
 				for (int i = 0; i < pointArray.size(); i++) {
 					Point storePoint = pointArray.get(i);
-					
-					Point newPoint = new Point(storePoint.getId(), storePoint.getName(),
-							storePoint.getLocX(), storePoint.getLocY());
+
 					System.out.println("Storing point in:"+currentMap.getMapName());
 					try {
-						ServerDB.insertPoint(currentMap, newPoint);
+						ServerDB.insertPoint(currentMap, pointArray.get(i));
 						System.out.println("AddPointSuccess");
 					} catch (AlreadyExistsException f){
 						System.out.println(f.getMessage());
@@ -459,47 +634,11 @@ public class MapUpdaterGUI{
 				}
 			}
 		});
-		// Show the frame after everything has been initalized
-		frame.setVisible(true);
-	}
 
-	/*
-	 * Returns the currently selected radbutton in the form of an int. 1 for
-	 * addPoint, 2 for editPoint, 3 for removePoint
-	 */
-	int getRadButton() {
-		int activeButton = 0;
-		if (rdbtnAddPoints.isSelected())
-			activeButton = 1;
-		if (rdbtnEditPoints.isSelected())
-			activeButton = 2;
-		if (rdbtnRemovePoints.isSelected())
-			activeButton = 3;
-		return activeButton;
-	}
 
-	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException {
+		return pointsPanel;
 
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException
-				| IllegalAccessException | UnsupportedLookAndFeelException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				MapUpdaterGUI mapUpdater = new MapUpdaterGUI();
-				try {
-					mapUpdater.createAndShowGUI();
-				} catch (IOException | AlreadyExistsException | SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
+
 	}
 
 
@@ -575,10 +714,30 @@ public class MapUpdaterGUI{
 				//System.out.println(newClick);
 				if (getRadButton() == 1) // if addpoint
 				{
-					Integer arraySize = pointArray.size();
+					Integer nameNumber = pointArray.size()+1;
+					double ourRotation = currentMap.getRotationAngle();
+					//ourRotation = 2 * Math.PI - ourRotation;
+
+
+					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;
+					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
+					double tempPreRotateX = lastMousex;
+					double tempPreRotateY = lastMousey;
+
+					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
+					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
+					tempPreRotateX = (tempPreRotateX/img.getWidth()) * currentMap.getWidth();
+					tempPreRotateY = (tempPreRotateY/img.getHeight()) * currentMap.getHeight();
+					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
+					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+
+					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
+					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
+
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
-							"Point " + arraySize.toString(), currentMap.getPointIDIndex(), lastMousex, lastMousey); 
-					//TODO BRIAAAAAANNN Please deal with the global x/y
+							"Point " + nameNumber.toString(), currentMap.getPointIDIndex(),
+							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
+
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						if(point.getId() == pointArray.get(k).getId()){
@@ -617,7 +776,7 @@ public class MapUpdaterGUI{
 					}*/
 					// newClick has some interesting storage things going on.
 					if (newClick == true) {
-						//CHANGE THIS LATER, GOOD FOR TESTING CLICKS
+						//TODO CHANGE THIS LATER, GOOD FOR TESTING CLICKS
 						MapUpdaterGUI.btnSaveMap.setText("Save Map, X:" + lastMousex + ", Y:" + lastMousey);
 
 						switch (getRadButton()) {
@@ -628,15 +787,20 @@ public class MapUpdaterGUI{
 											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
 								if (newClick == true && editingPoint == false) {
 									editPoint = currentPoint;
+									editPointIndex = i;
 									roomNumber.setText(editPoint.getName());
-									btnSavePoint.setText("Save Point Changes");
+									btnSavePoint.setText("Unselect Current Point");
 									editingPoint = true;
 									newClick = false;
 								} else if (newClick == true && editingPoint == true) {
-									if(editPoint == currentPoint){
+									if(editPoint.getId().contentEquals(currentPoint.getId())){
 
 									} else {
 										currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
+										pointArray.set(editPointIndex, editPoint);
+										pointArray.set(i, currentPoint);
+										System.out.println("Edge sizes- editPoint:"+pointArray.get(editPointIndex).getEdges().size()+
+												" currentPoint:"+pointArray.get(i).getEdges().size());
 										System.out.println("Current Edge is: " + currentEdge.getId());
 										edgeArray.add(currentEdge);
 										if (currentPoint.getNumEdges() > 0)//this has to be caught in an exception later
@@ -650,8 +814,11 @@ public class MapUpdaterGUI{
 									}
 									newClick = false;
 									if(pathMode){
-										editPoint.setName(roomNumber.getText());
+										Point tempEditPoint = pointArray.get(editPointIndex);
+										tempEditPoint.setName(roomNumber.getText());
+										pointArray.set(editPointIndex, tempEditPoint);
 										editPoint = currentPoint;
+										editPointIndex = i;
 										roomNumber.setText(editPoint.getName());
 									}
 
@@ -660,13 +827,88 @@ public class MapUpdaterGUI{
 							}
 							break;
 						case 3:// remove points
+							System.out.println("Remove point called.");
+							System.out.println("Size of edgeArray:"+edgeArray.size());
+							for (int j = 0; j < pointArray.size(); j++)
+							{
+								System.out.println("Number of edges in point "
+										+pointArray.get(j).getId()+": "+pointArray.get(j).getEdges().size());
+							}
 							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
 									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
 									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
 											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
-								if (newClick == true)
-									markForDelete.add(currentPoint);
+								if (newClick == true){
+									/* The error lies in the fact that edges, when created, are not being added to the points in the pointArray,
+									 * as a result, the code breaks when trying to remove said edge. The code below is the first half of a quick
+									 * fix, but we are going to try to address the underlying issue first.
+									int j = 0;
+									for (j = 0; j<edgeArray.size(); j++)
+									{
+										Edge currEdge = edgeArray.get(j);
+										if (currEdge.getPoint1().getId().contentEquals(currentPoint.getId()))
+										{
+											System.out.println("--Adding edge:"+currEdge.getId()+" to currPoint--");
+											currentPoint.addEdge(currEdge);
+										}
+										else if (currEdge.getPoint2().getId().contentEquals(currentPoint.getId()))
+										{
+											System.out.println("--Adding edge:"+currEdge.getId()+" to currPoint--");
+											currentPoint.addEdge(currEdge);
+										}
+									}*/
+									try{
+										System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
+										ServerDB.removePoint(currentPoint);
+									} catch (DoesNotExistException e1){
+										System.out.println("Reached Here");
+										e1.printStackTrace();
+									}
 
+									//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+									for(int kj = 0; kj < currentPoint.getEdges().size(); kj++){
+										//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+										while(edgeArray.contains(currentPoint.getEdges().get(kj))){
+											edgeArray.remove(currentPoint.getEdges().get(kj));
+										}
+										Edge edgeRemoving = currentPoint.getEdges().get(kj);
+
+										if(currentPoint.getId().contentEquals(edgeRemoving.getPoint1().getId()))
+										{
+											for(int f = 0; f < pointArray.size(); f++){
+												if(pointArray.get(f).getId().contentEquals(edgeRemoving.getPoint2().getId())){
+													for(int o = 0; o < pointArray.get(f).getEdges().size(); o++){
+														if(pointArray.get(f).getEdges().get(o).getId().contentEquals(edgeRemoving.getId())){
+															Point tmpPoint = pointArray.get(f);
+															tmpPoint.getEdges().remove(edgeRemoving);
+															tmpPoint.setNumEdges(tmpPoint.getNumEdges() - 1);
+															pointArray.set(f, tmpPoint);
+														}
+													}
+												}
+											}
+										}
+										else
+										{
+											for(int f = 0; f < pointArray.size(); f++){
+												if(pointArray.get(f).getId().contentEquals(edgeRemoving.getPoint1().getId())){
+													for(int o = 0; o < pointArray.get(f).getEdges().size(); o++){
+														if(pointArray.get(f).getEdges().get(o).getId().contentEquals(edgeRemoving.getId())){
+															Point tmpPoint = pointArray.get(f);
+															tmpPoint.getEdges().remove(edgeRemoving);
+															tmpPoint.setNumEdges(tmpPoint.getNumEdges() - 1);
+															pointArray.set(f, tmpPoint);
+														}
+													}
+												}
+											}
+										}
+									}
+
+									currentPoint.deleteEdges();
+									pointArray.remove(currentPoint);
+									pointArray.remove(currentPoint);
+								}
 								newClick = false;
 								repaint();
 							}
@@ -678,10 +920,21 @@ public class MapUpdaterGUI{
 
 					for (int j = 0; j < markForDelete.size(); j++) {
 						// remove edges to list
+
+
 						for(int kj = 0; kj < markForDelete.get(j).getEdges().size(); kj++){
-							edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							while(edgeArray.contains(markForDelete.get(j).getEdges().get(kj))){
+								edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							}
 						}
+						/*try {
+							ServerDB.removePoint(markForDelete.get(j));
+						} catch (DoesNotExistException e1) {
+							System.out.println("Attempted to delete point that doesn;t exist in the database. Not an error");
+						}*/
 						markForDelete.get(j).deleteEdges();
+						pointArray.remove(markForDelete.get(j));
 						pointArray.remove(markForDelete.get(j));
 						markForDelete.remove(j);
 					}
@@ -713,6 +966,7 @@ public class MapUpdaterGUI{
 		}
 
 	}
+
 
 
 

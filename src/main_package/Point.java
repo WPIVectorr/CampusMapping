@@ -54,6 +54,18 @@ public class Point {
 		this.globY = globY;
 	}
 	
+	public Point(String id, int mapId, String name, int index, int locX, int locY, int globX, int globY, int numberEdges) {
+		this.id = id;
+		this.mapId = mapId;
+		this.name = name;
+		this.locX = locX;
+		this.locY = locY;
+		this.numberEdges = numberEdges;
+		this.index = index;
+		this.globX = globX;
+		this.globY = globY;
+	}
+	
 	public Point(String id, String name, int index, int x, int y, int numberEdges) {
 		this.id = id;
 		this.name = name;
@@ -123,11 +135,6 @@ public class Point {
 		this.edges = edges;
 		this.numberEdges = edges.size();
 	}
-	//adds one edge
-	public void addEdge(Edge addMe){
-		edges.add(addMe);
-		this.numberEdges++;
-	}
 	//deletes all edges
 	public void deleteEdges(){
 		edges.clear();
@@ -143,6 +150,11 @@ public class Point {
 	public boolean equals(Point compPoint){
 		return this.id == compPoint.getId();
 	}
+	
+	public void setNumEdges(int numEdges){
+		this.numberEdges = numEdges;
+	}
+	
 	public void print()
 	{
 		System.out.println ("----------Printing Point:"+this.name+"----------");
@@ -174,5 +186,27 @@ public class Point {
 	public void setMapId(int mapId)
 	{
 		this.mapId = mapId;
+	}
+	public boolean addEdge(Edge edge)
+	{
+		boolean found = false;
+		int j = 0;
+		for (j = 0; j<edges.size(); j++)
+		{
+			if (edges.get(j).getId().contentEquals(edge.getID()))
+			{
+				found = true;
+			}
+		}
+		if (found)
+		{
+			return false;
+		}
+		else
+		{
+			edges.add(edge);
+			this.numberEdges++;
+			return true;
+		}
 	}
 }

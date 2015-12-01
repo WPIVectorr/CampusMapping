@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 import javafx.scene.shape.*;
 
@@ -32,7 +33,7 @@ public class MapUpdaterGUI{
 	private int pointSize = 5;
 	private boolean newClick = false;
 	private boolean editingPoint = false;
-	private boolean addingMap = false;
+	private static boolean addingMap = false;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
 	private ArrayList<Point> markForDelete = new ArrayList<Point>();
 
@@ -45,7 +46,7 @@ public class MapUpdaterGUI{
 	File logo;
 
 	private Map currentMap = null;
-	private ServerDB md = ServerDB.getInstance();
+	private static ServerDB md = ServerDB.getInstance();
 
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private Edge currentEdge;
@@ -55,7 +56,7 @@ public class MapUpdaterGUI{
 	private int windowSizeX = 932;
 	private int windowSizeY = 778;
 
-	private BufferedImage img = null;
+	private static BufferedImage img = null;
 	// ---------------------------------
 
 	private static JButton btnSaveMap;
@@ -75,9 +76,12 @@ public class MapUpdaterGUI{
 	private DrawPanel drawPanel = new DrawPanel();
 	private JTextField mapName;
 	private JTextField txtImageDirectoryPath;
-	private JComboBox mapDropDown;
+	private static JComboBox mapDropDown;
 	private File mapToAdd;
 	private Boolean pathMode = false;
+	private static String maptitle = "";
+	private static String srcInput = "";
+	private static File srcFile = null;
 
 	private Color buttonColor = new Color(153, 204, 255);
 
@@ -89,6 +93,15 @@ public class MapUpdaterGUI{
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
 
 		frame.setSize(932, 778);
+		
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		Dimension screenSize = tk.getScreenSize();
+		int screenHeight = screenSize.height;
+		int screenWidth = screenSize.width;
+		//frame.setSize(screenWidth / 2, screenHeight / 2);
+		frame.setLocation(screenWidth / 4, screenHeight / 4);
+		
+		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		frame.setMinimumSize(new Dimension(800, 600));
@@ -359,31 +372,54 @@ public class MapUpdaterGUI{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				addingMap = true;
-				String maptitle = mapName.getText();
+				maptitle = mapName.getText();
 
 				maptitle = maptitle.trim();
 				String mapNameNoExt;
-				String srcInput = "";
 				int l = 0;
 
 				// check directory to see if it exists
-				if(!(mapToAdd == null))
+				if(mapToAdd.exists()){
 					srcInput = mapToAdd.toString();
-				File srcFile = mapToAdd;
-				if ((maptitle == null || maptitle.equals("")) || mapToAdd == null) {
-					addingMap = false;
-					System.out.println("Error: Map is invalid");
-				} else {
-					for (int k = 0; k < mapDropDown.getItemCount(); k++) {
-						l = mapDropDown.getItemAt(k).toString().length();
-						mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
-						System.out.println(mapNameNoExt + "           " + (l - 4));
-						if (maptitle.equals(mapNameNoExt)) {
-							addingMap = false;
-							System.out.println("Error: Map invalid");
+					srcFile = mapToAdd;
+					if ((maptitle == null || maptitle.equals("")) || mapToAdd == null) {
+						addingMap = false;
+						System.out.println("Error: Map is invalid");
+					} else {
+						for (int k = 0; k < mapDropDown.getItemCount(); k++) {
+							l = mapDropDown.getItemAt(k).toString().length();
+							mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
+							System.out.println(mapNameNoExt + "           " + (l - 4));
+							if (maptitle.equals(mapNameNoExt)) {
+								addingMap = false;
+								System.out.println("Error: Map invalid");
+							}
 						}
 					}
 				}
+
+				if (addingMap){
+				// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
+				System.out.println("SavingMap");
+				File dest = new File("src/VectorMaps");
+				// File destAbs = dest.getAbsoluteFile();
+
+				String destInput = dest.getAbsolutePath();
+				// System.out.println("Destination Input: " + destInput);
+				// System.out.println("Source Input: " + srcInput);
+				destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
+				System.out.println(destInput);
+				File destFile = new File(destInput);
+				try {
+					copyFileUsingStream(srcFile, destFile);
+					img = ImageIO.read(destFile);
+				} catch (IOException a) {
+					System.out.println("invalid copy");
+					a.printStackTrace();
+				}
+				}
+				new MapInserterGUI();
+				/*				
 
 				if (addingMap) {
 					// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
@@ -422,8 +458,7 @@ public class MapUpdaterGUI{
 					}
 
 					// Create the Map object to be stored in the database
-					Map m = new Map(highestID + 1, maptitle);
-
+					Map m = new Map(highestID + 1, maptitle, AddedMapupperleftx, AddedMapupperlefty, AddedMaprotation);
 					highestID++;
 
 					try {
@@ -451,6 +486,7 @@ public class MapUpdaterGUI{
 				} else {
 
 				}
+				retrievedInfo = false; */
 
 			}
 		});
@@ -641,7 +677,57 @@ public class MapUpdaterGUI{
 
 	}
 
+	public static void setInfo(int x, int y, int x2, int y2, double angle){
+		System.out.println("setting info");
+		//frame.setVisible(true);
+		if (addingMap) {
+			
 
+			// Add the name of the map to the Map Selction Dropdown menu
+			mapDropDown.addItem(maptitle + srcInput.substring(srcInput.length() - 4));
+
+			// Finds the highest mapID in the database and stores it in
+			// highestID
+			int highestID;
+			if(md.getMapsFromLocal().isEmpty()){
+				highestID = 0;
+				System.out.print("Database contains no maps so highest ID is 1");
+
+
+			}
+			else{
+				//determines the highest mapID from the Maps stored in the database
+				ArrayList<Map> mdMapList = md.getMapsFromLocal();
+				highestID = mdMapList.get(0).getMapId();
+				for (int h = 0; h < mdMapList.size(); h++) {
+					if (highestID < mdMapList.get(h).getMapId()) {
+						highestID = mdMapList.get(h).getMapId();
+					}
+				}
+			}
+
+			// Create the Map object to be stored in the database
+			Map m = new Map(highestID + 1, maptitle, (double)x, (double)y, (double)x2, (double)y2, angle, 0);
+			highestID++;
+			System.out.println("rotation angle = " + m.getRotationAngle());
+			try {
+				md.insertMap(m);
+			} catch (AlreadyExistsException e1) {
+				System.out.print("Look at me im  an error 1");
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				System.out.print("Look at me im  an error 2");
+				e1.printStackTrace();
+			}
+			mapDropDown.setSelectedIndex(mapDropDown.getItemCount()-1);
+			System.out.println(mapDropDown.getItemCount());
+			addingMap = false;
+		} else {
+
+		}
+	}
 
 	class DrawPanel extends JPanel {
 
@@ -974,7 +1060,7 @@ public class MapUpdaterGUI{
 	 * Takes an input file directory path and a target directory path and copies
 	 * that File to the target location
 	 */
-	private void copyFileUsingStream(File source, File dest) throws IOException {
+	private static void copyFileUsingStream(File source, File dest) throws IOException {
 		System.out.println(source.getPath());
 		FileInputStream is = null;
 		FileOutputStream os = null;

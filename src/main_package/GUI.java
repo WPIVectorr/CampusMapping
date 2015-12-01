@@ -37,6 +37,7 @@ public class GUI{
 	private JPanel mainMenu;
 	private JPanel navMenu;
 	private JPanel menus;
+	private static JLabel loadingLabel;
 	private DrawRoute drawPanel = new DrawRoute();
 	private int windowScale = 2;
 	private int windowSizeX = 932;
@@ -56,6 +57,10 @@ public class GUI{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
+		frame.setVisible(true);
+
+        frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
 
 		maps = md.getMapsFromLocal();
 
@@ -463,6 +468,7 @@ public class GUI{
 		gbc_btnPrevious.gridx = 1;
 		gbc_btnPrevious.gridy = 3;
 		navMenu.add(btnPrevious, gbc_btnPrevious);
+		
 
 		// Button to get next step in directions
 		//sets the next button color to red
@@ -519,6 +525,7 @@ public class GUI{
 		// Add panel for drawing
 		frame.getContentPane().add(drawPanel);
 
+	    frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		// Make frame visible after initializing everything
 		frame.setVisible(true);
 	}
@@ -526,7 +533,9 @@ public class GUI{
 
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
-
+		
+		
+		
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
@@ -544,10 +553,11 @@ public class GUI{
 				e1.printStackTrace();
 			}
 		}
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
-			{
+			{		 				
 				GUI gui = new GUI();
 				try {
 					gui.createAndShowGUI();

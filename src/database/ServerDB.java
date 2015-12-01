@@ -59,10 +59,16 @@ public class ServerDB {
 
 	public static void main (String args[])
 	{
-		clearDatabase();
+		//clearDatabase();
 		//tryCreateDB();
 		conn = connect();
 		//testDB();
+		try {
+			printDatabase(true, true, true);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println("Done testing");
 	}
 
@@ -457,7 +463,7 @@ public class ServerDB {
 
 	//---------------------------------------------------------Modifying Functions-------------------------------------------------------=---
 
-	private static void updatePoint (Point point) throws SQLException, DoesNotExistException
+	public static void updatePoint (Point point) throws SQLException, DoesNotExistException
 	{
 		String ptId = point.getId();
 		//---------------------------------------------------Update point in database-------------------------------------------------
@@ -676,7 +682,9 @@ public class ServerDB {
 							found3 = true;
 							String deleteStatement = ("DELETE FROM "+tableName+" WHERE id = '"+edge.getID()+"'");
 							int x = conn.createStatement().executeUpdate(deleteStatement);
+
 							System.out.println("==========REMOVING EDGE:"+edge.getID()+"==========");
+
 							break;
 						}
 					}
@@ -728,6 +736,7 @@ public class ServerDB {
 			e1.printStackTrace();
 		}
 		int counter = 0;
+		//ArrayList<Map>serverMaps
 		for (counter = 0; counter<allMaps.size(); counter++)
 		{
 			Map tempMap = allMaps.get(counter);
@@ -791,10 +800,7 @@ public class ServerDB {
 			int newPtGlobY;
 			int newPtNumberEdges;
 			ArrayList<Edge> newPtEdges = new ArrayList<Edge>();
-
-			if (DEBUG)
-				System.out.println("Populating from database");
-			populateFromDatabase();
+			
 			ResultSet rs = statement.executeQuery("SELECT * FROM "+TABLE_NAME);
 			while (rs.next())
 			{
@@ -1263,6 +1269,19 @@ public class ServerDB {
 		//----------------------------------------------See results of insertions-----------------------------------------
 		System.out.println("Testing results of inserts");
 		ArrayList<Point> testArray = new ArrayList<Point>();
+		
+		if (DEBUG)
+			System.out.println("Populating from database");
+		try {
+			populateFromDatabase();
+		} catch (PopulateErrorException e8) {
+			// TODO Auto-generated catch block
+			e8.printStackTrace();
+		} catch (SQLException e8) {
+			// TODO Auto-generated catch block
+			e8.printStackTrace();
+		}
+		
 		try {
 			testArray = getPointsFromServer(testMap);
 		} catch (PopulateErrorException e) {

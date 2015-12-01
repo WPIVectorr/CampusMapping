@@ -61,12 +61,8 @@ public class MapInserterGUIButtonPanel extends JFrame {
 			}
 		// TODO Auto-generated constructor stub
 		
-		Toolkit tk = Toolkit.getDefaultToolkit();
-		Dimension screenSize = tk.getScreenSize();
-		int screenHeight = screenSize.height;
-		int screenWidth = screenSize.width;
-		setSize(screenWidth / 2, screenHeight / 2);
-		setLocation(screenWidth / 4, screenHeight / 4);
+		setSize(400, 600);
+		setLocation((int) (inserterLocation.x+windowSize.getWidth()), inserterLocation.y);
 		
 		
 		setResizable(false);

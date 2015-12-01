@@ -48,10 +48,10 @@ import java.awt.Insets;
 
 public class InterMapEdgeGUI extends JFrame {
 
-	private InserterButtonPanel buttonPanel = new InserterButtonPanel();
+	private interButtonPanel buttonPanel = new interButtonPanel();;
 	private MapPanel mapFrame= new MapPanel();
-
-	JComboBox mapDropDown;
+	private JComboBox<String> mapDropDown;
+	private JComboBox<String> comboDestPoint;
 	private static BufferedImage CampusMap = null;
 	private static BufferedImage AddingMap = null;
 	private int windowSizeX = 0;
@@ -62,7 +62,7 @@ public class InterMapEdgeGUI extends JFrame {
 	private static int pointSize = 5;
 	
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
-
+	private ArrayList<Map> maps = new ArrayList<Map>();
 
 	private Point currentPoint;
 	private Point editPoint;
@@ -73,16 +73,16 @@ public class InterMapEdgeGUI extends JFrame {
 
 	private Map currentMap = null;
 	private ServerDB md = ServerDB.getInstance();
-	private dbAccess database;
+
 
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private Edge currentEdge;
-	
+	private static JFrame frame = new JFrame("Add Edges Between Maps");
+
 	
 	public InterMapEdgeGUI(Map destMap, Point srcPoint) {
-		super("Connect Two Maps");
 		
-		database = new dbAccess(md);
+
 		
 		try {
 			   // Set to cross-platform Java Look and Feel (also called "Metal")
@@ -110,14 +110,14 @@ public class InterMapEdgeGUI extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		JPanel SelectionPanel = new JPanel();
-		getContentPane().add(SelectionPanel, BorderLayout.NORTH);
-		GridBagLayout gbl_SelectionPanel = new GridBagLayout();
-		gbl_SelectionPanel.columnWidths = new int[]{16, 99, 204, 53, 85, 277, 0, 0, 0};
-		gbl_SelectionPanel.rowHeights = new int[]{26, 0, 0, 0};
-		gbl_SelectionPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_SelectionPanel.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		SelectionPanel.setLayout(gbl_SelectionPanel);
+		
+		getContentPane().add(buttonPanel, BorderLayout.NORTH);
+		GridBagLayout gbl_buttonPanel = new GridBagLayout();
+		gbl_buttonPanel.columnWidths = new int[]{16, 99, 204, 53, 85, 277, 0, 0, 0};
+		gbl_buttonPanel.rowHeights = new int[]{26, 0, 0, 0};
+		gbl_buttonPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_buttonPanel.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		buttonPanel.setLayout(gbl_buttonPanel);
 		
 		JLabel lblSelectDestMap = new JLabel("Select Destination Map:");
 		GridBagConstraints gbc_lblSelectDestMap = new GridBagConstraints();
@@ -125,15 +125,16 @@ public class InterMapEdgeGUI extends JFrame {
 		gbc_lblSelectDestMap.insets = new Insets(0, 0, 5, 5);
 		gbc_lblSelectDestMap.gridx = 1;
 		gbc_lblSelectDestMap.gridy = 0;
-		SelectionPanel.add(lblSelectDestMap, gbc_lblSelectDestMap);
+		buttonPanel.add(lblSelectDestMap, gbc_lblSelectDestMap);
 		
-		mapDropDown = new JComboBox();
+		mapDropDown = new JComboBox<String>();
 		GridBagConstraints gbc_mapDropDown = new GridBagConstraints();
 		gbc_mapDropDown.insets = new Insets(0, 0, 5, 5);
 		gbc_mapDropDown.fill = GridBagConstraints.HORIZONTAL;
 		gbc_mapDropDown.gridx = 2;
 		gbc_mapDropDown.gridy = 0;
-		SelectionPanel.add(mapDropDown, gbc_mapDropDown);
+		buttonPanel.add(mapDropDown, gbc_mapDropDown);
+		
 		
 		JLabel lblSelectDestPoint = new JLabel("Select Destination Point");
 		GridBagConstraints gbc_lblSelectDestPoint = new GridBagConstraints();
@@ -141,22 +142,22 @@ public class InterMapEdgeGUI extends JFrame {
 		gbc_lblSelectDestPoint.insets = new Insets(0, 0, 5, 5);
 		gbc_lblSelectDestPoint.gridx = 4;
 		gbc_lblSelectDestPoint.gridy = 0;
-		SelectionPanel.add(lblSelectDestPoint, gbc_lblSelectDestPoint);
+		buttonPanel.add(lblSelectDestPoint, gbc_lblSelectDestPoint);
 		
-		JComboBox comboDestPoint = new JComboBox();
+		comboDestPoint = new JComboBox<String>();
 		GridBagConstraints gbc_comboDestPoint = new GridBagConstraints();
 		gbc_comboDestPoint.insets = new Insets(0, 0, 5, 5);
 		gbc_comboDestPoint.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboDestPoint.gridx = 5;
 		gbc_comboDestPoint.gridy = 0;
-		SelectionPanel.add(comboDestPoint, gbc_comboDestPoint);
+		buttonPanel.add(comboDestPoint, gbc_comboDestPoint);
 		
 		JButton btnConfirmSelection = new JButton("Confirm Selection");
 		GridBagConstraints gbc_btnConfirmSelection = new GridBagConstraints();
 		gbc_btnConfirmSelection.insets = new Insets(0, 0, 5, 5);
 		gbc_btnConfirmSelection.gridx = 4;
 		gbc_btnConfirmSelection.gridy = 1;
-		SelectionPanel.add(btnConfirmSelection, gbc_btnConfirmSelection);
+		buttonPanel.add(btnConfirmSelection, gbc_btnConfirmSelection);
 		
 
 		mapFrame.addMouseListener(new MouseAdapter() {
@@ -175,8 +176,38 @@ public class InterMapEdgeGUI extends JFrame {
 		windowSizeX = buttonPanel.getWidth();
 		windowSizeY = buttonPanel.getHeight();
 
+		maps = ServerDB.getMapsFromLocal();
+		mapDropDown.addItem("Select Map");
+		File vectorMapDir = new File("src/VectorMaps");
+		vectorMapDir = new File(vectorMapDir.getAbsolutePath());
+		File[] imgList = vectorMapDir.listFiles();
+		for (File imageFile: imgList) {
+			/*
+			 * tempMapName = imgList[f].getName(); nameLength =
+			 * tempMapName.length();
+			 * mapDropDown.addItem(tempMapName.substring(0, nameLength - 4));
+			 */
+			// includes extension
+			if(!(imageFile.getName().equals(".DS_Store"))){
+				System.out.println("Dropdown:" );
+				String temp = imageFile.getName().substring(0, imageFile.getName().length() -4);
+				System.out.println(temp);
+
+				//checks to make sure the names populating the drop down are in both the vector maps package and 
+				//the database
+				for(Map currMap: maps){
+					System.out.println("printing from database: " + currMap.getMapName());
+					if(currMap.getMapName().compareTo(temp) == 0){
+						mapDropDown.addItem(temp);
+						
+					}
+				}
+
+			}
+		}	
 		
-		mapDropDown = database.getMapDropDown();
+		
+		frame.repaint();
 				mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 					public void actionPerformed(ActionEvent a) {
 						name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
@@ -287,12 +318,17 @@ public class InterMapEdgeGUI extends JFrame {
 	private static void doRepaint()
 	{
 		//buttonPanel.repaint();
-		//t`mapPanel.repaint();
+		//`mapPanel.repaint();
 	}
 
 
-	class InserterButtonPanel extends JPanel {
+	class interButtonPanel extends JPanel {
 		
+		public interButtonPanel()
+		{
+
+			
+		}
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponents(g);

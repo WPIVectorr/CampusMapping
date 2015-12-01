@@ -37,6 +37,7 @@ public class GUI{
 	private JPanel mainMenu;
 	private JPanel navMenu;
 	private JPanel menus;
+	private GradientButton directionsButton;
 	private static JLabel loadingLabel;
 	private DrawRoute drawPanel = new DrawRoute();
 	private int windowScale = 2;
@@ -52,6 +53,7 @@ public class GUI{
 	private JFrame frame = new JFrame("Directions with Magnitude");
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(GUI.class.getResource("/VectorLogo/Logo Icon.png")));
 
 		frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -94,6 +96,7 @@ public class GUI{
 
 		JTextPane txtpnFullTextDir = new JTextPane();
 		JComboBox<Point> destBuilds = new JComboBox();
+		destBuilds.setEnabled(false);
 		JComboBox mapsDropdown = new JComboBox();
 
 		/*adds the room numbers based off of building name
@@ -154,6 +157,7 @@ public class GUI{
 		//startRooms.setBounds(296, 30, 148, 20);
 
 		JComboBox<Point> startBuilds = new JComboBox();
+		startBuilds.setEnabled(false);
 
 		//creates drop down box with building names
 		GridBagConstraints gbc_startBuilds = new GridBagConstraints();
@@ -170,7 +174,7 @@ public class GUI{
 		gbc_horizontalStrut_1.gridx = 5;
 		gbc_horizontalStrut_1.gridy = 1;
 		mainMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
-		mapsDropdown.addItem("Select Map");
+		//mapsDropdown.addItem("Select Map");
 
 
 
@@ -185,6 +189,10 @@ public class GUI{
 		//adds the correct points for the building specified
 		mapsDropdown.addActionListener (new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
+				startBuilds.setEnabled(true);
+				destBuilds.setEnabled(true);
+				directionsButton.setEnabled(true);
+				
 				buildDestIndex = mapsDropdown.getSelectedIndex();
 
 				String mapTitle = maps.get(buildDestIndex-1).getMapName();
@@ -259,7 +267,8 @@ public class GUI{
 		lblDestination.setLabelFor(destBuilds);
 
 		// Button that generates a route and switches to nav display
-		GradientButton directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
+		directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
+		directionsButton.setEnabled(false);
 		GridBagConstraints gbc_directionsButton = new GridBagConstraints();
 		gbc_directionsButton.fill = GridBagConstraints.BOTH;
 		gbc_directionsButton.insets = new Insets(0, 0, 0, 5);
@@ -433,6 +442,7 @@ public class GUI{
 
 		//creates a centered text field that will write back the users info they typed in
 		directionsText = new JTextField();
+		directionsText.setEditable(false);
 		directionsText.setHorizontalAlignment(JTextField.CENTER);
 		directionsText.setToolTipText("");
 		directionsText.setBounds(6, 174, 438, 30);

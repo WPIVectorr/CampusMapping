@@ -89,9 +89,11 @@ public class MapUpdaterGUI{
 	private JLabel lblMapImageDirectory;
 	private JLabel lblMapName;
 	private Component verticalStrut;
+	private JTabbedPane tabs = new JTabbedPane();
+	private ArrayList<Map> maps = new ArrayList<Map>();
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
-
+		maps = md.getMapsFromLocal();
 		frame.setSize(932, 778);
 		
 		Toolkit tk = Toolkit.getDefaultToolkit();
@@ -110,8 +112,8 @@ public class MapUpdaterGUI{
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BorderLayout());
 		frame.getContentPane().add(buttonPanel, BorderLayout.NORTH);
+		
 
-		JTabbedPane tabs = new JTabbedPane();
 		tabs.addTab("Maps", createMapsPanel());
 		tabs.addTab("Points", createPointsPanel());
 
@@ -136,11 +138,15 @@ public class MapUpdaterGUI{
 			activeButton = 2;
 		if (rdbtnRemovePoints.isSelected())
 			activeButton = 3;
+		if(activeButton != 0){
+			//btnSaveMap.doClick();
+			//System.out.println("saves map here" );
+		}
 		return activeButton;
 	}
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException {
-
+		
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
@@ -162,8 +168,10 @@ public class MapUpdaterGUI{
 		{
 			public void run()
 			{
+				System.out.println("Calling run");
 				MapUpdaterGUI mapUpdater = new MapUpdaterGUI();
 				try {
+					System.out.println("Calling create and show GUI");
 					mapUpdater.createAndShowGUI();
 				} catch (IOException | AlreadyExistsException | SQLException e) {
 					// TODO Auto-generated catch block
@@ -192,7 +200,7 @@ public class MapUpdaterGUI{
 		//System.out.println("Vectormap abs path: " + vectorMapDir.getAbsolutePath());
 
 		mapDropDown = new JComboBox();
-
+		mapDropDown.addItem("Select Map");
 		// Truncates the extensions off of the map name so only the name is
 		// displayed in the
 		// drop-down menu for selecting a map
@@ -205,11 +213,17 @@ public class MapUpdaterGUI{
 			 */
 			// includes extension
 			if(!(imgList[f].getName().equals(".DS_Store"))){
+				System.out.println("Dropdown:" );
+				String temp = imgList[f].getName().substring(0, imgList[f].getName().length() -4);
+				System.out.println(temp);
+
 				//checks to make sure the names populating the drop down are in both the vector maps package and 
 				//the database
-				for(int count = 0; count < md.getMapsFromLocal().size(); count++){
-					if(md.getMapsFromLocal().get(count).getMapName().compareTo(imgList[f].getName()) == 0){
-						mapDropDown.addItem(imgList[f].getName());
+				for(int count = 0; count < maps.size(); count++){
+					System.out.println("printing from database: " + maps.get(count).getMapName());
+					if(maps.get(count).getMapName().compareTo(temp) == 0){
+						mapDropDown.addItem(temp);
+						
 					}
 				}
 
@@ -250,29 +264,29 @@ public class MapUpdaterGUI{
 		mapsPanel.add(txtImageDirectoryPath, gbc_txtImageDirectoryPath);
 		txtImageDirectoryPath.setColumns(10);
 
-		mapDropDown.addItem("Select Map");
+		
 
 		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
 				name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
 				System.out.println("Selected item:"+name);
 
-				destinationFile = new File("src/VectorMaps/" + name);
+				destinationFile = new File("src/VectorMaps/" + name + ".jpg");
 				destinationFile = new File(destinationFile.getAbsolutePath());
 
 
 				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
 					pointArray.clear();
 					edgeArray.clear();
-					ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
-					System.out.println("MapList size is "+mapList.size());//Print out the size of the maps from the database
-					for(int i = 0; i < mapList.size(); i++){//Iterate through the mapList until we find the item we are looking for
+					//ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
+					System.out.println("MapList size is "+maps.size());//Print out the size of the maps from the database
+					for(int i = 0; i < maps.size(); i++){//Iterate through the mapList until we find the item we are looking for
 						System.out.println("Trying to find name:"+name);
-						if(name.equals(mapList.get(i).getMapName()+".jpg"))//Once we find the map:
+						if(name.equals(maps.get(i).getMapName()))//Once we find the map:
 						{
-							currentMap = mapList.get(i);//Grab the current map at this position.
+							currentMap = maps.get(i);//Grab the current map at this position.
 							pointArray = currentMap.getPointList();//Populate the point array with all the points found.
-							System.out.println("Map list size:"+mapList.size());
+							System.out.println("Map list size:"+maps.size());
 
 							for(int j = 0; j < pointArray.size(); j++){
 								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
@@ -284,7 +298,7 @@ public class MapUpdaterGUI{
 
 
 							System.out.println("Found map with number of points: "+currentMap.getPointList().size());
-							i = mapList.size();
+							i = maps.size();
 						}
 					}
 
@@ -440,7 +454,7 @@ public class MapUpdaterGUI{
 					// Finds the highest mapID in the database and stores it in
 					// highestID
 					int highestID;
-					if(md.getMapsFromLocal().isEmpty()){
+					if(maps.isEmpty()){
 						highestID = 0;
 						System.out.print("Database contains no maps so highest ID is 1");
 
@@ -448,11 +462,11 @@ public class MapUpdaterGUI{
 					}
 					else{
 						//determines the highest mapID from the Maps stored in the database
-						ArrayList<Map> mdMapList = md.getMapsFromLocal();
-						highestID = mdMapList.get(0).getMapId();
-						for (int h = 0; h < mdMapList.size(); h++) {
-							if (highestID < mdMapList.get(h).getMapId()) {
-								highestID = mdMapList.get(h).getMapId();
+						//ArrayList<Map> mdMapList = md.getMapsFromLocal();
+						highestID = maps.get(0).getMapId();
+						for (int h = 0; h < maps.size(); h++) {
+							if (highestID < maps.get(h).getMapId()) {
+								highestID = maps.get(h).getMapId();
 							}
 						}
 					}
@@ -651,7 +665,7 @@ public class MapUpdaterGUI{
 					} catch (SQLException e1) {
 						e1.printStackTrace();
 					} 
-					markForDelete.add(storePoint);
+					//markForDelete.add(storePoint);
 				}
 				System.out.println("Edge array size is: " + edgeArray.size());
 				for (int i = 0; i < edgeArray.size(); i++) {
@@ -671,7 +685,7 @@ public class MapUpdaterGUI{
 			}
 		});
 
-
+		
 		return pointsPanel;
 
 
@@ -789,7 +803,9 @@ public class MapUpdaterGUI{
 					newClick = false;
 					lastMousex = e.getX();
 					lastMousey = e.getY();
-					newClick = true;
+					if(tabs.getSelectedIndex() == 1)
+						newClick = true;
+					
 					repaint();
 				}
 			});
@@ -861,7 +877,9 @@ public class MapUpdaterGUI{
 						}
 					}*/
 					// newClick has some interesting storage things going on.
-					if (newClick == true) {
+					
+					if (newClick == true && tabs.getSelectedIndex() == 1) {
+					//if(newClick == true){
 						//TODO CHANGE THIS LATER, GOOD FOR TESTING CLICKS
 						MapUpdaterGUI.btnSaveMap.setText("Save Map, X:" + lastMousex + ", Y:" + lastMousey);
 
@@ -990,7 +1008,12 @@ public class MapUpdaterGUI{
 											}
 										}
 									}
-
+									for(int kj = 0; kj < currentPoint.getEdges().size(); kj++){
+										//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+										while(edgeArray.contains(currentPoint.getEdges().get(kj))){
+											edgeArray.remove(currentPoint.getEdges().get(kj));
+										}
+									}
 									currentPoint.deleteEdges();
 									pointArray.remove(currentPoint);
 									pointArray.remove(currentPoint);
@@ -1080,15 +1103,15 @@ public class MapUpdaterGUI{
 	private Map updateCurrentMap(Map map)
 	{
 		int mapId = map.getMapId();
-		ArrayList<Map> mapList = md.getMapsFromLocal();
+		//ArrayList<Map> mapList = md.getMapsFromLocal();
 		boolean foundMap = false;
 		int j = 0;
-		for (j = 0; j<mapList.size(); j++)
+		for (j = 0; j<maps.size(); j++)
 		{
-			if (mapId == mapList.get(j).getMapId())
+			if (mapId == maps.get(j).getMapId())
 			{
 				foundMap = true;
-				return mapList.get(j);
+				return maps.get(j);
 			}
 		}
 		if (foundMap == false)

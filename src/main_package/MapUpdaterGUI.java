@@ -734,6 +734,21 @@ public class MapUpdaterGUI{
 						System.out.println(g.getMessage());
 					}
 				}
+				newPoints.clear();
+				updatedPoints.clear();
+				newEdges.clear();
+				edgeArray.clear();
+				try {
+					pointArray = ServerDB.getPointsFromServer(currentMap);
+				} catch (PopulateErrorException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				for (int u = 0; u < pointArray.size(); u++){
+					for (int z = 0; z < pointArray.get(u).getEdges().size(); z++){
+						edgeArray.add(pointArray.get(u).getEdges().get(z));
+					}
+				}
 				roomNumber.setText("Select a Point to Edit");
 				editingPoint = false;
 				frame.repaint();
@@ -871,10 +886,9 @@ public class MapUpdaterGUI{
 				//System.out.println(newClick);
 				if (getRadButton() == 1) // if addpoint
 				{
-					Integer nameNumber = pointArray.size()+1;
+					Integer nameNumber = currentMap.getPointIDIndex()+1;
 					double ourRotation = 50;//currentMap.getRotationAngle();
 					//ourRotation = 2 * Math.PI - ourRotation;
-
 
 					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;
 					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
@@ -892,7 +906,7 @@ public class MapUpdaterGUI{
 					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
 
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
-							"Point " + nameNumber.toString(), currentMap.getPointIDIndex(),
+							"Hallway!", currentMap.getPointIDIndex(),
 							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
 
 					boolean shouldAdd = true;

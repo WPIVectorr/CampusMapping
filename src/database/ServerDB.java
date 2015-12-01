@@ -536,21 +536,27 @@ public class ServerDB {
 	public static void removePoint (Point pt) throws DoesNotExistException
 	{
 		//------------------------------------------------------Remove Edges from DB---------------------------------------------------------
-		
+		if (DEBUG)
+			System.out.println("Number of edges in pt passed to removePoint:"+pt.getEdges().size());
+		pt.print();
+		try {
+			populateFromDatabase();
+		} catch (PopulateErrorException e2) {
+			e2.printStackTrace();
+		} catch (SQLException e2) {
+			e2.printStackTrace();
+		}
 		ArrayList<Edge> edges = pt.getEdges();
+
 		int j =0;
 		for (j = edges.size(); j > 0; j--)
 		{
 			try {
-				System.out.println("REMOVING EDGE:"+edges.get(j-1).getID());
 				removeEdge(edges.get(j-1));
 			} catch (DoesNotExistException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		edges = pt.getEdges();
-		System.out.println("Number of edges after retrieval:"+edges.size());
 		
 		//------------------------------------------------------Remove point from DB----------------------------------------------------------
 		String ptId = pt.getId();
@@ -592,6 +598,8 @@ public class ServerDB {
 	
 	public static void removeEdge(Edge edge) throws DoesNotExistException
 	{
+		if (DEBUG)
+			System.out.println("remove Edge called");
 		Point p1 = edge.getPoint1();
 		Point p2 = edge.getPoint2();
 		
@@ -628,7 +636,7 @@ public class ServerDB {
 		{
 			if (edges.get(j).getId().contentEquals(edge.getId()))
 			{
-				found1 = true;
+				found2 = true;
 				edges.remove(j);
 				p2.setEdges(edges);
 				break;
@@ -668,6 +676,7 @@ public class ServerDB {
 							found3 = true;
 							String deleteStatement = ("DELETE FROM "+tableName+" WHERE id = '"+edge.getID()+"'");
 							int x = conn.createStatement().executeUpdate(deleteStatement);
+							System.out.println("==========REMOVING EDGE:"+edge.getID()+"==========");
 							break;
 						}
 					}

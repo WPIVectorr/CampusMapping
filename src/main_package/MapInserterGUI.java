@@ -7,7 +7,7 @@ import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import main_package.MapUpdaterGUI.UpdateMap;
+//import main_package.MapUpdaterGUI.UpdateMap;
 
 import java.awt.BorderLayout;
 import java.awt.Container;

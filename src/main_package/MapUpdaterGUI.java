@@ -821,6 +821,9 @@ public class MapUpdaterGUI{
 											}
 										}
 									}
+									g.setColor(Color.RED);
+									g.fillOval(editPoint.getLocX(), editPoint.getLocY(), pointSize+5,pointSize+5);
+									g.setColor(Color.BLACK);
 									newClick = false;
 									if(pathMode){
 										Point tempEditPoint = pointArray.get(editPointIndex);
@@ -1020,5 +1023,7 @@ public class MapUpdaterGUI{
 		}
 		return null;
 	}
+
+	
 
 }

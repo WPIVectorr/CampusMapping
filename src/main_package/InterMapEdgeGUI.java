@@ -160,6 +160,7 @@ public class InterMapEdgeGUI extends JFrame {
 				System.out.println("Clicked");
 				lastMousex = e.getX();
 				lastMousey = e.getY();
+				selectPoint();
 			}
 		});
 		getContentPane().add(mapFrame, BorderLayout.CENTER);
@@ -168,7 +169,8 @@ public class InterMapEdgeGUI extends JFrame {
 		
 		windowSizeX = buttonPanel.getWidth();
 		windowSizeY = buttonPanel.getHeight();
-		
+
+		mapDropDown.addItem("Select Map");
 		// When the Updater opens the software the list will be populated with
 				// the files in
 				// the VectorMapps resource folder
@@ -194,31 +196,83 @@ public class InterMapEdgeGUI extends JFrame {
 					}
 				}
 
-/*		// When the Updater opens the software the list will be populated with
-		// the files in
-		// the VectorMapps resource folder
-		File vectorMapDir = new File("src/VectorMaps");
-		vectorMapDir = new File(vectorMapDir.getAbsolutePath());
-		//System.out.println("Vectormap abs path: " + vectorMapDir.getAbsolutePath());
+				mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
+					public void actionPerformed(ActionEvent a) {
+						name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
+						System.out.println("Selected item:"+name);
 
-		// Truncates the extensions off of the map name so only the name is
-		// displayed in the
-		// drop-down menu for selecting a map
-		File[] imgList = vectorMapDir.listFiles();
-		for (int f = 0; f < imgList.length; f++) {
-			
-			 * tempMapName = imgList[f].getName(); nameLength =
-			 * tempMapName.length();
-			 * mapDropDown.addItem(tempMapName.substring(0, nameLength - 4));
-			 
-			// includes extension
-			if(!(imgList[f].getName().equals(".DS_Store"))){
-				secondMap.addItem(imgList[f].getName());
-			}
-		}*/
+						destinationFile = new File("src/VectorMaps/" + name);
+						destinationFile = new File(destinationFile.getAbsolutePath());
+
+
+						if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
+							pointArray.clear();
+							edgeArray.clear();
+							ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
+							System.out.println("MapList size is "+mapList.size());//Print out the size of the maps from the database
+							for(int i = 0; i < mapList.size(); i++){//Iterate through the mapList until we find the item we are looking for
+								System.out.println("Trying to find name:"+name);
+								if(name.equals(mapList.get(i).getMapName()+".jpg"))//Once we find the map:
+								{
+									currentMap = mapList.get(i);//Grab the current map at this position.
+									pointArray = currentMap.getPointList();//Populate the point array with all the points found.
+									System.out.println("Map list size:"+mapList.size());
+
+									for(int j = 0; j < pointArray.size(); j++){
+										ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
+										for(int k = 0; k < tmpEdges.size(); k++){
+											System.out.println(tmpEdges.get(k).getId());
+											edgeArray.add(tmpEdges.get(k));
+										}
+									}
+
+
+									System.out.println("Found map with number of points: "+currentMap.getPointList().size());
+									i = mapList.size();
+								}
+							}
+
+
+							/*				File destinationFile = new File("src/VectorMaps/" + name);
+															destinationFile = new File(destinationFile.getAbsolutePath());
+															if (!(name.equals("Select Map"))) {*/
+							try {
+								img = ImageIO.read(destinationFile);
+							} catch (IOException g) {
+								System.out.println("Invalid Map Selection");
+								g.printStackTrace();
+							}
+						} else {
+							File logo = new File("src/VectorLogo/VectorrLogo.png");
+							File logoFinal = new File(logo.getAbsolutePath());
+							//System.out.println("logoFinal: " + logoFinal);
+							try{
+								img = ImageIO.read(logoFinal);
+								System.out.println("loadLogo");
+							}
+							catch(IOException g){
+								System.out.println("Invalid logo");
+								g.printStackTrace();
+							}
+							pointArray.clear();
+							edgeArray.clear();
+						}
+						doRepaint();
+					}
+				});
+
 
 	}
 
+	private void selectPoint()
+	{
+		for(Point loopPoint:pointArray)
+		{
+			if(checkInPoint(loopPoint))
+				currentPoint = loopPoint;
+		}
+		
+	}
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -252,7 +306,7 @@ public class InterMapEdgeGUI extends JFrame {
 	private static void doRepaint()
 	{
 		//buttonPanel.repaint();
-		//mapPanel.repaint();
+		//t`mapPanel.repaint();
 	}
 
 
@@ -276,71 +330,6 @@ public class InterMapEdgeGUI extends JFrame {
 				int imagelocationy = (windowSizeY/2)-((int)(AddingMap.getHeight()/wScale)/2);
 				g.drawImage(AddingMap, imagelocationx, imagelocationy, (int)(AddingMap.getWidth()/wScale), (int)(AddingMap.getHeight()/wScale), null);
 			}
-			mapDropDown.addItem("Select Map");
-
-			mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
-				public void actionPerformed(ActionEvent a) {
-					name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
-					System.out.println("Selected item:"+name);
-
-					destinationFile = new File("src/VectorMaps/" + name);
-					destinationFile = new File(destinationFile.getAbsolutePath());
-
-
-					if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
-						pointArray.clear();
-						edgeArray.clear();
-						ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
-						System.out.println("MapList size is "+mapList.size());//Print out the size of the maps from the database
-						for(int i = 0; i < mapList.size(); i++){//Iterate through the mapList until we find the item we are looking for
-							System.out.println("Trying to find name:"+name);
-							if(name.equals(mapList.get(i).getMapName()+".jpg"))//Once we find the map:
-							{
-								currentMap = mapList.get(i);//Grab the current map at this position.
-								pointArray = currentMap.getPointList();//Populate the point array with all the points found.
-								System.out.println("Map list size:"+mapList.size());
-
-								for(int j = 0; j < pointArray.size(); j++){
-									ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
-									for(int k = 0; k < tmpEdges.size(); k++){
-										System.out.println(tmpEdges.get(k).getId());
-										edgeArray.add(tmpEdges.get(k));
-									}
-								}
-
-
-								System.out.println("Found map with number of points: "+currentMap.getPointList().size());
-								i = mapList.size();
-							}
-						}
-
-
-						/*				File destinationFile = new File("src/VectorMaps/" + name);
-														destinationFile = new File(destinationFile.getAbsolutePath());
-														if (!(name.equals("Select Map"))) {*/
-						try {
-							img = ImageIO.read(destinationFile);
-						} catch (IOException g) {
-							System.out.println("Invalid Map Selection");
-							g.printStackTrace();
-						}
-					} else {
-						File logo = new File("src/VectorLogo/VectorrLogo.png");
-						File logoFinal = new File(logo.getAbsolutePath());
-						//System.out.println("logoFinal: " + logoFinal);
-						try{
-							img = ImageIO.read(logoFinal);
-						}
-						catch(IOException g){
-							System.out.println("Invalid logo");
-							g.printStackTrace();
-						}
-						pointArray.clear();
-						edgeArray.clear();
-					}
-					doRepaint();
-				}
-			});
 		}
 	}
 	

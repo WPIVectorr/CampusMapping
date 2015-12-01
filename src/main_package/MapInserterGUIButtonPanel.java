@@ -126,6 +126,8 @@ public class MapInserterGUIButtonPanel extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				MapInserterGUI.DisposeFrame();
 				dispose();
+				System.out.println("telling to send");
+				MapInserterGUI.GiveMapUpdaterInfo();
 			}
 		});
 		
@@ -135,7 +137,9 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		getContentPane().add(DeletePoints);
 		DeletePoints.addActionListener(new ActionListener() {//Saves the map in the specific location
 			public void actionPerformed(ActionEvent e) {
-				
+				MapInserterGUI.clearAlignmentPoints();
+				MapInserterGUI.resetCornerNum();
+				MapInserterGUI.doRepaint();
 			}
 		});
 		
@@ -249,6 +253,12 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		CampusMap = campusMap;
 	}
 
+	public String getSelectedMap()
+	{
+		String selectedMap = mapDropDown.getSelectedItem().toString();	
+		
+		return selectedMap;
+	}
 
 	public static BufferedImage getAddingMap() {
 		return AddingMap;

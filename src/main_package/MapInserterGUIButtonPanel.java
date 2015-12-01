@@ -68,7 +68,7 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		getContentPane().setVisible(true);
 		getContentPane().setName("Vectorr");
 		getContentPane().setLayout(null);
-		
+		repaint();
 		//JButton DeleteMap = new JButton("Delete Map");
 		//DeleteMap.setBounds(10, 109, 126, 23);
 		//getContentPane().add(DeleteMap);
@@ -118,7 +118,26 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		});
 
 		
+		JButton Savemap = new JButton();
+		Savemap.setText("Save Map");
+		Savemap.setBounds(210, 98, 150, 26);
+		getContentPane().add(Savemap);
+		Savemap.addActionListener(new ActionListener() {//Saves the map in the specific location
+			public void actionPerformed(ActionEvent e) {
+				MapInserterGUI.DisposeFrame();
+				dispose();
+			}
+		});
 		
+		JButton DeletePoints = new JButton();
+		DeletePoints.setText("Delete Points");
+		DeletePoints.setBounds(30, 98, 150, 26);
+		getContentPane().add(DeletePoints);
+		DeletePoints.addActionListener(new ActionListener() {//Saves the map in the specific location
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
 		
 		JComboBox secondMap = new JComboBox();
 		secondMap.setBounds(168, 55, 211, 26);
@@ -193,6 +212,7 @@ public class MapInserterGUIButtonPanel extends JFrame {
 						mapDropDown.addItem(imgList[f].getName());
 					}
 				}
+				
 
 /*		// When the Updater opens the software the list will be populated with
 		// the files in
@@ -254,11 +274,16 @@ public class MapInserterGUIButtonPanel extends JFrame {
 				}
 
 				else {
-					wScale = (double) AddingMap.getHeight() / (double) windowSizeY;
+					wScale = (double) AddingMap.getWidth() / (double) windowSizeX;
 				}
 				int imagelocationx = (windowSizeX/2)-((int)(AddingMap.getWidth()/wScale)/2);
 				int imagelocationy = (windowSizeY/2)-((int)(AddingMap.getHeight()/wScale)/2);
+				int lowerleft = imagelocationy+(int)(AddingMap.getHeight()/wScale)-5;
 				g.drawImage(AddingMap, imagelocationx, imagelocationy, (int)(AddingMap.getWidth()/wScale), (int)(AddingMap.getHeight()/wScale), null);
+				g.fillOval(imagelocationx, imagelocationy, 5, 5);
+				g.fillOval(imagelocationx, lowerleft, 5, 5);
+				g.drawString("Point 1", imagelocationx, imagelocationy+20);
+				g.drawString("Point 2", imagelocationx, lowerleft);
 			}
 		}
 	}

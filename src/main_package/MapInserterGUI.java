@@ -135,6 +135,10 @@ public class MapInserterGUI extends JFrame{
 	public static void doRepaint(){
 		frame.repaint();
 	}
+	
+	public static void DisposeFrame(){
+		frame.dispose();
+	}
 
 	//sets the alignment point on the image with the correct number.
 	private void addPoints() {
@@ -162,15 +166,15 @@ public class MapInserterGUI extends JFrame{
 				}
 			}
 			
-			if(remove == false && alignmentPoints.size()<=3)
+			if(remove == false && alignmentPoints.size()<=2)
 			{
 				System.out.println("Adding a point.");
 				alignmentPoints.add(getCornerNum(), cornerPoint);
 				cornerNum = alignmentPoints.size();
 				frame.repaint();
 
-				if(alignmentPoints.size()==3 && !imageSet)
-					setImage();
+				if(alignmentPoints.size()==2 && !imageSet)
+					remove = true;
 			}else if(remove == true)
 			{
 				alignmentPoints.remove(cornerNum);
@@ -181,26 +185,6 @@ public class MapInserterGUI extends JFrame{
 		frame.repaint();
 		newClick =false;
 	}	
-
-	private void setImage(){
-		
-		int answer = JOptionPane.showConfirmDialog(null, "Is the image aligned properly?",
-	            "Image Alignment", JOptionPane.YES_NO_OPTION);
-		
-		switch (answer) {
-		case 0:
-			imageSet = true;
-			//yes break and close image inserter
-			break;
-		case 1:
-			//no go back to inserter
-			alignmentPoints.clear();
-			cornerNum = 0;
-			break;
-		default:
-			break;
-		}
-	}
 	
 	class PaintFrame extends JPanel {
 

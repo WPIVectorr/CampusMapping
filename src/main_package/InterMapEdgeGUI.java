@@ -12,6 +12,7 @@ import main_package.MapInserterGUI.PaintFrame;
 //import main_package.MapUpdaterGUI.UpdateMap;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -60,7 +61,7 @@ public class InterMapEdgeGUI extends JFrame {
 	private BufferedImage img = null;
 	private static int lastMousex,lastMousey;
 	private static int pointSize = 5;
-	
+	private static boolean mapSelected;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
 	private ArrayList<Map> maps = new ArrayList<Map>();
 
@@ -250,11 +251,12 @@ public class InterMapEdgeGUI extends JFrame {
 															if (!(name.equals("Select Map"))) {*/
 							try {
 								img = ImageIO.read(destinationFile);
+								mapSelected = true;
 							} catch (IOException g) {
 								System.out.println("Invalid Map Selection");
 								g.printStackTrace();
 							}
-						} else {
+							} else {
 							File logo = new File("src/VectorLogo/VectorrLogo.png");
 							File logoFinal = new File(logo.getAbsolutePath());
 							//System.out.println("logoFinal: " + logoFinal);
@@ -278,12 +280,14 @@ public class InterMapEdgeGUI extends JFrame {
 
 	private void selectPoint()
 	{
-		for(Point loopPoint:pointArray)
+		if(pointArray.size()!=0)
 		{
-			if(checkInPoint(loopPoint))
-				currentPoint = loopPoint;
+			for(Point loopPoint:pointArray)
+			{
+				if(checkInPoint(loopPoint))
+					currentPoint = loopPoint;
+			}
 		}
-		
 	}
 	
 	public static void main(String[] args) {
@@ -439,41 +443,23 @@ public class InterMapEdgeGUI extends JFrame {
 		}
 
 	}
-
-private boolean checkInPoint(Point currentPoint)
-{
 	
-	if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
-			&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
-			&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
-					&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
-			return true;
-		}else{
-			return false;
-		}
-}
-
-
-	/*
-	 * Takes an input file directory path and a target directory path and copies
-	 * that File to the target location
-	 */
-	private void copyFileUsingStream(File source, File dest) throws IOException {
-		System.out.println(source.getPath());
-		FileInputStream is = null;
-		FileOutputStream os = null;
-		is = new FileInputStream(source);
-		System.out.println(source.getPath());
-		os = new FileOutputStream(dest);
-		System.out.println(dest.getPath());
-		byte[] buffer = new byte[1024];
-		int length;
-		while ((length = is.read(buffer)) > 0) {
-			os.write(buffer, 0, length);
-		}
-		is.close();
-		os.close();
+	
+	private boolean checkInPoint(Point currentPoint)
+	{
+		
+		if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
+				&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
+				&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
+						&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
+				System.out.println("in Point");
+				return true;
+			}else{
+				return false;
+			}
 	}
+
+
 
 	private Map updatedestMap(Map map)
 	{
@@ -495,6 +481,8 @@ private boolean checkInPoint(Point currentPoint)
 		}
 		return null;
 	}
+
+	
 
 
 }

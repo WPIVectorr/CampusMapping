@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 
 import java.awt.Panel;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -60,8 +61,14 @@ public class MapInserterGUIButtonPanel extends JFrame {
 			}
 		// TODO Auto-generated constructor stub
 		
-		setSize(400, 600);
-		setLocation((int) (inserterLocation.x+windowSize.getWidth()),inserterLocation.y);
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		Dimension screenSize = tk.getScreenSize();
+		int screenHeight = screenSize.height;
+		int screenWidth = screenSize.width;
+		setSize(screenWidth / 2, screenHeight / 2);
+		setLocation(screenWidth / 4, screenHeight / 4);
+		
+		
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().add(ButtonPanel);

@@ -59,16 +59,11 @@ public class ServerDB {
 
 	public static void main (String args[])
 	{
-		//clearDatabase();
+		clearDatabase();
 		//tryCreateDB();
 		conn = connect();
 		//testDB();
-		try {
-			printDatabase(true, true, true);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		System.out.println("Done testing");
 	}
 

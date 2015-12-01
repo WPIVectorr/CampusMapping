@@ -46,14 +46,18 @@ public class MapInserterGUI extends JFrame{
 	private static int numSelectionPoints = 2;
 	//private MapInsertion drawPanel = new MapInsertion();
 	private MapInserterGUIButtonPanel buttonPanel;
-	private ArrayList<Point> alignmentPoints;
-	private int cornerNum;
+	private static ArrayList<Point> alignmentPoints;
+	private static int cornerNum;
 	private int pointSize = 5;
 	private boolean remove =false;
 	private boolean imageSet = false;
 	private BufferedImage CampusMap = null;
 	private BufferedImage AddingMap = null;
 	private int windowScale = 0;
+	private static Point point1 = null;
+	private static double Rotation = 0;
+	private static int point3x;
+	private static int point3y;
 	
 	Toolkit tk = Toolkit.getDefaultToolkit();
 	Dimension screenSize = tk.getScreenSize();
@@ -109,7 +113,7 @@ public class MapInserterGUI extends JFrame{
 		//getContentPane().setLayout(null);
 		windowSizeX = frame.getContentPane().getWidth();
 		windowSizeY = frame.getContentPane().getHeight();
-		System.out.println(frame.getSize());
+		//System.out.println(frame.getSize());
 		buttonPanel = new MapInserterGUIButtonPanel(frame.getLocation(),frame.getSize());
 		buttonPanel.setVisible(true);
 
@@ -120,11 +124,20 @@ public class MapInserterGUI extends JFrame{
 		//insertMap.setVisible(true);
 	}
 
+
 	/**
 	 * @return the alignmentPoints
 	 */
 	public ArrayList<Point> getAlignmentPoints() {
 		return alignmentPoints;
+	}
+	
+	public static void clearAlignmentPoints() {
+		alignmentPoints.clear();
+	}
+	
+	public static int resetCornerNum(){
+		return cornerNum = 0;
 	}
 
 	public int getCornerNum()
@@ -134,6 +147,17 @@ public class MapInserterGUI extends JFrame{
 
 	public static void doRepaint(){
 		frame.repaint();
+	}
+	
+	public static void DisposeFrame(){
+		frame.dispose();
+	}
+	
+	public static void GiveMapUpdaterInfo() {
+		MapUpdaterGUI.setInfo(point1.getLocX(), point1.getLocX(), point3x, point3y, Rotation);
+		System.out.println("Sending info");
+		clearAlignmentPoints();
+		resetCornerNum();
 	}
 
 	//sets the alignment point on the image with the correct number.
@@ -171,9 +195,6 @@ public class MapInserterGUI extends JFrame{
 				System.out.println("add Alignment #"+cornerNum +" X: "+cornerPoint.getLocX()+" Y: "+cornerPoint.getLocY());
 
 				doRepaint();
-				
-
-				
 			}else if(remove == true)
 			{
 				alignmentPoints.remove(cornerNum);

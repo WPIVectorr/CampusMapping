@@ -82,6 +82,8 @@ public class MapUpdaterGUI{
 
 		frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
 
 		JPanel buttonPanel = new JPanel();
@@ -466,8 +468,7 @@ public class MapUpdaterGUI{
 		pointsPanel.add(verticalStrut, gbc_verticalStrut);
 		rdbtnAddPoints = new JRadioButton("Add Points", true);
 		GridBagConstraints gbc_rdbtnAddPoints = new GridBagConstraints();
-		gbc_rdbtnAddPoints.anchor = GridBagConstraints.WEST;
-		gbc_rdbtnAddPoints.fill = GridBagConstraints.VERTICAL;
+		gbc_rdbtnAddPoints.fill = GridBagConstraints.BOTH;
 		gbc_rdbtnAddPoints.insets = new Insets(0, 0, 5, 5);
 		gbc_rdbtnAddPoints.gridx = 1;
 		gbc_rdbtnAddPoints.gridy = 1;
@@ -489,8 +490,7 @@ public class MapUpdaterGUI{
 		rdbtnEditPoints.setPreferredSize(new Dimension(125, 23));
 		rdbtnEditPoints.setHorizontalAlignment(SwingConstants.LEFT);
 		GridBagConstraints gbc_rdbtnEditPoints = new GridBagConstraints();
-		gbc_rdbtnEditPoints.anchor = GridBagConstraints.WEST;
-		gbc_rdbtnEditPoints.fill = GridBagConstraints.VERTICAL;
+		gbc_rdbtnEditPoints.fill = GridBagConstraints.BOTH;
 		gbc_rdbtnEditPoints.insets = new Insets(0, 0, 5, 5);
 		gbc_rdbtnEditPoints.gridx = 1;
 		gbc_rdbtnEditPoints.gridy = 2;
@@ -533,8 +533,7 @@ public class MapUpdaterGUI{
 
 		rdbtnRemovePoints = new JRadioButton("Remove Points");
 		GridBagConstraints gbc_rdbtnRemovePoints = new GridBagConstraints();
-		gbc_rdbtnRemovePoints.anchor = GridBagConstraints.WEST;
-		gbc_rdbtnRemovePoints.fill = GridBagConstraints.VERTICAL;
+		gbc_rdbtnRemovePoints.fill = GridBagConstraints.BOTH;
 		gbc_rdbtnRemovePoints.insets = new Insets(0, 0, 5, 5);
 		gbc_rdbtnRemovePoints.gridx = 1;
 		gbc_rdbtnRemovePoints.gridy = 3;

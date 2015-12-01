@@ -720,8 +720,8 @@ public class MapUpdaterGUI{
 				
 				
 				System.out.println("Edge array size is: " + edgeArray.size());
-				for (int i = 0; i < edgeArray.size(); i++) {
-					Edge storeEdge = edgeArray.get(i);
+				for (int i = 0; i < newEdges.size(); i++) {
+					Edge storeEdge = newEdges.get(i);
 					storeEdge.setId(storeEdge.getPoint1().getId() + "-" + storeEdge.getPoint2().getId());
 					System.out.println("Storing Edge: " + storeEdge.getId());
 					System.out.println("Storing Edge point 1: " + storeEdge.getPoint1().getId());
@@ -734,6 +734,8 @@ public class MapUpdaterGUI{
 						System.out.println(g.getMessage());
 					}
 				}
+				roomNumber.setText("Select a Point to Edit");
+				editingPoint = false;
 				frame.repaint();
 			}
 		});
@@ -1052,17 +1054,36 @@ public class MapUpdaterGUI{
 											currentPoint.addEdge(currEdge);
 										}
 									}*/
-									try{
-										System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
-										ServerDB.removePoint(currentPoint);
-									} catch (DoesNotExistException e1){
-										System.out.println("Reached Here");
-										e1.printStackTrace();
+									if(!newPoints.contains(currentPoint)){
+										int z = 0;
+										while(z < currentPoint.getEdges().size()){
+											if(newEdges.contains(currentPoint.getEdges().get(z))){
+												newEdges.remove(currentPoint.getEdges().get(z));
+												while(edgeArray.contains(currentPoint.getEdges().get(z))){
+													edgeArray.remove(currentPoint.getEdges().get(z));
+												}
+												currentPoint.getEdges().remove(z);
+												currentPoint.setNumEdges(currentPoint.getNumEdges() - 1);
+											} else {
+												z++;
+											}
+										}
+										
+										try{
+											System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
+											ServerDB.removePoint(currentPoint);
+										} catch (DoesNotExistException e1){
+											System.out.println("Reached Here");
+											e1.printStackTrace();
+										}
+									} else {
+										newPoints.remove(currentPoint);
 									}
 									
 									//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
 									for(int kj = 0; kj < currentPoint.getEdges().size(); kj++){
 										//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+										
 										while(edgeArray.contains(currentPoint.getEdges().get(kj))){
 											edgeArray.remove(currentPoint.getEdges().get(kj));
 											if(newEdges.contains(currentPoint.getEdges().get(kj))){
@@ -1119,7 +1140,7 @@ public class MapUpdaterGUI{
 									pointArray.remove(currentPoint);
 								}
 								newClick = false;
-								repaint();
+								frame.repaint();
 							}
 							break;
 						default:

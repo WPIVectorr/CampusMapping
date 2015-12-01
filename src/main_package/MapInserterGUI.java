@@ -7,7 +7,7 @@ import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import main_package.MapUpdaterGUI.UpdateMap;
+//import main_package.MapUpdaterGUI.UpdateMap;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -205,7 +205,11 @@ public class MapInserterGUI extends JFrame{
 		doRepaint();
 		newClick =false;
 		if(alignmentPoints.size()==numSelectionPoints && !imageSet)
-			setImage();
+		{
+			imageSet = true;
+			doRepaint();
+			//setImage();
+		}
 	}	
 
 	private void setImage(){
@@ -256,6 +260,8 @@ public class MapInserterGUI extends JFrame{
 			if (newClick == true) {
 				addPoints();
 			}
+			
+			
 			CampusMap = MapInserterGUIButtonPanel.getCampusMap();
 			if (!(CampusMap == null)) {
 				// Scale the image to the appropriate screen size

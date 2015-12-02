@@ -49,6 +49,7 @@ public class GUI{
 	private Color previousColor = new Color(255, 75, 75);
 	private Color currentColor = new Color(219, 209, 0);
 	private Color nextColor = new Color(51, 255, 51);
+	private Color pointColor = Color.ORANGE;
 
 	private JFrame frame = new JFrame("Directions with Magnitude");
 
@@ -61,9 +62,22 @@ public class GUI{
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
 		frame.setVisible(true);
 
-        frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-
+		/*maps = new ArrayList<Map>();
+		Point point1 = new Point("Point 1", "Point 1", 50, 50);
+		Point point2 = new Point("Point 2", "Point 2", 300, 50);
+		Point point3 = new Point("Point 3", "Point 3", 300, 200);
+		Point point4 = new Point("Point 4", "Point 4", 200, 200);
+		ArrayList<Point> testPoints = new ArrayList<Point>();
+		Edge edge1 = new Edge(point1, point2);
+		Edge edge2 = new Edge(point2, point3);
+		Edge edge3 = new Edge(point3, point4);
+		Map testMap = new Map( 1, "Test Map");
+		testMap.addPoint(point1);
+		testMap.addPoint(point2);
+		testMap.addPoint(point3);
+		testMap.addPoint(point4);*/
 		maps = md.getMapsFromLocal();
 
 
@@ -124,12 +138,6 @@ public class GUI{
 		gbc_horizontalStrut.gridy = 1;
 		mainMenu.add(horizontalStrut, gbc_horizontalStrut);
 
-
-		for(int i = 0; i < maps.size(); i++){	
-			mapsDropdown.addItem(maps.get(i).getMapName());
-		}
-
-
 		JLabel lblMaps = new JLabel("Select Map:");
 		lblMaps.setHorizontalAlignment(SwingConstants.CENTER);
 		GridBagConstraints gbc_lblMaps = new GridBagConstraints();
@@ -174,7 +182,11 @@ public class GUI{
 		gbc_horizontalStrut_1.gridx = 5;
 		gbc_horizontalStrut_1.gridy = 1;
 		mainMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
-		//mapsDropdown.addItem("Select Map");
+		mapsDropdown.addItem("Select Map");
+
+		for(int i = 0; i < maps.size(); i++){	
+			mapsDropdown.addItem(maps.get(i).getMapName());
+		}
 
 
 
@@ -189,57 +201,66 @@ public class GUI{
 		//adds the correct points for the building specified
 		mapsDropdown.addActionListener (new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
-				startBuilds.setEnabled(true);
-				destBuilds.setEnabled(true);
-				directionsButton.setEnabled(true);
-				
-				buildDestIndex = mapsDropdown.getSelectedIndex();
+				if(mapsDropdown.getSelectedItem() != "Select Map"){
+					startBuilds.setEnabled(true);
+					destBuilds.setEnabled(true);
+					directionsButton.setEnabled(true);
 
-				String mapTitle = maps.get(buildDestIndex-1).getMapName();
-				//String mapTitle = "AtwaterKent1";
+					buildDestIndex = mapsDropdown.getSelectedIndex();
 
-				File dest = new File("src/VectorMaps");
-				String destInput = dest.getAbsolutePath();
-				//assuming all maps saved in vectorMaps are in jpg
-				destInput = destInput + "/" + mapTitle + ".jpg";
+					String mapTitle = maps.get(buildDestIndex-1).getMapName();
+					//String mapTitle = "AtwaterKent1";
 
-				File destFile = new File(destInput);
-				try{
-					img = ImageIO.read(destFile);
-					frame.repaint();
-				}
-				catch(IOException a){
-					System.out.println("Could not find file:"+destInput);
-					a.printStackTrace();
-				}
+					File dest = new File("src/VectorMaps");
+					String destInput = dest.getAbsolutePath();
+					//assuming all maps saved in vectorMaps are in jpg
+					destInput = destInput + "/" + mapTitle + ".jpg";
 
-				startBuilds.removeAllItems();
-				destBuilds.removeAllItems();
-				if(buildDestIndex!=0){
-					//System.out.println("building size: " + buildings.length);
-					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-						startBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
-						System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
-						//System.out.println("buildings[i] " + buildings[i]);
-
-						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+					File destFile = new File(destInput);
+					try{
+						img = ImageIO.read(destFile);
+						frame.repaint();
 					}
-					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-						destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
-						//System.out.println("buildings[i] " + buildings[i]);
-
-						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+					catch(IOException a){
+						System.out.println("Could not find file:"+destInput);
+						a.printStackTrace();
 					}
+
+					startBuilds.removeAllItems();
+					destBuilds.removeAllItems();
+					if(buildDestIndex!=0){
+						//System.out.println("building size: " + buildings.length);
+						for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
+							startBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
+							System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
+							//System.out.println("buildings[i] " + buildings[i]);
+
+							// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+						}
+						for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
+							destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
+							//System.out.println("buildings[i] " + buildings[i]);
+
+							// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+						}
+					}
+					//startBuilds.removeAllItems();
+					//for (int i=0; i < buildings.length; i++){
+					//System.out.println("buildings[i] match: " + buildings[i]);
+					//startBuilds.addItem(buildings[i]);
+					//}
+					//destBuilds.removeAllItems();
+					//for (int i=0; i < buildings.length; i++){
+					///destBuilds.addItem(buildings[i]);
+					//}
 				}
-				//startBuilds.removeAllItems();
-				//for (int i=0; i < buildings.length; i++){
-				//System.out.println("buildings[i] match: " + buildings[i]);
-				//startBuilds.addItem(buildings[i]);
-				//}
-				//destBuilds.removeAllItems();
-				//for (int i=0; i < buildings.length; i++){
-				///destBuilds.addItem(buildings[i]);
-				//}
+				else{
+					startBuilds.removeAllItems();
+					destBuilds.removeAllItems();
+					startBuilds.setEnabled(false);
+					destBuilds.setEnabled(false);
+					directionsButton.setEnabled(false);
+				}
 			}
 		});
 
@@ -386,14 +407,14 @@ public class GUI{
 				frame.repaint();
 			}
 		});
-		
+
 		Component verticalStrut = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
 		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
 		gbc_verticalStrut.gridx = 2;
 		gbc_verticalStrut.gridy = 0;
 		navMenu.add(verticalStrut, gbc_verticalStrut);
-		
+
 		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();
 		gbc_horizontalStrut_2.insets = new Insets(0, 0, 5, 5);
@@ -430,7 +451,7 @@ public class GUI{
 		gbc_chckbxColorBlindMode.gridx = 3;
 		gbc_chckbxColorBlindMode.gridy = 1;
 		navMenu.add(chckbxColorBlindMode, gbc_chckbxColorBlindMode);
-		
+
 		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_3 = new GridBagConstraints();
 		gbc_horizontalStrut_3.insets = new Insets(0, 0, 5, 0);
@@ -478,7 +499,7 @@ public class GUI{
 		gbc_btnPrevious.gridx = 1;
 		gbc_btnPrevious.gridy = 3;
 		navMenu.add(btnPrevious, gbc_btnPrevious);
-		
+
 
 		// Button to get next step in directions
 		//sets the next button color to red
@@ -518,13 +539,13 @@ public class GUI{
 				// Otherwise if it is unselected, switch to default colors
 				if (chckbxColorBlindMode.isSelected()){
 					previousColor = new Color(182, 109, 255);
-					//currentColor = new Color(219, 209, 0);
 					nextColor = new Color(0, 146, 146);
+					pointColor = new Color(146, 0, 0);
 				}
 				else{
 					previousColor = new Color(255, 75, 75);
-					//currentColor = new Color(219, 209, 0);
 					nextColor = new Color(51, 255, 51);
+					pointColor = Color.ORANGE;
 				}
 				btnPrevious.setColor(previousColor);
 				btnNext.setColor(nextColor);
@@ -535,7 +556,7 @@ public class GUI{
 		// Add panel for drawing
 		frame.getContentPane().add(drawPanel);
 
-	    frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		// Make frame visible after initializing everything
 		frame.setVisible(true);
 	}
@@ -543,9 +564,9 @@ public class GUI{
 
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
-		
-		
-		
+
+
+
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
@@ -563,7 +584,7 @@ public class GUI{
 				e1.printStackTrace();
 			}
 		}
-		
+
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -617,7 +638,7 @@ public class GUI{
 
 					// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)
 					// Draw lines for all points up to current point, use previousColor (same color as "Previous" button)
-					g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
+					g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 100));
 					g2.setStroke(new BasicStroke(3));
 					for (int i = 0; i < textPos; i++){
 						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
@@ -628,12 +649,7 @@ public class GUI{
 						g.setColor(currentColor);
 						g2.drawLine(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY(), finalDir.get(textPos).getDestination().getLocX(), finalDir.get(textPos).getDestination().getLocY());
 						g2.setStroke(new BasicStroke(3));
-						// Prints a rectangle indicating where the user currently is, needs refinement
-						g.setColor(Color.MAGENTA);
-						g.fillRect(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY() - 20, 65, 15);
-						g.setColor(Color.BLACK);
-						g.drawRect(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY() - 20, 65, 15);
-						g.drawString("You are Here", finalDir.get(textPos).getOrigin().getLocX() + 2, finalDir.get(textPos).getOrigin().getLocY() - 10);
+
 					}
 
 					// Draw lines for all points until the end, use nextColor (same color as "Next" button)
@@ -644,17 +660,74 @@ public class GUI{
 
 					// Draws ovals with black borders at each of the points along the path, needs to use an offset
 					for (int i = 0; i < finalDir.size(); i++){
-						g.setColor(Color.ORANGE);
-						g.fillOval(finalDir.get(i).getOrigin().getLocX() - 6, finalDir.get(i).getOrigin().getLocY() -6, 12, 12);
-						g.setColor(Color.BLACK);
-						g.drawOval(finalDir.get(i).getOrigin().getLocX() - 6, finalDir.get(i).getOrigin().getLocY() -6, 12, 12);						
+						if (i != textPos){
+							g.setColor(pointColor);
+							g.fillOval(finalDir.get(i).getOrigin().getLocX() - 6, finalDir.get(i).getOrigin().getLocY() -6, 12, 12);
+							g.setColor(Color.BLACK);
+							g.drawOval(finalDir.get(i).getOrigin().getLocX() - 6, finalDir.get(i).getOrigin().getLocY() -6, 12, 12);
+						}
+						else{
+
+							// Creates a star indicating where the user currently is
+
+							int midX = finalDir.get(textPos).getOrigin().getLocX();
+							int midY = finalDir.get(textPos).getOrigin().getLocY();
+							int radius[] = {20,5,15,5};
+							int nPoints = 10;
+							int[] X = new int[nPoints];
+							int[] Y = new int[nPoints];
+
+							for (int j=0; j<nPoints; j++)
+							{
+								double x = Math.cos(j*((2*Math.PI)/nPoints))*radius[j % 4];
+								double y = Math.sin(j*((2*Math.PI)/nPoints))*radius[j % 4];
+
+								X[j] = (int) x+midX;
+								Y[j] = (int) y+midY;
+							}
+							g2.setStroke(new BasicStroke(2));
+							g.setColor(pointColor);
+							g.fillPolygon(X, Y, nPoints);
+							g.setColor(Color.BLACK);
+							g.drawPolygon(X, Y, nPoints);
+							g2.setStroke(new BasicStroke(3));
+						}
 					}
-					// Draws final oval in path
-					g.setColor(Color.ORANGE);
-					g.fillOval(finalDir.get(finalDir.size()-1).getDestination().getLocX() - 6, finalDir.get(finalDir.size()-1).getDestination().getLocY() -6, 12, 12);
-					g.setColor(Color.BLACK);
-					g.drawOval(finalDir.get(finalDir.size()-1).getDestination().getLocX() - 6, finalDir.get(finalDir.size()-1).getDestination().getLocY() -6, 12, 12);	
+					// Draws final oval in path (or star)
+					if (textPos == finalDir.size()){
+
+						// Creates a star indicating where the user currently is
+
+						int midX = finalDir.get(finalDir.size()-1).getDestination().getLocX();
+						int midY = finalDir.get(finalDir.size()-1).getDestination().getLocY();
+						int radius[] = {20,5,15,5};
+						int nPoints = 10;
+						int[] X = new int[nPoints];
+						int[] Y = new int[nPoints];
+
+						for (int i=0; i<nPoints; i++)
+						{
+							double x = Math.cos(i*((2*Math.PI)/nPoints))*radius[i % 4];
+							double y = Math.sin(i*((2*Math.PI)/nPoints))*radius[i % 4];
+
+							X[i] = (int) x+midX;
+							Y[i] = (int) y+midY;
+						}
+						g2.setStroke(new BasicStroke(1));
+						g.setColor(pointColor);
+						g.fillPolygon(X, Y, nPoints);
+						g.setColor(Color.BLACK);
+						g.drawPolygon(X, Y, nPoints);
+						g2.setStroke(new BasicStroke(3));
+					}
+					else{
+						g.setColor(pointColor);
+						g.fillOval(finalDir.get(finalDir.size()-1).getDestination().getLocX() - 6, finalDir.get(finalDir.size()-1).getDestination().getLocY() -6, 12, 12);
+						g.setColor(Color.BLACK);
+						g.drawOval(finalDir.get(finalDir.size()-1).getDestination().getLocX() - 6, finalDir.get(finalDir.size()-1).getDestination().getLocY() -6, 12, 12);	
+					}
 				}
+
 			}
 		}
 	}

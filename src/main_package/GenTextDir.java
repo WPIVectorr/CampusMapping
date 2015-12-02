@@ -17,6 +17,8 @@ public class GenTextDir {
 			}
 			double dist = 0;//Now find out the last direction
 			dist = PythagTheorem(arrPoints[arrPoints.length - 2].getGlobX() - arrPoints[arrPoints.length - 1].getGlobX(), arrPoints[arrPoints.length - 2].getGlobY() - arrPoints[arrPoints.length - 1].getGlobY());//CONVERT TO FEET
+			dist = dist * scale * 1.5;
+			dist = dist * 200 / 177;
 			dist = dist * 10;
 			dist = Math.floor(dist);
 			dist = dist / 10;

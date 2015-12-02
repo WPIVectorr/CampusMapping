@@ -4,7 +4,7 @@ import java.util.ArrayList;
 //There is currently a problem in it displaying straight and slight turns as sharp turns. Need to check this.
 public class GenTextDir {
 	boolean DEBUG = false;//Debug variable for printouts
-	public ArrayList<Directions> genTextDir(ArrayList<Point> listPoints){
+	public ArrayList<Directions> genTextDir(ArrayList<Point> listPoints, int scale){
 		if(listPoints.size() <= 1){//checks to make certain there are enough points (Origin and Destination are not the same)
 			return null;
 		} else { //If the origin and destination are not the same, then continue

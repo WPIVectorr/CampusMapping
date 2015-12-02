@@ -82,7 +82,7 @@ public class MapUpdaterGUI{
 	private DrawPanel drawPanel = new DrawPanel();
 	private JTextField mapName;
 	private JTextField txtImageDirectoryPath;
-	private static JComboBox mapDropDown;
+	private static JComboBox<String> mapDropDown;
 	private File mapToAdd;
 	private JCheckBox chckbxPathMode;
 	private Boolean pathMode = false;
@@ -340,7 +340,7 @@ public class MapUpdaterGUI{
 					//ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
 					System.out.println("MapList size is "+maps.size());//Print out the size of the maps from the database
 					for(int i = 0; i < maps.size(); i++){//Iterate through the mapList until we find the item we are looking for
-						System.out.println("Trying to find name:"+name + ".jpg");
+						System.out.println("Trying to find name:"+ name + ".jpg");
 						if(name.equals(maps.get(i).getMapName()))//Once we find the map:
 						{
 							currentMap = maps.get(i);//Grab the current map at this position.
@@ -487,9 +487,10 @@ public class MapUpdaterGUI{
 				rdbtnEditPoints.setEnabled(true);
 				rdbtnRemovePoints.setEnabled(true);
 
-				maptitle = mapName.getText();
+				//maptitle = mapName.getText();
 				System.out.println("Map title is: "+maptitle);
 				maptitle = maptitle.trim();
+				System.out.println("Map title after trim is: "+maptitle);
 				String mapNameNoExt;
 				int l = 0;
 				Boolean MapNameExists = false;
@@ -524,7 +525,7 @@ public class MapUpdaterGUI{
 							l = mapDropDown.getItemAt(k).toString().length();
 							mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
 							addingMap = true;
-
+							System.out.println("Map name now: " + maptitle);
 						}
 					}
 				}
@@ -537,8 +538,10 @@ public class MapUpdaterGUI{
 					String destInput = dest.getAbsolutePath();
 					// System.out.println("Destination Input: " + destInput);
 					// System.out.println("Source Input: " + srcInput);
+					System.out.println("Mapname after addingMap: "+maptitle);
+					
 					destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
-					System.out.println(destInput);
+					System.out.println("dest input: "+destInput);
 					File destFile = new File(destInput);
 					try {
 						copyFileUsingStream(srcFile, destFile);
@@ -553,6 +556,8 @@ public class MapUpdaterGUI{
 						new MapInserterGUI();
 					}
 				}
+				System.out.println("maptitle: " + maptitle);
+				mapDropDown.addItem(maptitle);
 				mapsLoadingLabel.setVisible(false);
 			}
 		});
@@ -873,7 +878,7 @@ public class MapUpdaterGUI{
 
 
 			// Add the name of the map to the Map Selction Dropdown menu
-			mapDropDown.addItem(maptitle);
+			
 
 			// Finds the highest mapID in the database and stores it in
 			// highestID

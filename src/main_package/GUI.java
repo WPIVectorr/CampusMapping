@@ -317,7 +317,7 @@ public class GUI{
 					else{
 						//System.out.println(route.size());
 						GenTextDir gentextdir = new GenTextDir();
-						ArrayList<Directions> tempDir = gentextdir.genTextDir(route, windowScale);
+						ArrayList<Directions> tempDir = gentextdir.genTextDir(route, 2.8);
 						//ArrayList<Directions> finalDir = null;
 						try {
 							finalDir = gentextdir.generateDirections(tempDir);

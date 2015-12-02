@@ -730,7 +730,7 @@ public class MapUpdaterGUI{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(editPoint != null && currentMap != null)
-					connectMapGUI = new InterMapEdgeGUI(currentMap, editPoint);
+					connectMapGUI = new InterMapEdgeGUI(maps, editPoint);
 
 			}
 		});
@@ -947,7 +947,7 @@ public class MapUpdaterGUI{
 
 
 				windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
-				System.out.println("Image Original Width " + img.getWidth());
+				//System.out.println("Image Original Width " + img.getWidth());
 				int WidthSize = (int)((double) img.getHeight() / windowScale);
 				if (WidthSize > (double)drawPanel.getHeight()){
 					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();

@@ -945,7 +945,7 @@ public class MapUpdaterGUI{
 
 	}
 
-	public static void setInfo(int x, int y, int x2, int y2, double angle){
+	public static void setInfo(double x, double y, double x2, double y2, double angle){
 		if(DEBUG){
 			System.out.println("setting info");
 		}

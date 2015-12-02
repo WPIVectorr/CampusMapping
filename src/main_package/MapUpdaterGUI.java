@@ -277,7 +277,7 @@ public class MapUpdaterGUI{
 
 				destinationFile = new File("src/VectorMaps/" + name + ".jpg");
 				destinationFile = new File(destinationFile.getAbsolutePath());
-
+				System.out.println("destinationFile: " + destinationFile);
 
 				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
 					pointArray.clear();
@@ -406,9 +406,9 @@ public class MapUpdaterGUI{
 					System.out.println("Error: Map is invalid");
 				} else {
 					for (int k = 0; k < mapDropDown.getItemCount(); k++) {
-						l = mapDropDown.getItemAt(k).toString().length();
-						mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
-						System.out.println(mapNameNoExt + "           " + (l - 4));
+						//l = mapDropDown.getItemAt(k).toString().length();
+						mapNameNoExt = mapDropDown.getItemAt(k).toString();
+						System.out.println(mapNameNoExt + "           " + (l));
 						if (maptitle.equals(mapNameNoExt)) {
 							addingMap = false;
 							System.out.println("Error: Map invalid");

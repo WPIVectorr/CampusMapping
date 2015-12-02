@@ -478,6 +478,7 @@ public class GUI{
 						
 						String fullText = " Full List of Directions:\n";
 						directionsText.setText(textDir.get(0).get(0));
+						
 						int tempPos = 0;
 						for(int i = 0; i < textDir.size(); i++){
 							tempPos++;
@@ -619,12 +620,12 @@ public class GUI{
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if((textPos == 0 && mapPos == 0) || textDir == null){
-
+					
 				}
 				else if (textPos == 0){
 					mapPos--;
-					textPos = multiMapFinalDir.get(mapPos).size() - 1;
-					directionsText.setText(textDir.get(mapPos).get(textPos));
+					textPos = multiMapFinalDir.get(mapPos).size();
+					directionsText.setText(textDir.get(mapPos).get(textPos - 1));
 
 					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
 					destinationFile = new File(destinationFile.getAbsolutePath());
@@ -666,13 +667,15 @@ public class GUI{
 
 
 					if(textPos < multiMapFinalDir.get(mapPos).size()){
-						directionsText.setText(textDir.get(mapPos).get(textPos));
 						textPos++;
+						directionsText.setText(textDir.get(mapPos).get(textPos-1));
+						
 					}
 					else if (textPos == multiMapFinalDir.get(mapPos).size() && mapPos < multiMapFinalDir.size() - 1) {
 						textPos = 0; // For route coloring 
-						mapPos = mapPos + 1;
-
+						if(mapPos < multiMapFinalDir.size() - 1){
+							mapPos = mapPos + 1;
+						}
 						directionsText.setText("Enter " + dirMaps.get(mapPos).getMapName());
 						//change map
 						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
@@ -689,8 +692,8 @@ public class GUI{
 						}
 						frame.repaint();
 					} else { 
-						textPos = multiMapFinalDir.get(mapPos).size() - 1;
-						mapPos = multiMapFinalDir.size();
+						textPos = multiMapFinalDir.get(mapPos).size();
+						mapPos = multiMapFinalDir.size() - 1;
 						directionsText.setText("You have arrived at your destination");
 					}
 				}
@@ -803,22 +806,22 @@ public class GUI{
 				// Draw lines for all points up to current point, use previousColor (same color as "Previous" button)
 				g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
 				g2.setStroke(new BasicStroke(3));
-				for (int i = 0; i < textPos; i++){
+				for (int i = 0; i < textPos - 1; i++){
 					g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
 				}
 				// Draw a thicker line for the current step in the directions, use currentColor
 				System.out.println("mapPos: " + mapPos);
-				if (textPos != multiMapFinalDir.get(mapPos).size()){
+				if (textPos != 0 || (mapPos == multiMapFinalDir.size()-1 && multiMapFinalDir.get(mapPos).size()-1 == textPos)){
 					g2.setStroke(new BasicStroke(6));
 					g.setColor(currentColor);
-					g2.drawLine(multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocY());
+					g2.drawLine(multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocY());
 					g2.setStroke(new BasicStroke(3));
 					// Prints a rectangle indicating where the user currently is, needs refinement
 				}
 
 				// Draw lines for all points until the end, use nextColor (same color as "Next" button)
 				g.setColor(nextColor);
-				for (int i = textPos + 1; i < multiMapFinalDir.get(mapPos).size(); i++){
+				for (int i = textPos; i < multiMapFinalDir.get(mapPos).size(); i++){
 					g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
 				}
 

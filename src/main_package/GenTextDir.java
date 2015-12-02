@@ -328,7 +328,9 @@ public class GenTextDir {
 		int i = 0;
 		ArrayList<ArrayList<Directions>> returnDirections = new ArrayList<ArrayList<Directions>>();
 		for (i = 0; i < oldDir.size(); i++){
+			
 			ArrayList<Directions> currSet = new ArrayList<Directions>();
+			
 			while(i < oldDir.size() && oldDir.get(i).getOrigin().getMapId() == oldDir.get(i).getDestination().getMapId()){
 				currSet.add(oldDir.get(i));
 				i++;

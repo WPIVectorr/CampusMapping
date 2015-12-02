@@ -38,7 +38,7 @@ public class GUI{
 	private JPanel navMenu;
 	private JPanel menus;
 	private DrawRoute drawPanel = new DrawRoute();
-	private double windowScale = 2;
+	private int windowScale = 2;
 	private int windowSizeX = 932;
 	private int windowSizeY = 778;
 	private ArrayList<Directions> finalDir = null;
@@ -317,7 +317,7 @@ public class GUI{
 					else{
 						//System.out.println(route.size());
 						GenTextDir gentextdir = new GenTextDir();
-						ArrayList<Directions> tempDir = gentextdir.genTextDir(route, 2.8270944741532977);
+						ArrayList<Directions> tempDir = gentextdir.genTextDir(route, 2.8);
 						//ArrayList<Directions> finalDir = null;
 						try {
 							finalDir = gentextdir.generateDirections(tempDir);
@@ -591,20 +591,26 @@ public class GUI{
 		@Override
 		public void paintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
-			if (!(img == null)) {
-
-				// Scale the image to the appropriate screen size
-
-
-				windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
-				int WidthSize = (int)((double) img.getHeight() / windowScale);
-				if (WidthSize > (double)drawPanel.getHeight()){
-					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
-					
+			double wScale;
+			if(img != null){
+				if (img.getHeight() >= img.getWidth()) {
+					wScale = (double) img.getHeight() / (double) windowSizeY;
+					windowScale = img.getHeight() / windowSizeY;
+				} else {
+					wScale = (double) img.getHeight() / (double) windowSizeY;
+					windowScale = img.getWidth() / windowSizeX;
 				}
-				
-				g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
-			}
+				if (wScale > windowScale)
+					windowScale += 1;
+
+				//sets the correct dimensions for logo
+				if(img.getHeight() < windowSizeY && img.getWidth() < windowSizeX){
+					g.drawImage(img,  0,  0,  windowSizeX, img.getHeight(), null);
+				}
+				else{
+					//draws a map based off of scale dimensions found above
+					g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
+				}
 
 				if (showRoute && route != null){
 
@@ -651,4 +657,4 @@ public class GUI{
 			}
 		}
 	}
-
+}

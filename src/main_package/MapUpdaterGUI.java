@@ -107,7 +107,7 @@ public class MapUpdaterGUI{
 		int screenHeight = screenSize.height;
 		int screenWidth = screenSize.width;
 		//frame.setSize(screenWidth / 2, screenHeight / 2);
-		frame.setLocation(screenWidth / 4, screenHeight / 4);
+		frame.setLocation(screenWidth / 24, screenHeight / 24);
 		
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -778,11 +778,15 @@ public class MapUpdaterGUI{
 
 	}
 
-	public static void setInfo(int x, int y, int x2, int y2, double angle){
+	public static void setInfo(double x, double y, double x2, double y2, double angle){
 		System.out.println("setting info");
 		//frame.setVisible(true);
 		if (addingMap) {
-			
+			System.out.println("X1: " + x);
+			System.out.println("Y1: " + y);
+			System.out.println("X2: " + x2);
+			System.out.println("Y2: " + y2);
+			System.out.println("Angle: " + angle);
 
 			// Add the name of the map to the Map Selction Dropdown menu
 			mapDropDown.addItem(maptitle);

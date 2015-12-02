@@ -39,7 +39,7 @@ public class GUI{
 	private JPanel navMenu;
 	private JPanel menus;
 	private DrawRoute drawPanel = new DrawRoute();
-	private int windowScale = 2;
+	private double windowScale = 2;
 	private int windowSizeX = 932;
 	private int windowSizeY = 778;
 	private ArrayList<Directions> finalDir = null;
@@ -208,24 +208,24 @@ public class GUI{
 				destBuilds.removeAllItems();
 				if(buildDestIndex!=0){
 					edgeArray = new ArrayList<Edge>();
-					
+
 					pointArray = maps.get(buildDestIndex - 1).getPointList();
-					
+
 					for(int i = 0; i < pointArray.size(); i++){
 						for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
 							edgeArray.add(pointArray.get(i).getEdges().get(j));
 						}
 					}
-					
+
 					//System.out.println("building size: " + buildings.length);
 					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
 						startBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
 						System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
 						//System.out.println("buildings[i] " + buildings[i]);
-						
+
 						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
 					}
-					
+
 					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
 						destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
 						//System.out.println("buildings[i] " + buildings[i]);
@@ -283,7 +283,7 @@ public class GUI{
 
 
 				//gets the start and end building and room numbers the user chose
-				
+
 				for(int i = 0; i < pointArray.size(); i++){
 					if(pointArray.get(i).getName() == startBuilds.getSelectedItem().toString()){
 						start = pointArray.get(i);
@@ -294,9 +294,9 @@ public class GUI{
 						end = pointArray.get(i);
 					}
 				}
-				
+
 				if(!start.equals(end)){
-					
+
 					//System.out.println("--------------------astar--------------------------------");
 					//start.print();
 					//end.print();
@@ -328,7 +328,7 @@ public class GUI{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						
+						dirMaps = new ArrayList<Map>();
 						multiMapFinalDir = gentextdir.genMultiMapDirections(finalDir);
 						for(int r = 0; r < multiMapFinalDir.size(); r++){
 							for(int s = 0; s < maps.size(); s++){
@@ -336,7 +336,7 @@ public class GUI{
 									dirMaps.add(maps.get(s));
 								}
 							}
-							
+
 						}
 						try {
 							textDir = gentextdir.genDirStrings(multiMapFinalDir);
@@ -354,9 +354,9 @@ public class GUI{
 								fullText += " " + (tempPos + 1) + ". " + textDir.get(i).get(j) + "\n\n";
 							}
 						}
-						
-						
-						
+
+
+
 						txtpnFullTextDir.setText(fullText);						
 					}
 
@@ -412,14 +412,14 @@ public class GUI{
 				frame.repaint();
 			}
 		});
-		
+
 		Component verticalStrut = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
 		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
 		gbc_verticalStrut.gridx = 2;
 		gbc_verticalStrut.gridy = 0;
 		navMenu.add(verticalStrut, gbc_verticalStrut);
-		
+
 		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();
 		gbc_horizontalStrut_2.insets = new Insets(0, 0, 5, 5);
@@ -456,7 +456,7 @@ public class GUI{
 		gbc_chckbxColorBlindMode.gridx = 3;
 		gbc_chckbxColorBlindMode.gridy = 1;
 		navMenu.add(chckbxColorBlindMode, gbc_chckbxColorBlindMode);
-		
+
 		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_3 = new GridBagConstraints();
 		gbc_horizontalStrut_3.insets = new Insets(0, 0, 5, 0);
@@ -487,13 +487,13 @@ public class GUI{
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if((textPos == 0 && mapPos == 0) || textDir == null){
-					
+
 				}
 				else if (textPos == 0){
 					mapPos--;
 					textPos = multiMapFinalDir.get(mapPos).size() - 1;
 					directionsText.setText(textDir.get(mapPos).get(textPos));
-					
+
 					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
 					destinationFile = new File(destinationFile.getAbsolutePath());
 					try {
@@ -531,16 +531,16 @@ public class GUI{
 				else {
 					// Checks if incrementing textPos will set the array out of bounds
 					// If it will, the user is at the end, display a message accordingly
-					
-					
-					if(textPos < multiMapFinalDir.get(mapPos).size() - 1){
-						textPos++;
+
+
+					if(textPos < multiMapFinalDir.get(mapPos).size()){
 						directionsText.setText(textDir.get(mapPos).get(textPos));
+						textPos++;
 					}
-					else if (textPos == multiMapFinalDir.get(mapPos).size() - 1 && mapPos < multiMapFinalDir.size() - 1) {
+					else if (textPos == multiMapFinalDir.get(mapPos).size() && mapPos < multiMapFinalDir.size() - 1) {
 						textPos = 0; // For route coloring 
 						mapPos = mapPos + 1;
-						
+
 						directionsText.setText("Enter " + dirMaps.get(mapPos).getMapName());
 						//change map
 						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
@@ -650,65 +650,60 @@ public class GUI{
 		@Override
 		public void paintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
-			double wScale;
-			if(img != null){
-				if (img.getHeight() >= img.getWidth()) {
-					wScale = (double) img.getHeight() / (double) windowSizeY;
-					windowScale = img.getHeight() / windowSizeY;
-				} else {
-					wScale = (double) img.getHeight() / (double) windowSizeY;
-					windowScale = img.getWidth() / windowSizeX;
-				}
-				if (wScale > windowScale)
-					windowScale += 1;
+			if (!(img == null)) {
 
-				//sets the correct dimensions for logo
-				if(img.getHeight() < windowSizeY && img.getWidth() < windowSizeX){
-					g.drawImage(img,  0,  0,  windowSizeX, img.getHeight(), null);
-				}
-				else{
-					//draws a map based off of scale dimensions found above
-					g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
-				}
+				// Scale the image to the appropriate screen size
 
-				if (showRoute && route != null){
 
-					// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)
-					// Draw lines for all points up to current point, use previousColor (same color as "Previous" button)
-					g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
+				windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
+				//System.out.println("Image Original Width " + img.getWidth());
+				int WidthSize = (int)((double) img.getHeight() / windowScale);
+				if (WidthSize > (double)drawPanel.getHeight()){
+					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
+				}
+				g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
+			}
+
+
+			if (showRoute && route != null){
+
+				// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)
+				// Draw lines for all points up to current point, use previousColor (same color as "Previous" button)
+				g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
+				g2.setStroke(new BasicStroke(3));
+				for (int i = 0; i < textPos; i++){
+					g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
+				}
+				// Draw a thicker line for the current step in the directions, use currentColor
+				System.out.println("mapPos: " + mapPos);
+				if (textPos != multiMapFinalDir.get(mapPos).size()){
+					g2.setStroke(new BasicStroke(6));
+					g.setColor(currentColor);
+					g2.drawLine(multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocY());
 					g2.setStroke(new BasicStroke(3));
-					for (int i = 0; i < textPos; i++){
-						g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
-					}
-					// Draw a thicker line for the current step in the directions, use currentColor
-					if (textPos != finalDir.size()){
-						g2.setStroke(new BasicStroke(6));
-						g.setColor(currentColor);
-						g2.drawLine(multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocY());
-						g2.setStroke(new BasicStroke(3));
-						// Prints a rectangle indicating where the user currently is, needs refinement
-					}
-
-					// Draw lines for all points until the end, use nextColor (same color as "Next" button)
-					g.setColor(nextColor);
-					for (int i = textPos + 1; i < multiMapFinalDir.get(mapPos).size(); i++){
-						g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
-					}
-
-					// Draws ovals with black borders at each of the points along the path, needs to use an offset
-					for (int i = 0; i < multiMapFinalDir.get(mapPos).size(); i++){
-						g.setColor(Color.ORANGE);
-						g.fillOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);
-						g.setColor(Color.BLACK);
-						g.drawOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);						
-					}
-					// Draws final oval in path
-					g.setColor(Color.ORANGE);
-					g.fillOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);
-					g.setColor(Color.BLACK);
-					g.drawOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);	
+					// Prints a rectangle indicating where the user currently is, needs refinement
 				}
+
+				// Draw lines for all points until the end, use nextColor (same color as "Next" button)
+				g.setColor(nextColor);
+				for (int i = textPos + 1; i < multiMapFinalDir.get(mapPos).size(); i++){
+					g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
+				}
+
+				// Draws ovals with black borders at each of the points along the path, needs to use an offset
+				for (int i = 0; i < multiMapFinalDir.get(mapPos).size(); i++){
+					g.setColor(Color.ORANGE);
+					g.fillOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);
+					g.setColor(Color.BLACK);
+					g.drawOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);						
+				}
+				// Draws final oval in path
+				g.setColor(Color.ORANGE);
+				g.fillOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);
+				g.setColor(Color.BLACK);
+				g.drawOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);	
 			}
 		}
 	}
 }
+

@@ -73,7 +73,7 @@ public class MapUpdaterGUI{
 
 	//---------------------------------
 	private final static boolean DEBUG = false;
-	
+
 	String point1;
 	String point2;
 	String point3;
@@ -341,6 +341,7 @@ public class MapUpdaterGUI{
 					System.out.println("New selected item:"+name);
 				}
 
+
 				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
 					pointArray.clear();
 					oldPoints.clear();
@@ -373,10 +374,13 @@ public class MapUpdaterGUI{
 							for(int j = 0; j < pointArray.size(); j++){
 								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
 								for(int k = 0; k < tmpEdges.size(); k++){
-									if(DEBUG){
-										System.out.println(tmpEdges.get(k).getId());
+
+									if (tmpEdges.get(k).getPoint1().getMapId()==tmpEdges.get(k).getPoint2().getMapId()){
+										if(DEBUG){
+											System.out.println(tmpEdges.get(k).getId());
+										}
+										edgeArray.add(tmpEdges.get(k));
 									}
-									edgeArray.add(tmpEdges.get(k));
 								}
 							}
 
@@ -538,11 +542,14 @@ public class MapUpdaterGUI{
 						addingMap = false;
 					}
 				} else {
+
+
 					if (MapNameExists == false){
 						for (int k = 0; k < mapDropDown.getItemCount(); k++) {
 							l = mapDropDown.getItemAt(k).toString().length();
 							mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
 							addingMap = true;
+
 						}
 					}
 				}
@@ -752,7 +759,7 @@ public class MapUpdaterGUI{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(editPoint != null && currentMap != null)
-					connectMapGUI = new InterMapEdgeGUI(currentMap, editPoint);
+					connectMapGUI = new InterMapEdgeGUI(maps, editPoint);
 
 			}
 		});
@@ -835,9 +842,15 @@ public class MapUpdaterGUI{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				for (int u = 0; u < pointArray.size(); u++){
-					for (int z = 0; z < pointArray.get(u).getEdges().size(); z++){
-						edgeArray.add(pointArray.get(u).getEdges().get(z));
+				for(int j = 0; j < pointArray.size(); j++){
+					ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
+					for(int k = 0; k < tmpEdges.size(); k++){
+						if (tmpEdges.get(k).getPoint1().getMapId()==tmpEdges.get(k).getPoint2().getMapId()){
+							if(DEBUG){
+								System.out.println(tmpEdges.get(k).getId());
+							}
+							edgeArray.add(tmpEdges.get(k));
+						}
 					}
 				}
 				roomNumber.setText("Select a Point to Edit");
@@ -1006,7 +1019,7 @@ public class MapUpdaterGUI{
 				if (getRadButton() == 1) // if addpoint
 				{
 					Integer nameNumber = currentMap.getPointIDIndex()+1;
-					double ourRotation = currentMap.getRotationAngle();
+					double ourRotation = 50;//currentMap.getRotationAngle();
 					//ourRotation = 2 * Math.PI - ourRotation;
 
 					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;

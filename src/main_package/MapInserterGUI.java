@@ -40,6 +40,7 @@ import java.lang.Math;
 
 
 public class MapInserterGUI extends JFrame{
+
 	public final static boolean DEBUG = false;
 	
 	private static boolean newClick = false;
@@ -115,7 +116,6 @@ public class MapInserterGUI extends JFrame{
 		//getContentPane().setLayout(null);
 		windowSizeX = frame.getContentPane().getWidth();
 		windowSizeY = frame.getContentPane().getHeight();
-		//System.out.println(frame.getSize());
 		buttonPanel = new MapInserterGUIButtonPanel(frame.getLocation(),frame.getSize());
 		buttonPanel.setVisible(true);
 
@@ -163,13 +163,11 @@ public class MapInserterGUI extends JFrame{
 			System.out.println("Point 3x: " + point3x);
 			System.out.println("Point 3y: " + point3y);
 			System.out.println("Rotation: " + Rotation);
-
 		}
-		MapUpdaterGUI.setInfo(point1.getLocX(), point1.getLocX(), point3x, point3y, Rotation);
+		MapUpdaterGUI.setInfo((double) point1.getLocX(), (double) point1.getLocY(), point3x, point3y, Rotation);
 		if(DEBUG){
 			System.out.println("Sending info");
 		}
-
 		clearAlignmentPoints();
 		resetCornerNum();
 	}
@@ -318,12 +316,10 @@ public class MapInserterGUI extends JFrame{
 						System.out.println("Original Width " + AddingMap.getWidth());
 						System.out.println("Image Width " + ImageWidth);
 					}
-					//System.out.println("Image Scale Height " + HeightScale);
-					//System.out.println("Image Scale Width " + WidthScale);
 					Rotation = -Math.atan2(point1.getLocY()-point2.getLocY(), point1.getLocX()-point2.getLocX())-Math.toRadians(90);
 					point3y = point2.getLocY() + (-(double)(Math.cos(Math.toRadians(90)-Rotation))*(double)ImageWidth);
 					point3x = point2.getLocX() + ((double)(Math.sin(Math.toRadians(90)-Rotation)*(double)ImageWidth));
-
+					
 					double HeightScale = Math.abs((double)ImageHeight/(double)AddingMap.getHeight());
 					double WidthScale = Math.abs((double)ImageWidth/(double)AddingMap.getWidth());
 					
@@ -355,3 +351,4 @@ public class MapInserterGUI extends JFrame{
 		}
 	}
 }
+

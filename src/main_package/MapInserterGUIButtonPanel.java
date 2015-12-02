@@ -1,42 +1,28 @@
 package main_package;
 
 import javax.swing.JFrame;
-import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import main_package.MapInserterGUI.PaintFrame;
-//import main_package.MapUpdaterGUI.UpdateMap;
-
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import java.awt.Panel;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 
 
 public class MapInserterGUIButtonPanel extends JFrame {
+	
 	public final static boolean DEBUG = false;
-
+	
 	private InserterButtonPanel ButtonPanel = new InserterButtonPanel();
 	private JComboBox mapDropDown;
 	private JComboBox secondMap;
@@ -109,7 +95,6 @@ public class MapInserterGUIButtonPanel extends JFrame {
 				} else {
 					File logo = new File("src/VectorLogo/VectorrLogo.png");
 					File logoFinal = new File(logo.getAbsolutePath());
-					//System.out.println("logoFinal: " + logoFinal);
 					try{
 						setCampusMap(ImageIO.read(logoFinal));
 					}
@@ -188,7 +173,6 @@ public class MapInserterGUIButtonPanel extends JFrame {
 				} else {
 					File logo = new File("src/VectorLogo/VectorrLogo.png");
 					File logoFinal = new File(logo.getAbsolutePath());
-					//System.out.println("logoFinal: " + logoFinal);
 					try{
 						setAddingMap(ImageIO.read(logoFinal));
 					}
@@ -209,7 +193,6 @@ public class MapInserterGUIButtonPanel extends JFrame {
 				// the VectorMapps resource folder
 				File vectorMapDir = new File("src/VectorMaps");
 				vectorMapDir = new File(vectorMapDir.getAbsolutePath());
-				//System.out.println("Vectormap abs path: " + vectorMapDir.getAbsolutePath());
 
 				// Truncates the extensions off of the map name so only the name is
 				// displayed in the
@@ -235,7 +218,6 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		// the VectorMapps resource folder
 		File vectorMapDir = new File("src/VectorMaps");
 		vectorMapDir = new File(vectorMapDir.getAbsolutePath());
-		//System.out.println("Vectormap abs path: " + vectorMapDir.getAbsolutePath());
 
 		// Truncates the extensions off of the map name so only the name is
 		// displayed in the

@@ -382,8 +382,6 @@ public class InterMapEdgeGUI extends JFrame {
 
 		/*		public interButtonPanel()
 		{
-
-
 		}*/
 		@Override
 		public void paintComponent(Graphics g) {

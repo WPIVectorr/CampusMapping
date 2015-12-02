@@ -28,9 +28,8 @@ public class GUI{
 
 	private ArrayList<Map> maps = new ArrayList<Map>();
 	private ArrayList<Point> route;
-	private ArrayList<Edge> edgeArray;
-	private ArrayList<Point> pointArray;
-	private String[] textDir;
+	private ArrayList<ArrayList<String>> textDir;
+	private int mapPos;
 	private int textPos;
 	private Point start;
 	private Point end;
@@ -40,18 +39,26 @@ public class GUI{
 	private JPanel navMenu;
 	private JPanel menus;
 	private DrawRoute drawPanel = new DrawRoute();
-	private int windowScale = 2;
+	private double windowScale = 2;
 	private int windowSizeX = 932;
 	private int windowSizeY = 778;
 	private ArrayList<Directions> finalDir = null;
+	private ArrayList<ArrayList<Directions>> multiMapFinalDir = null;
+	private ArrayList<Map> dirMaps = null;
+	private ArrayList<Point> allPoints = null;
 	private int buildStartIndex;
 	private int buildDestIndex;
 	private Color previousColor = new Color(255, 75, 75);
 	private Color currentColor = new Color(219, 209, 0);
 	private Color nextColor = new Color(51, 255, 51);
-
+	private ArrayList<Point> pointArray;
+	private ArrayList<Edge> edgeArray;
 	private JFrame frame = new JFrame("Directions with Magnitude");
-
+	JComboBox mapsDropdown = new JComboBox();
+	JComboBox<Point> destBuilds = new JComboBox();
+	JComboBox<Point> startBuilds = new JComboBox();
+	JComboBox DestMaps = new JComboBox();
+	Map startMap;
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
 		frame.setSize(932, 778);
@@ -60,7 +67,12 @@ public class GUI{
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
 
 		maps = md.getMapsFromLocal();
-
+		allPoints = new ArrayList<Point>();
+		for(int i = 0; i < maps.size(); i++){
+			for(int j = 0; j < maps.get(i).getPointList().size(); j++){
+				allPoints.add(maps.get(i).getPointList().get(j));
+			}
+		}
 
 		//System.out.println("------------------edges check-------------------");
 
@@ -90,8 +102,7 @@ public class GUI{
 		frame.getContentPane().add(menus, BorderLayout.NORTH);
 
 		JTextPane txtpnFullTextDir = new JTextPane();
-		JComboBox<Point> destBuilds = new JComboBox();
-		JComboBox mapsDropdown = new JComboBox();
+
 
 		/*adds the room numbers based off of building name
         startBuilds.addActionListener (new ActionListener () {
@@ -105,84 +116,119 @@ public class GUI{
             }
         });*/
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
-		gbl_mainMenu.columnWidths = new int[]{0, 0, 298, 298, 298, 0, 0, 0};
-		gbl_mainMenu.rowHeights = new int[]{27, 27, 27, 0, 0};
-		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_mainMenu.columnWidths = new int[]{0, 160, 209, 166, 298, 0, 0};
+		gbl_mainMenu.rowHeights = new int[]{27, 27, 27, 0, 0, 0};
+		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		mainMenu.setLayout(gbl_mainMenu);
+		mapsDropdown.addItem("Select Map");
+		DestMaps.addItem("Select Map");
+		for(int i = 0; i < maps.size(); i++){	
+			mapsDropdown.addItem(maps.get(i).getMapName());
+			DestMaps.addItem(maps.get(i).getMapName());
+		}
 
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
 		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 5);
-		gbc_horizontalStrut.gridx = 1;
+		gbc_horizontalStrut.gridx = 0;
 		gbc_horizontalStrut.gridy = 1;
 		mainMenu.add(horizontalStrut, gbc_horizontalStrut);
 
 
-		for(int i = 0; i < maps.size(); i++){	
-			mapsDropdown.addItem(maps.get(i).getMapName());
-		}
-
-
-		JLabel lblMaps = new JLabel("Select Map:");
+		JLabel lblMaps = new JLabel("Starting Map:");
 		lblMaps.setHorizontalAlignment(SwingConstants.CENTER);
 		GridBagConstraints gbc_lblMaps = new GridBagConstraints();
 		gbc_lblMaps.fill = GridBagConstraints.BOTH;
 		gbc_lblMaps.insets = new Insets(0, 0, 5, 5);
-		gbc_lblMaps.gridx = 2;
+		gbc_lblMaps.gridx = 1;
 		gbc_lblMaps.gridy = 1;
 		mainMenu.add(lblMaps, gbc_lblMaps);
 
-		//adds the starting location label to the line with starting location options
-		JLabel lblStartingLocation = new JLabel("Starting Location:");
-		GridBagConstraints gbc_lblStartingLocation = new GridBagConstraints();
-		gbc_lblStartingLocation.anchor = GridBagConstraints.EAST;
-		gbc_lblStartingLocation.fill = GridBagConstraints.VERTICAL;
-		gbc_lblStartingLocation.insets = new Insets(0, 0, 5, 5);
-		gbc_lblStartingLocation.gridx = 3;
-		gbc_lblStartingLocation.gridy = 1;
-		mainMenu.add(lblStartingLocation, gbc_lblStartingLocation);
-		lblStartingLocation.setBounds(6, 31, 119, 16);
 
-		//creates the drop down box with rooms for start (initially waits for the building to have 
-		//the specific buildings room numbers)
-
-		//	         buttonPanel.add(startRooms);
-		//startRooms.setBounds(296, 30, 148, 20);
-
-		JComboBox<Point> startBuilds = new JComboBox();
-
-		//creates drop down box with building names
-		GridBagConstraints gbc_startBuilds = new GridBagConstraints();
-		gbc_startBuilds.fill = GridBagConstraints.BOTH;
-		gbc_startBuilds.insets = new Insets(0, 0, 5, 5);
-		gbc_startBuilds.gridx = 4;
-		gbc_startBuilds.gridy = 1;
-		mainMenu.add(startBuilds, gbc_startBuilds);
-		startBuilds.setBounds(122, 30, 148, 20);
-
-		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
-		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
-		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 5);
-		gbc_horizontalStrut_1.gridx = 5;
-		gbc_horizontalStrut_1.gridy = 1;
-		mainMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
-		mapsDropdown.addItem("Select Map");
-
-
+		
 
 		//creates a dropdown menu with map names
 		GridBagConstraints gbc_mapsDropdown = new GridBagConstraints();
 		gbc_mapsDropdown.fill = GridBagConstraints.BOTH;
 		gbc_mapsDropdown.insets = new Insets(0, 0, 5, 5);
 		gbc_mapsDropdown.gridx = 2;
-		gbc_mapsDropdown.gridy = 2;
+		gbc_mapsDropdown.gridy = 1;
 		mainMenu.add(mapsDropdown, gbc_mapsDropdown);
 
 		//adds the correct points for the building specified
 		mapsDropdown.addActionListener (new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
-				buildDestIndex = mapsDropdown.getSelectedIndex();
+				buildStartIndex = mapsDropdown.getSelectedIndex();
+
+
+				String mapTitle = maps.get(buildStartIndex-1).getMapName();
+				//String mapTitle = "AtwaterKent1";
+
+				File start = new File("src/VectorMaps");
+				String startInput = start.getAbsolutePath();
+				//assuming all maps saved in vectorMaps are in jpg
+				startInput = startInput + "/" + mapTitle + ".jpg";
+
+				File destFile = new File(startInput);
+				try{
+					img = ImageIO.read(destFile);
+					frame.repaint();
+				}
+				catch(IOException a){
+					System.out.println("Could not find file:"+startInput);
+					a.printStackTrace();
+				}
+
+				startBuilds.removeAllItems();
+				//destBuilds.removeAllItems();
+				if(buildStartIndex!=0){
+					edgeArray = new ArrayList<Edge>();
+
+					pointArray = maps.get(buildStartIndex - 1).getPointList();
+
+					for(int i = 0; i < pointArray.size(); i++){
+						for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
+							edgeArray.add(pointArray.get(i).getEdges().get(j));
+						}
+					}
+
+					//System.out.println("building size: " + buildings.length);
+					for (int i = 0; i < maps.get(buildStartIndex-1).getPointList().size(); i++){
+						if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equals("Hallway")){
+							startBuilds.addItem(maps.get(buildStartIndex-1).getPointList().get(i));
+							System.out.println("startBuildsSize: " + maps.get(buildStartIndex-1).getPointList().size());
+						}
+						//System.out.println("buildings[i] " + buildings[i]);
+
+						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+					}
+
+					/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
+						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
+							destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
+						}*/
+						//System.out.println("buildings[i] " + buildings[i]);
+
+						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+					}
+				}
+				//startBuilds.removeAllItems();
+				//for (int i=0; i < buildings.length; i++){
+				//System.out.println("buildings[i] match: " + buildings[i]);
+				//startBuilds.addItem(buildings[i]);
+				//}
+				//destBuilds.removeAllItems();
+				//for (int i=0; i < buildings.length; i++){
+				///destBuilds.addItem(buildings[i]);
+				//}
+			}
+		);
+		//adds the correct points for the building specified
+		DestMaps.addActionListener (new ActionListener () {
+			public void actionPerformed(ActionEvent e) {
+				buildDestIndex = DestMaps.getSelectedIndex();
+
 
 				String mapTitle = maps.get(buildDestIndex-1).getMapName();
 				//String mapTitle = "AtwaterKent1";
@@ -202,32 +248,33 @@ public class GUI{
 					a.printStackTrace();
 				}
 
-				startBuilds.removeAllItems();
+				//startBuilds.removeAllItems();
 				destBuilds.removeAllItems();
 				if(buildDestIndex!=0){
-
 					edgeArray = new ArrayList<Edge>();
-					
+
 					pointArray = maps.get(buildDestIndex - 1).getPointList();
-					
+
 					for(int i = 0; i < pointArray.size(); i++){
 						for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
-							if(pointArray.get(i).getEdges().get(j).getPoint1().getMapId() == pointArray.get(i).getEdges().get(j).getPoint2().getMapId())
-								edgeArray.add(pointArray.get(i).getEdges().get(j));
+							edgeArray.add(pointArray.get(i).getEdges().get(j));
 						}
 					}
-					
 
 					//System.out.println("building size: " + buildings.length);
-					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-						startBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
-						System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
+					/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
+						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
+							startBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
+							System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
+						}
 						//System.out.println("buildings[i] " + buildings[i]);
-
 						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
-					}
+					}*/
+
 					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-						destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
+						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
+							destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
+						}
 						//System.out.println("buildings[i] " + buildings[i]);
 
 						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
@@ -245,8 +292,59 @@ public class GUI{
 			}
 		});
 
+
+		//adds the starting location label to the line with starting location options
+		JLabel lblStartingLocation = new JLabel("Starting Room:");
+		GridBagConstraints gbc_lblStartingLocation = new GridBagConstraints();
+		gbc_lblStartingLocation.anchor = GridBagConstraints.EAST;
+		gbc_lblStartingLocation.fill = GridBagConstraints.VERTICAL;
+		gbc_lblStartingLocation.insets = new Insets(0, 0, 5, 5);
+		gbc_lblStartingLocation.gridx = 3;
+		gbc_lblStartingLocation.gridy = 1;
+		mainMenu.add(lblStartingLocation, gbc_lblStartingLocation);
+		lblStartingLocation.setBounds(6, 31, 119, 16);
+
+		//creates the drop down box with rooms for start (initially waits for the building to have 
+		//the specific buildings room numbers)
+
+		//	         buttonPanel.add(startRooms);
+		//startRooms.setBounds(296, 30, 148, 20);
+
+
+
+		//creates drop down box with building names
+		GridBagConstraints gbc_startBuilds = new GridBagConstraints();
+		gbc_startBuilds.fill = GridBagConstraints.BOTH;
+		gbc_startBuilds.insets = new Insets(0, 0, 5, 5);
+		gbc_startBuilds.gridx = 4;
+		gbc_startBuilds.gridy = 1;
+		mainMenu.add(startBuilds, gbc_startBuilds);
+		startBuilds.setBounds(122, 30, 148, 20);
+
+		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
+		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 0);
+		gbc_horizontalStrut_1.gridx = 5;
+		gbc_horizontalStrut_1.gridy = 1;
+		mainMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
+
+		JLabel lblDestinationMap = new JLabel("Destination Map:");
+		GridBagConstraints gbc_lblDestinationMap = new GridBagConstraints();
+		gbc_lblDestinationMap.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDestinationMap.gridx = 1;
+		gbc_lblDestinationMap.gridy = 2;
+		mainMenu.add(lblDestinationMap, gbc_lblDestinationMap);
+
+
+		GridBagConstraints gbc_destMaps = new GridBagConstraints();
+		gbc_destMaps.insets = new Insets(0, 0, 5, 5);
+		gbc_destMaps.fill = GridBagConstraints.HORIZONTAL;
+		gbc_destMaps.gridx = 2;
+		gbc_destMaps.gridy = 2;
+		mainMenu.add(DestMaps, gbc_destMaps);
+
 		//adds the destination label to the line with destination location options
-		JLabel lblDestination = new JLabel("Destination:");
+		JLabel lblDestination = new JLabel("Destination Room:");
 		GridBagConstraints gbc_lblDestination = new GridBagConstraints();
 		gbc_lblDestination.anchor = GridBagConstraints.EAST;
 		gbc_lblDestination.fill = GridBagConstraints.VERTICAL;
@@ -272,7 +370,7 @@ public class GUI{
 		GradientButton directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
 		GridBagConstraints gbc_directionsButton = new GridBagConstraints();
 		gbc_directionsButton.fill = GridBagConstraints.BOTH;
-		gbc_directionsButton.insets = new Insets(0, 0, 0, 5);
+		gbc_directionsButton.insets = new Insets(0, 0, 5, 5);
 		gbc_directionsButton.gridx = 3;
 		gbc_directionsButton.gridy = 3;
 		mainMenu.add(directionsButton, gbc_directionsButton);
@@ -284,11 +382,20 @@ public class GUI{
 
 				//gets the start and end building and room numbers the user chose
 
-				start = (Point) startBuilds.getSelectedItem();
-				end = (Point) destBuilds.getSelectedItem();
-				if(!start.equals(end)){
+				for(int i = 0; i < allPoints.size(); i++){
+					if(allPoints.get(i).getName().equals(startBuilds.getSelectedItem().toString())){
+						start = allPoints.get(i);
+						i = allPoints.size();
+					}
+				}
+				for(int i = 0; i < allPoints.size(); i++){
+					if(allPoints.get(i).getName().equals(destBuilds.getSelectedItem().toString())){
+						end = allPoints.get(i);
+						i = allPoints.size();
+					}
+				}
 
-
+				if(!start.getId().equals(end.getId())){
 
 					//System.out.println("--------------------astar--------------------------------");
 					//start.print();
@@ -301,9 +408,9 @@ public class GUI{
 
 					if(route != null){
 						/*System.out.println("route: ");
-												for(int i = route.size() - 1; i >= 0; i--){
-													System.out.println(route.get(i));
-												}*/
+																		for(int i = route.size() - 1; i >= 0; i--){
+																			System.out.println(route.get(i));
+																		}*/
 
 					}
 					showRoute = true;
@@ -313,7 +420,7 @@ public class GUI{
 					else{
 						//System.out.println(route.size());
 						GenTextDir gentextdir = new GenTextDir();
-						ArrayList<Directions> tempDir = gentextdir.genTextDir(route);
+						ArrayList<Directions> tempDir = gentextdir.genTextDir(route, 2.8);
 						//ArrayList<Directions> finalDir = null;
 						try {
 							finalDir = gentextdir.generateDirections(tempDir);
@@ -321,17 +428,67 @@ public class GUI{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						dirMaps = new ArrayList<Map>();
+						if(multiMapFinalDir != null){
+							multiMapFinalDir.clear();
+						}
+						mapPos = 0;
+						textPos = 0;
+						multiMapFinalDir = gentextdir.genMultiMapDirections(finalDir);
+						if(!(multiMapFinalDir.get(0).isEmpty() && multiMapFinalDir.size() == 1)){
+
+							for(int r = 0; r < multiMapFinalDir.size(); r++){
+								for(int s = 0; s < maps.size(); s++){
+									if(multiMapFinalDir.get(r).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
+										dirMaps.add(maps.get(s));
+									}
+								}
+
+							}
+
+							try {
+								textDir = gentextdir.genDirStrings(multiMapFinalDir);
+							} catch (MalformedDirectionException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} else {
+							multiMapFinalDir.add(gentextdir.genTextDir(route, 2.8));
+							try {
+								textDir = gentextdir.genDirStrings(multiMapFinalDir);
+							} catch (MalformedDirectionException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						
+						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
+						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
-							textDir = gentextdir.genDirStrings(finalDir);
-						} catch (MalformedDirectionException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							//System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
+							//System.out.println("Map name " + currentMap.getMapName());
+							img = ImageIO.read(destinationFile);
+						} catch (IOException g) {
+							System.out.println("Invalid Map Selection");
+							g.printStackTrace();
 						}
+						frame.repaint();
+						
+						
 						String fullText = " Full List of Directions:\n";
-						directionsText.setText(textDir[0]);
-						for (int i=0; i < textDir.length; i++){
-							fullText += " " + (i + 1) + ". " + textDir[i] + "\n\n";
+						directionsText.setText(textDir.get(0).get(0));
+						
+						int tempPos = 0;
+						for(int i = 0; i < textDir.size(); i++){
+							tempPos++;
+							for(int j = 0; j < textDir.get(i).size(); j++){
+								tempPos++;
+								fullText += " " + (tempPos + 1) + ". " + textDir.get(i).get(j) + "\n\n";
+							}
 						}
+
+
+
 						txtpnFullTextDir.setText(fullText);						
 					}
 
@@ -387,14 +544,14 @@ public class GUI{
 				frame.repaint();
 			}
 		});
-		
+
 		Component verticalStrut = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
 		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
 		gbc_verticalStrut.gridx = 2;
 		gbc_verticalStrut.gridy = 0;
 		navMenu.add(verticalStrut, gbc_verticalStrut);
-		
+
 		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();
 		gbc_horizontalStrut_2.insets = new Insets(0, 0, 5, 5);
@@ -431,7 +588,7 @@ public class GUI{
 		gbc_chckbxColorBlindMode.gridx = 3;
 		gbc_chckbxColorBlindMode.gridy = 1;
 		navMenu.add(chckbxColorBlindMode, gbc_chckbxColorBlindMode);
-		
+
 		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_3 = new GridBagConstraints();
 		gbc_horizontalStrut_3.insets = new Insets(0, 0, 5, 0);
@@ -461,12 +618,28 @@ public class GUI{
 		GradientButton btnPrevious = new GradientButton("Previous", previousColor);
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(textPos == 0 || textDir == null){
-
+				if((textPos == 0 && mapPos == 0) || textDir == null){
+					
 				}
-				else{
+				else if (textPos == 0){
+					mapPos--;
+					textPos = multiMapFinalDir.get(mapPos).size();
+					directionsText.setText(textDir.get(mapPos).get(textPos - 1));
+
+					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
+					destinationFile = new File(destinationFile.getAbsolutePath());
+					try {
+						//System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
+						//System.out.println("Map name " + currentMap.getMapName());
+						img = ImageIO.read(destinationFile);
+					} catch (IOException g) {
+						System.out.println("Invalid Map Selection");
+						g.printStackTrace();
+					}
+					frame.repaint();
+				} else {
 					textPos--;
-					directionsText.setText(textDir[textPos]);
+					directionsText.setText(textDir.get(mapPos).get(textPos));
 				}
 				frame.repaint();
 			}
@@ -487,18 +660,42 @@ public class GUI{
 				if (textDir == null){
 
 				}
-				else
+				else {
 					// Checks if incrementing textPos will set the array out of bounds
 					// If it will, the user is at the end, display a message accordingly
-					if(textPos < textDir.length - 1){
+
+
+					if(textPos < multiMapFinalDir.get(mapPos).size()){
 						textPos++;
-						directionsText.setText(textDir[textPos]);
+						directionsText.setText(textDir.get(mapPos).get(textPos-1));
+						
 					}
-					else {
-						textPos = textDir.length; // For route coloring 
+					else if (textPos == multiMapFinalDir.get(mapPos).size() && mapPos < multiMapFinalDir.size() - 1) {
+						textPos = 0; // For route coloring 
+						if(mapPos < multiMapFinalDir.size() - 1){
+							mapPos = mapPos + 1;
+						}
+						directionsText.setText("Enter " + dirMaps.get(mapPos).getMapName());
+						//change map
+						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
+
+
+						destinationFile = new File(destinationFile.getAbsolutePath());
+						try {
+							//System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
+							//System.out.println("Map name " + currentMap.getMapName());
+							img = ImageIO.read(destinationFile);
+						} catch (IOException g) {
+							System.out.println("Invalid Map Selection");
+							g.printStackTrace();
+						}
+						frame.repaint();
+					} else { 
+						textPos = multiMapFinalDir.get(mapPos).size();
+						mapPos = multiMapFinalDir.size() - 1;
 						directionsText.setText("You have arrived at your destination");
 					}
-
+				}
 				frame.repaint();
 			}
 		});
@@ -587,69 +784,58 @@ public class GUI{
 		@Override
 		public void paintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
-			double wScale;
-			if(img != null){
-				if (img.getHeight() >= img.getWidth()) {
-					wScale = (double) img.getHeight() / (double) windowSizeY;
-					windowScale = img.getHeight() / windowSizeY;
-				} else {
-					wScale = (double) img.getHeight() / (double) windowSizeY;
-					windowScale = img.getWidth() / windowSizeX;
-				}
-				if (wScale > windowScale)
-					windowScale += 1;
+			if (!(img == null)) {
 
-				//sets the correct dimensions for logo
-				if(img.getHeight() < windowSizeY && img.getWidth() < windowSizeX){
-					g.drawImage(img,  0,  0,  windowSizeX, img.getHeight(), null);
-				}
-				else{
-					//draws a map based off of scale dimensions found above
-					g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
-				}
+				// Scale the image to the appropriate screen size
 
-				if (showRoute && route != null){
 
-					// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)
-					// Draw lines for all points up to current point, use previousColor (same color as "Previous" button)
-					g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
+				windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
+				//System.out.println("Image Original Width " + img.getWidth());
+				int WidthSize = (int)((double) img.getHeight() / windowScale);
+				if (WidthSize > (double)drawPanel.getHeight()){
+					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
+				}
+				g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
+			}
+
+
+			if (showRoute && route != null){
+
+				// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)
+				// Draw lines for all points up to current point, use previousColor (same color as "Previous" button)
+				g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
+				g2.setStroke(new BasicStroke(3));
+				for (int i = 0; i < textPos - 1; i++){
+					g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
+				}
+				// Draw a thicker line for the current step in the directions, use currentColor
+				System.out.println("mapPos: " + mapPos);
+				if (textPos != 0 || (mapPos == multiMapFinalDir.size()-1 && multiMapFinalDir.get(mapPos).size()-1 == textPos)){
+					g2.setStroke(new BasicStroke(6));
+					g.setColor(currentColor);
+					g2.drawLine(multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocY());
 					g2.setStroke(new BasicStroke(3));
-					for (int i = 0; i < textPos; i++){
-						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
-					}
-					// Draw a thicker line for the current step in the directions, use currentColor
-					if (textPos != finalDir.size()){
-						g2.setStroke(new BasicStroke(6));
-						g.setColor(currentColor);
-						g2.drawLine(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY(), finalDir.get(textPos).getDestination().getLocX(), finalDir.get(textPos).getDestination().getLocY());
-						g2.setStroke(new BasicStroke(3));
-						// Prints a rectangle indicating where the user currently is, needs refinement
-						g.setColor(Color.MAGENTA);
-						g.fillRect(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY() - 20, 65, 15);
-						g.setColor(Color.BLACK);
-						g.drawRect(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY() - 20, 65, 15);
-						g.drawString("You are Here", finalDir.get(textPos).getOrigin().getLocX() + 2, finalDir.get(textPos).getOrigin().getLocY() - 10);
-					}
-
-					// Draw lines for all points until the end, use nextColor (same color as "Next" button)
-					g.setColor(nextColor);
-					for (int i = textPos + 1; i < finalDir.size(); i++){
-						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
-					}
-
-					// Draws ovals with black borders at each of the points along the path, needs to use an offset
-					for (int i = 0; i < finalDir.size(); i++){
-						g.setColor(Color.ORANGE);
-						g.fillOval(finalDir.get(i).getOrigin().getLocX() - 6, finalDir.get(i).getOrigin().getLocY() -6, 12, 12);
-						g.setColor(Color.BLACK);
-						g.drawOval(finalDir.get(i).getOrigin().getLocX() - 6, finalDir.get(i).getOrigin().getLocY() -6, 12, 12);						
-					}
-					// Draws final oval in path
-					g.setColor(Color.ORANGE);
-					g.fillOval(finalDir.get(finalDir.size()-1).getDestination().getLocX() - 6, finalDir.get(finalDir.size()-1).getDestination().getLocY() -6, 12, 12);
-					g.setColor(Color.BLACK);
-					g.drawOval(finalDir.get(finalDir.size()-1).getDestination().getLocX() - 6, finalDir.get(finalDir.size()-1).getDestination().getLocY() -6, 12, 12);	
+					// Prints a rectangle indicating where the user currently is, needs refinement
 				}
+
+				// Draw lines for all points until the end, use nextColor (same color as "Next" button)
+				g.setColor(nextColor);
+				for (int i = textPos; i < multiMapFinalDir.get(mapPos).size(); i++){
+					g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
+				}
+
+				// Draws ovals with black borders at each of the points along the path, needs to use an offset
+				for (int i = 0; i < multiMapFinalDir.get(mapPos).size(); i++){
+					g.setColor(Color.ORANGE);
+					g.fillOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);
+					g.setColor(Color.BLACK);
+					g.drawOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);						
+				}
+				// Draws final oval in path
+				g.setColor(Color.ORANGE);
+				g.fillOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);
+				g.setColor(Color.BLACK);
+				g.drawOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);	
 			}
 		}
 	}

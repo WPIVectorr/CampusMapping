@@ -18,7 +18,8 @@ import database.AlreadyExistsException;
 import database.ServerDB;
 
 public class GUI{
-
+	public final static boolean DEBUG = false;
+	
 	ServerDB md = ServerDB.getInstance();
 
 	private BufferedImage img = null;
@@ -232,7 +233,9 @@ public class GUI{
 						//System.out.println("building size: " + buildings.length);
 						for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
 							startBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
-							System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
+							if(DEBUG){
+								System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
+							}
 							//System.out.println("buildings[i] " + buildings[i]);
 
 							// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));

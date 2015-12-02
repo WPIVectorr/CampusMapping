@@ -40,6 +40,8 @@ import java.lang.Math;
 
 
 public class MapInserterGUI extends JFrame{
+	public final static boolean DEBUG = false;
+	
 	private static boolean newClick = false;
 	private static int lastMousex = 0;
 	private static int lastMousey = 0;
@@ -155,7 +157,9 @@ public class MapInserterGUI extends JFrame{
 	
 	public static void GiveMapUpdaterInfo() {
 		MapUpdaterGUI.setInfo(point1.getLocX(), point1.getLocX(), point3x, point3y, Rotation);
-		System.out.println("Sending info");
+		if(DEBUG){
+			System.out.println("Sending info");
+		}
 		clearAlignmentPoints();
 		resetCornerNum();
 	}
@@ -171,7 +175,9 @@ public class MapInserterGUI extends JFrame{
 		{//if there isn't anything in the array, the foreach won't run.
 			alignmentPoints.add(getCornerNum(), cornerPoint);
 			cornerNum = alignmentPoints.size();
-			System.out.println("add Alignment #"+cornerNum +" X: "+cornerPoint.getLocX()+" Y: "+cornerPoint.getLocY());
+			if(DEBUG){
+				System.out.println("add Alignment #"+cornerNum +" X: "+cornerPoint.getLocX()+" Y: "+cornerPoint.getLocY());
+			}
 
 		}else if(!buttonPanel.getSelectedMap().contentEquals("Select Map")){
 			for (Point currentPoint : alignmentPoints) {
@@ -180,7 +186,9 @@ public class MapInserterGUI extends JFrame{
 						&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
 								&& lastMousey < currentPoint.getLocY() + (pointSize + 5)))
 				{
-					System.out.println("remove");
+					if(DEBUG){
+						System.out.println("remove");
+					}
 					cornerNum = alignmentPoints.indexOf(currentPoint);
 					remove =true;
 					break;
@@ -189,10 +197,14 @@ public class MapInserterGUI extends JFrame{
 
 			if(remove == false && alignmentPoints.size()<numSelectionPoints && !buttonPanel.getSelectedMap().contentEquals("Select Map"))
 			{
-				System.out.println("Adding a point.");
+				if(DEBUG){
+					System.out.println("Adding a point.");
+				}
 				alignmentPoints.add(getCornerNum(), cornerPoint);
 				cornerNum = alignmentPoints.size();
-				System.out.println("add Alignment #"+cornerNum +" X: "+cornerPoint.getLocX()+" Y: "+cornerPoint.getLocY());
+				if(DEBUG){
+					System.out.println("add Alignment #"+cornerNum +" X: "+cornerPoint.getLocX()+" Y: "+cornerPoint.getLocY());
+				}
 
 				doRepaint();
 			}else if(remove == true)
@@ -292,12 +304,16 @@ public class MapInserterGUI extends JFrame{
 					double WidthScale2 = (double)AddingMap.getWidth()/(double)AddingMap.getHeight();
 					int ImageWidth = (int) (ImageHeight*WidthScale2);
 					
-					System.out.println("Original Width " + AddingMap.getWidth());
-					System.out.println("Image Width " + ImageWidth);
+					if(DEBUG){
+						System.out.println("Original Width " + AddingMap.getWidth());
+						System.out.println("Image Width " + ImageWidth);
+					}
 					//System.out.println("Image Scale Height " + HeightScale);
 					//System.out.println("Image Scale Width " + WidthScale);
 					double Rotation = -Math.atan2(point1.getLocY()-point2.getLocY(), point1.getLocX()-point2.getLocX())-Math.toRadians(90);
-					System.out.println(Math.toDegrees(Rotation));
+					if(DEBUG){
+						System.out.println(Math.toDegrees(Rotation));
+					}
 					
 					double HeightScale = Math.abs((double)ImageHeight/(double)AddingMap.getHeight());
 					double WidthScale = Math.abs((double)ImageWidth/(double)AddingMap.getWidth());
@@ -320,7 +336,9 @@ public class MapInserterGUI extends JFrame{
 					Integer drawNum = Integer.parseInt(currentPoint.getId())+1;
 					g.drawString(drawNum.toString(), drawX-pointSize, drawY+pointSize);
 					//g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
-					System.out.println(alignmentPoints.size());
+					if(DEBUG){
+						System.out.println(alignmentPoints.size());
+					}
 				}
 			}
 			

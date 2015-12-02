@@ -1359,4 +1359,3 @@ public class MapUpdaterGUI{
 
 
 }
-

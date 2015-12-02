@@ -93,18 +93,21 @@ public class MapUpdaterGUI{
 	private Color buttonColor = new Color(153, 204, 255);
 
 	private JFrame frame = new JFrame("Map Updater");
+	private JLabel genericLoadingFrame;
 	private JLabel lblMapImageDirectory;
 	private JLabel lblMapName;
 	private Component verticalStrut;
-	private Icon loadingIcon;
+	//private ImageIcon loadingIcon;
 	private JLabel mapsLoadingLabel;
 	private JLabel pointsLoadingLabel;
 	private JTabbedPane tabs = new JTabbedPane();
 	private ArrayList<Map> maps = new ArrayList<Map>();
 	private JButton btnConnectToOther;
 	private InterMapEdgeGUI connectMapGUI;
+	private static ImageIcon loadingIcon = new ImageIcon("src/VectorLogo/faster reverse.gif");
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
+
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		frame.setVisible(true);
@@ -120,8 +123,17 @@ public class MapUpdaterGUI{
 
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		maps = md.getMapsFromLocal();
+		
+		
+		genericLoadingFrame = new JLabel(loadingIcon);
+		frame.add(genericLoadingFrame);
+		genericLoadingFrame.setVisible(true);
+		frame.toFront();
+		frame.repaint();
+		System.out.println("loadinglogo");
+		
+		
+		maps = ServerDB.getMapsFromLocal();
 
 		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
@@ -130,7 +142,7 @@ public class MapUpdaterGUI{
 		buttonPanel.setLayout(new BorderLayout());
 		frame.getContentPane().add(buttonPanel, BorderLayout.NORTH);
 
-		loadingIcon = new ImageIcon("src/VectorLogo/faster reverse.gif");
+		
 
 		tabs.addTab("Maps", createMapsPanel());
 		tabs.addTab("Points", createPointsPanel());
@@ -350,6 +362,7 @@ public class MapUpdaterGUI{
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}//Populate the point array with all the points found.
+							
 							oldPoints = pointArray;
 							System.out.println("Map list size:"+maps.size());
 
@@ -1175,7 +1188,8 @@ public class MapUpdaterGUI{
 												z++;
 											}
 										}
-
+										
+										genericLoadingFrame.setVisible(true);
 										try{
 											System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
 											ServerDB.removePoint(currentPoint);
@@ -1247,6 +1261,7 @@ public class MapUpdaterGUI{
 									pointArray.remove(currentPoint);
 								}
 								newClick = false;
+								genericLoadingFrame.setVisible(false);
 								frame.repaint();
 							}
 							break;

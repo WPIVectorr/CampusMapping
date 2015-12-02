@@ -28,6 +28,8 @@ public class GUI{
 
 	private ArrayList<Map> maps = new ArrayList<Map>();
 	private ArrayList<Point> route;
+	private ArrayList<Edge> edgeArray;
+	private ArrayList<Point> pointArray;
 	private String[] textDir;
 	private int textPos;
 	private Point start;
@@ -47,8 +49,7 @@ public class GUI{
 	private Color previousColor = new Color(255, 75, 75);
 	private Color currentColor = new Color(219, 209, 0);
 	private Color nextColor = new Color(51, 255, 51);
-	private ArrayList<Point> pointArray;
-	private ArrayList<Edge> edgeArray;
+
 	private JFrame frame = new JFrame("Directions with Magnitude");
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
@@ -117,7 +118,7 @@ public class GUI{
 		gbc_horizontalStrut.gridy = 1;
 		mainMenu.add(horizontalStrut, gbc_horizontalStrut);
 
-		mapsDropdown.addItem("Select Map");
+
 		for(int i = 0; i < maps.size(); i++){	
 			mapsDropdown.addItem(maps.get(i).getMapName());
 		}
@@ -166,7 +167,7 @@ public class GUI{
 		gbc_horizontalStrut_1.gridx = 5;
 		gbc_horizontalStrut_1.gridy = 1;
 		mainMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
-		//mapsDropdown.addItem("Select Map");
+		mapsDropdown.addItem("Select Map");
 
 
 
@@ -204,25 +205,27 @@ public class GUI{
 				startBuilds.removeAllItems();
 				destBuilds.removeAllItems();
 				if(buildDestIndex!=0){
+
 					edgeArray = new ArrayList<Edge>();
 					
 					pointArray = maps.get(buildDestIndex - 1).getPointList();
 					
 					for(int i = 0; i < pointArray.size(); i++){
 						for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
-							edgeArray.add(pointArray.get(i).getEdges().get(j));
+							if(pointArray.get(i).getEdges().get(j).getPoint1().getMapId() == pointArray.get(i).getEdges().get(j).getPoint2().getMapId())
+								edgeArray.add(pointArray.get(i).getEdges().get(j));
 						}
 					}
 					
+
 					//System.out.println("building size: " + buildings.length);
 					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
 						startBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
 						System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
 						//System.out.println("buildings[i] " + buildings[i]);
-						
+
 						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
 					}
-					
 					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
 						destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
 						//System.out.println("buildings[i] " + buildings[i]);
@@ -280,20 +283,13 @@ public class GUI{
 
 
 				//gets the start and end building and room numbers the user chose
-				
-				for(int i = 0; i < pointArray.size(); i++){
-					if(pointArray.get(i).getName() == startBuilds.getSelectedItem().toString()){
-						start = pointArray.get(i);
-					}
-				}
-				for(int i = 0; i < pointArray.size(); i++){
-					if(pointArray.get(i).getName() == destBuilds.getSelectedItem().toString()){
-						end = pointArray.get(i);
-					}
-				}
-				
+
+				start = (Point) startBuilds.getSelectedItem();
+				end = (Point) destBuilds.getSelectedItem();
 				if(!start.equals(end)){
-					
+
+
+
 					//System.out.println("--------------------astar--------------------------------");
 					//start.print();
 					//end.print();
@@ -317,7 +313,7 @@ public class GUI{
 					else{
 						//System.out.println(route.size());
 						GenTextDir gentextdir = new GenTextDir();
-						ArrayList<Directions> tempDir = gentextdir.genTextDir(route, 2.8);
+						ArrayList<Directions> tempDir = gentextdir.genTextDir(route);
 						//ArrayList<Directions> finalDir = null;
 						try {
 							finalDir = gentextdir.generateDirections(tempDir);

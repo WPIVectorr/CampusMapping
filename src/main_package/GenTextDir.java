@@ -17,7 +17,7 @@ public class GenTextDir {
 			}
 			double dist = 0;//Now find out the last direction
 			dist = PythagTheorem(arrPoints[arrPoints.length - 2].getGlobX() - arrPoints[arrPoints.length - 1].getGlobX(), arrPoints[arrPoints.length - 2].getGlobY() - arrPoints[arrPoints.length - 1].getGlobY());//CONVERT TO FEET
-			dist = dist * scale * 2;
+			dist = dist * scale * 1.5;
 			dist = dist * 200 / 177;
 			dist = dist * 10;
 			dist = Math.floor(dist);
@@ -41,9 +41,7 @@ public class GenTextDir {
 				prevPoint = arrPoints[arrPoints.length-i];//Grab the previous point the user was at
 				currPoint = arrPoints[arrPoints.length-(i+1)];//Grab the current point the user is at
 				nextPoint = arrPoints[arrPoints.length-(i+2)];//Grab the next point the user is going to.
-				//System.out.println("Previous point name: " + prevPoint.getName());
-				//System.out.println("Current point name: " + currPoint.getName());
-				//System.out.println("Next point name: " + nextPoint.getName());
+				
 				//The way this code works is first it moves all the points such that the current point
 				//sits at the origin.
 				prevPointX = prevPoint.getGlobX() - currPoint.getGlobX();//THIS IS BECAUSE (0,0) IS THE TOP LEFT
@@ -51,14 +49,12 @@ public class GenTextDir {
 
 				nextPointX = nextPoint.getGlobX() - currPoint.getGlobX();
 				nextPointY = currPoint.getGlobY() - nextPoint.getGlobY();
-				//System.out.println("Previous next point Y was : " + nextPointY);
-				//System.out.println("Previous Y is: " + prevPointY);
+				
 				
 				//Next, we want to rotate the points around the axis, so the vector from the previous point
 				//to the current point is the Y axis
 				double angleRotate = 0;//Initialize the angle of rotation.
-				//System.out.println("PrevPointX = " + prevPointX);
-				//System.out.println("PrevPointY = " + prevPointY);
+				
 				if(prevPointY == 0){//if the previous points Y is at 0, we rotate either PI/2, or -PI/2
 					if(prevPointX < 0){//If it's X is less than 0, we are rotating PI/2
 						angleRotate = -Math.PI/2;
@@ -80,9 +76,9 @@ public class GenTextDir {
 						angleRotate = 0;
 					}
 				}
-				System.out.println("Previous Point X value at " + currPoint.getName() + " is: " + prevPointX);
-				System.out.println("Previous Point Y value at " + currPoint.getName() + " is: " + prevPointY);
-				if(DEBUG){//testing
+				if(DEBUG){
+					System.out.println("Previous Point X value at " + currPoint.getName() + " is: " + prevPointX);
+					System.out.println("Previous Point Y value at " + currPoint.getName() + " is: " + prevPointY);
 					System.out.println("Tan Value is: " + Math.atan(-1 / -1) * 4);
 					System.out.println("Angle of rotation is: " + angleRotate * 180 / Math.PI);
 					System.out.println("Prev Point X = " + prevPointX);
@@ -90,10 +86,9 @@ public class GenTextDir {
 					System.out.println("Next Point X = " + nextPointX);
 					System.out.println("Next Point Y = " + nextPointY);
 				}
-				//System.out.println("Angle of rotation is: " + (180 * angleRotate / Math.PI));
+				
 				//Now, rotate the previous point by the angle of rotation.
 				double tempPrevPointX = (prevPointX * Math.cos(angleRotate)) - (prevPointY * Math.sin(angleRotate));
-				//System.out.println("tempPrevPointX " + tempPrevPointX);
 				double tempPrevPointY = (prevPointX * Math.sin(angleRotate)) + (prevPointY * Math.cos(angleRotate));
 				//Next, rotate the next point by the angle of rotation
 				double tempNextPointX = (nextPointX * Math.cos(angleRotate)) - (nextPointY * Math.sin(angleRotate));
@@ -132,20 +127,14 @@ public class GenTextDir {
 				if(DEBUG){
 					System.out.println("Turn " + angle + " degrees");
 				}
-				System.out.println("Angle found at " + currPoint.getName() + " is: " + angle);
 				/*if(angle < 0){
 					if(nextPointX > 0){
 						nextPointX = -nextPointX;
 					}
 				}*/
-				System.out.println("Angle Rotate found at " + currPoint.getName() + " is " + angleRotate);
 				
 				angle = Math.abs(angle);//Set the angle equal to its absolute value (no turning - degrees)
 				String turnAmount;
-				//System.out.println("At " + currPoint.getName() + " the past angle rotate value is: " + (180 * angleRotate / Math.PI));
-				//System.out.println("At " + currPoint.getName() + " the angle value is: " + angle);
-				//System.out.println("At " + currPoint.getName() + " the y value is: " + prevPointY);
-				//System.out.println("At " + currPoint.getName() + " the x value is: " + nextPointX);
 				if((angle >= -10) && (angle <= 10)){//if the angle is within some degree of error of 0, we are going straight
 					dist = 0;//Now find out the last direction
 					dist = PythagTheorem(nextPoint.getGlobX() - currPoint.getGlobX(), nextPoint.getGlobY() - currPoint.getGlobY());//CONVERT TO FEET
@@ -156,13 +145,10 @@ public class GenTextDir {
 					
 				
 				} else if (nextPointX <= 0){//otherwise, if its X is negative, we are turning left.
-					//System.out.println("At " + currPoint.getName() + " the new y value is: " + nextPointY);
 					
 					if(nextPointY < 0){//if the Y is less than 0, angle is 180-angle
 						angle = 180-angle;
-						//System.out.println("angle at: " + currPoint.getName());
 					}
-					System.out.println("X found at " + currPoint.getName() + " is: " + nextPointX);
 					
 					if(angle > 0 && angle < 60){
 						turnAmount = "slight left";
@@ -181,9 +167,6 @@ public class GenTextDir {
 					if(nextPointY < 0){
 						angle = 180-angle;
 					}
-					System.out.println("X found at " + currPoint.getName() + " is: " + nextPointX);
-					System.out.println("Angle found at " + currPoint.getName() + " is: " + angle);
-					
 					if(angle > 0 && angle < 60){
 						turnAmount = "slight right";
 					} else if(angle > 60 && angle < 120){
@@ -230,76 +213,63 @@ public class GenTextDir {
 		int i = 0;
 		boolean shouldAdd = true;
 		while(i < directions.size()){
-			System.out.println("Found getTurn of: " + directions.get(i).getTurn());
 			if(shouldAdd && directions.get(i).getTurn().equals("slight left")){
 				currDir = directions.get(i);
 				i++;
-				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
-				while(i < directions.size() && directions.get(i).isStraight()){
+				while(i < directions.size() && directions.get(i).isStraight() && directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
-					System.out.println("i is: " + i);
 					i++;
 				}
 			} else if (shouldAdd && directions.get(i).getTurn().equals("left")) {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
-				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
-				while(i < directions.size() && directions.get(i).isStraight()){
+				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
-					System.out.println("i is: " + i);
 					i++;
 				}
 			} else if (shouldAdd && directions.get(i).getTurn().equals("sharp left")) {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
-				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
-				while(i < directions.size() && directions.get(i).isStraight()){
+				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
-					System.out.println("i is: " + i);
 					i++;
 				}
 			} else if (shouldAdd && directions.get(i).getTurn().equals("slight right")) {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
-				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
-				while(i < directions.size() && directions.get(i).isStraight()){
+				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
-					System.out.println("i is: " + i);
 					i++;
 				}
 			} else if (shouldAdd && directions.get(i).getTurn().equals("right")) {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
-				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
-				while(i < directions.size() && directions.get(i).isStraight()){
+				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
-					System.out.println("i is: " + i);
 					i++;
 				}
 			} else if (shouldAdd && directions.get(i).getTurn().equals("sharp right")) {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
-				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
-				while(i < directions.size() && directions.get(i).isStraight()){
+				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
-					System.out.println("i is: " + i);
 					i++;
 				}
 				
@@ -308,12 +278,10 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
-				System.out.println("Go " + currDir.getTurn() + " at " + currDir.getOrigin());
-				while(i < directions.size() && directions.get(i).isStraight()){
+				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
-					System.out.println("i is: " + i);
 					i++;
 				}
 			} else if(shouldAdd) {
@@ -326,32 +294,57 @@ public class GenTextDir {
 		return retDirections;
 	}
 	
-	public String[] genDirStrings(ArrayList<Directions> directions) throws MalformedDirectionException{
-		String[] retString = new String[directions.size()];
+	public ArrayList<ArrayList<String>> genDirStrings(ArrayList<ArrayList<Directions>> directions) throws MalformedDirectionException{
+		ArrayList<ArrayList<String>> retString = new ArrayList<ArrayList<String>>();
 		Directions currDir;
-		System.out.println("Directions size is: " + directions.size());
-		System.out.println("RetString length is: " + retString.length);
-		for(int i = 0; i < retString.length; i++){
-			currDir = directions.get(i);
-			if(currDir.getTurn().equals("slight left")){
-				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
-			} else if (currDir.getTurn().equals("left")) {
-				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
-			} else if (currDir.getTurn().equals("sharp left")) {
-				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
-			} else if (currDir.getTurn().equals("slight right")) {
-				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
-			} else if (currDir.getTurn().equals("right")) {
-				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
-			} else if (currDir.getTurn().equals("sharp right")) {
-				retString[i] = "From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
-			} else if (currDir.getTurn().equals("straight")) {
-				retString[i] = "From " + currDir.getOrigin().getName() + " go " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.";
-			} else {
-				throw new MalformedDirectionException("This direction has the wrong turn information" + directions.get(i).getTurn());
+		for(int j = 0; j < directions.size(); j++){
+			ArrayList<String> tempStringList = new ArrayList<String>();
+			for(int i = 0; i < directions.get(j).size(); i++){
+				currDir = directions.get(j).get(i);
+				if(currDir.getTurn().equals("slight left")){
+					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+				} else if (currDir.getTurn().equals("left")) {
+					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+				} else if (currDir.getTurn().equals("sharp left")) {
+					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+				} else if (currDir.getTurn().equals("slight right")) {
+					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+				} else if (currDir.getTurn().equals("right")) {
+					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+				} else if (currDir.getTurn().equals("sharp right")) {
+					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+				} else if (currDir.getTurn().equals("straight")) {
+					tempStringList.add("From " + currDir.getOrigin().getName() + " go " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+				} else {
+					throw new MalformedDirectionException("This direction has the wrong turn information" + directions.get(j).get(i).getTurn());
+				}
 			}
+			retString.add(tempStringList);
 		}
 		return retString;
+	}
+	
+	public ArrayList<ArrayList<Directions>> genMultiMapDirections(ArrayList<Directions> oldDir){
+		int i = 0;
+		ArrayList<ArrayList<Directions>> returnDirections = new ArrayList<ArrayList<Directions>>();
+		for (i = 0; i < oldDir.size(); i++){
+			ArrayList<Directions> currSet = new ArrayList<Directions>();
+			while(i < oldDir.size() && oldDir.get(i).getOrigin().getMapId() == oldDir.get(i).getDestination().getMapId()){
+				currSet.add(oldDir.get(i));
+				i++;
+			}
+			/*
+			 * if(i == oldDir.size(){
+			 * 	
+			 * } else {
+			 * 	currSet.add(oldDir.get(i));
+			 * }
+			 * 
+			 */
+			returnDirections.add(currSet);
+		}
+		
+		return returnDirections;
 	}
 	
 }

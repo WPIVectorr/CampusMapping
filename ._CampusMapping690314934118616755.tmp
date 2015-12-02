@@ -1,0 +1,7 @@
+tree 64c5a800a0915fb7530a19472a5f7d03f435b8c0
+parent 7703ad2e8a7e258411d0e9e91d9f065578a9dcd4
+parent f142bb76a730ed97b6837a2878d92ed2374cd577
+author ibanatoski <ibanatoski@gmail.com> 1447362633 -0500
+committer ibanatoski <ibanatoski@gmail.com> 1447362633 -0500
+
+Merge branch 'IMB_dev' of https://github.com/WPIVectorr/CampusMapping.git into IMB_dev

@@ -1,25 +1,41 @@
+
 package main_package;
 
+import javax.imageio.ImageIO;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import java.awt.Color;
-
 //import main_package.MapUpdaterGUI.UpdateMap;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
+
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import java.awt.Panel;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.lang.Math;
 
@@ -41,8 +57,8 @@ public class MapInserterGUI extends JFrame{
 	private int windowScale = 0;
 	private static Point point1 = null;
 	private static double Rotation = 0;
-	private static int point3x;
-	private static int point3y;
+	private static double point3x;
+	private static double point3y;
 	
 	Toolkit tk = Toolkit.getDefaultToolkit();
 	Dimension screenSize = tk.getScreenSize();
@@ -84,13 +100,13 @@ public class MapInserterGUI extends JFrame{
 			   e.printStackTrace();
 			}
 		// TODO Auto-generated constructor stub
-		frame.setSize(932, 778);
+		//frame.setSize(932, 778);
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
 		int screenHeight = screenSize.height;
 		int screenWidth = screenSize.width;
-		frame.setSize(screenWidth / 2, screenHeight / 2);
-		frame.setLocation(screenWidth / 4, screenHeight / 4);
+		frame.setSize((int) (screenWidth / 1.5), (int) (screenHeight / 1.5));
+		frame.setLocation(screenWidth / 24, screenHeight / 24);
 		frame.setVisible(true);
 		pointFrame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -139,7 +155,13 @@ public class MapInserterGUI extends JFrame{
 	}
 	
 	public static void GiveMapUpdaterInfo() {
-		MapUpdaterGUI.setInfo(point1.getLocX(), point1.getLocX(), point3x, point3y, Rotation);
+		System.out.println("Told to send info");
+		System.out.println("Point 1x: " + point1.getLocX());
+		System.out.println("Point 1y: " + point1.getLocY());
+		System.out.println("Point 3x: " + point3x);
+		System.out.println("Point 3y: " + point3y);
+		System.out.println("Rotation: " + Rotation);
+		MapUpdaterGUI.setInfo((double) point1.getLocX(), (double) point1.getLocY(), point3x, point3y, Rotation);
 		System.out.println("Sending info");
 		clearAlignmentPoints();
 		resetCornerNum();
@@ -269,9 +291,9 @@ public class MapInserterGUI extends JFrame{
 			}
 
 			AddingMap = MapInserterGUIButtonPanel.getAddingMap();
-			if (!(AddingMap == null) || (!(alignmentPoints == null))) {
+			if (!(AddingMap == null) && (!(alignmentPoints == null)) && (alignmentPoints.size() > 1)) {
 				if (imageSet){
-					Point point1 = alignmentPoints.get(0);
+					point1 = alignmentPoints.get(0);
 					Point point2 = alignmentPoints.get(1);
 					int ImageHeight = Math.abs((int)Math.sqrt(Math.pow((point1.getLocX()-point2.getLocX()),2)+Math.pow((point1.getLocY()-point2.getLocY()),2)));
 					double WidthScale2 = (double)AddingMap.getWidth()/(double)AddingMap.getHeight();
@@ -281,8 +303,9 @@ public class MapInserterGUI extends JFrame{
 					System.out.println("Image Width " + ImageWidth);
 					//System.out.println("Image Scale Height " + HeightScale);
 					//System.out.println("Image Scale Width " + WidthScale);
-					double Rotation = -Math.atan2(point1.getLocY()-point2.getLocY(), point1.getLocX()-point2.getLocX())-Math.toRadians(90);
-					System.out.println(Math.toDegrees(Rotation));
+					Rotation = -Math.atan2(point1.getLocY()-point2.getLocY(), point1.getLocX()-point2.getLocX())-Math.toRadians(90);
+					point3y = point2.getLocY() + (-(double)(Math.cos(Math.toRadians(90)-Rotation))*(double)ImageWidth);
+					point3x = point2.getLocX() + ((double)(Math.sin(Math.toRadians(90)-Rotation)*(double)ImageWidth));
 					
 					double HeightScale = Math.abs((double)ImageHeight/(double)AddingMap.getHeight());
 					double WidthScale = Math.abs((double)ImageWidth/(double)AddingMap.getWidth());
@@ -294,6 +317,7 @@ public class MapInserterGUI extends JFrame{
 					Graphics2D g2d = (Graphics2D) g;
 					
 					g2d.drawImage(AddingMap, tx, null);
+					g.fillOval( (int) point3x, (int) point3y, 5, 5);
 				}
 				
 			}
@@ -303,9 +327,7 @@ public class MapInserterGUI extends JFrame{
 					int drawY = (int) currentPoint.getLocY();
 					// draws the points onto the map
 					Integer drawNum = Integer.parseInt(currentPoint.getId())+1;
-					g.setColor(Color.RED);
 					g.drawString(drawNum.toString(), drawX-pointSize, drawY+pointSize);
-					g.setColor(Color.BLACK);
 					//g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 					System.out.println(alignmentPoints.size());
 				}

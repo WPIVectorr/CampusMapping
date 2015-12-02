@@ -1,3 +1,4 @@
+
 package main_package;
 
 
@@ -5,6 +6,12 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import com.mysql.fabric.Server;
+
+import database.AlreadyExistsException;
+import database.DoesNotExistException;
+import database.InsertFailureException;
+import database.NoMapException;
 import database.ServerDB;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -22,6 +29,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -55,7 +63,8 @@ public class InterMapEdgeGUI extends JFrame {
 	File destinationFile;
 	File logo;
  
-	private Map currentMap = null;
+	private Map connectMap = null;
+	private Map srcMap = null;
 	private ServerDB md = ServerDB.getInstance();
 
 
@@ -65,11 +74,18 @@ public class InterMapEdgeGUI extends JFrame {
 	
 	public InterMapEdgeGUI(ArrayList<Map> mapList, Point passedPoint) {
 		
-		if(maps != null)
+		if(mapList != null)
 			maps = mapList;
 		
-		if(srcPoint != null)
+		if(passedPoint != null)
+		{
 			srcPoint = passedPoint;
+			for(Map loopMap:maps)
+			{
+				if(loopMap.getMapId()==srcPoint.getMapId())
+					srcMap = loopMap;
+			}
+		}
 		
 		try {
 			   // Set to cross-platform Java Look and Feel (also called "Metal")
@@ -94,7 +110,7 @@ public class InterMapEdgeGUI extends JFrame {
 		setLocation(screenWidth / 4, screenHeight / 4);
 		setVisible(true);
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		
@@ -203,8 +219,28 @@ public class InterMapEdgeGUI extends JFrame {
 			public void actionPerformed(ActionEvent a){
 				if(connectPoint != null ) 
 				{
-					new Edge(srcPoint, connectPoint);
-					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+					try {
+						ServerDB.insertEdge(new Edge(srcPoint, connectPoint));
+					} catch (InsertFailureException | AlreadyExistsException | SQLException | DoesNotExistException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+/*					try {
+						ServerDB.removePoint(srcPoint);
+						ServerDB.removePoint(connectPoint);
+					} catch (DoesNotExistException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					try {
+						ServerDB.insertPoint(srcMap, srcPoint);
+						ServerDB.insertPoint(connectMap, connectPoint);
+					} catch (AlreadyExistsException | NoMapException | InsertFailureException | SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}*/
+					System.out.println("edge Created ");
+					frame.dispose();
 				}
 			}
 		});
@@ -218,30 +254,32 @@ public class InterMapEdgeGUI extends JFrame {
 						destinationFile = new File("src/VectorMaps/" + name+".jpg");
 						destinationFile = new File(destinationFile.getAbsolutePath());
 
-
+						
+						if(maps == null)
+						{
+							ArrayList<Map> maps = md.getMapsFromLocal(); //Grab all the maps from the database
+							System.out.println("Got "+maps.size() + " from Database");//Print out the size of the maps from the database
+						}else{
+							System.out.println("Got "+maps.size() + " maps from Updater");
+						}
+						
 						if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
 							pointArray.clear();
-							
-							if(maps == null)
-							{
-								ArrayList<Map> maps = md.getMapsFromLocal(); //Grab all the maps from the database
-								System.out.println("Got "+maps.size() + " from Database");//Print out the size of the maps from the database
-							}else{
-								System.out.println("Got "+maps.size() + " from Updater");
-							}
+
 							for(int i = 0; i < maps.size(); i++){//Iterate through the maps until we find the item we are looking for
-								System.out.println("Trying to find name:"+name);
-								if(name.equals(maps.get(i).getMapName()+".jpg"))//Once we find the map:
+								//System.out.println("Trying to find name:"+name);
+								if(name.contains(maps.get(i).getMapName()))//Once we find the map:
 								{
-									currentMap = maps.get(i);//Grab the current map at this position.
-									pointArray = currentMap.getPointList();//Populate the point array with all the points found.
+									connectMap = maps.get(i);//Grab the current map at this position.
+									pointArray = connectMap.getPointList();//Populate the point array with all the points found.
 									System.out.println("Map list size:"+maps.size());
 
-									System.out.println("Found map with number of points: "+currentMap.getPointList().size());
+									System.out.println("Found map with number of points: "+connectMap.getPointList().size());
+									
 									i = maps.size();
 								}
 							}
-
+							System.out.println("current Map: " +connectMap.getMapName());
 
 							/*				File destinationFile = new File("src/VectorMaps/" + name);
 															destinationFile = new File(destinationFile.getAbsolutePath());
@@ -300,14 +338,14 @@ public class InterMapEdgeGUI extends JFrame {
 			}
 		}
 		if(connectPoint != null)
+		{
 			btnConfirmSelection.setEnabled(true);
+			System.out.println("srcPoint id: "+srcPoint.getId());
+			System.out.println("Connection Point id: "+connectPoint.getId());
+		}
+		
 	}
-	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		InterMapEdgeGUI addInterMapEdge = new InterMapEdgeGUI(null, null);
-		addInterMapEdge.setVisible(true);
-	}
+
 	public static BufferedImage getcampusMap() {
 		return campusMap;
 	}
@@ -408,7 +446,7 @@ public class InterMapEdgeGUI extends JFrame {
 				System.out.println("painting Image");
 
 				windowScale = ((double)img.getWidth() / (double)mapFrame.getWidth());
-				System.out.println("Image Original Width " + img.getWidth());
+				//System.out.println("Image Original Width " + img.getWidth());
 				int WidthSize = (int)((double) img.getHeight() / windowScale);
 				if (WidthSize > (double)getHeight()){
 					windowScale =  ((double)img.getHeight() / (double)mapFrame.getHeight());
@@ -425,6 +463,7 @@ public class InterMapEdgeGUI extends JFrame {
 					int drawX = (int) loopPoint.getLocX();
 					int drawY = (int) loopPoint.getLocY();
 					// draws the points onto the map.
+					System.out.println("printoval");
 					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 					
 					if(connectPoint != null)
@@ -435,7 +474,7 @@ public class InterMapEdgeGUI extends JFrame {
 					}
 				}
 
-
+				//mapFrame.repaint();
 			}
 
 		}

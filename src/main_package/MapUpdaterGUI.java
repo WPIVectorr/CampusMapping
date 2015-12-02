@@ -781,42 +781,42 @@ public class MapUpdaterGUI{
 
 			}
 		});
-	
 
-	btnSaveMap = new GradientButton("Save Map", buttonColor); // defined above to change text in
-	btnSaveMap.setEnabled(false);
-	// point selector
-	GridBagConstraints gbc_btnSaveMap = new GridBagConstraints();
-	gbc_btnSaveMap.insets = new Insets(0, 0, 5, 5);
-	gbc_btnSaveMap.fill = GridBagConstraints.BOTH;
-	gbc_btnSaveMap.gridx = 3;
-	gbc_btnSaveMap.gridy = 4;
-	pointsPanel.add(btnSaveMap, gbc_btnSaveMap);
 
-	btnSaveMap.addActionListener(new ActionListener() {
+		btnSaveMap = new GradientButton("Save Map", buttonColor); // defined above to change text in
+		btnSaveMap.setEnabled(false);
+		// point selector
+		GridBagConstraints gbc_btnSaveMap = new GridBagConstraints();
+		gbc_btnSaveMap.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSaveMap.fill = GridBagConstraints.BOTH;
+		gbc_btnSaveMap.gridx = 3;
+		gbc_btnSaveMap.gridy = 4;
+		pointsPanel.add(btnSaveMap, gbc_btnSaveMap);
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
+		btnSaveMap.addActionListener(new ActionListener() {
 
-			pointsLoadingLabel.setVisible(true);
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
-			for (int i = 0; i < newPoints.size(); i++){
-				try {
-					ServerDB.insertPoint(currentMap, newPoints.get(i));
-					System.out.println("AddPointSuccess");
-				} catch (AlreadyExistsException f){
-					System.out.println(f.getMessage());
-				} catch (NoMapException e1) {
-					e1.printStackTrace();
-				} catch (InsertFailureException e1) {
-					e1.printStackTrace();
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				} 
-			}
+				pointsLoadingLabel.setVisible(true);
 
-			for (int j = 0; j < updatedPoints.size(); j++){
-				/*try {
+				for (int i = 0; i < newPoints.size(); i++){
+					try {
+						ServerDB.insertPoint(currentMap, newPoints.get(i));
+						System.out.println("AddPointSuccess");
+					} catch (AlreadyExistsException f){
+						System.out.println(f.getMessage());
+					} catch (NoMapException e1) {
+						e1.printStackTrace();
+					} catch (InsertFailureException e1) {
+						e1.printStackTrace();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					} 
+				}
+
+				for (int j = 0; j < updatedPoints.size(); j++){
+					/*try {
 						if(!newPoints.contains(updatedPoints.get(j))){
 							ServerDB.updatePoint(updatedPoints.get(j));
 						}
@@ -827,243 +827,243 @@ public class MapUpdaterGUI{
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}*/
-			}
+				}
 
 
 
-			System.out.println("Edge array size is: " + edgeArray.size());
-			for (int i = 0; i < newEdges.size(); i++) {
-				Edge storeEdge = newEdges.get(i);
-				storeEdge.setId(storeEdge.getPoint1().getId() + "-" + storeEdge.getPoint2().getId());
-				System.out.println("Storing Edge: " + storeEdge.getId());
-				System.out.println("Storing Edge point 1: " + storeEdge.getPoint1().getId());
-				System.out.println("Storing Edge point 2: " + storeEdge.getPoint2().getId());
+				System.out.println("Edge array size is: " + edgeArray.size());
+				for (int i = 0; i < newEdges.size(); i++) {
+					Edge storeEdge = newEdges.get(i);
+					storeEdge.setId(storeEdge.getPoint1().getId() + "-" + storeEdge.getPoint2().getId());
+					System.out.println("Storing Edge: " + storeEdge.getId());
+					System.out.println("Storing Edge point 1: " + storeEdge.getPoint1().getId());
+					System.out.println("Storing Edge point 2: " + storeEdge.getPoint2().getId());
+					try {
+						ServerDB.insertEdge(storeEdge);
+					} catch (InsertFailureException | AlreadyExistsException | SQLException
+							| DoesNotExistException g) {
+						// TODO Auto-generated catch block
+						System.out.println(g.getMessage());
+					}
+				}
+
+				newPoints.clear();
+				updatedPoints.clear();
+				newEdges.clear();
+				edgeArray.clear();
 				try {
-					ServerDB.insertEdge(storeEdge);
-				} catch (InsertFailureException | AlreadyExistsException | SQLException
-						| DoesNotExistException g) {
+					pointArray = ServerDB.getPointsFromServer(currentMap);
+				} catch (PopulateErrorException e1) {
 					// TODO Auto-generated catch block
-					System.out.println(g.getMessage());
+					e1.printStackTrace();
 				}
-			}
-
-			newPoints.clear();
-			updatedPoints.clear();
-			newEdges.clear();
-			edgeArray.clear();
-			try {
-				pointArray = ServerDB.getPointsFromServer(currentMap);
-			} catch (PopulateErrorException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			for (int u = 0; u < pointArray.size(); u++){
-				for (int z = 0; z < pointArray.get(u).getEdges().size(); z++){
-					edgeArray.add(pointArray.get(u).getEdges().get(z));
+				for (int u = 0; u < pointArray.size(); u++){
+					for (int z = 0; z < pointArray.get(u).getEdges().size(); z++){
+						edgeArray.add(pointArray.get(u).getEdges().get(z));
+					}
 				}
-			}
-			roomNumber.setText("Select a Point to Edit");
-			editingPoint = false;
-			frame.repaint();
-			pointsLoadingLabel.setVisible(false);
-		}
-	});
-
-	rdbtnAddPoints.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e) {
-			chckbxPathMode.setEnabled(false);
-			btnSavePoint.setEnabled(false);
-			roomNumber.setEnabled(false);
-			btnConnectToOther.setEnabled(false);
-			editPoint = null;
-			frame.repaint();
-		}
-	});
-	rdbtnEditPoints.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e) {
-			chckbxPathMode.setEnabled(true);
-			btnSavePoint.setEnabled(true);
-			roomNumber.setEnabled(true);
-			btnConnectToOther.setEnabled(true);
-			frame.repaint();
-			
-		}
-	});
-	rdbtnRemovePoints.addActionListener(new ActionListener(){
-		public void actionPerformed(ActionEvent e) {
-			chckbxPathMode.setEnabled(false);
-			btnSavePoint.setEnabled(false);
-			roomNumber.setEnabled(false);
-			btnConnectToOther.setEnabled(false);
-			editPoint = null;
-			frame.repaint();
-		}
-	});
-	pointsLoadingLabel.setVisible(false);
-
-	return pointsPanel;
-
-
-}
-
-public static void setInfo(int x, int y, int x2, int y2, double angle){
-	System.out.println("setting info");
-	//frame.setVisible(true);
-	if (addingMap) {
-
-
-		// Add the name of the map to the Map Selction Dropdown menu
-		mapDropDown.addItem(maptitle);
-
-		// Finds the highest mapID in the database and stores it in
-		// highestID
-		int highestID;
-		if(md.getMapsFromLocal().isEmpty()){
-			highestID = 0;
-			System.out.print("Database contains no maps so highest ID is 1");
-
-
-		}
-		else{
-			//determines the highest mapID from the Maps stored in the database
-			ArrayList<Map> mdMapList = md.getMapsFromLocal();
-			highestID = mdMapList.get(0).getMapId();
-			for (int h = 0; h < mdMapList.size(); h++) {
-				if (highestID < mdMapList.get(h).getMapId()) {
-					highestID = mdMapList.get(h).getMapId();
-				}
-			}
-		}
-
-		// Create the Map object to be stored in the database
-		Map m = new Map(highestID + 1, maptitle, (double)x, (double)y, (double)x2, (double)y2, angle, 0);
-		highestID++;
-		System.out.println("rotation angle = " + m.getRotationAngle());
-		try {
-			md.insertMap(m);
-		} catch (AlreadyExistsException e1) {
-			System.out.print("Look at me im  an error 1");
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			System.out.print("Look at me im  an error 2");
-			e1.printStackTrace();
-		}
-		mapDropDown.setSelectedIndex(mapDropDown.getItemCount()-1);
-		System.out.println(mapDropDown.getItemCount());
-		addingMap = false;
-	} else {
-
-	}
-}
-
-class DrawPanel extends JPanel {
-
-	ArrayList<Point> paintArray = new ArrayList<Point>(); // arraylist of
-	// points
-	// already
-	// painted
-	// Point editPoint;
-	// Driver values used for testing:
-	int pointID = 0;
-	int numEdges = 0;
-	int edgeWeight = 1;
-
-
-
-	@Override
-	public void paintComponent(Graphics g) {
-
-		super.paintComponent(g);
-
-		// -------------------------------
-		// if(img == null)
-		// img = ImageIO.read(new
-		// File("/User/ibanatoski/git/CampusMapping/src/VectorMaps/"));
-		if (!(img == null)) {
-
-			// Scale the image to the appropriate screen size
-
-
-			windowScale = ((double)img.getWidth() / (double)frame.getContentPane().getWidth());
-			System.out.println("Image Original Width " + img.getWidth());
-			int WidthSize = (int)((double) img.getHeight() / windowScale);
-			if (WidthSize > (double)drawPanel.getHeight()){
-				windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
-			}
-			g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
-		}
-
-
-
-		//selecting points on the map
-		addMouseListener(new MouseAdapter() {
-			public void mouseReleased(MouseEvent e) {
-				newClick = false;
-				lastMousex = e.getX();
-				lastMousey = e.getY();
-				if(tabs.getSelectedIndex() == 1)
-					newClick = true;
-
-				repaint();
+				roomNumber.setText("Select a Point to Edit");
+				editingPoint = false;
+				frame.repaint();
+				pointsLoadingLabel.setVisible(false);
 			}
 		});
 
-		// add point to the point array (has to take place outside of below
-		// loop)
-		if (newClick == true) {
-			//System.out.println(newClick);
-			if (getRadButton() == 1) // if addpoint
-			{
-				Integer nameNumber = currentMap.getPointIDIndex()+1;
-				double ourRotation = 50;//currentMap.getRotationAngle();
-				//ourRotation = 2 * Math.PI - ourRotation;
+		rdbtnAddPoints.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				chckbxPathMode.setEnabled(false);
+				btnSavePoint.setEnabled(false);
+				roomNumber.setEnabled(false);
+				btnConnectToOther.setEnabled(false);
+				editPoint = null;
+				frame.repaint();
+			}
+		});
+		rdbtnEditPoints.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				chckbxPathMode.setEnabled(true);
+				btnSavePoint.setEnabled(true);
+				roomNumber.setEnabled(true);
+				btnConnectToOther.setEnabled(true);
+				frame.repaint();
 
-				double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;
-				double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
-				double tempPreRotateX = lastMousex;
-				double tempPreRotateY = lastMousey;
+			}
+		});
+		rdbtnRemovePoints.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				chckbxPathMode.setEnabled(false);
+				btnSavePoint.setEnabled(false);
+				roomNumber.setEnabled(false);
+				btnConnectToOther.setEnabled(false);
+				editPoint = null;
+				frame.repaint();
+			}
+		});
+		pointsLoadingLabel.setVisible(false);
 
-				tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
-				tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
-				tempPreRotateX = (tempPreRotateX/img.getWidth()) * currentMap.getWidth();
-				tempPreRotateY = (tempPreRotateY/img.getHeight()) * currentMap.getHeight();
-				double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
-				double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+		return pointsPanel;
 
-				int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
-				int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
 
-				Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
-						"Hallway!", currentMap.getPointIDIndex(),
-						lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
+	}
 
-				boolean shouldAdd = true;
-				for(int k = 0; k < pointArray.size(); k++){
-					if(point.getId() == pointArray.get(k).getId()){
-						shouldAdd = false;
+	public static void setInfo(int x, int y, int x2, int y2, double angle){
+		System.out.println("setting info");
+		//frame.setVisible(true);
+		if (addingMap) {
+
+
+			// Add the name of the map to the Map Selction Dropdown menu
+			mapDropDown.addItem(maptitle);
+
+			// Finds the highest mapID in the database and stores it in
+			// highestID
+			int highestID;
+			if(md.getMapsFromLocal().isEmpty()){
+				highestID = 0;
+				System.out.print("Database contains no maps so highest ID is 1");
+
+
+			}
+			else{
+				//determines the highest mapID from the Maps stored in the database
+				ArrayList<Map> mdMapList = md.getMapsFromLocal();
+				highestID = mdMapList.get(0).getMapId();
+				for (int h = 0; h < mdMapList.size(); h++) {
+					if (highestID < mdMapList.get(h).getMapId()) {
+						highestID = mdMapList.get(h).getMapId();
 					}
 				}
-				if(shouldAdd){
-					pointArray.add(point);
-					newPoints.add(point);
-				}
-				//System.out.println("add point to map: "+currentMap.getMapId()+" Point Array size: "+pointArray.size());
-				repaint();
 			}
+
+			// Create the Map object to be stored in the database
+			Map m = new Map(highestID + 1, maptitle, (double)x, (double)y, (double)x2, (double)y2, angle, 0);
+			highestID++;
+			System.out.println("rotation angle = " + m.getRotationAngle());
+			try {
+				md.insertMap(m);
+			} catch (AlreadyExistsException e1) {
+				System.out.print("Look at me im  an error 1");
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				System.out.print("Look at me im  an error 2");
+				e1.printStackTrace();
+			}
+			mapDropDown.setSelectedIndex(mapDropDown.getItemCount()-1);
+			System.out.println(mapDropDown.getItemCount());
+			addingMap = false;
+		} else {
+
 		}
+	}
 
-		// draws all the points onto the map.
-		// cleans the array of deleted points.
-		if (pointArray.size() > 0) {
-			for (int i = 0; i < pointArray.size(); i++) {
+	class DrawPanel extends JPanel {
 
-				currentPoint = pointArray.get(i);
-				//System.out.println("numEdges: "+currentPoint.getNumEdges());
+		ArrayList<Point> paintArray = new ArrayList<Point>(); // arraylist of
+		// points
+		// already
+		// painted
+		// Point editPoint;
+		// Driver values used for testing:
+		int pointID = 0;
+		int numEdges = 0;
+		int edgeWeight = 1;
 
-				// add edges to list
-				/*for (int j = 0; j < currentPoint.getNumEdges(); j++) {
+
+
+		@Override
+		public void paintComponent(Graphics g) {
+
+			super.paintComponent(g);
+
+			// -------------------------------
+			// if(img == null)
+			// img = ImageIO.read(new
+			// File("/User/ibanatoski/git/CampusMapping/src/VectorMaps/"));
+			if (!(img == null)) {
+
+				// Scale the image to the appropriate screen size
+
+
+				windowScale = ((double)img.getWidth() / (double)frame.getContentPane().getWidth());
+				System.out.println("Image Original Width " + img.getWidth());
+				int WidthSize = (int)((double) img.getHeight() / windowScale);
+				if (WidthSize > (double)drawPanel.getHeight()){
+					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
+				}
+				g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
+			}
+
+
+
+			//selecting points on the map
+			addMouseListener(new MouseAdapter() {
+				public void mouseReleased(MouseEvent e) {
+					newClick = false;
+					lastMousex = e.getX();
+					lastMousey = e.getY();
+					if(tabs.getSelectedIndex() == 1)
+						newClick = true;
+
+					repaint();
+				}
+			});
+
+			// add point to the point array (has to take place outside of below
+			// loop)
+			if (newClick == true) {
+				//System.out.println(newClick);
+				if (getRadButton() == 1) // if addpoint
+				{
+					Integer nameNumber = currentMap.getPointIDIndex()+1;
+					double ourRotation = 50;//currentMap.getRotationAngle();
+					//ourRotation = 2 * Math.PI - ourRotation;
+
+					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;
+					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
+					double tempPreRotateX = lastMousex;
+					double tempPreRotateY = lastMousey;
+
+					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
+					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
+					tempPreRotateX = (tempPreRotateX/img.getWidth()) * currentMap.getWidth();
+					tempPreRotateY = (tempPreRotateY/img.getHeight()) * currentMap.getHeight();
+					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
+					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+
+					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
+					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
+
+					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
+							"Hallway!", currentMap.getPointIDIndex(),
+							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
+
+					boolean shouldAdd = true;
+					for(int k = 0; k < pointArray.size(); k++){
+						if(point.getId() == pointArray.get(k).getId()){
+							shouldAdd = false;
+						}
+					}
+					if(shouldAdd){
+						pointArray.add(point);
+						newPoints.add(point);
+					}
+					//System.out.println("add point to map: "+currentMap.getMapId()+" Point Array size: "+pointArray.size());
+					repaint();
+				}
+			}
+
+			// draws all the points onto the map.
+			// cleans the array of deleted points.
+			if (pointArray.size() > 0) {
+				for (int i = 0; i < pointArray.size(); i++) {
+
+					currentPoint = pointArray.get(i);
+					//System.out.println("numEdges: "+currentPoint.getNumEdges());
+
+					// add edges to list
+					/*for (int j = 0; j < currentPoint.getNumEdges(); j++) {
 						Edge tmpEdge = currentPoint.getEdges().get(j);
 						System.out.println("Adding edge: " + currentPoint.getEdges().get(j).getId());
 						boolean shouldAdd = true;
@@ -1076,116 +1076,116 @@ class DrawPanel extends JPanel {
 							edgeArray.add(currentPoint.getEdges().get(j));
 						}
 					}*/
-				// newClick has some interesting storage things going on.
+					// newClick has some interesting storage things going on.
 
-				if (newClick == true && tabs.getSelectedIndex() == 1) {
-					//if(newClick == true){
-					//TODO CHANGE THIS LATER, GOOD FOR TESTING CLICKS
-					MapUpdaterGUI.btnSaveMap.setText("Save Map, X:" + lastMousex + ", Y:" + lastMousey);
+					if (newClick == true && tabs.getSelectedIndex() == 1) {
+						//if(newClick == true){
+						//TODO CHANGE THIS LATER, GOOD FOR TESTING CLICKS
+						MapUpdaterGUI.btnSaveMap.setText("Save Map, X:" + lastMousex + ", Y:" + lastMousey);
 
-					switch (getRadButton()) {
-					case 2:// edit points
-						if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
-								&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
-								&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
-										&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
-							if (newClick == true && editingPoint == false) {
-								editPoint = currentPoint;
-								editPointIndex = i;
-								roomNumber.setText(editPoint.getName());
-								btnSavePoint.setText("Unselect Current Point");
-								editingPoint = true;
-								newClick = false;/*
-								g.setColor(Color.ORANGE);
-								g.fillOval(currentPoint.getLocX() - 4, currentPoint.getLocY() - 4, 8, 8);*/
-							} else if (newClick == true && editingPoint == true) {
-								if(editPoint.getId().contentEquals(currentPoint.getId())){
-
-								} else {
-									currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
-									pointArray.set(editPointIndex, editPoint);
-									pointArray.set(i, currentPoint);
-									if(!(updatedPoints.contains(editPoint))){
-										updatedPoints.add(editPoint);
-									} else {
-										for(int r = 0; r < updatedPoints.size(); r++){
-											if(editPoint.getId().contentEquals(updatedPoints.get(r).getId())){
-												updatedPoints.set(r, editPoint);
-											}
-										}
-									}
-									if(!(updatedPoints.contains(currentPoint))){
-										updatedPoints.add(currentPoint);
-									} else {
-										for(int r = 0; r < updatedPoints.size(); r++){
-											if(currentPoint.getId().contentEquals(updatedPoints.get(r).getId())){
-												updatedPoints.set(r, currentPoint);
-											}
-										}
-									}
-									System.out.println("Edge sizes- editPoint:"+pointArray.get(editPointIndex).getEdges().size()+
-											" currentPoint:"+pointArray.get(i).getEdges().size());
-									System.out.println("Current Edge is: " + currentEdge.getId());
-									edgeArray.add(currentEdge);
-									if(newEdges.contains(currentEdge)){
-										for(int r = 0; r < newEdges.size(); r++){
-											if(currentEdge.getId().contentEquals(newEdges.get(r).getId())){
-												newEdges.set(r, currentEdge);
-											}
-										}
-									} else {
-										newEdges.add(currentEdge);
-									}
-
-									if (currentPoint.getNumEdges() > 0)//this has to be caught in an exception later
-									{
-										for (int j = 0; j < currentPoint.getNumEdges(); j++) {
-											System.out.println("Adding clicked edge between: "
-													+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
-													+ currentPoint.getEdges().get(j).getPoint2().getName());
-										}
-									}
-								}
-
-								newClick = false;
-								if(pathMode){
-									Point tempEditPoint = pointArray.get(editPointIndex);
-									tempEditPoint.setName(roomNumber.getText());
-									pointArray.set(editPointIndex, tempEditPoint);
-									if(updatedPoints.contains(tempEditPoint)){
-										for(int r = 0; r < updatedPoints.size(); r++){
-											if(tempEditPoint.getId().contentEquals(updatedPoints.get(r).getId())){
-												updatedPoints.set(r, currentPoint);
-											}
-										}
-									} else {
-										updatedPoints.add(tempEditPoint);
-									}
+						switch (getRadButton()) {
+						case 2:// edit points
+							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
+									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
+									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
+											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
+								if (newClick == true && editingPoint == false) {
 									editPoint = currentPoint;
 									editPointIndex = i;
 									roomNumber.setText(editPoint.getName());
-								}
+									btnSavePoint.setText("Unselect Current Point");
+									editingPoint = true;
+									newClick = false;/*
+								g.setColor(Color.ORANGE);
+								g.fillOval(currentPoint.getLocX() - 4, currentPoint.getLocY() - 4, 8, 8);*/
+								} else if (newClick == true && editingPoint == true) {
+									if(editPoint.getId().contentEquals(currentPoint.getId())){
 
+									} else {
+										currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
+										pointArray.set(editPointIndex, editPoint);
+										pointArray.set(i, currentPoint);
+										if(!(updatedPoints.contains(editPoint))){
+											updatedPoints.add(editPoint);
+										} else {
+											for(int r = 0; r < updatedPoints.size(); r++){
+												if(editPoint.getId().contentEquals(updatedPoints.get(r).getId())){
+													updatedPoints.set(r, editPoint);
+												}
+											}
+										}
+										if(!(updatedPoints.contains(currentPoint))){
+											updatedPoints.add(currentPoint);
+										} else {
+											for(int r = 0; r < updatedPoints.size(); r++){
+												if(currentPoint.getId().contentEquals(updatedPoints.get(r).getId())){
+													updatedPoints.set(r, currentPoint);
+												}
+											}
+										}
+										System.out.println("Edge sizes- editPoint:"+pointArray.get(editPointIndex).getEdges().size()+
+												" currentPoint:"+pointArray.get(i).getEdges().size());
+										System.out.println("Current Edge is: " + currentEdge.getId());
+										edgeArray.add(currentEdge);
+										if(newEdges.contains(currentEdge)){
+											for(int r = 0; r < newEdges.size(); r++){
+												if(currentEdge.getId().contentEquals(newEdges.get(r).getId())){
+													newEdges.set(r, currentEdge);
+												}
+											}
+										} else {
+											newEdges.add(currentEdge);
+										}
+
+										if (currentPoint.getNumEdges() > 0)//this has to be caught in an exception later
+										{
+											for (int j = 0; j < currentPoint.getNumEdges(); j++) {
+												System.out.println("Adding clicked edge between: "
+														+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
+														+ currentPoint.getEdges().get(j).getPoint2().getName());
+											}
+										}
+									}
+
+									newClick = false;
+									if(pathMode){
+										Point tempEditPoint = pointArray.get(editPointIndex);
+										tempEditPoint.setName(roomNumber.getText());
+										pointArray.set(editPointIndex, tempEditPoint);
+										if(updatedPoints.contains(tempEditPoint)){
+											for(int r = 0; r < updatedPoints.size(); r++){
+												if(tempEditPoint.getId().contentEquals(updatedPoints.get(r).getId())){
+													updatedPoints.set(r, currentPoint);
+												}
+											}
+										} else {
+											updatedPoints.add(tempEditPoint);
+										}
+										editPoint = currentPoint;
+										editPointIndex = i;
+										roomNumber.setText(editPoint.getName());
+									}
+
+								}
+								repaint();
 							}
-							repaint();
-						}
-						break;
-					case 3:// remove points
-						System.out.println("Remove point called.");
-						System.out.println("Size of edgeArray:"+edgeArray.size());
-						for (int j = 0; j < pointArray.size(); j++)
-						{
-							System.out.println("Number of edges in point "
-									+pointArray.get(j).getId()+": "+pointArray.get(j).getEdges().size());
-						}
-						if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
-								&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
-								&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
-										&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
-							if (newClick == true){
-								/* The error lies in the fact that edges, when created, are not being added to the points in the pointArray,
-								 * as a result, the code breaks when trying to remove said edge. The code below is the first half of a quick
-								 * fix, but we are going to try to address the underlying issue first.
+							break;
+						case 3:// remove points
+							System.out.println("Remove point called.");
+							System.out.println("Size of edgeArray:"+edgeArray.size());
+							for (int j = 0; j < pointArray.size(); j++)
+							{
+								System.out.println("Number of edges in point "
+										+pointArray.get(j).getId()+": "+pointArray.get(j).getEdges().size());
+							}
+							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
+									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
+									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
+											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
+								if (newClick == true){
+									/* The error lies in the fact that edges, when created, are not being added to the points in the pointArray,
+									 * as a result, the code breaks when trying to remove said edge. The code below is the first half of a quick
+									 * fix, but we are going to try to address the underlying issue first.
 									int j = 0;
 									for (j = 0; j<edgeArray.size(); j++)
 									{
@@ -1201,144 +1201,144 @@ class DrawPanel extends JPanel {
 											currentPoint.addEdge(currEdge);
 										}
 									}*/
-								if(!newPoints.contains(currentPoint)){
-									int z = 0;
-									while(z < currentPoint.getEdges().size()){
-										if(newEdges.contains(currentPoint.getEdges().get(z))){
-											newEdges.remove(currentPoint.getEdges().get(z));
-											while(edgeArray.contains(currentPoint.getEdges().get(z))){
-												edgeArray.remove(currentPoint.getEdges().get(z));
+									if(!newPoints.contains(currentPoint)){
+										int z = 0;
+										while(z < currentPoint.getEdges().size()){
+											if(newEdges.contains(currentPoint.getEdges().get(z))){
+												newEdges.remove(currentPoint.getEdges().get(z));
+												while(edgeArray.contains(currentPoint.getEdges().get(z))){
+													edgeArray.remove(currentPoint.getEdges().get(z));
+												}
+												currentPoint.getEdges().remove(z);
+												currentPoint.setNumEdges(currentPoint.getNumEdges() - 1);
+											} else {
+												z++;
 											}
-											currentPoint.getEdges().remove(z);
-											currentPoint.setNumEdges(currentPoint.getNumEdges() - 1);
-										} else {
-											z++;
 										}
+
+										try{
+											System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
+											ServerDB.removePoint(currentPoint);
+										} catch (DoesNotExistException e1){
+											System.out.println("Reached Here");
+											e1.printStackTrace();
+										}
+									} else {
+										newPoints.remove(currentPoint);
 									}
 
-									try{
-										System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
-										ServerDB.removePoint(currentPoint);
-									} catch (DoesNotExistException e1){
-										System.out.println("Reached Here");
-										e1.printStackTrace();
-									}
-								} else {
-									newPoints.remove(currentPoint);
-								}
-
-								//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
-								for(int kj = 0; kj < currentPoint.getEdges().size(); kj++){
 									//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+									for(int kj = 0; kj < currentPoint.getEdges().size(); kj++){
+										//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
 
-									while(edgeArray.contains(currentPoint.getEdges().get(kj))){
-										edgeArray.remove(currentPoint.getEdges().get(kj));
-										if(newEdges.contains(currentPoint.getEdges().get(kj))){
-											newEdges.remove(currentPoint.getEdges().get(kj));
+										while(edgeArray.contains(currentPoint.getEdges().get(kj))){
+											edgeArray.remove(currentPoint.getEdges().get(kj));
+											if(newEdges.contains(currentPoint.getEdges().get(kj))){
+												newEdges.remove(currentPoint.getEdges().get(kj));
+											}
 										}
-									}
-									Edge edgeRemoving = currentPoint.getEdges().get(kj);
+										Edge edgeRemoving = currentPoint.getEdges().get(kj);
 
-									if(currentPoint.getId().contentEquals(edgeRemoving.getPoint1().getId()))
-									{
-										for(int f = 0; f < pointArray.size(); f++){
-											if(pointArray.get(f).getId().contentEquals(edgeRemoving.getPoint2().getId())){
-												for(int o = 0; o < pointArray.get(f).getEdges().size(); o++){
-													if(pointArray.get(f).getEdges().get(o).getId().contentEquals(edgeRemoving.getId())){
-														Point tmpPoint = pointArray.get(f);
-														tmpPoint.getEdges().remove(edgeRemoving);
-														tmpPoint.setNumEdges(tmpPoint.getNumEdges() - 1);
-														pointArray.set(f, tmpPoint);
+										if(currentPoint.getId().contentEquals(edgeRemoving.getPoint1().getId()))
+										{
+											for(int f = 0; f < pointArray.size(); f++){
+												if(pointArray.get(f).getId().contentEquals(edgeRemoving.getPoint2().getId())){
+													for(int o = 0; o < pointArray.get(f).getEdges().size(); o++){
+														if(pointArray.get(f).getEdges().get(o).getId().contentEquals(edgeRemoving.getId())){
+															Point tmpPoint = pointArray.get(f);
+															tmpPoint.getEdges().remove(edgeRemoving);
+															tmpPoint.setNumEdges(tmpPoint.getNumEdges() - 1);
+															pointArray.set(f, tmpPoint);
+														}
+													}
+												}
+											}
+										}
+										else
+										{
+											for(int f = 0; f < pointArray.size(); f++){
+												if(pointArray.get(f).getId().contentEquals(edgeRemoving.getPoint1().getId())){
+													for(int o = 0; o < pointArray.get(f).getEdges().size(); o++){
+														if(pointArray.get(f).getEdges().get(o).getId().contentEquals(edgeRemoving.getId())){
+															Point tmpPoint = pointArray.get(f);
+															tmpPoint.getEdges().remove(edgeRemoving);
+															tmpPoint.setNumEdges(tmpPoint.getNumEdges() - 1);
+															pointArray.set(f, tmpPoint);
+														}
 													}
 												}
 											}
 										}
 									}
-									else
-									{
-										for(int f = 0; f < pointArray.size(); f++){
-											if(pointArray.get(f).getId().contentEquals(edgeRemoving.getPoint1().getId())){
-												for(int o = 0; o < pointArray.get(f).getEdges().size(); o++){
-													if(pointArray.get(f).getEdges().get(o).getId().contentEquals(edgeRemoving.getId())){
-														Point tmpPoint = pointArray.get(f);
-														tmpPoint.getEdges().remove(edgeRemoving);
-														tmpPoint.setNumEdges(tmpPoint.getNumEdges() - 1);
-														pointArray.set(f, tmpPoint);
-													}
-												}
-											}
+									for(int kj = 0; kj < currentPoint.getEdges().size(); kj++){
+										//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+										while(edgeArray.contains(currentPoint.getEdges().get(kj))){
+											edgeArray.remove(currentPoint.getEdges().get(kj));
 										}
 									}
-								}
-								for(int kj = 0; kj < currentPoint.getEdges().size(); kj++){
-									//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
-									while(edgeArray.contains(currentPoint.getEdges().get(kj))){
-										edgeArray.remove(currentPoint.getEdges().get(kj));
+									if(newPoints.contains(currentPoint)){
+										newPoints.remove(currentPoint);
 									}
+									if(updatedPoints.contains(currentPoint)){
+										updatedPoints.remove(currentPoint);
+									}
+									currentPoint.deleteEdges();
+									pointArray.remove(currentPoint);
+									pointArray.remove(currentPoint);
 								}
-								if(newPoints.contains(currentPoint)){
-									newPoints.remove(currentPoint);
-								}
-								if(updatedPoints.contains(currentPoint)){
-									updatedPoints.remove(currentPoint);
-								}
-								currentPoint.deleteEdges();
-								pointArray.remove(currentPoint);
-								pointArray.remove(currentPoint);
+								newClick = false;
+								frame.repaint();
 							}
-							newClick = false;
-							frame.repaint();
-						}
-						break;
-					default:
-						break;
-					}
-				}
-
-				for (int j = 0; j < markForDelete.size(); j++) {
-					// remove edges to list
-
-
-					for(int kj = 0; kj < markForDelete.get(j).getEdges().size(); kj++){
-						//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
-						while(edgeArray.contains(markForDelete.get(j).getEdges().get(kj))){
-							edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							break;
+						default:
+							break;
 						}
 					}
-					/*try {
+
+					for (int j = 0; j < markForDelete.size(); j++) {
+						// remove edges to list
+
+
+						for(int kj = 0; kj < markForDelete.get(j).getEdges().size(); kj++){
+							//edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							while(edgeArray.contains(markForDelete.get(j).getEdges().get(kj))){
+								edgeArray.remove(markForDelete.get(j).getEdges().get(kj));
+							}
+						}
+						/*try {
 							ServerDB.removePoint(markForDelete.get(j));
 						} catch (DoesNotExistException e1) {
 							System.out.println("Attempted to delete point that doesn;t exist in the database. Not an error");
 						}*/
-					markForDelete.get(j).deleteEdges();
-					pointArray.remove(markForDelete.get(j));
-					pointArray.remove(markForDelete.get(j));
-					markForDelete.remove(j);
-				}
+						markForDelete.get(j).deleteEdges();
+						pointArray.remove(markForDelete.get(j));
+						pointArray.remove(markForDelete.get(j));
+						markForDelete.remove(j);
+					}
 
-				int drawX = (int) currentPoint.getLocX();
-				int drawY = (int) currentPoint.getLocY();
-				// draws the points onto the map.
-				
-				
-				g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
-				if(editPoint != null)
-				{
-					g.setColor(Color.RED);
-					g.fillOval(editPoint.getLocX()- (pointSize / 2), editPoint.getLocY()- (pointSize / 2), pointSize+5,pointSize+5);
-					g.setColor(Color.BLACK);
-				}
+					int drawX = (int) currentPoint.getLocX();
+					int drawY = (int) currentPoint.getLocY();
+					// draws the points onto the map.
+
+
+					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
+					if(editPoint != null)
+					{
+						g.setColor(Color.RED);
+						g.fillOval(editPoint.getLocX()- (pointSize / 2), editPoint.getLocY()- (pointSize / 2), pointSize+5,pointSize+5);
+						g.setColor(Color.BLACK);
+					}
 					//draw lines between points
-			}
-			for (int j = 0; j < edgeArray.size(); j++) {
-				g.drawLine(edgeArray.get(j).getPoint1().getLocX(), edgeArray.get(j).getPoint1().getLocY(),
-						edgeArray.get(j).getPoint2().getLocX(), edgeArray.get(j).getPoint2().getLocY());
+				}
+				for (int j = 0; j < edgeArray.size(); j++) {
+					g.drawLine(edgeArray.get(j).getPoint1().getLocX(), edgeArray.get(j).getPoint1().getLocY(),
+							edgeArray.get(j).getPoint2().getLocX(), edgeArray.get(j).getPoint2().getLocY());
+
+				}
 
 			}
 
-		}
-
-		/*			for (int i = 0; i < markForDelete.size(); i++) {
+			/*			for (int i = 0; i < markForDelete.size(); i++) {
 				// remove edges to list
 				edgeArray.clear();
 				markForDelete.get(i).deleteEdges();
@@ -1346,55 +1346,55 @@ class DrawPanel extends JPanel {
 				markForDelete.remove(i);
 			}*/
 
-		newClick = false;
-	}
-
-}
-
-
-
-
-/*
- * Takes an input file directory path and a target directory path and copies
- * that File to the target location
- */
-private static void copyFileUsingStream(File source, File dest) throws IOException {
-	System.out.println(source.getPath());
-	FileInputStream is = null;
-	FileOutputStream os = null;
-	is = new FileInputStream(source);
-	System.out.println(source.getPath());
-	os = new FileOutputStream(dest);
-	System.out.println(dest.getPath());
-	byte[] buffer = new byte[1024];
-	int length;
-	while ((length = is.read(buffer)) > 0) {
-		os.write(buffer, 0, length);
-	}
-	is.close();
-	os.close();
-}
-
-private Map updateCurrentMap(Map map)
-{
-	int mapId = map.getMapId();
-	//ArrayList<Map> mapList = md.getMapsFromLocal();
-	boolean foundMap = false;
-	int j = 0;
-	for (j = 0; j<maps.size(); j++)
-	{
-		if (mapId == maps.get(j).getMapId())
-		{
-			foundMap = true;
-			return maps.get(j);
+			newClick = false;
 		}
+
 	}
-	if (foundMap == false)
+
+
+
+
+	/*
+	 * Takes an input file directory path and a target directory path and copies
+	 * that File to the target location
+	 */
+	private static void copyFileUsingStream(File source, File dest) throws IOException {
+		System.out.println(source.getPath());
+		FileInputStream is = null;
+		FileOutputStream os = null;
+		is = new FileInputStream(source);
+		System.out.println(source.getPath());
+		os = new FileOutputStream(dest);
+		System.out.println(dest.getPath());
+		byte[] buffer = new byte[1024];
+		int length;
+		while ((length = is.read(buffer)) > 0) {
+			os.write(buffer, 0, length);
+		}
+		is.close();
+		os.close();
+	}
+
+	private Map updateCurrentMap(Map map)
 	{
-		System.out.println("Failed to find and update map");
+		int mapId = map.getMapId();
+		//ArrayList<Map> mapList = md.getMapsFromLocal();
+		boolean foundMap = false;
+		int j = 0;
+		for (j = 0; j<maps.size(); j++)
+		{
+			if (mapId == maps.get(j).getMapId())
+			{
+				foundMap = true;
+				return maps.get(j);
+			}
+		}
+		if (foundMap == false)
+		{
+			System.out.println("Failed to find and update map");
+		}
+		return null;
 	}
-	return null;
-}
 
 
 

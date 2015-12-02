@@ -82,7 +82,7 @@ public class MapUpdaterGUI{
 	private DrawPanel drawPanel = new DrawPanel();
 	private JTextField mapName;
 	private JTextField txtImageDirectoryPath;
-	private static JComboBox mapDropDown;
+	private static JComboBox<String> mapDropDown;
 	private File mapToAdd;
 	private JCheckBox chckbxPathMode;
 	private Boolean pathMode = false;
@@ -110,7 +110,7 @@ public class MapUpdaterGUI{
 		frame.setVisible(true);
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MapUpdaterGUI.class.getResource("/VectorLogo/Logo Icon.png")));
 		frame.setSize(932, 778);
-
+		frame.setResizable(false);
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
 		int screenHeight = screenSize.height;
@@ -340,7 +340,7 @@ public class MapUpdaterGUI{
 					//ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
 					System.out.println("MapList size is "+maps.size());//Print out the size of the maps from the database
 					for(int i = 0; i < maps.size(); i++){//Iterate through the mapList until we find the item we are looking for
-						System.out.println("Trying to find name:"+name + ".jpg");
+						System.out.println("Trying to find name:"+ name + ".jpg");
 						if(name.equals(maps.get(i).getMapName()))//Once we find the map:
 						{
 							currentMap = maps.get(i);//Grab the current map at this position.
@@ -480,16 +480,17 @@ public class MapUpdaterGUI{
 				mapsLoadingLabel.setVisible(true);
 				addingMap = true;
 
-				String maptitle = mapName.getText();
+				maptitle = mapName.getText();
 
 				btnSaveMap.setEnabled(true);
 				rdbtnAddPoints.setEnabled(true);
 				rdbtnEditPoints.setEnabled(true);
 				rdbtnRemovePoints.setEnabled(true);
 
-				maptitle = mapName.getText();
+				//maptitle = mapName.getText();
 				System.out.println("Map title is: "+maptitle);
 				maptitle = maptitle.trim();
+				System.out.println("Map title after trim is: "+maptitle);
 				String mapNameNoExt;
 				int l = 0;
 				Boolean MapNameExists = false;
@@ -524,7 +525,7 @@ public class MapUpdaterGUI{
 							l = mapDropDown.getItemAt(k).toString().length();
 							mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
 							addingMap = true;
-
+							System.out.println("Map name now: " + maptitle);
 						}
 					}
 				}
@@ -537,8 +538,10 @@ public class MapUpdaterGUI{
 					String destInput = dest.getAbsolutePath();
 					// System.out.println("Destination Input: " + destInput);
 					// System.out.println("Source Input: " + srcInput);
+					System.out.println("Mapname after addingMap: "+maptitle);
+					
 					destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
-					System.out.println(destInput);
+					System.out.println("dest input: "+destInput);
 					File destFile = new File(destInput);
 					try {
 						copyFileUsingStream(srcFile, destFile);
@@ -553,6 +556,8 @@ public class MapUpdaterGUI{
 						new MapInserterGUI();
 					}
 				}
+				System.out.println("maptitle: " + maptitle);
+				mapDropDown.addItem(maptitle);
 				mapsLoadingLabel.setVisible(false);
 			}
 		});
@@ -729,8 +734,8 @@ public class MapUpdaterGUI{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(editPoint != null && currentMap != null)
-					connectMapGUI = new InterMapEdgeGUI(maps, editPoint);
+				if(editPoint != null && maps != null)
+					connectMapGUI = new InterMapEdgeGUI(maps, editPoint, drawPanel.getWidth(), drawPanel.getHeight());
 
 			}
 		});
@@ -769,7 +774,7 @@ public class MapUpdaterGUI{
 				}
 
 				for (int j = 0; j < updatedPoints.size(); j++){
-					/*try {
+					try {
 						if(!newPoints.contains(updatedPoints.get(j))){
 							ServerDB.updatePoint(updatedPoints.get(j));
 						}
@@ -779,7 +784,7 @@ public class MapUpdaterGUI{
 					} catch (DoesNotExistException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					}*/
+					}
 				}
 
 
@@ -873,7 +878,7 @@ public class MapUpdaterGUI{
 
 
 			// Add the name of the map to the Map Selction Dropdown menu
-			mapDropDown.addItem(maptitle);
+			
 
 			// Finds the highest mapID in the database and stores it in
 			// highestID
@@ -996,7 +1001,7 @@ public class MapUpdaterGUI{
 					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
 
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
-							"Hallway!", currentMap.getPointIDIndex(),
+							"Hallway", currentMap.getPointIDIndex(),
 							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
 
 					boolean shouldAdd = true;
@@ -1285,7 +1290,7 @@ public class MapUpdaterGUI{
 					if(editPoint != null)
 					{
 						g.setColor(Color.RED);
-						g.fillOval(editPoint.getLocX()- (pointSize / 2), editPoint.getLocY()- (pointSize / 2), pointSize+5,pointSize+5);
+						g.fillOval(editPoint.getLocX()- (pointSize+5 / 2), editPoint.getLocY()- (pointSize+5 / 2), pointSize+5,pointSize+5);
 						g.setColor(Color.BLACK);
 					}
 					//draw lines between points
@@ -1359,4 +1364,3 @@ public class MapUpdaterGUI{
 
 
 }
-

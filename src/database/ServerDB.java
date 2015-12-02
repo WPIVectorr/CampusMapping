@@ -457,7 +457,7 @@ public class ServerDB {
 
 	//---------------------------------------------------------Modifying Functions-------------------------------------------------------=---
 
-	private static void updatePoint (Point point) throws SQLException, DoesNotExistException
+	public static void updatePoint (Point point) throws SQLException, DoesNotExistException
 	{
 		String ptId = point.getId();
 		//---------------------------------------------------Update point in database-------------------------------------------------

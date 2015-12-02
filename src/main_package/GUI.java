@@ -268,7 +268,6 @@ public class GUI{
 							System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
 						}
 						//System.out.println("buildings[i] " + buildings[i]);
-
 						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
 					}*/
 
@@ -841,4 +840,3 @@ public class GUI{
 		}
 	}
 }
-

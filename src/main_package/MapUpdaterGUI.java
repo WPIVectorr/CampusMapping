@@ -742,7 +742,7 @@ public class MapUpdaterGUI{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				btnSaveMap.setText("Saving");
 				pointsLoadingLabel.setVisible(true);
 
 				for (int i = 0; i < newPoints.size(); i++){
@@ -811,6 +811,7 @@ public class MapUpdaterGUI{
 				editingPoint = false;
 				frame.repaint();
 				pointsLoadingLabel.setVisible(false);
+				btnSaveMap.setText("Saved Map");
 			}
 		});
 

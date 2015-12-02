@@ -48,6 +48,7 @@ public class MapUpdaterGUI{
 	String name;
 	File destinationFile;
 	File logo;
+	int prevRadButtonVal = 0;
 
 	private Map currentMap = null;
 	private static ServerDB md = ServerDB.getInstance();
@@ -137,16 +138,32 @@ public class MapUpdaterGUI{
 	 */
 	public int getRadButton() {
 		int activeButton = 0;
-		if (rdbtnAddPoints.isSelected())
+		if (rdbtnAddPoints.isSelected()){
 			activeButton = 1;
-		if (rdbtnEditPoints.isSelected())
+			if(prevRadButtonVal != 1){
+				btnSaveMap.doClick();
+				prevRadButtonVal = 1;
+			}
+		}
+		if (rdbtnEditPoints.isSelected()){
 			activeButton = 2;
-		if (rdbtnRemovePoints.isSelected())
+			if(prevRadButtonVal != 2){
+				btnSaveMap.doClick();
+				prevRadButtonVal = 2;
+			}
+		}
+		if (rdbtnRemovePoints.isSelected()){
+			
 			activeButton = 3;
-		if(activeButton != 0){
+			if(prevRadButtonVal != 3){
+				btnSaveMap.doClick();
+				prevRadButtonVal = 3;
+			}
+		}
+		//if(activeButton != 0){
 			//btnSaveMap.doClick();
 			//System.out.println("saves map here" );
-		}
+		//}
 		return activeButton;
 	}
 
@@ -999,6 +1016,9 @@ public class MapUpdaterGUI{
 											}
 										}
 									}
+									g.setColor(Color.RED);
+									g.fillOval(editPoint.getLocX(), editPoint.getLocY(), pointSize+5,pointSize+5);
+									g.setColor(Color.BLACK);
 									newClick = false;
 									if(pathMode){
 										Point tempEditPoint = pointArray.get(editPointIndex);
@@ -1240,5 +1260,7 @@ public class MapUpdaterGUI{
 		}
 		return null;
 	}
+
+	
 
 }

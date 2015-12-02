@@ -72,8 +72,8 @@ public class MapUpdaterGUI{
 	private static JRadioButton rdbtnRemovePoints;
 
 	//---------------------------------
-	private static boolean DEBUG = true;
-
+	private final static boolean DEBUG = false;
+	
 	String point1;
 	String point2;
 	String point3;
@@ -199,10 +199,14 @@ public class MapUpdaterGUI{
 		{
 			public void run()
 			{
-				System.out.println("Calling run");
+				if(DEBUG){
+					System.out.println("Calling run");
+				}
 				MapUpdaterGUI mapUpdater = new MapUpdaterGUI();
 				try {
-					System.out.println("Calling create and show GUI");
+					if(DEBUG){
+						System.out.println("Calling create and show GUI");
+					}
 					mapUpdater.createAndShowGUI();
 				} catch (IOException | AlreadyExistsException | SQLException e) {
 					// TODO Auto-generated catch block
@@ -254,14 +258,20 @@ public class MapUpdaterGUI{
 			 */
 			// includes extension
 			if(!(imgList[f].getName().equals(".DS_Store"))){
-				System.out.println("Dropdown:" );
+				if(DEBUG){
+					System.out.println("Dropdown:" );
+				}
 				String temp = imgList[f].getName().substring(0, imgList[f].getName().length() -4);
-				System.out.println(temp);
+				if(DEBUG){
+					System.out.println(temp);
+				}
 
 				//checks to make sure the names populating the drop down are in both the vector maps package and 
 				//the database
 				for(int count = 0; count < maps.size(); count++){
-					System.out.println("printing from database: " + maps.get(count).getMapName());
+					if(DEBUG){
+						System.out.println("printing from database: " + maps.get(count).getMapName());
+					}
 					if(maps.get(count).getMapName().compareTo(temp) == 0){
 						mapDropDown.addItem(temp);
 
@@ -317,7 +327,9 @@ public class MapUpdaterGUI{
 				rdbtnRemovePoints.setEnabled(true);
 
 				name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
-				System.out.println("Selected item:"+name);
+				if(DEBUG){
+					System.out.println("Selected item:"+name);
+				}
 				
 				
 				destinationFile = new File("src/VectorMaps/" + name + ".jpg");
@@ -325,7 +337,9 @@ public class MapUpdaterGUI{
 				
 				destinationFile = new File(destinationFile.getAbsolutePath());
 				
-				System.out.println("New selected item:"+name);
+				if(DEBUG){
+					System.out.println("New selected item:"+name);
+				}
 
 				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
 					pointArray.clear();
@@ -335,9 +349,13 @@ public class MapUpdaterGUI{
 					updatedPoints.clear();
 					newEdges.clear();
 					//ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
-					System.out.println("MapList size is "+maps.size());//Print out the size of the maps from the database
+					if(DEBUG){
+						System.out.println("MapList size is "+maps.size());//Print out the size of the maps from the database
+					}
 					for(int i = 0; i < maps.size(); i++){//Iterate through the mapList until we find the item we are looking for
-						System.out.println("Trying to find name:"+name + ".jpg");
+						if(DEBUG){
+							System.out.println("Trying to find name:"+name + ".jpg");
+						}
 						if(name.equals(maps.get(i).getMapName()))//Once we find the map:
 						{
 							currentMap = maps.get(i);//Grab the current map at this position.
@@ -348,18 +366,24 @@ public class MapUpdaterGUI{
 								e.printStackTrace();
 							}//Populate the point array with all the points found.
 							oldPoints = pointArray;
-							System.out.println("Map list size:"+maps.size());
+							if(DEBUG){
+								System.out.println("Map list size:"+maps.size());
+							}
 
 							for(int j = 0; j < pointArray.size(); j++){
 								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
 								for(int k = 0; k < tmpEdges.size(); k++){
-									System.out.println(tmpEdges.get(k).getId());
+									if(DEBUG){
+										System.out.println(tmpEdges.get(k).getId());
+									}
 									edgeArray.add(tmpEdges.get(k));
 								}
 							}
 
 
-							System.out.println("Found map with number of points: "+currentMap.getPointList().size());
+							if(DEBUG){
+								System.out.println("Found map with number of points: "+currentMap.getPointList().size());
+							}
 							i = maps.size();
 						}
 					}
@@ -370,7 +394,9 @@ public class MapUpdaterGUI{
 													if (!(name.equals("Select Map"))) {*/
 					try {
 
-						System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
+						if(DEBUG){
+							System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
+						}
 						//System.out.println("Map name " + currentMap.getMapName());
 
 						img = ImageIO.read(destinationFile);
@@ -477,7 +503,9 @@ public class MapUpdaterGUI{
 				rdbtnRemovePoints.setEnabled(true);
 
 				maptitle = mapName.getText();
-				System.out.println("Map title is: "+maptitle);
+				if(DEBUG){
+					System.out.println("Map title is: "+maptitle);
+				}
 				maptitle = maptitle.trim();
 				String mapNameNoExt;
 				int l = 0;
@@ -492,10 +520,14 @@ public class MapUpdaterGUI{
 					} else {
 						for (int k = 0; k < mapDropDown.getItemCount(); k++) {
 							l = mapDropDown.getItemAt(k).toString().length();
-							System.out.println("The length of l is: " + l);
-							System.out.println("The item at that space is: " + mapDropDown.getItemAt(k).toString());
+							if(DEBUG){
+								System.out.println("The length of l is: " + l);
+								System.out.println("The item at that space is: " + mapDropDown.getItemAt(k).toString());
+							}
 							mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
-							System.out.println(mapNameNoExt + "           " + (l - 4));
+							if(DEBUG){
+								System.out.println(mapNameNoExt + "           " + (l - 4));
+							}
 							if (maptitle.equals(mapNameNoExt)) {
 								addingMap = false;
 								System.out.println("Error: Map invalid");
@@ -506,7 +538,9 @@ public class MapUpdaterGUI{
 
 				if (addingMap){
 				// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
-				System.out.println("SavingMap");
+				if(DEBUG){
+					System.out.println("SavingMap");
+				}
 				File dest = new File("src/VectorMaps");
 				// File destAbs = dest.getAbsoluteFile();
 
@@ -514,7 +548,9 @@ public class MapUpdaterGUI{
 				// System.out.println("Destination Input: " + destInput);
 				// System.out.println("Source Input: " + srcInput);
 				destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
-				System.out.println(destInput);
+				if(DEBUG){
+					System.out.println(destInput);
+				}
 				File destFile = new File(destInput);
 				try {
 					copyFileUsingStream(srcFile, destFile);
@@ -723,7 +759,9 @@ public class MapUpdaterGUI{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (editingPoint) {
-					System.out.println("Updating changed points");
+					if(DEBUG){
+						System.out.println("Updating changed points");
+					}
 					editPoint.setName(roomNumber.getText());
 					if(updatedPoints.contains(editPoint)){
 						for(int r = 0; r < updatedPoints.size(); r++){
@@ -778,7 +816,9 @@ public class MapUpdaterGUI{
 				for (int i = 0; i < newPoints.size(); i++){
 					try {
 						ServerDB.insertPoint(currentMap, newPoints.get(i));
-						System.out.println("AddPointSuccess");
+						if(DEBUG){
+							System.out.println("AddPointSuccess");
+						}
 					} catch (AlreadyExistsException f){
 						System.out.println(f.getMessage());
 					} catch (NoMapException e1) {
@@ -806,13 +846,17 @@ public class MapUpdaterGUI{
 				
 				
 				
-				System.out.println("Edge array size is: " + edgeArray.size());
+				if(DEBUG){
+					System.out.println("Edge array size is: " + edgeArray.size());
+				}
 				for (int i = 0; i < newEdges.size(); i++) {
 					Edge storeEdge = newEdges.get(i);
 					storeEdge.setId(storeEdge.getPoint1().getId() + "-" + storeEdge.getPoint2().getId());
-					System.out.println("Storing Edge: " + storeEdge.getId());
-					System.out.println("Storing Edge point 1: " + storeEdge.getPoint1().getId());
-					System.out.println("Storing Edge point 2: " + storeEdge.getPoint2().getId());
+					if(DEBUG){
+						System.out.println("Storing Edge: " + storeEdge.getId());
+						System.out.println("Storing Edge point 1: " + storeEdge.getPoint1().getId());
+						System.out.println("Storing Edge point 2: " + storeEdge.getPoint2().getId());
+					}
 					try {
 						ServerDB.insertEdge(storeEdge);
 					} catch (InsertFailureException | AlreadyExistsException | SQLException
@@ -873,7 +917,9 @@ public class MapUpdaterGUI{
 	}
 
 	public static void setInfo(int x, int y, int x2, int y2, double angle){
-		System.out.println("setting info");
+		if(DEBUG){
+			System.out.println("setting info");
+		}
 		//frame.setVisible(true);
 		if (addingMap) {
 			
@@ -886,7 +932,9 @@ public class MapUpdaterGUI{
 			int highestID;
 			if(md.getMapsFromLocal().isEmpty()){
 				highestID = 0;
-				System.out.print("Database contains no maps so highest ID is 1");
+				if(DEBUG){
+					System.out.print("Database contains no maps so highest ID is 1");
+				}
 
 
 			}
@@ -904,7 +952,9 @@ public class MapUpdaterGUI{
 			// Create the Map object to be stored in the database
 			Map m = new Map(highestID + 1, maptitle, (double)x, (double)y, (double)x2, (double)y2, angle, 0);
 			highestID++;
-			System.out.println("rotation angle = " + m.getRotationAngle());
+			if(DEBUG){
+				System.out.println("rotation angle = " + m.getRotationAngle());
+			}
 			try {
 				md.insertMap(m);
 			} catch (AlreadyExistsException e1) {
@@ -917,7 +967,9 @@ public class MapUpdaterGUI{
 				e1.printStackTrace();
 			}
 			mapDropDown.setSelectedIndex(mapDropDown.getItemCount()-1);
-			System.out.println(mapDropDown.getItemCount());
+			if(DEBUG){
+				System.out.println(mapDropDown.getItemCount());
+			}
 			addingMap = false;
 		} else {
 
@@ -953,7 +1005,9 @@ public class MapUpdaterGUI{
 
 
 				windowScale = ((double)img.getWidth() / (double)frame.getContentPane().getWidth());
-				System.out.println("Image Original Width " + img.getWidth());
+				if(DEBUG){
+					System.out.println("Image Original Width " + img.getWidth());
+				}
 				int WidthSize = (int)((double) img.getHeight() / windowScale);
 				if (WidthSize > (double)drawPanel.getHeight()){
 					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
@@ -1087,9 +1141,11 @@ public class MapUpdaterGUI{
 												}
 											}
 										}
-										System.out.println("Edge sizes- editPoint:"+pointArray.get(editPointIndex).getEdges().size()+
+										if(DEBUG){
+											System.out.println("Edge sizes- editPoint:"+pointArray.get(editPointIndex).getEdges().size()+
 												" currentPoint:"+pointArray.get(i).getEdges().size());
-										System.out.println("Current Edge is: " + currentEdge.getId());
+											System.out.println("Current Edge is: " + currentEdge.getId());
+										}
 										edgeArray.add(currentEdge);
 										if(newEdges.contains(currentEdge)){
 											for(int r = 0; r < newEdges.size(); r++){
@@ -1104,9 +1160,11 @@ public class MapUpdaterGUI{
 										if (currentPoint.getNumEdges() > 0)//this has to be caught in an exception later
 										{
 											for (int j = 0; j < currentPoint.getNumEdges(); j++) {
-												System.out.println("Adding clicked edge between: "
+												if(DEBUG){
+													System.out.println("Adding clicked edge between: "
 														+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
 														+ currentPoint.getEdges().get(j).getPoint2().getName());
+												}
 											}
 										}
 									}
@@ -1137,12 +1195,16 @@ public class MapUpdaterGUI{
 							}
 							break;
 						case 3:// remove points
-							System.out.println("Remove point called.");
-							System.out.println("Size of edgeArray:"+edgeArray.size());
+							if(DEBUG){
+								System.out.println("Remove point called.");
+								System.out.println("Size of edgeArray:"+edgeArray.size());
+							}
 							for (int j = 0; j < pointArray.size(); j++)
 							{
-								System.out.println("Number of edges in point "
-										+pointArray.get(j).getId()+": "+pointArray.get(j).getEdges().size());
+								if(DEBUG){
+									System.out.println("Number of edges in point "
+											+pointArray.get(j).getId()+": "+pointArray.get(j).getEdges().size());
+								}
 							}
 							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
 									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
@@ -1183,7 +1245,9 @@ public class MapUpdaterGUI{
 										}
 										
 										try{
-											System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
+											if(DEBUG){
+												System.out.println("Number of edges in point to be removed:"+currentPoint.getEdges().size());
+											}
 											ServerDB.removePoint(currentPoint);
 										} catch (DoesNotExistException e1){
 											System.out.println("Reached Here");
@@ -1318,13 +1382,19 @@ public class MapUpdaterGUI{
 	 * that File to the target location
 	 */
 	private static void copyFileUsingStream(File source, File dest) throws IOException {
-		System.out.println(source.getPath());
+		if(DEBUG){
+			System.out.println(source.getPath());
+		}
 		FileInputStream is = null;
 		FileOutputStream os = null;
 		is = new FileInputStream(source);
-		System.out.println(source.getPath());
+		if(DEBUG){
+			System.out.println(source.getPath());
+		}
 		os = new FileOutputStream(dest);
-		System.out.println(dest.getPath());
+		if(DEBUG){
+			System.out.println(dest.getPath());
+		}
 		byte[] buffer = new byte[1024];
 		int length;
 		while ((length = is.read(buffer)) > 0) {

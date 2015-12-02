@@ -130,7 +130,7 @@ public class MapUpdaterGUI{
 		buttonPanel.setLayout(new BorderLayout());
 		frame.getContentPane().add(buttonPanel, BorderLayout.NORTH);
 
-		loadingIcon = new ImageIcon("src/VectorLogo/smaller gif.gif");
+		loadingIcon = new ImageIcon("src/VectorLogo/faster reverse.gif");
 
 		tabs.addTab("Maps", createMapsPanel());
 		tabs.addTab("Points", createPointsPanel());
@@ -469,6 +469,9 @@ public class MapUpdaterGUI{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (mapToAdd == null){
+					mapToAdd = new File(txtImageDirectoryPath.getText());
+				}
 				mapsLoadingLabel.setVisible(true);
 				addingMap = true;
 
@@ -484,29 +487,39 @@ public class MapUpdaterGUI{
 				maptitle = maptitle.trim();
 				String mapNameNoExt;
 				int l = 0;
-
+				Boolean MapNameExists = false;
+				System.out.println("map to add: " + mapToAdd.toString());
 				// check directory to see if it exists
-				if(mapToAdd.exists()){
+				if (mapToAdd.exists() && mapToAdd.isFile()){
 					srcInput = mapToAdd.toString();
 					srcFile = mapToAdd;
-					if ((maptitle == null || maptitle.equals("")) || mapToAdd == null) {
+					for (int y = 0; y < mapDropDown.getItemCount(); y++){
+						if (mapDropDown.getItemAt(y).toString().equals(maptitle)){
+							mapName.setText("Map Name Already Exists");
+							MapNameExists = true;
+							y = mapDropDown.getItemCount();
+						}
+					}
+				}else {
+					txtImageDirectoryPath.setText("Error Map Directory is Invalid");
+					addingMap = false;
+				}
+				if ((maptitle == null || maptitle.equals("Map Name") || maptitle.equals("")) || MapNameExists) {
+					if(MapNameExists){
 						addingMap = false;
-						System.out.println("Error: Map is invalid");
-					} else {
+					}else{
+						mapName.setText("Map Name Invalid");
+						addingMap = false;
+					}
+				} else {
+					if (MapNameExists == false){
 						for (int k = 0; k < mapDropDown.getItemCount(); k++) {
 							l = mapDropDown.getItemAt(k).toString().length();
-							System.out.println("The length of l is: " + l);
-							System.out.println("The item at that space is: " + mapDropDown.getItemAt(k).toString());
 							mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
-							System.out.println(mapNameNoExt + "           " + (l - 4));
-							if (maptitle.equals(mapNameNoExt)) {
-								addingMap = false;
-								System.out.println("Error: Map invalid");
-							}
+							addingMap = true;
 						}
 					}
 				}
-
 				if (addingMap){
 					// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
 					System.out.println("SavingMap");
@@ -526,81 +539,13 @@ public class MapUpdaterGUI{
 						System.out.println("invalid copy");
 						a.printStackTrace();
 					}
-				}
-				if(maps == null || maps.size() == 0){
-					setInfo(0, 0, img.getWidth(), img.getHeight(), 0);
-				} else {
-					new MapInserterGUI();
-				}
-				/*				
-
-				if (addingMap) {
-					// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
-					System.out.println("SavingMap");
-					File dest = new File("src/VectorMaps");
-					// File destAbs = dest.getAbsoluteFile();
-
-					String destInput = dest.getAbsolutePath();
-					// System.out.println("Destination Input: " + destInput);
-					// System.out.println("Source Input: " + srcInput);
-					destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
-					System.out.println(destInput);
-					File destFile = new File(destInput);
-
-					// Add the name of the map to the Map Selction Dropdown menu
-					mapDropDown.addItem(maptitle + srcInput.substring(srcInput.length() - 4));
-
-					// Finds the highest mapID in the database and stores it in
-					// highestID
-					int highestID;
-					if(maps.isEmpty()){
-						highestID = 0;
-						System.out.print("Database contains no maps so highest ID is 1");
-
-
+					if(maps == null || maps.size() == 0){
+						setInfo(0, 0, img.getWidth(), img.getHeight(), 0);
+					} else {
+						new MapInserterGUI();
 					}
-					else{
-						//determines the highest mapID from the Maps stored in the database
-						//ArrayList<Map> mdMapList = md.getMapsFromLocal();
-						highestID = maps.get(0).getMapId();
-						for (int h = 0; h < maps.size(); h++) {
-							if (highestID < maps.get(h).getMapId()) {
-								highestID = maps.get(h).getMapId();
-							}
-						}
-					}
-
-					// Create the Map object to be stored in the database
-					Map m = new Map(highestID + 1, maptitle, AddedMapupperleftx, AddedMapupperlefty, AddedMaprotation);
-					highestID++;
-
-					try {
-						md.insertMap(m);
-					} catch (AlreadyExistsException e1) {
-						System.out.print("Look at me im  an error 1");
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						System.out.print("Look at me im  an error 2");
-						e1.printStackTrace();
-					}
-
-					try {
-						copyFileUsingStream(srcFile, destFile);
-						img = ImageIO.read(destFile);
-					} catch (IOException a) {
-						System.out.println("invalid copy");
-						a.printStackTrace();
-					}
-					mapDropDown.setSelectedIndex(mapDropDown.getItemCount()-1);
-					System.out.println(mapDropDown.getItemCount());
-					addingMap = false;
-				} else {
-
 				}
 				mapsLoadingLabel.setVisible(false);
-				retrievedInfo = false; */
 			}
 		});
 
@@ -1102,7 +1047,7 @@ public class MapUpdaterGUI{
 									if(editPoint.getId().contentEquals(currentPoint.getId())){
 
 									} else {
-										currentEdge = new Edge(editPoint, currentPoint, edgeWeight);
+										currentEdge = new Edge(editPoint, currentPoint);
 										pointArray.set(editPointIndex, editPoint);
 										pointArray.set(i, currentPoint);
 										if(!(updatedPoints.contains(editPoint))){

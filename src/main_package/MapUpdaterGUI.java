@@ -329,6 +329,7 @@ public class MapUpdaterGUI{
 
 				System.out.println("New selected item:"+name);
 
+
 				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
 					pointArray.clear();
 					oldPoints.clear();
@@ -516,11 +517,14 @@ public class MapUpdaterGUI{
 						addingMap = false;
 					}
 				} else {
+
+
 					if (MapNameExists == false){
 						for (int k = 0; k < mapDropDown.getItemCount(); k++) {
 							l = mapDropDown.getItemAt(k).toString().length();
 							mapNameNoExt = mapDropDown.getItemAt(k).toString().substring(0, l - 4);
 							addingMap = true;
+
 						}
 					}
 				}

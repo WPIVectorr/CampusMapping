@@ -28,6 +28,8 @@ public class GUI{
 
 	private ArrayList<Map> maps = new ArrayList<Map>();
 	private ArrayList<Point> route;
+	private ArrayList<Edge> edgeArray;
+	private ArrayList<Point> pointArray;
 	private String[] textDir;
 	private int textPos;
 	private Point start;
@@ -203,6 +205,19 @@ public class GUI{
 				startBuilds.removeAllItems();
 				destBuilds.removeAllItems();
 				if(buildDestIndex!=0){
+
+					edgeArray = new ArrayList<Edge>();
+					
+					pointArray = maps.get(buildDestIndex - 1).getPointList();
+					
+					for(int i = 0; i < pointArray.size(); i++){
+						for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
+							if(pointArray.get(i).getEdges().get(j).getPoint1().getMapId() == pointArray.get(i).getEdges().get(j).getPoint2().getMapId())
+								edgeArray.add(pointArray.get(i).getEdges().get(j));
+						}
+					}
+					
+
 					//System.out.println("building size: " + buildings.length);
 					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
 						startBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));

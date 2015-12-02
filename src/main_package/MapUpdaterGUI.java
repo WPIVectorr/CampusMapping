@@ -110,7 +110,7 @@ public class MapUpdaterGUI{
 		frame.setVisible(true);
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MapUpdaterGUI.class.getResource("/VectorLogo/Logo Icon.png")));
 		frame.setSize(932, 778);
-
+		frame.setResizable(false);
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
 		int screenHeight = screenSize.height;
@@ -734,8 +734,8 @@ public class MapUpdaterGUI{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(editPoint != null && currentMap != null)
-					connectMapGUI = new InterMapEdgeGUI(currentMap, editPoint);
+				if(editPoint != null && maps != null)
+					connectMapGUI = new InterMapEdgeGUI(maps, editPoint, drawPanel.getWidth(), drawPanel.getHeight());
 
 			}
 		});
@@ -774,7 +774,7 @@ public class MapUpdaterGUI{
 				}
 
 				for (int j = 0; j < updatedPoints.size(); j++){
-					/*try {
+					try {
 						if(!newPoints.contains(updatedPoints.get(j))){
 							ServerDB.updatePoint(updatedPoints.get(j));
 						}
@@ -784,7 +784,7 @@ public class MapUpdaterGUI{
 					} catch (DoesNotExistException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					}*/
+					}
 				}
 
 
@@ -952,7 +952,7 @@ public class MapUpdaterGUI{
 
 
 				windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
-				System.out.println("Image Original Width " + img.getWidth());
+				//System.out.println("Image Original Width " + img.getWidth());
 				int WidthSize = (int)((double) img.getHeight() / windowScale);
 				if (WidthSize > (double)drawPanel.getHeight()){
 					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
@@ -1001,7 +1001,7 @@ public class MapUpdaterGUI{
 					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
 
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
-							"Hallway!", currentMap.getPointIDIndex(),
+							"Hallway", currentMap.getPointIDIndex(),
 							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
 
 					boolean shouldAdd = true;
@@ -1290,7 +1290,7 @@ public class MapUpdaterGUI{
 					if(editPoint != null)
 					{
 						g.setColor(Color.RED);
-						g.fillOval(editPoint.getLocX()- (pointSize / 2), editPoint.getLocY()- (pointSize / 2), pointSize+5,pointSize+5);
+						g.fillOval(editPoint.getLocX()- (pointSize+5 / 2), editPoint.getLocY()- (pointSize+5 / 2), pointSize+5,pointSize+5);
 						g.setColor(Color.BLACK);
 					}
 					//draw lines between points

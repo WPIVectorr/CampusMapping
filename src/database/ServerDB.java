@@ -59,7 +59,7 @@ public class ServerDB {
 
 	public static void main (String args[])
 	{
-		clearDatabase();
+		//clearDatabase();
 		//tryCreateDB();
 		conn = connect();
 		//testDB();
@@ -711,6 +711,7 @@ public class ServerDB {
 			statement.executeUpdate("DROP DATABASE "+DATABASE_NAME);
 			//conn.createStatement().executeUpdate("FLUSH HOSTS");
 			tryCreateDB();
+			System.out.println("Done Clearing DataBase");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

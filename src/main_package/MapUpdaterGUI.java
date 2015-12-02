@@ -963,7 +963,7 @@ public class MapUpdaterGUI{
 				if (getRadButton() == 1) // if addpoint
 				{
 					Integer nameNumber = currentMap.getPointIDIndex()+1;
-					double ourRotation = 50;//currentMap.getRotationAngle();
+					double ourRotation = currentMap.getRotationAngle();
 					//ourRotation = 2 * Math.PI - ourRotation;
 
 					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;

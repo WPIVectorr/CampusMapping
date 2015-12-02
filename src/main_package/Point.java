@@ -148,7 +148,7 @@ public class Point {
 		return name;
 	}
 	public boolean equals(Point compPoint){
-		return this.id == compPoint.getId();
+		return this.id.equals(compPoint.getId());
 	}
 	
 	public void setNumEdges(int numEdges){

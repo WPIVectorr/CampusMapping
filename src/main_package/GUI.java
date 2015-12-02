@@ -210,7 +210,8 @@ public class GUI{
 					
 					for(int i = 0; i < pointArray.size(); i++){
 						for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
-							edgeArray.add(pointArray.get(i).getEdges().get(j));
+							if(pointArray.get(i).getEdges().get(j).getPoint1().getMapId() == pointArray.get(i).getEdges().get(j).getPoint2().getMapId())
+								edgeArray.add(pointArray.get(i).getEdges().get(j));
 						}
 					}
 					

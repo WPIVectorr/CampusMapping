@@ -59,7 +59,7 @@ public class InterMapEdgeGUI extends JFrame {
 	private JButton btnConfirmSelection;
 
 	private Point connectPoint;
-	String name;
+	private String name;
 	File destinationFile;
 	File logo;
  
@@ -106,7 +106,7 @@ public class InterMapEdgeGUI extends JFrame {
 		Dimension screenSize = tk.getScreenSize();
 		int screenHeight = screenSize.height;
 		int screenWidth = screenSize.width;
-		setSize(screenWidth / 2, screenHeight/ 2);
+		setSize(932, 778);
 		setLocation(screenWidth / 4, screenHeight / 4);
 		setVisible(true);
 		
@@ -241,6 +241,7 @@ public class InterMapEdgeGUI extends JFrame {
 					}*/
 					System.out.println("edge Created ");
 					frame.dispose();
+					frame.validate();
 				}
 			}
 		});
@@ -248,6 +249,7 @@ public class InterMapEdgeGUI extends JFrame {
 				mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 					public void actionPerformed(ActionEvent a) {
 						pointArray.clear();
+						connectPoint = null;
 						name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
 						System.out.println("Selected item:"+name);
 
@@ -406,6 +408,9 @@ public class InterMapEdgeGUI extends JFrame {
 				}
 				if(destDropDown != null)
 					destDropDown.setEnabled(true);
+			}else if(pointArray.size() == 0)
+			{
+				destDropDown.setEnabled(false);
 			}
 			
 		}

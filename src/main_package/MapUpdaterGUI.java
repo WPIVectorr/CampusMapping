@@ -480,7 +480,7 @@ public class MapUpdaterGUI{
 				mapsLoadingLabel.setVisible(true);
 				addingMap = true;
 
-				String maptitle = mapName.getText();
+				maptitle = mapName.getText();
 
 				btnSaveMap.setEnabled(true);
 				rdbtnAddPoints.setEnabled(true);

@@ -4,6 +4,8 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import java.awt.Color;
+
 //import main_package.MapUpdaterGUI.UpdateMap;
 
 import java.awt.Dimension;
@@ -301,7 +303,9 @@ public class MapInserterGUI extends JFrame{
 					int drawY = (int) currentPoint.getLocY();
 					// draws the points onto the map
 					Integer drawNum = Integer.parseInt(currentPoint.getId())+1;
+					g.setColor(Color.RED);
 					g.drawString(drawNum.toString(), drawX-pointSize, drawY+pointSize);
+					g.setColor(Color.BLACK);
 					//g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 					System.out.println(alignmentPoints.size());
 				}

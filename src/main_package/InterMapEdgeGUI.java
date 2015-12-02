@@ -35,13 +35,12 @@ public class InterMapEdgeGUI extends JFrame {
 	private interButtonPanel buttonPanel = new interButtonPanel();;
 	private MapPanel mapFrame= new MapPanel();
 	private JComboBox<String> mapDropDown;
-	private JComboBox<String> comboDestPoint;
-	private static BufferedImage CampusMap = null;
-	private static BufferedImage AddingMap = null;
+	private JComboBox<String> destDropDown;
+	private static BufferedImage campusMap = null;
+	private static BufferedImage img = null;
 	private int windowSizeX = 0;
 	private int windowSizeY = 0;
-	private int windowScale = 0;
-	private BufferedImage img = null;
+	private double windowScale = 0;
 	private static int lastMousex,lastMousey;
 	private static int pointSize = 5;
 	private static boolean mapSelected;
@@ -59,8 +58,7 @@ public class InterMapEdgeGUI extends JFrame {
 	private ServerDB md = ServerDB.getInstance();
 
 
-	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
-	private Edge currentEdge;
+
 	private static JFrame frame = new JFrame("Add Edges Between Maps");
 
 	
@@ -128,13 +126,13 @@ public class InterMapEdgeGUI extends JFrame {
 		gbc_lblSelectDestPoint.gridy = 0;
 		buttonPanel.add(lblSelectDestPoint, gbc_lblSelectDestPoint);
 		
-		comboDestPoint = new JComboBox<String>();
-		GridBagConstraints gbc_comboDestPoint = new GridBagConstraints();
-		gbc_comboDestPoint.insets = new Insets(0, 0, 5, 5);
-		gbc_comboDestPoint.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboDestPoint.gridx = 5;
-		gbc_comboDestPoint.gridy = 0;
-		buttonPanel.add(comboDestPoint, gbc_comboDestPoint);
+		destDropDown = new JComboBox<String>();
+		GridBagConstraints gbc_destDropDown = new GridBagConstraints();
+		gbc_destDropDown.insets = new Insets(0, 0, 5, 5);
+		gbc_destDropDown.fill = GridBagConstraints.HORIZONTAL;
+		gbc_destDropDown.gridx = 5;
+		gbc_destDropDown.gridy = 0;
+		buttonPanel.add(destDropDown, gbc_destDropDown);
 		
 		JButton btnConfirmSelection = new JButton("Confirm Selection");
 		GridBagConstraints gbc_btnConfirmSelection = new GridBagConstraints();
@@ -191,19 +189,18 @@ public class InterMapEdgeGUI extends JFrame {
 		}	
 		
 		
-		frame.repaint();
 				mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 					public void actionPerformed(ActionEvent a) {
 						name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
 						System.out.println("Selected item:"+name);
 
-						destinationFile = new File("src/VectorMaps/" + name);
+						destinationFile = new File("src/VectorMaps/" + name+".jpg");
 						destinationFile = new File(destinationFile.getAbsolutePath());
 
 
 						if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
 							pointArray.clear();
-							edgeArray.clear();
+							
 							ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
 							System.out.println("MapList size is "+mapList.size());//Print out the size of the maps from the database
 							for(int i = 0; i < mapList.size(); i++){//Iterate through the mapList until we find the item we are looking for
@@ -213,15 +210,6 @@ public class InterMapEdgeGUI extends JFrame {
 									currentMap = mapList.get(i);//Grab the current map at this position.
 									pointArray = currentMap.getPointList();//Populate the point array with all the points found.
 									System.out.println("Map list size:"+mapList.size());
-
-									for(int j = 0; j < pointArray.size(); j++){
-										ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
-										for(int k = 0; k < tmpEdges.size(); k++){
-											System.out.println(tmpEdges.get(k).getId());
-											edgeArray.add(tmpEdges.get(k));
-										}
-									}
-
 
 									System.out.println("Found map with number of points: "+currentMap.getPointList().size());
 									i = mapList.size();
@@ -252,9 +240,9 @@ public class InterMapEdgeGUI extends JFrame {
 								g.printStackTrace();
 							}
 							pointArray.clear();
-							edgeArray.clear();
+							
 						}
-						doRepaint();
+						mapFrame.repaint();
 					}
 				});
 
@@ -278,13 +266,13 @@ public class InterMapEdgeGUI extends JFrame {
 		InterMapEdgeGUI addInterMapEdge = new InterMapEdgeGUI(null, null);
 		addInterMapEdge.setVisible(true);
 	}
-	public static BufferedImage getCampusMap() {
-		return CampusMap;
+	public static BufferedImage getcampusMap() {
+		return campusMap;
 	}
 
 
-	public void setCampusMap(BufferedImage campusMap) {
-		CampusMap = campusMap;
+	public void setcampusMap(BufferedImage campusMap) {
+		campusMap = campusMap;
 	}
 
 	public String getSelectedMap()
@@ -294,46 +282,40 @@ public class InterMapEdgeGUI extends JFrame {
 		return selectedMap;
 	}
 
-	public static BufferedImage getAddingMap() {
-		return AddingMap;
+	public static BufferedImage getimg() {
+		return img;
 	}
 
 
-	public static void setAddingMap(BufferedImage addingMap) {
-		AddingMap = addingMap;
+	public static void setimg(BufferedImage mapToAdd) {
+		img = mapToAdd;
 	}
 	private static void doRepaint()
 	{
 		//buttonPanel.repaint();
-		//`mapPanel.repaint();
+		//mapFrame.repaint();
 	}
 
 
 	class interButtonPanel extends JPanel {
 		
-		public interButtonPanel()
+/*		public interButtonPanel()
 		{
 
 			
-		}
+		}*/
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponents(g);
 			
-			if (!(AddingMap == null)){
-				double wScale;
-
-				if (AddingMap.getHeight() >= AddingMap.getWidth()) {
-					wScale = (double) AddingMap.getHeight() / (double) windowSizeY;
+			if(pointArray.size()!=0)
+			{
+				for(Point currPoint: pointArray)
+				{
+					destDropDown.addItem(currPoint.getName());
 				}
-
-				else {
-					wScale = (double) AddingMap.getHeight() / (double) windowSizeY;
-				}
-				int imagelocationx = (windowSizeX/2)-((int)(AddingMap.getWidth()/wScale)/2);
-				int imagelocationy = (windowSizeY/2)-((int)(AddingMap.getHeight()/wScale)/2);
-				g.drawImage(AddingMap, imagelocationx, imagelocationy, (int)(AddingMap.getWidth()/wScale), (int)(AddingMap.getHeight()/wScale), null);
 			}
+			
 		}
 	}
 	
@@ -364,62 +346,35 @@ public class InterMapEdgeGUI extends JFrame {
 			// -------------------------------
 			// if(img == null)
 			// img = ImageIO.read(new
-			// File("/User/ibanatoski/git/CampusMapping/src/VectorMaps/"));
+			// File("/User/ibanatoski/git/campusMapping/src/VectorMaps/"));
+			
 			if (!(img == null)) {
 
 				// Scale the image to the appropriate screen size
-				double wScale;
+				System.out.println("painting Image");
 
-				if (img.getHeight() >= img.getWidth()) {
-					wScale = (double) img.getHeight() / (double) windowSizeY;
-					windowScale = img.getHeight() / windowSizeY;
-				} 
-
-				else {
-					wScale = (double) img.getHeight() / (double) windowSizeY;
-					windowScale = img.getWidth() / windowSizeX;
+				windowScale = ((double)img.getWidth() / (double)mapFrame.getWidth());
+				System.out.println("Image Original Width " + img.getWidth());
+				int WidthSize = (int)((double) img.getHeight() / windowScale);
+				if (WidthSize > (double)getHeight()){
+					windowScale =  ((double)img.getHeight() / (double)mapFrame.getHeight());
 				}
-				if (wScale > windowScale)
-					windowScale += 1;
-
-				//sets the correct dimensions for logo
-				if(img.getHeight() < windowSizeY && img.getWidth() < windowSizeX){
-					g.drawImage(img,  0,  0,  windowSizeX, img.getHeight(), null);
-				}
-				//sets the correct dimensions for maps
-				else{
-					// draw image/map
-					g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
-				}
-			} else {
-				//System.out.println("Reaching here---------------------------------");
+				System.out.println((int)((double)img.getWidth() / windowScale)+", "+(int)((double)img.getHeight() / windowScale));
+				g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
 			}
-
-
-
-
-
-
-			
+				
 
 			// draws all the points onto the map.
 			// cleans the array of deleted points.
 			if (pointArray.size() > 0) {
 				for (Point currentPoint: pointArray) {
-
-
 					int drawX = (int) currentPoint.getLocX();
 					int drawY = (int) currentPoint.getLocY();
 					// draws the points onto the map.
 					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
-
 					//draw lines between points
 				}
-				for (int j = 0; j < edgeArray.size(); j++) {
-					g.drawLine(edgeArray.get(j).getPoint1().getLocX(), edgeArray.get(j).getPoint1().getLocY(),
-							edgeArray.get(j).getPoint2().getLocX(), edgeArray.get(j).getPoint2().getLocY());
 
-				}
 
 			}
 

@@ -28,7 +28,8 @@ public class GUI{
 
 	private ArrayList<Map> maps = new ArrayList<Map>();
 	private ArrayList<Point> route;
-	private String[] textDir;
+	private ArrayList<ArrayList<String>> textDir;
+	private int mapPos;
 	private int textPos;
 	private Point start;
 	private Point end;
@@ -42,6 +43,8 @@ public class GUI{
 	private int windowSizeX = 932;
 	private int windowSizeY = 778;
 	private ArrayList<Directions> finalDir = null;
+	private ArrayList<ArrayList<Directions>> multiMapFinalDir = null;
+	private ArrayList<Map> dirMaps = null;
 	private int buildStartIndex;
 	private int buildDestIndex;
 	private Color previousColor = new Color(255, 75, 75);
@@ -325,17 +328,35 @@ public class GUI{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						
+						multiMapFinalDir = gentextdir.genMultiMapDirections(finalDir);
+						for(int r = 0; r < multiMapFinalDir.size(); r++){
+							for(int s = 0; s < maps.size(); s++){
+								if(multiMapFinalDir.get(r).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
+									dirMaps.add(maps.get(s));
+								}
+							}
+							
+						}
 						try {
-							textDir = gentextdir.genDirStrings(finalDir);
+							textDir = gentextdir.genDirStrings(multiMapFinalDir);
 						} catch (MalformedDirectionException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 						String fullText = " Full List of Directions:\n";
-						directionsText.setText(textDir[0]);
-						for (int i=0; i < textDir.length; i++){
-							fullText += " " + (i + 1) + ". " + textDir[i] + "\n\n";
+						directionsText.setText(textDir.get(0).get(0));
+						int tempPos = 0;
+						for(int i = 0; i < textDir.size(); i++){
+							tempPos++;
+							for(int j = 0; j < textDir.get(i).size(); j++){
+								tempPos++;
+								fullText += " " + (tempPos + 1) + ". " + textDir.get(i).get(j) + "\n\n";
+							}
 						}
+						
+						
+						
 						txtpnFullTextDir.setText(fullText);						
 					}
 
@@ -465,12 +486,28 @@ public class GUI{
 		GradientButton btnPrevious = new GradientButton("Previous", previousColor);
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(textPos == 0 || textDir == null){
-
+				if((textPos == 0 && mapPos == 0) || textDir == null){
+					
 				}
-				else{
+				else if (textPos == 0){
+					mapPos--;
+					textPos = multiMapFinalDir.get(mapPos).size() - 1;
+					directionsText.setText(textDir.get(mapPos).get(textPos));
+					
+					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
+					destinationFile = new File(destinationFile.getAbsolutePath());
+					try {
+						//System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
+						//System.out.println("Map name " + currentMap.getMapName());
+						img = ImageIO.read(destinationFile);
+					} catch (IOException g) {
+						System.out.println("Invalid Map Selection");
+						g.printStackTrace();
+					}
+					frame.repaint();
+				} else {
 					textPos--;
-					directionsText.setText(textDir[textPos]);
+					directionsText.setText(textDir.get(mapPos).get(textPos));
 				}
 				frame.repaint();
 			}
@@ -491,18 +528,40 @@ public class GUI{
 				if (textDir == null){
 
 				}
-				else
+				else {
 					// Checks if incrementing textPos will set the array out of bounds
 					// If it will, the user is at the end, display a message accordingly
-					if(textPos < textDir.length - 1){
+					
+					
+					if(textPos < multiMapFinalDir.get(mapPos).size() - 1){
 						textPos++;
-						directionsText.setText(textDir[textPos]);
+						directionsText.setText(textDir.get(mapPos).get(textPos));
 					}
-					else {
-						textPos = textDir.length; // For route coloring 
+					else if (textPos == multiMapFinalDir.get(mapPos).size() - 1 && mapPos < multiMapFinalDir.size() - 1) {
+						textPos = 0; // For route coloring 
+						mapPos = mapPos + 1;
+						
+						directionsText.setText("Enter " + dirMaps.get(mapPos).getMapName());
+						//change map
+						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
+
+
+						destinationFile = new File(destinationFile.getAbsolutePath());
+						try {
+							//System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
+							//System.out.println("Map name " + currentMap.getMapName());
+							img = ImageIO.read(destinationFile);
+						} catch (IOException g) {
+							System.out.println("Invalid Map Selection");
+							g.printStackTrace();
+						}
+						frame.repaint();
+					} else { 
+						textPos = multiMapFinalDir.get(mapPos).size() - 1;
+						mapPos = multiMapFinalDir.size();
 						directionsText.setText("You have arrived at your destination");
 					}
-
+				}
 				frame.repaint();
 			}
 		});
@@ -619,40 +678,35 @@ public class GUI{
 					g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
 					g2.setStroke(new BasicStroke(3));
 					for (int i = 0; i < textPos; i++){
-						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
+						g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
 					}
 					// Draw a thicker line for the current step in the directions, use currentColor
 					if (textPos != finalDir.size()){
 						g2.setStroke(new BasicStroke(6));
 						g.setColor(currentColor);
-						g2.drawLine(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY(), finalDir.get(textPos).getDestination().getLocX(), finalDir.get(textPos).getDestination().getLocY());
+						g2.drawLine(multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocY());
 						g2.setStroke(new BasicStroke(3));
 						// Prints a rectangle indicating where the user currently is, needs refinement
-						g.setColor(Color.MAGENTA);
-						g.fillRect(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY() - 20, 65, 15);
-						g.setColor(Color.BLACK);
-						g.drawRect(finalDir.get(textPos).getOrigin().getLocX(), finalDir.get(textPos).getOrigin().getLocY() - 20, 65, 15);
-						g.drawString("You are Here", finalDir.get(textPos).getOrigin().getLocX() + 2, finalDir.get(textPos).getOrigin().getLocY() - 10);
 					}
 
 					// Draw lines for all points until the end, use nextColor (same color as "Next" button)
 					g.setColor(nextColor);
-					for (int i = textPos + 1; i < finalDir.size(); i++){
-						g2.drawLine(finalDir.get(i).getOrigin().getLocX(), finalDir.get(i).getOrigin().getLocY(), finalDir.get(i).getDestination().getLocX(), finalDir.get(i).getDestination().getLocY());
+					for (int i = textPos + 1; i < multiMapFinalDir.get(mapPos).size(); i++){
+						g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
 					}
 
 					// Draws ovals with black borders at each of the points along the path, needs to use an offset
-					for (int i = 0; i < finalDir.size(); i++){
+					for (int i = 0; i < multiMapFinalDir.get(mapPos).size(); i++){
 						g.setColor(Color.ORANGE);
-						g.fillOval(finalDir.get(i).getOrigin().getLocX() - 6, finalDir.get(i).getOrigin().getLocY() -6, 12, 12);
+						g.fillOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);
 						g.setColor(Color.BLACK);
-						g.drawOval(finalDir.get(i).getOrigin().getLocX() - 6, finalDir.get(i).getOrigin().getLocY() -6, 12, 12);						
+						g.drawOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);						
 					}
 					// Draws final oval in path
 					g.setColor(Color.ORANGE);
-					g.fillOval(finalDir.get(finalDir.size()-1).getDestination().getLocX() - 6, finalDir.get(finalDir.size()-1).getDestination().getLocY() -6, 12, 12);
+					g.fillOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);
 					g.setColor(Color.BLACK);
-					g.drawOval(finalDir.get(finalDir.size()-1).getDestination().getLocX() - 6, finalDir.get(finalDir.size()-1).getDestination().getLocY() -6, 12, 12);	
+					g.drawOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);	
 				}
 			}
 		}

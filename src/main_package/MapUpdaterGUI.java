@@ -58,7 +58,7 @@ public class MapUpdaterGUI{
 	private Edge currentEdge;
 
 	// ---------------------------------
-	private int windowScale = 2;
+	private double windowScale = 2;
 	private int windowSizeX = 932;
 	private int windowSizeY = 778;
 
@@ -856,32 +856,17 @@ public class MapUpdaterGUI{
 			if (!(img == null)) {
 
 				// Scale the image to the appropriate screen size
-				double wScale;
 
-				if (img.getHeight() >= img.getWidth()) {
-					wScale = (double) img.getHeight() / (double) windowSizeY;
-					windowScale = img.getHeight() / windowSizeY;
-				} 
 
-				else {
-					wScale = (double) img.getHeight() / (double) windowSizeY;
-					windowScale = img.getWidth() / windowSizeX;
+				windowScale = ((double)img.getWidth() / (double)frame.getContentPane().getWidth());
+				System.out.println("Image Original Width " + img.getWidth());
+				int WidthSize = (int)((double) img.getHeight() / windowScale);
+				if (WidthSize > (double)drawPanel.getHeight()){
+					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
 				}
-				if (wScale > windowScale)
-					windowScale += 1;
-
-				//sets the correct dimensions for logo
-				if(img.getHeight() < windowSizeY && img.getWidth() < windowSizeX){
-					g.drawImage(img,  0,  0,  windowSizeX, img.getHeight(), null);
-				}
-				//sets the correct dimensions for maps
-				else{
-					// draw image/map
-					g.drawImage(img, 0, 0, img.getWidth() / windowScale, img.getHeight() / windowScale, null);
-				}
-			} else {
-				//System.out.println("Reaching here---------------------------------");
+				g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
 			}
+			
 
 
 			//selecting points on the map

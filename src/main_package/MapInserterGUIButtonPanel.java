@@ -35,6 +35,7 @@ import javax.swing.JComboBox;
 
 
 public class MapInserterGUIButtonPanel extends JFrame {
+	public final static boolean DEBUG = false;
 
 	private InserterButtonPanel ButtonPanel = new InserterButtonPanel();
 	private JComboBox mapDropDown;
@@ -90,7 +91,9 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
 				String name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
-				System.out.println("Selected item:"+name);
+				if(DEBUG){
+					System.out.println("Selected item:"+name);
+				}
 
 				File destinationFile = new File("src/VectorMaps/" + name);
 				destinationFile = new File(destinationFile.getAbsolutePath());
@@ -129,7 +132,9 @@ public class MapInserterGUIButtonPanel extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				MapInserterGUI.DisposeFrame();
 				dispose();
-				System.out.println("telling to send");
+				if(DEBUG){
+					System.out.println("telling to send");
+				}
 				MapInserterGUI.GiveMapUpdaterInfo();
 			}
 		});
@@ -165,7 +170,9 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		secondMap.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
 				String name = secondMap.getSelectedItem().toString();//When you select an item, grab the name of the map selected
-				System.out.println("Selected item:"+name);
+				if(DEBUG){
+					System.out.println("Selected item:"+name);
+				}
 
 				File destinationFile = new File("src/VectorMaps/" + name);
 				destinationFile = new File(destinationFile.getAbsolutePath());
@@ -191,7 +198,9 @@ public class MapInserterGUIButtonPanel extends JFrame {
 					}
 				}
 				panel.repaint();
-				System.out.println("painting");
+				if(DEBUG){
+					System.out.println("painting");
+				}
 			}
 		});
 		

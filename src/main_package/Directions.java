@@ -8,6 +8,8 @@ public class Directions {
 	private Point origin;
 	private Point destination;
 	
+	public final static boolean DEBUG = false;
+	
 	public Directions(String turn, double distance, boolean isStraight, double time, Point origin, Point destination){
 		this.turn = turn;
 		this.distance = distance;

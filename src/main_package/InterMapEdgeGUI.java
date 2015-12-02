@@ -48,6 +48,8 @@ import java.awt.Insets;
 
 
 public class InterMapEdgeGUI extends JFrame {
+	
+	public final static boolean DEBUG = false;
 
 	private interButtonPanel buttonPanel = new interButtonPanel();;
 	private MapPanel mapFrame= new MapPanel();
@@ -164,7 +166,9 @@ public class InterMapEdgeGUI extends JFrame {
 		mapFrame.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				System.out.println("Clicked");
+				if(DEBUG){
+					System.out.println("Clicked");
+				}
 				lastMousex = e.getX();
 				lastMousey = e.getY();
 				selectPoint();
@@ -190,14 +194,19 @@ public class InterMapEdgeGUI extends JFrame {
 			 */
 			// includes extension
 			if(!(imageFile.getName().equals(".DS_Store"))){
-				System.out.println("Dropdown:" );
+				if(DEBUG){
+					System.out.println("Dropdown:" );
+				}
 				String temp = imageFile.getName().substring(0, imageFile.getName().length() -4);
-				System.out.println(temp);
-
+				if(DEBUG){
+					System.out.println(temp);
+				}
 				//checks to make sure the names populating the drop down are in both the vector maps package and 
 				//the database
 				for(Map currMap: maps){
-					System.out.println("printing from database: " + currMap.getMapName());
+					if(DEBUG){
+						System.out.println("printing from database: " + currMap.getMapName());
+					}
 					if(currMap.getMapName().compareTo(temp) == 0){
 						mapDropDown.addItem(temp);
 						
@@ -212,7 +221,9 @@ public class InterMapEdgeGUI extends JFrame {
 				mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 					public void actionPerformed(ActionEvent a) {
 						name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
-						System.out.println("Selected item:"+name);
+						if(DEBUG){
+							System.out.println("Selected item:"+name);
+						}
 
 						destinationFile = new File("src/VectorMaps/" + name);
 						destinationFile = new File(destinationFile.getAbsolutePath());
@@ -222,25 +233,35 @@ public class InterMapEdgeGUI extends JFrame {
 							pointArray.clear();
 							edgeArray.clear();
 							ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
-							System.out.println("MapList size is "+mapList.size());//Print out the size of the maps from the database
+							if(DEBUG){
+								System.out.println("MapList size is "+mapList.size());//Print out the size of the maps from the database
+							}
 							for(int i = 0; i < mapList.size(); i++){//Iterate through the mapList until we find the item we are looking for
-								System.out.println("Trying to find name:"+name);
+								if(DEBUG){
+									System.out.println("Trying to find name:"+name);
+								}
 								if(name.equals(mapList.get(i).getMapName()+".jpg"))//Once we find the map:
 								{
 									currentMap = mapList.get(i);//Grab the current map at this position.
 									pointArray = currentMap.getPointList();//Populate the point array with all the points found.
-									System.out.println("Map list size:"+mapList.size());
+									if(DEBUG){
+										System.out.println("Map list size:"+mapList.size());
+									}
 
 									for(int j = 0; j < pointArray.size(); j++){
 										ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
 										for(int k = 0; k < tmpEdges.size(); k++){
-											System.out.println(tmpEdges.get(k).getId());
+											if(DEBUG){
+												System.out.println(tmpEdges.get(k).getId());
+											}
 											edgeArray.add(tmpEdges.get(k));
 										}
 									}
 
 
-									System.out.println("Found map with number of points: "+currentMap.getPointList().size());
+									if(DEBUG){
+										System.out.println("Found map with number of points: "+currentMap.getPointList().size());
+									}
 									i = mapList.size();
 								}
 							}
@@ -262,7 +283,9 @@ public class InterMapEdgeGUI extends JFrame {
 							//System.out.println("logoFinal: " + logoFinal);
 							try{
 								img = ImageIO.read(logoFinal);
-								System.out.println("loadLogo");
+								if(DEBUG){
+									System.out.println("loadLogo");
+								}
 							}
 							catch(IOException g){
 								System.out.println("Invalid logo");
@@ -452,7 +475,9 @@ public class InterMapEdgeGUI extends JFrame {
 				&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
 				&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
 						&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
-				System.out.println("in Point");
+				if(DEBUG){
+					System.out.println("in Point");
+				}
 				return true;
 			}else{
 				return false;

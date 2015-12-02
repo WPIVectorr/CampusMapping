@@ -20,6 +20,7 @@ public class GenTextDir {
 			dist = dist * 10;
 			dist = Math.floor(dist);
 			dist = dist / 10;
+			dist = dist * 200 / 177;
 			Directions retDirFirst = new Directions("straight", dist, true, dist, arrPoints[arrPoints.length - 1], arrPoints[arrPoints.length - 2]);
 			retDir.add(retDirFirst);
 			
@@ -139,6 +140,7 @@ public class GenTextDir {
 					dist = dist * 10;
 					dist = Math.floor(dist);
 					dist = dist / 10;
+					dist = dist * 200 / 177;
 					currDir = new Directions("straight", dist, true, dist, currPoint, nextPoint);
 					
 				
@@ -160,6 +162,7 @@ public class GenTextDir {
 					dist = dist * 10;
 					dist = Math.floor(dist);
 					dist = dist / 10;
+					dist = dist * 200 / 177;
 					currDir = new Directions(turnAmount, dist, false, dist, currPoint, nextPoint);
 				} else {//otherwise, do the same, but we are turning right
 					if(nextPointY < 0){
@@ -178,6 +181,7 @@ public class GenTextDir {
 					dist = dist * 10;
 					dist = Math.floor(dist);
 					dist = dist / 10;
+					dist = dist * 200 / 177;
 					currDir = new Directions(turnAmount, dist, false, dist, currPoint, nextPoint);
 					
 				}

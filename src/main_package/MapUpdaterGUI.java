@@ -858,8 +858,7 @@ public class MapUpdaterGUI{
 				// Scale the image to the appropriate screen size
 
 
-				windowScale = ((double)img.getWidth() / (double)frame.getContentPane().getWidth());
-				System.out.println("Image Original Width " + img.getWidth());
+				windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
 				int WidthSize = (int)((double) img.getHeight() / windowScale);
 				if (WidthSize > (double)drawPanel.getHeight()){
 					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();

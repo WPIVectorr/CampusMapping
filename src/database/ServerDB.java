@@ -59,11 +59,10 @@ public class ServerDB {
 
 	public static void main (String args[])
 	{
-		clearDatabase();
+		//clearDatabase();
 		//tryCreateDB();
 		conn = connect();
 		//testDB();
-		
 		System.out.println("Done testing");
 	}
 
@@ -458,7 +457,7 @@ public class ServerDB {
 
 	//---------------------------------------------------------Modifying Functions-------------------------------------------------------=---
 
-	public static void updatePoint (Point point) throws SQLException, DoesNotExistException
+	private static void updatePoint (Point point) throws SQLException, DoesNotExistException
 	{
 		String ptId = point.getId();
 		//---------------------------------------------------Update point in database-------------------------------------------------
@@ -712,6 +711,7 @@ public class ServerDB {
 			statement.executeUpdate("DROP DATABASE "+DATABASE_NAME);
 			//conn.createStatement().executeUpdate("FLUSH HOSTS");
 			tryCreateDB();
+			System.out.println("Done Clearing DataBase");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

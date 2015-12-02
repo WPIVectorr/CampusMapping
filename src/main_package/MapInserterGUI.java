@@ -54,6 +54,10 @@ public class MapInserterGUI extends JFrame{
 	private BufferedImage CampusMap = null;
 	private BufferedImage AddingMap = null;
 	private int windowScale = 0;
+	private static Point point1 = null;
+	private static double Rotation = 0;
+	private static double point3x;
+	private static double point3y;
 	
 	Toolkit tk = Toolkit.getDefaultToolkit();
 	Dimension screenSize = tk.getScreenSize();
@@ -63,10 +67,6 @@ public class MapInserterGUI extends JFrame{
 	private int windowSizeY = 0;
 	private boolean alignedProperly = false;
 	private static JFrame frame = new JFrame("Add to Campus Map");
-	private static Point point1 = null;
-	private static double Rotation = 0;
-	private static int point3x;
-	private static int point3y;
 
 	public MapInserterGUI() {
 		//super("Add to Campus Map");
@@ -99,13 +99,13 @@ public class MapInserterGUI extends JFrame{
 			   e.printStackTrace();
 			}
 		// TODO Auto-generated constructor stub
-		frame.setSize(932, 778);
+		//frame.setSize(932, 778);
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
 		int screenHeight = screenSize.height;
 		int screenWidth = screenSize.width;
-		frame.setSize(screenWidth / 2, screenHeight / 2);
-		frame.setLocation(screenWidth / 4, screenHeight / 4);
+		frame.setSize((int) (screenWidth / 1.5), (int) (screenHeight / 1.5));
+		frame.setLocation(screenWidth / 24, screenHeight / 24);
 		frame.setVisible(true);
 		pointFrame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -113,7 +113,7 @@ public class MapInserterGUI extends JFrame{
 		//getContentPane().setLayout(null);
 		windowSizeX = frame.getContentPane().getWidth();
 		windowSizeY = frame.getContentPane().getHeight();
-		System.out.println(frame.getSize());
+		//System.out.println(frame.getSize());
 		buttonPanel = new MapInserterGUIButtonPanel(frame.getLocation(),frame.getSize());
 		buttonPanel.setVisible(true);
 
@@ -123,6 +123,7 @@ public class MapInserterGUI extends JFrame{
 		MapInserterGUI insertMap = new MapInserterGUI();
 		//insertMap.setVisible(true);
 	}
+
 
 	/**
 	 * @return the alignmentPoints
@@ -153,7 +154,13 @@ public class MapInserterGUI extends JFrame{
 	}
 	
 	public static void GiveMapUpdaterInfo() {
-		MapUpdaterGUI.setInfo(point1.getLocX(), point1.getLocX(), point3x, point3y, Rotation);
+		System.out.println("Told to send info");
+		System.out.println("Point 1x: " + point1.getLocX());
+		System.out.println("Point 1y: " + point1.getLocY());
+		System.out.println("Point 3x: " + point3x);
+		System.out.println("Point 3y: " + point3y);
+		System.out.println("Rotation: " + Rotation);
+		MapUpdaterGUI.setInfo((double) point1.getLocX(), (double) point1.getLocY(), point3x, point3y, Rotation);
 		System.out.println("Sending info");
 		clearAlignmentPoints();
 		resetCornerNum();
@@ -283,7 +290,7 @@ public class MapInserterGUI extends JFrame{
 			}
 
 			AddingMap = MapInserterGUIButtonPanel.getAddingMap();
-			if (!(AddingMap == null) && (!(alignmentPoints == null)) && alignmentPoints.size()>1) {
+			if (!(AddingMap == null) && (!(alignmentPoints == null)) && (alignmentPoints.size() > 1)) {
 				if (imageSet){
 					point1 = alignmentPoints.get(0);
 					Point point2 = alignmentPoints.get(1);
@@ -296,8 +303,8 @@ public class MapInserterGUI extends JFrame{
 					//System.out.println("Image Scale Height " + HeightScale);
 					//System.out.println("Image Scale Width " + WidthScale);
 					Rotation = -Math.atan2(point1.getLocY()-point2.getLocY(), point1.getLocX()-point2.getLocX())-Math.toRadians(90);
-					double point3y = point2.getLocY() + (-(double)(Math.cos(Math.toRadians(90)-Rotation))*(double)ImageWidth);
-					double point3x = point2.getLocX() + ((double)(Math.sin(Math.toRadians(90)-Rotation)*(double)ImageWidth));
+					point3y = point2.getLocY() + (-(double)(Math.cos(Math.toRadians(90)-Rotation))*(double)ImageWidth);
+					point3x = point2.getLocX() + ((double)(Math.sin(Math.toRadians(90)-Rotation)*(double)ImageWidth));
 					
 					double HeightScale = Math.abs((double)ImageHeight/(double)AddingMap.getHeight());
 					double WidthScale = Math.abs((double)ImageWidth/(double)AddingMap.getWidth());

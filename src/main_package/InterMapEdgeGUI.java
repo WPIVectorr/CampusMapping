@@ -55,6 +55,7 @@ public class InterMapEdgeGUI extends JFrame {
 	private static int pointSize = 7;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
 	private ArrayList<Map> maps = new ArrayList<Map>();
+	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private Point srcPoint;
 	private JButton btnConfirmSelection;
 
@@ -171,13 +172,14 @@ public class InterMapEdgeGUI extends JFrame {
 		gbc_btnConfirmSelection.gridy = 1;
 		buttonPanel.add(btnConfirmSelection, gbc_btnConfirmSelection);
 		btnConfirmSelection.setEnabled(false);
-
+		
 		buttonPanel.repaint();
 		mapFrame.repaint();
 
 		mapFrame.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				btnConfirmSelection.setText("Confirm Selection");
 				System.out.println("Clicked");
 				lastMousex = e.getX();
 				lastMousey = e.getY();
@@ -224,19 +226,24 @@ public class InterMapEdgeGUI extends JFrame {
 		}	
 		btnConfirmSelection.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent a){
-				if(connectPoint != null ) 
-				{
-					try {
-						ServerDB.insertEdge(new Edge(srcPoint, connectPoint));
-					} catch (InsertFailureException | AlreadyExistsException | SQLException | DoesNotExistException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+				if(connectPoint != null) {
+					if (!((edgeArray.contains(new Edge(srcPoint, connectPoint)) || (!(edgeArray.contains(new Edge(connectPoint, srcPoint))))))){
+						try {
+							ServerDB.insertEdge(new Edge(srcPoint, connectPoint));
+						} catch (InsertFailureException | AlreadyExistsException | SQLException | DoesNotExistException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	
+						System.out.println("edge Created ");
+						frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+					} else{
+						btnConfirmSelection.setText("Edge Already Exists");
 					}
-
-					System.out.println("edge Created ");
-					frame.dispose();
-					frame.validate();
+				} else {
+					btnConfirmSelection.setText("Pease Select Point");
 				}
+				
 			}
 		});
 
@@ -278,7 +285,17 @@ public class InterMapEdgeGUI extends JFrame {
 
 							i = maps.size();
 						}
+						
 					}
+					System.out.println("getting edges");
+					if(pointArray != null){
+						for(int k=0; k < pointArray.size(); k++){
+							for(int j=0; j < pointArray.get(k).getNumEdges(); j++){
+								edgeArray.add(pointArray.get(k).getEdges().get(j));
+							}
+						}
+					}
+					System.out.println("got edges");
 					System.out.println("current Map: " +connectMap.getMapName());
 
 					/*				File destinationFile = new File("src/VectorMaps/" + name);
@@ -384,8 +401,8 @@ public class InterMapEdgeGUI extends JFrame {
 		{
 		}*/
 		@Override
-		public void paintComponent(Graphics g) {
-			super.paintComponents(g);
+		public void paintComponent(Graphics l) {
+			super.paintComponents(l);
 			if(maps == null || maps.size() == 0)
 			{
 				if(mapDropDown != null && destDropDown != null)
@@ -466,7 +483,7 @@ public class InterMapEdgeGUI extends JFrame {
 					int drawX = (int) loopPoint.getLocX();
 					int drawY = (int) loopPoint.getLocY();
 					// draws the points onto the map.
-					System.out.println("printoval");
+					//System.out.println("printoval");
 					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 
 					if(connectPoint != null)

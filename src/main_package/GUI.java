@@ -18,7 +18,7 @@ import database.AlreadyExistsException;
 import database.ServerDB;
 
 public class GUI{
-
+	boolean DEBUG = false;
 	ServerDB md = ServerDB.getInstance();
 
 	private BufferedImage img = null;
@@ -197,7 +197,8 @@ public class GUI{
 					for (int i = 0; i < maps.get(buildStartIndex-1).getPointList().size(); i++){
 						if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equals("Hallway")){
 							startBuilds.addItem(maps.get(buildStartIndex-1).getPointList().get(i));
-							System.out.println("startBuildsSize: " + maps.get(buildStartIndex-1).getPointList().size());
+							if(DEBUG)
+								System.out.println("startBuildsSize: " + maps.get(buildStartIndex-1).getPointList().size());
 						}
 						//System.out.println("buildings[i] " + buildings[i]);
 
@@ -809,7 +810,8 @@ public class GUI{
 					g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
 				}
 				// Draw a thicker line for the current step in the directions, use currentColor
-				System.out.println("mapPos: " + mapPos);
+				if(DEBUG)
+					System.out.println("mapPos: " + mapPos);
 				if (textPos != 0 || (mapPos == multiMapFinalDir.size()-1 && multiMapFinalDir.get(mapPos).size()-1 == textPos)){
 					g2.setStroke(new BasicStroke(6));
 					g.setColor(currentColor);

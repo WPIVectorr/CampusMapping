@@ -16,7 +16,7 @@ import main_package.Point;
 
 public class ServerDB {
 	//------------------------------------------------------------Constants--------------------------------------------------------------------
-	private static String DATABASE_URL = "jdbc:mysql://campusmapping.c5bohpl1biax.us-west-2.rds.amazonaws.com:3306/";	
+	private static String DATABASE_URL = "jdbc:mysql://dev-instance.c5bohpl1biax.us-west-2.rds.amazonaws.com:3306/";	
 	private static String DATABASE_NAME = "campusMapping_db";
 	private static String userName = "Vectorr";
 	private static String password = "mag";
@@ -91,6 +91,11 @@ public class ServerDB {
 
 	public static Connection connect()
 	{
+		try {
+			conn.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 		Connection connection = null;
 		try {
 			connection = DriverManager.getConnection(DATABASE_URL + DATABASE_NAME, userName, password);

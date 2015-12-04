@@ -738,7 +738,7 @@ public class ServerDB {
 			try {
 				tempMap.setPointList(getPointsFromServer(tempMap));
 			} catch (PopulateErrorException e) {
-				System.out.println("Failed to get points for map:"+allMaps.get(counter).getMapId());
+				System.out.println("Failed to get points for map:"+allMaps.get(counter).getMapId() + ", Map Name: " + allMaps.get(counter).getMapName());
 				e.printStackTrace();
 			}
 			allMaps.set(counter, tempMap);

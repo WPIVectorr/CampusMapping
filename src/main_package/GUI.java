@@ -73,7 +73,6 @@ public class GUI{
 				allPoints.add(maps.get(i).getPointList().get(j));
 			}
 		}
-
 		//System.out.println("------------------edges check-------------------");
 
 
@@ -127,7 +126,7 @@ public class GUI{
 			mapsDropdown.addItem(maps.get(i).getMapName());
 			DestMaps.addItem(maps.get(i).getMapName());
 		}
-
+		
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
 		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 5);
@@ -439,9 +438,23 @@ public class GUI{
 						if(!(multiMapFinalDir.get(0).isEmpty() && multiMapFinalDir.size() == 1)){
 
 							for(int r = 0; r < multiMapFinalDir.size(); r++){
-								for(int s = 0; s < maps.size(); s++){
-									if(multiMapFinalDir.get(r).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
-										dirMaps.add(maps.get(s));
+								if(multiMapFinalDir.get(r).size() != 0){
+									for(int s = 0; s < maps.size(); s++){
+										if(multiMapFinalDir.get(r).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
+											dirMaps.add(maps.get(s));
+										}
+									}
+								} else if (r != 0 && multiMapFinalDir.get(r - 1).size() != 0){
+									for(int s = 0; s < maps.size(); s++){
+										if(multiMapFinalDir.get(r-1).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
+											dirMaps.add(maps.get(s));
+										}
+									}
+								} else if(r == 0){
+									for(int s = 0; s < maps.size(); s++){
+										if(multiMapFinalDir.get(r+1).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
+											dirMaps.add(maps.get(s));
+										}
 									}
 								}
 
@@ -474,10 +487,16 @@ public class GUI{
 							g.printStackTrace();
 						}
 						frame.repaint();
-						
+						for(int r = 0; r < multiMapFinalDir.size(); r++){
+							if(multiMapFinalDir.get(r).size() == 0){
+								mapPos++;
+							} else {
+								r = multiMapFinalDir.size();
+							}
+						}
 						
 						String fullText = " Full List of Directions:\n";
-						directionsText.setText(textDir.get(0).get(0));
+						directionsText.setText(textDir.get(mapPos).get(0));
 						
 						int tempPos = 0;
 						for(int i = 0; i < textDir.size(); i++){
@@ -624,9 +643,13 @@ public class GUI{
 				}
 				else if (textPos == 0){
 					mapPos--;
-					textPos = multiMapFinalDir.get(mapPos).size();
-					directionsText.setText(textDir.get(mapPos).get(textPos - 1));
+					if(multiMapFinalDir.get(mapPos).size() == 0){
+						mapPos++;
+					} else {
 
+						textPos = multiMapFinalDir.get(mapPos).size();
+						directionsText.setText(textDir.get(mapPos).get(textPos - 1));
+					}
 					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
 					destinationFile = new File(destinationFile.getAbsolutePath());
 					try {

@@ -112,9 +112,13 @@ public class InterMapEdgeGUI extends JFrame {
 		Dimension screenSize = tk.getScreenSize();
 		int screenHeight = screenSize.height;
 		int screenWidth = screenSize.width;
-		setSize(932, 778);
+		int framex = 932;
+		int framey = 778;
+		setSize(framex, framey);
 		frame.setResizable(false);
-		setLocation(screenWidth / 4, screenHeight / 4);
+		int locationx = screenWidth / 2;
+		int locationy = screenHeight / 2;
+		setLocation(locationx-(framex/2), locationy-(framey/2));
 		setVisible(true);
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -235,7 +239,6 @@ public class InterMapEdgeGUI extends JFrame {
 				} else {
 					btnConfirmSelection.setText("Pease Select Point");
 				}
-				
 			}
 		});
 
@@ -343,9 +346,6 @@ public class InterMapEdgeGUI extends JFrame {
 
 	class interButtonPanel extends JPanel {
 
-		/*		public interButtonPanel()
-		{
-		}*/
 		@Override
 		public void paintComponent(Graphics l) {
 			super.paintComponents(l);
@@ -362,10 +362,6 @@ public class InterMapEdgeGUI extends JFrame {
 			}
 			if(pointArray != null && pointArray.size()!=0)
 			{
-				/*for(Point currPoint: pointArray)
-				{
-					destDropDown.addItem(currPoint.getName());
-				}*/
 				if(destDropDown != null)
 					destDropDown.setEnabled(true);
 			}else if(pointArray.size() == 0)
@@ -386,7 +382,6 @@ public class InterMapEdgeGUI extends JFrame {
 
 		@Override
 		public void paintComponent(Graphics g) {
-
 			super.paintComponent(g);
 
 			// -------------------------------
@@ -424,8 +419,8 @@ public class InterMapEdgeGUI extends JFrame {
 					if(connectPoint != null)
 					{
 						g.setColor(Color.ORANGE);
-						g.fillOval(connectPoint.getLocX()-(pointSize+2 / 2),connectPoint.getLocY()-(pointSize+2 / 2), pointSize+2, pointSize+2);
-						g.setColor(Color.BLACK);						
+						g.fillOval(connectPoint.getLocX()-((pointSize / 2) + 2),connectPoint.getLocY()-((pointSize / 2) + 2), pointSize+2, pointSize+2);
+						g.setColor(Color.BLACK);
 					}
 				}
 			}

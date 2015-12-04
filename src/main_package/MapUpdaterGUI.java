@@ -1015,7 +1015,7 @@ public class MapUpdaterGUI{
 					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
 					double tempPreRotateX = lastMousex;
 					double tempPreRotateY = lastMousey;
-
+					
 					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
 					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
 					tempPreRotateX = (tempPreRotateX/img.getWidth()) * currentMap.getWidth();

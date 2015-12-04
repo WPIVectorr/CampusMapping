@@ -105,7 +105,7 @@ public class MapInserterGUI extends JFrame{
 		int screenHeight = screenSize.height;
 		int screenWidth = screenSize.width;
 		frame.setSize((int) (screenWidth / 1.5), (int) (screenHeight / 1.5));
-		frame.setLocation(screenWidth / 24, screenHeight / 24);
+		frame.setLocation(screenWidth / 2, screenHeight / 2);
 		frame.setVisible(true);
 		pointFrame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

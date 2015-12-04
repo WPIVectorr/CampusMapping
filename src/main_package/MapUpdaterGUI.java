@@ -109,14 +109,17 @@ public class MapUpdaterGUI{
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		frame.setVisible(true);
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MapUpdaterGUI.class.getResource("/VectorLogo/Logo Icon.png")));
-		frame.setSize(932, 778);
+		double framex = 932;
+		double framey = 778;
+		frame.setSize((int)framex, (int)framey);
 		frame.setResizable(false);
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
 		int screenHeight = screenSize.height;
 		int screenWidth = screenSize.width;
-		//frame.setSize(screenWidth / 2, screenHeight / 2);
-		frame.setLocation(screenWidth / 4, screenHeight / 4);
+		double xlocation = (screenWidth / 2)-(framex/2);
+		double ylocation = (screenHeight / 2)-(framey/2);
+		frame.setLocation((int)xlocation, (int)ylocation);
 
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -19,6 +19,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -45,8 +46,7 @@ public class InterMapEdgeGUI extends JFrame {
 	private interButtonPanel buttonPanel = new interButtonPanel();;
 	private MapPanel mapFrame= new MapPanel();
 	private JComboBox<String> mapDropDown;
-	private JComboBox<String> destDropDown;
-	private static BufferedImage campusMap = null;
+	private JTextField destDropDown;
 	private static BufferedImage img = null;
 	private int windowSizeX = 0;
 	private int windowSizeY = 0;
@@ -54,7 +54,7 @@ public class InterMapEdgeGUI extends JFrame {
 	private static int lastMousex,lastMousey;
 	private static int pointSize = 7;
 	private ArrayList<Point> pointArray = new ArrayList<Point>();
-	private ArrayList<Map> maps = new ArrayList<Map>();
+	private static ArrayList<Map> maps = new ArrayList<Map>();
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private Point srcPoint;
 	private JButton btnConfirmSelection;
@@ -80,8 +80,7 @@ public class InterMapEdgeGUI extends JFrame {
 
 		imagewidth = drawwidth;
 		imageheight = drawheight;
-		if(mapList != null)
-			maps = mapList;
+		maps = mapList;
 
 		if(passedPoint != null)
 		{
@@ -145,7 +144,7 @@ public class InterMapEdgeGUI extends JFrame {
 		gbc_mapDropDown.gridx = 2;
 		gbc_mapDropDown.gridy = 0;
 		buttonPanel.add(mapDropDown, gbc_mapDropDown);
-		if(maps ==null || maps.size()==0)
+		if(maps == null || maps.size()==0)
 			mapDropDown.setEnabled(false);
 
 		JLabel lblSelectDestPoint = new JLabel("Select Destination Point");
@@ -156,13 +155,14 @@ public class InterMapEdgeGUI extends JFrame {
 		gbc_lblSelectDestPoint.gridy = 0;
 		buttonPanel.add(lblSelectDestPoint, gbc_lblSelectDestPoint);
 
-		destDropDown = new JComboBox<String>();
+		destDropDown = new JTextField();
 		GridBagConstraints gbc_destDropDown = new GridBagConstraints();
 		gbc_destDropDown.insets = new Insets(0, 0, 5, 5);
 		gbc_destDropDown.fill = GridBagConstraints.HORIZONTAL;
 		gbc_destDropDown.gridx = 5;
 		gbc_destDropDown.gridy = 0;
 		buttonPanel.add(destDropDown, gbc_destDropDown);
+		destDropDown.setEditable(false);
 
 
 		btnConfirmSelection = new JButton("Confirm Selection");
@@ -180,7 +180,7 @@ public class InterMapEdgeGUI extends JFrame {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				btnConfirmSelection.setText("Confirm Selection");
-				System.out.println("Clicked");
+				//System.out.println("Clicked");
 				lastMousex = e.getX();
 				lastMousey = e.getY();
 				selectPoint();
@@ -193,7 +193,6 @@ public class InterMapEdgeGUI extends JFrame {
 		windowSizeX = buttonPanel.getWidth();
 		windowSizeY = buttonPanel.getHeight();
 
-
 		mapDropDown.addItem("Select Map");
 		File vectorMapDir = new File("src/VectorMaps");
 		vectorMapDir = new File(vectorMapDir.getAbsolutePath());
@@ -205,21 +204,15 @@ public class InterMapEdgeGUI extends JFrame {
 			 * mapDropDown.addItem(tempMapName.substring(0, nameLength - 4));
 			 */
 			// includes extension
-			if(!(imageFile.getName().equals(".DS_Store"))){
-				System.out.println("Dropdown:" );
+			if(!(imageFile.getName().equals(".DS_Store")) || imageFile.getName().equals(srcMap.getMapName())){
+				//System.out.println("Dropdown:" );
 				String temp = imageFile.getName().substring(0, imageFile.getName().length() -4);
-				System.out.println(temp);
+				//System.out.println(temp);
 
-				//checks to make sure the names populating the drop down are in both the vector maps package and 
-				//the database
-				if(maps != null)
-				{
-					for(Map currMap: maps){
-						System.out.println("printing from database: " + currMap.getMapName());
-						if(currMap.getMapName().compareTo(temp) == 0){
-							mapDropDown.addItem(temp);
+				for(int count = 0; count < maps.size(); count++){
+					if(maps.get(count).getMapName().compareTo(temp) == 0){
+						mapDropDown.addItem(temp);
 
-						}
 					}
 				}
 			}
@@ -234,8 +227,7 @@ public class InterMapEdgeGUI extends JFrame {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-	
-						System.out.println("edge Created ");
+						//System.out.println("edge Created ");
 						frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 					} else{
 						btnConfirmSelection.setText("Edge Already Exists");
@@ -252,42 +244,29 @@ public class InterMapEdgeGUI extends JFrame {
 				pointArray.clear();
 				connectPoint = null;
 				name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
-				System.out.println("Selected item:"+name);
+				//System.out.println("Selected item:"+name);
 
 				destinationFile = new File("src/VectorMaps/" + name+".jpg");
 				destinationFile = new File(destinationFile.getAbsolutePath());
-
-
-				if(maps == null)
-				{
-					ArrayList<Map> maps = md.getMapsFromLocal(); //Grab all the maps from the database
-					System.out.println("Got "+maps.size() + " from Database");//Print out the size of the maps from the database
-				}else{
-					System.out.println("Got "+maps.size() + " maps from Updater");
-				}
-				pointArray.clear();
-				destDropDown.removeAllItems();
+				
+				//System.out.println("Got "+maps.size() + " maps from Updater");
+				destDropDown.setText("Select Point");
 				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
 
 					
-					for(int i = 0; i < maps.size(); i++){//Iterate through the maps until we find the item we are looking for
+					for(Map currMap:maps){//Iterate through the maps until we find the item we are looking for
 						//System.out.println("Trying to find name:"+name);
-						if(name.equals(maps.get(i).getMapName()))//Once we find the map:
+						if(name.equals(currMap.getMapName()))//Once we find the map:
 						{
-							connectMap = maps.get(i);//Grab the current map at this position.
-							pointArray = connectMap.getPointList();//Populate the point array with all the points found.
-							for(int count = 0; count < pointArray.size(); count ++){
-								destDropDown.addItem(pointArray.get(count).getName());
+							connectMap = currMap;//Grab the current map at this position.
+							for(Point pointBreak:connectMap.getPointList())
+							{
+								pointArray.add(pointBreak);//Populate the point array with all the points found.
 							}
-							System.out.println("Map list size:"+maps.size());
-
-							System.out.println("Found map with number of points: "+connectMap.getPointList().size());
-
-							i = maps.size();
 						}
 						
 					}
-					System.out.println("getting edges");
+					//System.out.println("getting edges");
 					if(pointArray != null){
 						for(int k=0; k < pointArray.size(); k++){
 							for(int j=0; j < pointArray.get(k).getNumEdges(); j++){
@@ -295,8 +274,8 @@ public class InterMapEdgeGUI extends JFrame {
 							}
 						}
 					}
-					System.out.println("got edges");
-					System.out.println("current Map: " +connectMap.getMapName());
+					//System.out.println("got edges");
+					//System.out.println("current Map: " +connectMap.getMapName());
 
 					/*				File destinationFile = new File("src/VectorMaps/" + name);
 															destinationFile = new File(destinationFile.getAbsolutePath());
@@ -304,7 +283,7 @@ public class InterMapEdgeGUI extends JFrame {
 					try {
 						img = ImageIO.read(destinationFile);
 					} catch (IOException g) {
-						System.out.println("Invalid Map Selection");
+						//System.out.println("Invalid Map Selection");
 						g.printStackTrace();
 					}
 				} else {
@@ -313,13 +292,12 @@ public class InterMapEdgeGUI extends JFrame {
 					//System.out.println("logoFinal: " + logoFinal);
 					try{
 						img = ImageIO.read(logoFinal);
-						System.out.println("loadLogo");
+						//System.out.println("loadLogo");
 					}
 					catch(IOException g){
-						System.out.println("Invalid logo");
+						//System.out.println("Invalid logo");
 						g.printStackTrace();
 					}
-					pointArray.clear();
 
 				}
 				mapFrame.repaint();
@@ -333,14 +311,13 @@ public class InterMapEdgeGUI extends JFrame {
 		//System.out.println("logoFinal: " + logoFinal);
 		try{
 			img = ImageIO.read(logoFinal);
-			System.out.println("loadLogo");
+			//System.out.println("loadLogo");
 			mapFrame.repaint();
 		}
 		catch(IOException g){
-			System.out.println("Invalid logo");
+			//System.out.println("Invalid logo");
 			g.printStackTrace();
 		}
-		mapFrame.repaint();
 		buttonPanel.repaint();
 	}
 
@@ -358,42 +335,11 @@ public class InterMapEdgeGUI extends JFrame {
 		{
 			mapFrame.repaint();
 			btnConfirmSelection.setEnabled(true);
-			System.out.println("srcPoint id: "+srcPoint.getId());
-			System.out.println("Connection Point id: "+connectPoint.getId());
+			//System.out.println("srcPoint id: "+srcPoint.getId());
+			//System.out.println("Connection Point id: "+connectPoint.getId());
 		}
-
+		destDropDown.setText(connectPoint.getName());
 	}
-
-	public static BufferedImage getcampusMap() {
-		return campusMap;
-	}
-
-
-	public void setcampusMap(BufferedImage campusMap) {
-		campusMap = campusMap;
-	}
-
-	public String getSelectedMap()
-	{
-		String selectedMap = mapDropDown.getSelectedItem().toString();	
-
-		return selectedMap;
-	}
-
-	public static BufferedImage getimg() {
-		return img;
-	}
-
-
-	public static void setimg(BufferedImage mapToAdd) {
-		img = mapToAdd;
-	}
-	private static void doRepaint()
-	{
-		//buttonPanel.repaint();
-		//mapFrame.repaint();
-	}
-
 
 	class interButtonPanel extends JPanel {
 
@@ -438,17 +384,6 @@ public class InterMapEdgeGUI extends JFrame {
 
 	class MapPanel extends JPanel {
 
-		ArrayList<Point> paintArray = new ArrayList<Point>(); // arraylist of
-		// points
-		// already
-		// painted
-		// Point editPoint;
-		// Driver values used for testing:
-
-		int edgeWeight = 1;
-
-
-
 		@Override
 		public void paintComponent(Graphics g) {
 
@@ -463,14 +398,14 @@ public class InterMapEdgeGUI extends JFrame {
 
 				// Scale the image to the appropriate screen size
 				//System.out.println("painting Image");
-				System.out.println("Map Frame Width: "+ mapFrame.getWidth());
-				System.out.println("Map Frame Height: "+ mapFrame.getHeight());
+				//System.out.println("Map Frame Width: "+ mapFrame.getWidth());
+				//System.out.println("Map Frame Height: "+ mapFrame.getHeight());
 				windowScale = ((double)img.getWidth() / (double)imagewidth);
 				int WidthSize = (int)((double) img.getHeight() / windowScale);
 				if (WidthSize > (double)imageheight){
 					windowScale =  ((double)img.getHeight() / (double)imageheight);
 				}
-				System.out.println("SCALE!: "+ windowScale);
+				//System.out.println("SCALE!: "+ windowScale);
 				//System.out.println((int)((double)img.getWidth() / windowScale)+", "+(int)((double)img.getHeight() / windowScale));
 				g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
 			}
@@ -493,8 +428,6 @@ public class InterMapEdgeGUI extends JFrame {
 						g.setColor(Color.BLACK);						
 					}
 				}
-
-				//mapFrame.repaint();
 			}
 
 		}
@@ -509,7 +442,7 @@ public class InterMapEdgeGUI extends JFrame {
 				&& lastMousex < selectPoint.getLocX() + (pointSize + 5))
 				&& (lastMousey > selectPoint.getLocY() - (pointSize + 5)
 						&& lastMousey < selectPoint.getLocY() + (pointSize + 5))) {
-			System.out.println("in Point");
+			//System.out.println("in Point");
 			return true;
 		}else{
 			return false;

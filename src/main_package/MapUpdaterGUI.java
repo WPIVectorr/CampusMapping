@@ -73,7 +73,7 @@ public class MapUpdaterGUI{
 	private static JRadioButton rdbtnRemovePoints;
 
 	//---------------------------------
-	private final static boolean DEBUG = true;
+	private final static boolean DEBUG = false;
 
 	String point1;
 	String point2;
@@ -144,6 +144,7 @@ public class MapUpdaterGUI{
 		frame.getContentPane().add(drawPanel);
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		
 	}
 
 
@@ -209,7 +210,8 @@ public class MapUpdaterGUI{
 					System.out.println("Calling run");
 				MapUpdaterGUI mapUpdater = new MapUpdaterGUI();
 				try {
-					System.out.println("Calling create and show GUI");
+					if(DEBUG)
+						System.out.println("Calling create and show GUI");
 					mapUpdater.createAndShowGUI();
 				} catch (IOException | AlreadyExistsException | SQLException e) {
 					// TODO Auto-generated catch block
@@ -315,8 +317,6 @@ public class MapUpdaterGUI{
 		mapsPanel.add(txtImageDirectoryPath, gbc_txtImageDirectoryPath);
 		txtImageDirectoryPath.setColumns(10);
 
-
-
 		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
 				mapsLoadingLabel.setVisible(true);
@@ -415,7 +415,8 @@ public class MapUpdaterGUI{
 						img = ImageIO.read(logoFinal);
 					}
 					catch(IOException g){
-						System.out.println("Invalid logo");
+						if(DEBUG)
+							System.out.println("Invalid logo");
 						g.printStackTrace();
 					}
 					pointArray.clear();
@@ -567,7 +568,8 @@ public class MapUpdaterGUI{
 						copyFileUsingStream(srcFile, destFile);
 						img = ImageIO.read(destFile);
 					} catch (IOException a) {
-						System.out.println("invalid copy");
+						if(DEBUG)
+							System.out.println("invalid copy");
 						a.printStackTrace();
 					}
 					if(maps == null || maps.size() == 0){
@@ -1038,7 +1040,8 @@ public class MapUpdaterGUI{
 
 					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
 					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
-					System.out.println("newest map id: "+currentMap.getNewPointID());
+					if(DEBUG)
+						System.out.println("newest map id: "+currentMap.getNewPointID());
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
 							roomNumber.getText(), currentMap.getPointIDIndex(),
 							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);

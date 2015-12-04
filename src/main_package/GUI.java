@@ -75,10 +75,6 @@ public class GUI{
 		}
 		//System.out.println("------------------edges check-------------------");
 
-
-
-		//maps.get(0).getPointList().get(0).print();
-
 		mainMenu = new JPanel();
 		mainMenu.setBackground(new Color(255, 235, 205));
 
@@ -479,8 +475,6 @@ public class GUI{
 						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
 						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
-							//System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
-							//System.out.println("Map name " + currentMap.getMapName());
 							img = ImageIO.read(destinationFile);
 						} catch (IOException g) {
 							System.out.println("Invalid Map Selection");
@@ -653,8 +647,6 @@ public class GUI{
 					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
 					destinationFile = new File(destinationFile.getAbsolutePath());
 					try {
-						//System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
-						//System.out.println("Map name " + currentMap.getMapName());
 						img = ImageIO.read(destinationFile);
 					} catch (IOException g) {
 						System.out.println("Invalid Map Selection");
@@ -706,8 +698,6 @@ public class GUI{
 
 						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
-							//System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
-							//System.out.println("Map name " + currentMap.getMapName());
 							img = ImageIO.read(destinationFile);
 						} catch (IOException g) {
 							System.out.println("Invalid Map Selection");

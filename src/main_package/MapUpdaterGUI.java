@@ -1,7 +1,11 @@
 package main_package;
 
 import java.awt.*;
+import java.awt.Polygon;
+import java.awt.Shape;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -55,7 +59,6 @@ public class MapUpdaterGUI{
 
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private ArrayList<Edge> newEdges = new ArrayList<Edge>();
-	private ArrayList<Edge> drawnEdges = new ArrayList<Edge>();
 	private Edge currentEdge;
 
 	// ---------------------------------
@@ -117,13 +120,12 @@ public class MapUpdaterGUI{
 		int screenHeight = screenSize.height;
 		int screenWidth = screenSize.width;
 		//frame.setSize(screenWidth / 2, screenHeight / 2);
-		frame.setLocation(screenWidth / 4, screenHeight / 4);
+		frame.setLocation(screenWidth / 6, screenHeight / 20);
 
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		maps = md.getMapsFromLocal();
-
+		
 		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
 
@@ -132,13 +134,19 @@ public class MapUpdaterGUI{
 		frame.getContentPane().add(buttonPanel, BorderLayout.NORTH);
 
 		loadingIcon = new ImageIcon("src/VectorLogo/faster reverse.gif");
-
+		
+		
+		
+		maps = md.getMapsFromLocal();
 		tabs.addTab("Maps", createMapsPanel());
 		tabs.addTab("Points", createPointsPanel());
 
 		buttonPanel.add(tabs, BorderLayout.NORTH);
 
+		
+
 		frame.getContentPane().add(drawPanel);
+
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
@@ -729,8 +737,9 @@ public class MapUpdaterGUI{
 					}
 					roomNumber.setText("Select a Point to Edit");
 					editingPoint = false;
+					editPoint = null;
+					frame.repaint();	//necessary for redrawing the map without the highlighted point
 				} else {
-
 				}
 			}
 		});
@@ -970,6 +979,13 @@ public class MapUpdaterGUI{
 			super.paintComponent(g);
 			
 			Graphics2D g2D = (Graphics2D) g;
+			
+			
+			AffineTransform OriginalTransform = g2D.getTransform();
+			
+			//g2D.translate(tx, ty);
+			
+			
 
 			// -------------------------------
 			// if(img == null)
@@ -1003,6 +1019,61 @@ public class MapUpdaterGUI{
 					repaint();
 				}
 			});
+			
+			
+			
+		addMouseWheelListener(new MouseWheelListener(){
+			public void mouseWheelMoved(MouseWheelEvent e) {
+			       String message;
+			       int notches = e.getWheelRotation();
+			       
+			       if (notches < 0) {
+			           message = "Mouse wheel moved UP " + -notches + " notch(es)";
+			       }
+			       else {
+			           message = "Mouse wheel moved DOWN " + notches + " notch(es)";
+			       }
+			       if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+			           message += "    Scroll type: WHEEL_UNIT_SCROLL\n";
+			           message += "    Scroll amount: " + e.getScrollAmount() + " unit increments per notch\n";
+			           message += "    Units to scroll: " + e.getUnitsToScroll() + " unit increments\n";
+			       } else { //scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+			           
+			       }
+			       System.out.println(message);
+			}
+			
+			       
+		});
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 
 			// add point to the point array (has to take place outside of below
 			// loop)
@@ -1048,7 +1119,40 @@ public class MapUpdaterGUI{
 				}
 			}
 
-			// draws all the points onto the map.
+			
+			
+			// -----------------------------------------------------------------------------------------------
+			//------------------------draws all the points and edges onto the map-----------------------------
+			
+			//draws all edges in the edge array
+			for (int j = 0; j < edgeArray.size(); j++) {
+				g2D.setStroke(new BasicStroke(4));
+				g2D.drawLine(edgeArray.get(j).getPoint1().getLocX(), edgeArray.get(j).getPoint1().getLocY(),
+						edgeArray.get(j).getPoint2().getLocX(), edgeArray.get(j).getPoint2().getLocY());
+				g2D.setStroke(new BasicStroke(2));
+				g.setColor(Color.ORANGE);
+				//g.setColor(Color.getHSBColor(0f, 0f, 0.38f)); //gray color rgb R:96, G:96, B:96
+				g2D.drawLine(edgeArray.get(j).getPoint1().getLocX(), edgeArray.get(j).getPoint1().getLocY(),
+						edgeArray.get(j).getPoint2().getLocX(), edgeArray.get(j).getPoint2().getLocY());					
+				g.setColor(Color.BLACK);
+			}
+			
+			
+			for( int w = 0; w < pointArray.size(); w++){
+				int drawX = (int) pointArray.get(w).getLocX();
+				int drawY = (int) pointArray.get(w).getLocY();
+				// draws the points onto the map.
+				g.setColor(Color.BLACK);
+				g.drawOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
+				g.setColor(Color.getHSBColor(0.12f, 0.74f, 0.7f));
+				g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
+				g.setColor(Color.BLACK);
+			}
+			
+			
+			// -----------------------------------------------------------------------------------------------
+			
+			
 			// cleans the array of deleted points.
 			if (pointArray.size() > 0) {
 				for (int i = 0; i < pointArray.size(); i++) {
@@ -1089,9 +1193,7 @@ public class MapUpdaterGUI{
 									roomNumber.setText(editPoint.getName());
 									btnSavePoint.setText("Unselect Current Point");
 									editingPoint = true;
-									newClick = false;/*
-								g.setColor(Color.ORANGE);
-								g.fillOval(currentPoint.getLocX() - 4, currentPoint.getLocY() - 4, 8, 8);*/
+									newClick = false;
 								} else if (newClick == true && editingPoint == true) {
 									if(editPoint.getId().contentEquals(currentPoint.getId())){
 
@@ -1327,56 +1429,29 @@ public class MapUpdaterGUI{
 						markForDelete.remove(j);
 					}
 
-					
-
-					
-
-					if(editPoint != null)
-					{
-						//g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5.0f));
-						g.setColor(Color.RED);
-						//g2D.setColor(Color.RED);
-						g.fillOval(editPoint.getLocX()- ((pointSize / 2) + 2), editPoint.getLocY()- ((pointSize / 2)+2), pointSize + 4, pointSize + 4);
-						g.setColor(Color.BLACK);
-						g.drawOval(editPoint.getLocX()- ((pointSize / 2) + 2), editPoint.getLocY()- ((pointSize / 2)+2), pointSize + 4, pointSize + 4);
-
-					}
-					//draw lines between points
-				}
+				}//end of remove point case switch
 				
 				
 
 			}//end of traversing pointArray
-			
-			
-			//draws all edges in the edge array
-			for (int j = 0; j < edgeArray.size(); j++) {
-				
-				g.setColor(Color.ORANGE);
-				
-				//if(!(drawnEdges.contains(edgeArray.get(j)))){
-					g.drawLine(edgeArray.get(j).getPoint1().getLocX(), edgeArray.get(j).getPoint1().getLocY(),
-						edgeArray.get(j).getPoint2().getLocX(), edgeArray.get(j).getPoint2().getLocY());
-					drawnEdges.add(edgeArray.get(j));
-					g.setColor(Color.BLACK);
-				//}
-			}
-			
-			for( int w = 0; w < pointArray.size(); w++){
-				int drawX = (int) pointArray.get(w).getLocX();
-				int drawY = (int) pointArray.get(w).getLocY();
-				// draws the points onto the map.
+			//editPoint != null &&
+			if( editingPoint == true)
+			{
+				g.setColor(Color.RED);
+				g.fillOval(editPoint.getLocX()- ((pointSize / 2) + 2), editPoint.getLocY()- ((pointSize / 2)+2), pointSize + 4, pointSize + 4);
 				g.setColor(Color.BLACK);
-				g.drawOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
-				//g2D.drawPolygon();
-				g.setColor(Color.getHSBColor(0.12f, 0.74f, 0.7f));
-				g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
-				g.setColor(Color.BLACK);
+				g.drawOval(editPoint.getLocX()- ((pointSize / 2) + 2), editPoint.getLocY()- ((pointSize / 2)+2), pointSize + 4, pointSize + 4);
+				//g.setColor(Color.CYAN);
+				//Shape star = createStar(5, editPoint.getLocX(), editPoint.getLocY(), pointSize, pointSize+5);
+				//g2D.fill(star);
+				//g.setColor(Color.BLACK);
+				//g2D.draw(star);
 			}
+			//draw lines between points
 			
-			drawnEdges.clear();
 			newClick = false;
-		}
+
+		}//end of paint component
 
 	}
 
@@ -1429,6 +1504,22 @@ public class MapUpdaterGUI{
 		return null;
 	}
 
+	public static Shape createStar(int arms, int centerx, int centery, double rOuter, double rInner)
+	{
+	    double angle = Math.PI / arms;
 
+	    GeneralPath path = new GeneralPath();
+
+	    for (int i = 0; i < 2 * arms; i++)
+	    {
+	        double r = (i & 1) == 0 ? rOuter : rInner;
+	        Point2D.Double p = new Point2D.Double(centerx + Math.cos(i * angle) * r, centery + Math.sin(i * angle) * r);
+	        if (i == 0) path.moveTo(p.getX(), p.getY());
+	        else path.lineTo(p.getX(), p.getY());
+	    }
+	    path.closePath();
+	    return path;
+	}
 
 }
+

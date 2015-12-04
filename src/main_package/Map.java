@@ -250,4 +250,8 @@ public class Map {
 		return retVal;
 	}
 	
+	public void setPointIDIndex(int newIndex)
+	{
+		this.pointIDIndex = newIndex;
+	}
 }

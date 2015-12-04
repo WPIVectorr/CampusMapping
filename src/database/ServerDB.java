@@ -16,7 +16,7 @@ import main_package.Point;
 
 public class ServerDB {
 	//------------------------------------------------------------Constants--------------------------------------------------------------------
-	private static String DATABASE_URL = "jdbc:mysql://dev-instance.c5bohpl1biax.us-west-2.rds.amazonaws.com:3306/";	
+	private static String DATABASE_URL = "jdbc:mysql://campusmapping.c5bohpl1biax.us-west-2.rds.amazonaws.com:3306/";	
 	private static String DATABASE_NAME = "campusMapping_db";
 	private static String userName = "Vectorr";
 	private static String password = "mag";
@@ -59,7 +59,7 @@ public class ServerDB {
 
 	public static void main (String args[])
 	{
-		//clearDatabase();
+		updateAllPointIDIndexes();
 		//tryCreateDB();
 		conn = connect();
 		//testDB();
@@ -91,10 +91,14 @@ public class ServerDB {
 
 	public static Connection connect()
 	{
-		try {
-			conn.close();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		if (conn != null)
+		{
+			try {
+			
+				conn.close();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 		}
 		Connection connection = null;
 		try {
@@ -462,6 +466,56 @@ public class ServerDB {
 
 	//---------------------------------------------------------Modifying Functions-------------------------------------------------------=---
 
+	public static void updateMap (Map map) throws SQLException, DoesNotExistException
+	{
+		int mapId = map.getMapId();
+		//---------------------------------------------------Update Map in database-------------------------------------------------
+		conn = connect();
+		Statement statement = conn.createStatement();
+		statement.setQueryTimeout(5);  											// set timeout to 30 sec.
+		
+		String updateStatement = "UPDATE "+MAP_TABLE_NAME+" SET ";
+		updateStatement += ("id = "+map.getMapId());
+		updateStatement += ", ";
+		updateStatement += "name = '"+map.getMapName()+"'";
+		updateStatement += ", ";
+		updateStatement += "xTopLeft = "+map.getxTopLeft();
+		updateStatement += ", ";
+		updateStatement += "yTopLeft = "+map.getyTopLeft();
+		updateStatement += ", ";
+		updateStatement += "xBotRight = "+map.getxBotRight();
+		updateStatement += ", ";
+		updateStatement += "yBotRight = "+map.getyBotRight();
+		updateStatement += ", ";
+		updateStatement += "rotation = "+map.getRotationAngle();
+		updateStatement += ", ";
+		updateStatement += "pointIDIndex = "+map.getPointIDIndex();
+		updateStatement +=(" WHERE ID = '"+mapId+"'");
+		int updateResult = statement.executeUpdate(updateStatement);			
+		
+		conn.close();
+		if (updateResult == 0)
+		{
+			throw new DoesNotExistException("No Rows changed, could not find"); 
+		}
+		//-------------------------------------------------Update Map in Local objects------------------------------------------
+		int j = 0;
+		boolean foundObject= false;
+		for (j = 0; j<allMaps.size(); j++)
+		{
+			if (allMaps.get(j).getMapId() == mapId)
+			{
+				foundObject = true;
+				allMaps.set(j, map);
+			}
+		}
+		if (foundObject == false)
+		{
+			throw new DoesNotExistException("Could not find point object in local object storage");
+		}
+	
+	}
+	
 	public static void updatePoint (Point point) throws SQLException, DoesNotExistException
 	{
 		String ptId = point.getId();
@@ -839,7 +893,7 @@ public class ServerDB {
 
 					if (foundEdge == false)
 					{			
-						throw new PopulateErrorException("Couldn't find edgeId in allEdges");
+						throw new PopulateErrorException("Couldn't find edgeId:"+edgeId+" in allEdges");
 					}
 				}
 
@@ -1015,10 +1069,6 @@ public class ServerDB {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		finally
-		{
-			conn.close();
-		}
 	}
 
 	//-----------------------------------------------------------Helper Functions--------------------------------------------------------------
@@ -1173,6 +1223,41 @@ public class ServerDB {
 			else if (p2.getIndex() < p2.getIndex())
 				return -1;
 			return 0;
+		}
+	}
+	
+	public static void updateAllPointIDIndexes()
+	{
+		try {
+			populateFromDatabase();
+		} catch (PopulateErrorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int j = 0;
+		ArrayList<Point> currPoints = null;
+		Map currentMap = null;
+		for (j = 0; j < allMaps.size(); j++)
+		{
+			currentMap = allMaps.get(j);
+			try {
+				currPoints = getPointsFromServer(currentMap);
+			} catch (PopulateErrorException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			currentMap.setPointIDIndex(currPoints.size() + 200);
+			System.out.println("Updating map:"+currentMap.getMapName()+" set pointIDIndex to "+currentMap.getPointIDIndex());
+			try {
+				updateMap(currentMap);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} catch (DoesNotExistException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

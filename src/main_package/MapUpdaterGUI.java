@@ -55,6 +55,7 @@ public class MapUpdaterGUI{
 
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private ArrayList<Edge> newEdges = new ArrayList<Edge>();
+	private ArrayList<Edge> drawnEdges = new ArrayList<Edge>();
 	private Edge currentEdge;
 
 	// ---------------------------------
@@ -72,7 +73,7 @@ public class MapUpdaterGUI{
 	private static JRadioButton rdbtnRemovePoints;
 
 	//---------------------------------
-	private final static boolean DEBUG = false;
+	private final static boolean DEBUG = true;
 
 	String point1;
 	String point2;
@@ -967,6 +968,8 @@ public class MapUpdaterGUI{
 		public void paintComponent(Graphics g) {
 
 			super.paintComponent(g);
+			
+			Graphics2D g2D = (Graphics2D) g;
 
 			// -------------------------------
 			// if(img == null)
@@ -1076,10 +1079,10 @@ public class MapUpdaterGUI{
 
 						switch (getRadButton()) {
 						case 2:// edit points
-							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
-									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
-									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
-											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
+							if ((lastMousex > currentPoint.getLocX() - (pointSize + 1)
+									&& lastMousex < currentPoint.getLocX() + (pointSize + 1))
+									&& (lastMousey > currentPoint.getLocY() - (pointSize + 1)
+											&& lastMousey < currentPoint.getLocY() + (pointSize + 1))) {
 								if (newClick == true && editingPoint == false) {
 									editPoint = currentPoint;
 									editPointIndex = i;
@@ -1301,7 +1304,7 @@ public class MapUpdaterGUI{
 						default:
 							break;
 						}
-					}
+					}//end of case switch
 
 					for (int j = 0; j < markForDelete.size(); j++) {
 						// remove edges to list
@@ -1324,36 +1327,54 @@ public class MapUpdaterGUI{
 						markForDelete.remove(j);
 					}
 
-					int drawX = (int) currentPoint.getLocX();
-					int drawY = (int) currentPoint.getLocY();
-					// draws the points onto the map.
+					
 
+					
 
-					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 					if(editPoint != null)
 					{
+						//g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5.0f));
 						g.setColor(Color.RED);
-						g.fillOval(editPoint.getLocX()- (pointSize+5 / 2), editPoint.getLocY()- (pointSize+5 / 2), pointSize+5,pointSize+5);
+						//g2D.setColor(Color.RED);
+						g.fillOval(editPoint.getLocX()- ((pointSize / 2) + 2), editPoint.getLocY()- ((pointSize / 2)+2), pointSize + 4, pointSize + 4);
 						g.setColor(Color.BLACK);
+						g.drawOval(editPoint.getLocX()- ((pointSize / 2) + 2), editPoint.getLocY()- ((pointSize / 2)+2), pointSize + 4, pointSize + 4);
+
 					}
 					//draw lines between points
 				}
-				for (int j = 0; j < edgeArray.size(); j++) {
+				
+				
+
+			}//end of traversing pointArray
+			
+			
+			//draws all edges in the edge array
+			for (int j = 0; j < edgeArray.size(); j++) {
+				
+				g.setColor(Color.ORANGE);
+				
+				//if(!(drawnEdges.contains(edgeArray.get(j)))){
 					g.drawLine(edgeArray.get(j).getPoint1().getLocX(), edgeArray.get(j).getPoint1().getLocY(),
-							edgeArray.get(j).getPoint2().getLocX(), edgeArray.get(j).getPoint2().getLocY());
-
-				}
-
+						edgeArray.get(j).getPoint2().getLocX(), edgeArray.get(j).getPoint2().getLocY());
+					drawnEdges.add(edgeArray.get(j));
+					g.setColor(Color.BLACK);
+				//}
 			}
-
-			/*			for (int i = 0; i < markForDelete.size(); i++) {
-				// remove edges to list
-				edgeArray.clear();
-				markForDelete.get(i).deleteEdges();
-				pointArray.remove(markForDelete.get(i));
-				markForDelete.remove(i);
-			}*/
-
+			
+			for( int w = 0; w < pointArray.size(); w++){
+				int drawX = (int) pointArray.get(w).getLocX();
+				int drawY = (int) pointArray.get(w).getLocY();
+				// draws the points onto the map.
+				g.setColor(Color.BLACK);
+				g.drawOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
+				//g2D.drawPolygon();
+				g.setColor(Color.getHSBColor(0.12f, 0.74f, 0.7f));
+				g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
+				g.setColor(Color.BLACK);
+			}
+			
+			drawnEdges.clear();
 			newClick = false;
 		}
 

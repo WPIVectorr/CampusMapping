@@ -9,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
@@ -72,7 +73,7 @@ public class GUI{
 	JComboBox DestMaps = new JComboBox();
 	Map startMap;
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
-		printDirections();
+		
 		frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(800, 600));
@@ -86,7 +87,7 @@ public class GUI{
 			}
 		}
 		//System.out.println("------------------edges check-------------------");
-
+		
 
 
 		//maps.get(0).getPointList().get(0).print();
@@ -877,73 +878,5 @@ public class GUI{
 			}
 		}
 	}
-	public void printDirections()
-	{
-		
-		{
-		    String filename = ("item.text"); // THIS IS THE TEXT FILE TO PRINT
-		    try{
-		    PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-		    DocFlavor flavor = DocFlavor.INPUT_STREAM.TEXT_PLAIN_UTF_8; //  FILE IS .txt TYPE
-		    PrintService printService[] =
-		            PrintServiceLookup.lookupPrintServices(flavor, pras);
-		    PrintService defaultService =
-		            PrintServiceLookup.lookupDefaultPrintService();
-		    PrintService service = ServiceUI.printDialog(null, 200, 200,
-		            printService, defaultService, flavor, pras);
-		    if (service != null) {
-		        DocPrintJob job = service.createPrintJob();
-		        FileInputStream fis = new FileInputStream(filename);
-		        DocAttributeSet das = new HashDocAttributeSet();
-		        Doc doc = new SimpleDoc(fis, flavor, das);
-		        job.print(doc, pras);
 
-		    }
-		    }
-		    catch(Exception a){
-		        JOptionPane.showMessageDialog(null, "OPeration Failed");
-		    }
-		}
-
-
-		
-		
-		
-		
-/*		//PrinterJob pj = PrinterJob.getPrinterJob();
-		PrintService svc = PrintServiceLookup.lookupDefaultPrintService();
-		PrintRequestAttributeSet attrs = new HashPrintRequestAttributeSet();
-		FileInputStream fis = null;
-		
-		String testString = "test";
-		InputStream stream = new ByteArrayInputStream(testString.getBytes(StandardCharsets.UTF_16));
-
-		try {
-			fis = new FileInputStream("src/VectorMaps/Campus.jpg");
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
-
-		PrintService selection = ServiceUI.printDialog(
-				null, 100, 100, services, svc, null, attrs);
-		SimpleDoc simpleDoc = new SimpleDoc(testString,DocFlavor.STRING.TEXT_PLAIN,null);
-		DocPrintJob job = svc.createPrintJob();
-
-		try {
-			job.print(simpleDoc, attrs);
-		} catch (PrintException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} */
-		
-/*		if (pj.printDialog()) {
-	        try {pj.print();}
-	        catch (PrinterException exc) {
-	            System.out.println(exc);
-	         }
-	     }   */
-	}
 }

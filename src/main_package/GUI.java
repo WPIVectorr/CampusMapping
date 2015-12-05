@@ -5,13 +5,26 @@ import java.awt.event.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.print.*;
+import javax.print.attribute.DocAttributeSet;
+import javax.print.attribute.HashDocAttributeSet;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
@@ -69,12 +82,27 @@ public class GUI{
 	JComboBox<Point> startBuilds = new JComboBox();
 	JComboBox DestMaps = new JComboBox();
 	Map startMap;
+	
+	private static SplashPage loadingAnimation;
+	
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
-
-		frame.setSize(932, 778);
+		
+		//frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(800, 600));
+
+		//added by JPG scales the GUI to the screensize.
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		Dimension screenSize = tk.getScreenSize();
+		float screenHeight = screenSize.height*4/5;
+		float screenWidth = screenSize.width*4/5;
+		frame.setSize((int)screenWidth, (int)screenHeight);
+		double xlocation = (screenSize.width / 2)-(frame.getWidth()/2);
+		double ylocation = (screenSize.height / 2)-(frame.getHeight()/2);
+		frame.setLocation((int)xlocation, (int)ylocation);
+
 		frame.getContentPane().setBackground(backgroundColor);
+
 
 		maps = md.getMapsFromLocal();
 		allPoints = new ArrayList<Point>();
@@ -85,9 +113,6 @@ public class GUI{
 		}
 		//System.out.println("------------------edges check-------------------");
 
-
-
-		//maps.get(0).getPointList().get(0).print();
 
 		mainMenu = new JPanel();
 		mainMenu.setBackground(backgroundColor);
@@ -504,8 +529,6 @@ public class GUI{
 						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
 						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
-							//System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
-							//System.out.println("Map name " + currentMap.getMapName());
 							img = ImageIO.read(destinationFile);
 						} catch (IOException g) {
 							System.out.println("Invalid Map Selection");
@@ -690,8 +713,6 @@ public class GUI{
 					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
 					destinationFile = new File(destinationFile.getAbsolutePath());
 					try {
-						//System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
-						//System.out.println("Map name " + currentMap.getMapName());
 						img = ImageIO.read(destinationFile);
 					} catch (IOException g) {
 						System.out.println("Invalid Map Selection");
@@ -752,8 +773,6 @@ public class GUI{
 
 						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
-							//System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
-							//System.out.println("Map name " + currentMap.getMapName());
 							img = ImageIO.read(destinationFile);
 						} catch (IOException g) {
 							System.out.println("Invalid Map Selection");
@@ -777,6 +796,7 @@ public class GUI{
 
 		// Make frame visible after initializing everything
 		frame.setVisible(true);
+		loadingAnimation.hideSplash(0);
 	}
 
 	public JPanel createPrefMenu(){
@@ -898,6 +918,16 @@ public class GUI{
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 
+		//added by JPG starts and plays the animation
+		loadingAnimation = new SplashPage();
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
+		
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
@@ -1017,6 +1047,7 @@ public class GUI{
 						g2.draw(star);
 					}
 				}
+
 				// Draws final oval or star in path
 				if (textPos != multiMapFinalDir.get(mapPos).size()){
 					g.setColor(pointColor);
@@ -1034,4 +1065,5 @@ public class GUI{
 			}
 		}
 	}
+
 }

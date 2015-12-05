@@ -16,16 +16,11 @@ public class Map {
 	private int pointIDIndex = 0;
 	private double width;
 	private double height;
-	
-	/*
-	public Map (ArrayList<Point> pointList, int mapId, String mapName)
+
+	public Map ()
 	{
-		this.Points = pointList;
-		this.mapId = mapId;
-		this.mapName = mapName;
+		
 	}
-	*/
-	//TODO UPdate Constructors
 	public Map (int mapId, String mapName)
 	{
 		this.mapId = mapId;

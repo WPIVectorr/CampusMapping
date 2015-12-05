@@ -765,7 +765,7 @@ public class MapUpdaterGUI{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(editPoint != null && emptyMaps != null)
-					connectMapGUI = new InterMapEdgeGUI(emptyMaps, editPoint, drawPanel.getWidth(), drawPanel.getHeight());
+					connectMapGUI = new InterMapEdgeGUI(ServerDB.getMapsFromLocal(), editPoint, drawPanel.getWidth(), drawPanel.getHeight());
 
 			}
 		});

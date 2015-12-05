@@ -2,6 +2,8 @@ package main_package;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
@@ -50,7 +52,12 @@ public class GUI{
 	private JTextField directionsText;
 	private JPanel mainMenu;
 	private JPanel navMenu;
+	private JPanel prefMenu;
 	private JPanel menus;
+	CardLayout menuLayout;
+	private String returnMenu;
+	private GradientButton btnNext;
+	private GradientButton btnPrevious;
 	private DrawRoute drawPanel = new DrawRoute();
 	private double windowScale = 2;
 	private int windowSizeX = 932;
@@ -64,6 +71,9 @@ public class GUI{
 	private Color previousColor = new Color(255, 75, 75);
 	private Color currentColor = new Color(219, 209, 0);
 	private Color nextColor = new Color(51, 255, 51);
+	private Color pointColor = Color.ORANGE;
+	private Color backgroundColor = new Color(255, 235, 205);
+	private Color buttonColor = new Color(153, 204, 255);
 	private ArrayList<Point> pointArray;
 	private ArrayList<Edge> edgeArray;
 	private JFrame frame = new JFrame("Directions with Magnitude");
@@ -80,8 +90,7 @@ public class GUI{
 		//frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(800, 600));
-		frame.getContentPane().setBackground(new Color(255, 235, 205));
-	
+
 		//added by JPG scales the GUI to the screensize.
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
@@ -91,6 +100,8 @@ public class GUI{
 		double xlocation = (screenSize.width / 2)-(frame.getWidth()/2);
 		double ylocation = (screenSize.height / 2)-(frame.getHeight()/2);
 		frame.setLocation((int)xlocation, (int)ylocation);
+
+		frame.getContentPane().setBackground(backgroundColor);
 
 
 		maps = md.getMapsFromLocal();
@@ -104,10 +115,10 @@ public class GUI{
 
 
 		mainMenu = new JPanel();
-		mainMenu.setBackground(new Color(255, 235, 205));
+		mainMenu.setBackground(backgroundColor);
 
 		navMenu = new JPanel();
-		navMenu.setBackground(new Color(255, 235, 205));
+		navMenu.setBackground(backgroundColor);
 
 		GridBagLayout gbl_navMenu = new GridBagLayout();
 		gbl_navMenu.columnWidths = new int[]{0, 298, 298, 298, 0, 0};
@@ -116,11 +127,12 @@ public class GUI{
 		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
 
-
 		menus = new JPanel(new CardLayout());
+		menuLayout = (CardLayout) menus.getLayout();
 		menus.add(mainMenu, "Main Menu");
 		menus.add(navMenu, "Nav Menu");
-		CardLayout menuLayout = (CardLayout) menus.getLayout();
+		menus.add(createPrefMenu(), "Pref Menu");
+
 
 		frame.getContentPane().add(menus, BorderLayout.NORTH);
 
@@ -150,7 +162,7 @@ public class GUI{
 			mapsDropdown.addItem(maps.get(i).getMapName());
 			DestMaps.addItem(maps.get(i).getMapName());
 		}
-		
+
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
 		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 5);
@@ -169,7 +181,7 @@ public class GUI{
 		mainMenu.add(lblMaps, gbc_lblMaps);
 
 
-		
+
 
 		//creates a dropdown menu with map names
 		GridBagConstraints gbc_mapsDropdown = new GridBagConstraints();
@@ -232,22 +244,22 @@ public class GUI{
 						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
 							destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
 						}*/
-						//System.out.println("buildings[i] " + buildings[i]);
+					//System.out.println("buildings[i] " + buildings[i]);
 
-						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
-					}
+					// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
 				}
-				//startBuilds.removeAllItems();
-				//for (int i=0; i < buildings.length; i++){
-				//System.out.println("buildings[i] match: " + buildings[i]);
-				//startBuilds.addItem(buildings[i]);
-				//}
-				//destBuilds.removeAllItems();
-				//for (int i=0; i < buildings.length; i++){
-				///destBuilds.addItem(buildings[i]);
-				//}
 			}
-		);
+			//startBuilds.removeAllItems();
+			//for (int i=0; i < buildings.length; i++){
+			//System.out.println("buildings[i] match: " + buildings[i]);
+			//startBuilds.addItem(buildings[i]);
+			//}
+			//destBuilds.removeAllItems();
+			//for (int i=0; i < buildings.length; i++){
+			///destBuilds.addItem(buildings[i]);
+			//}
+		}
+				);
 		//adds the correct points for the building specified
 		DestMaps.addActionListener (new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
@@ -390,6 +402,21 @@ public class GUI{
 		destBuilds.setBounds(122, 80, 148, 20);
 		lblDestination.setLabelFor(destBuilds);
 
+		GradientButton btnSetPreferencesMain = new GradientButton("Set Preferences", buttonColor);
+		GridBagConstraints gbc_btnSetPreferencesMain = new GridBagConstraints();
+		gbc_btnSetPreferencesMain.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSetPreferencesMain.gridx = 2;
+		gbc_btnSetPreferencesMain.gridy = 3;
+		mainMenu.add(btnSetPreferencesMain, gbc_btnSetPreferencesMain);
+		btnSetPreferencesMain.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Note which menu to return to
+				returnMenu = "Main Menu";
+				// Show preferences menu
+				menuLayout.show(menus, "Pref Menu");
+			}
+		});
+
 		// Button that generates a route and switches to nav display
 		GradientButton directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
 		GridBagConstraints gbc_directionsButton = new GridBagConstraints();
@@ -400,8 +427,9 @@ public class GUI{
 		mainMenu.add(directionsButton, gbc_directionsButton);
 		directionsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// reset text position index
+				// reset text position and map position indexes
 				textPos = 0;
+				mapPos = 0;
 
 
 				//gets the start and end building and room numbers the user chose
@@ -456,8 +484,6 @@ public class GUI{
 						if(multiMapFinalDir != null){
 							multiMapFinalDir.clear();
 						}
-						mapPos = 0;
-						textPos = 0;
 						multiMapFinalDir = gentextdir.genMultiMapDirections(finalDir);
 						if(!(multiMapFinalDir.get(0).isEmpty() && multiMapFinalDir.size() == 1)){
 
@@ -499,7 +525,7 @@ public class GUI{
 								e.printStackTrace();
 							}
 						}
-						
+
 						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
 						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
@@ -516,10 +542,10 @@ public class GUI{
 								r = multiMapFinalDir.size();
 							}
 						}
-						
+
 						String fullText = " Full List of Directions:\n";
 						directionsText.setText(textDir.get(mapPos).get(0));
-						
+
 						int tempPos = 0;
 						for(int i = 0; i < textDir.size(); i++){
 							tempPos++;
@@ -572,10 +598,10 @@ public class GUI{
 		txtpnFullTextDir.setBorder(textBorder);
 
 		// Initalize this button first so it can be used in return button
-		GradientButton btnFullTextDirections = new GradientButton("Show Full Text Directions", new Color(153, 204, 255));
+		GradientButton btnFullTextDirections = new GradientButton("Show Full Text Directions", buttonColor);
 
 		// Button to return to main menu
-		GradientButton btnReturn = new GradientButton("Select New Route", new Color(153, 204, 255));
+		GradientButton btnReturn = new GradientButton("Select New Route", buttonColor);
 		btnReturn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Return to main menu, don't show route anymore
@@ -624,12 +650,23 @@ public class GUI{
 			}
 		});
 
-		JCheckBox chckbxColorBlindMode = new JCheckBox("Color Blind Mode");
-		GridBagConstraints gbc_chckbxColorBlindMode = new GridBagConstraints();
-		gbc_chckbxColorBlindMode.insets = new Insets(0, 0, 5, 5);
-		gbc_chckbxColorBlindMode.gridx = 3;
-		gbc_chckbxColorBlindMode.gridy = 1;
-		navMenu.add(chckbxColorBlindMode, gbc_chckbxColorBlindMode);
+		GradientButton btnSetPreferencesNav = new GradientButton("Set Preferences", buttonColor);
+		GridBagConstraints gbc_btnSetPreferencesNav = new GridBagConstraints();
+		gbc_btnSetPreferencesNav.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSetPreferencesNav.gridx = 3;
+		gbc_btnSetPreferencesNav.gridy = 1;
+		navMenu.add(btnSetPreferencesNav, gbc_btnSetPreferencesNav);
+		btnSetPreferencesNav.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Save which menu to return to
+				returnMenu = "Nav Menu";
+				// Change view to preferences menu, don't show route anymore
+				menuLayout.show(menus, "Pref Menu");
+				txtpnFullTextDir.setVisible(false);
+				btnFullTextDirections.setText("Show Full Text Directions");
+				frame.repaint();
+			}
+		});
 
 		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_3 = new GridBagConstraints();
@@ -657,11 +694,11 @@ public class GUI{
 
 		// Button to get previous step in directions
 		//sets the previous button color to green
-		GradientButton btnPrevious = new GradientButton("Previous", previousColor);
+		btnPrevious = new GradientButton("Previous", previousColor);
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if((textPos == 0 && mapPos == 0) || textDir == null){
-					
+
 				}
 				else if (textPos == 0){
 					mapPos--;
@@ -670,7 +707,8 @@ public class GUI{
 					} else {
 
 						textPos = multiMapFinalDir.get(mapPos).size();
-						directionsText.setText(textDir.get(mapPos).get(textPos - 1));
+						//directionsText.setText(textDir.get(mapPos).get(textPos));
+						directionsText.setText("Enter " + dirMaps.get(mapPos + 1).getMapName());
 					}
 					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
 					destinationFile = new File(destinationFile.getAbsolutePath());
@@ -698,7 +736,7 @@ public class GUI{
 
 		// Button to get next step in directions
 		//sets the next button color to red
-		GradientButton btnNext = new GradientButton("Next", nextColor);
+		btnNext = new GradientButton("Next", nextColor);
 		btnNext.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				if (textDir == null){
@@ -709,19 +747,28 @@ public class GUI{
 					// If it will, the user is at the end, display a message accordingly
 
 
-					if(textPos < multiMapFinalDir.get(mapPos).size()){
+					if(textPos < multiMapFinalDir.get(mapPos).size()){ 
 						textPos++;
-						directionsText.setText(textDir.get(mapPos).get(textPos-1));
-						
-					}
-					else if (textPos == multiMapFinalDir.get(mapPos).size() && mapPos < multiMapFinalDir.size() - 1) {
-						textPos = 0; // For route coloring 
-						if(mapPos < multiMapFinalDir.size() - 1){
-							mapPos = mapPos + 1;
+						if (textPos != multiMapFinalDir.get(mapPos).size()){
+							directionsText.setText(textDir.get(mapPos).get(textPos));
 						}
-						directionsText.setText("Enter " + dirMaps.get(mapPos).getMapName());
+						else if (mapPos != multiMapFinalDir.size() - 1){
+							directionsText.setText("Enter " + dirMaps.get(mapPos + 1).getMapName());
+						}
+						else {
+							textPos = multiMapFinalDir.get(mapPos).size();
+							//mapPos = multiMapFinalDir.size() - 1;
+							directionsText.setText("You have arrived at your destination");
+						}
+					}	
+
+					
+					else if (textPos == multiMapFinalDir.get(mapPos).size() && mapPos != multiMapFinalDir.size() - 1) {
+						textPos = 0; // For route coloring 
+						mapPos++;
 						//change map
 						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
+						directionsText.setText(textDir.get(mapPos).get(textPos));
 
 
 						destinationFile = new File(destinationFile.getAbsolutePath());
@@ -732,15 +779,10 @@ public class GUI{
 							g.printStackTrace();
 						}
 						frame.repaint();
-					} else { 
-						textPos = multiMapFinalDir.get(mapPos).size();
-						mapPos = multiMapFinalDir.size() - 1;
-						directionsText.setText("You have arrived at your destination");
-					}
 				}
 				frame.repaint();
 			}
-		});
+			}});
 		GridBagConstraints gbc_btnNext = new GridBagConstraints();
 		gbc_btnNext.insets = new Insets(0, 0, 0, 5);
 		gbc_btnNext.anchor = GridBagConstraints.NORTH;
@@ -748,27 +790,6 @@ public class GUI{
 		gbc_btnNext.gridx = 3;
 		gbc_btnNext.gridy = 3;
 		navMenu.add(btnNext, gbc_btnNext);
-
-		// Add action listener to swap color palette, needs to be set after buttons are initialized
-		chckbxColorBlindMode.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// If checkbox is selected, switch to color blind friendly colors
-				// Otherwise if it is unselected, switch to default colors
-				if (chckbxColorBlindMode.isSelected()){
-					previousColor = new Color(182, 109, 255);
-					//currentColor = new Color(219, 209, 0);
-					nextColor = new Color(0, 146, 146);
-				}
-				else{
-					previousColor = new Color(255, 75, 75);
-					//currentColor = new Color(219, 209, 0);
-					nextColor = new Color(51, 255, 51);
-				}
-				btnPrevious.setColor(previousColor);
-				btnNext.setColor(nextColor);
-				frame.repaint();
-			}
-		});
 
 		// Add panel for drawing
 		frame.getContentPane().add(drawPanel);
@@ -778,7 +799,122 @@ public class GUI{
 		loadingAnimation.hideSplash(0);
 	}
 
+	public JPanel createPrefMenu(){
+		prefMenu = new JPanel();
+		prefMenu.setBackground(backgroundColor);
+		GridBagLayout gbl_prefMenu = new GridBagLayout();
+		gbl_prefMenu.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_prefMenu.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
+		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		prefMenu.setLayout(gbl_prefMenu);
 
+
+		JLabel lblPathfinding = new JLabel("Pathfinding Preferences");
+		GridBagConstraints gbc_lblPathfinding = new GridBagConstraints();
+		gbc_lblPathfinding.gridwidth = 3;
+		gbc_lblPathfinding.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPathfinding.gridx = 2;
+		gbc_lblPathfinding.gridy = 1;
+		prefMenu.add(lblPathfinding, gbc_lblPathfinding);
+
+		JLabel lblVisualPreferences = new JLabel("Visual Preferneces");
+		GridBagConstraints gbc_lblVisualPreferences = new GridBagConstraints();
+		gbc_lblVisualPreferences.insets = new Insets(0, 0, 5, 0);
+		gbc_lblVisualPreferences.gridx = 11;
+		gbc_lblVisualPreferences.gridy = 1;
+		prefMenu.add(lblVisualPreferences, gbc_lblVisualPreferences);
+
+		JLabel lblOutside = new JLabel("Outside");
+		GridBagConstraints gbc_lblOutside = new GridBagConstraints();
+		gbc_lblOutside.insets = new Insets(0, 0, 5, 5);
+		gbc_lblOutside.gridx = 2;
+		gbc_lblOutside.gridy = 2;
+		prefMenu.add(lblOutside, gbc_lblOutside);
+
+		JLabel lblStairs = new JLabel("Stairs");
+		GridBagConstraints gbc_lblStairs = new GridBagConstraints();
+		gbc_lblStairs.insets = new Insets(0, 0, 5, 5);
+		gbc_lblStairs.gridx = 4;
+		gbc_lblStairs.gridy = 2;
+		prefMenu.add(lblStairs, gbc_lblStairs);
+
+		JRadioButton rdbtnStandard = new JRadioButton("Standard");
+		GridBagConstraints gbc_rdbtnStandard = new GridBagConstraints();
+		gbc_rdbtnStandard.anchor = GridBagConstraints.WEST;
+		gbc_rdbtnStandard.insets = new Insets(0, 0, 5, 0);
+		gbc_rdbtnStandard.gridx = 11;
+		gbc_rdbtnStandard.gridy = 2;
+		prefMenu.add(rdbtnStandard, gbc_rdbtnStandard);
+		rdbtnStandard.setSelected(true);
+
+		// Add action listener to swap color palette, needs to be set after buttons are initialized
+		rdbtnStandard.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Switch to standard colors
+				previousColor = new Color(255, 75, 75);
+				nextColor = new Color(51, 255, 51);
+				pointColor = Color.ORANGE;
+			}
+		});
+
+		JSlider sliderOutside = new JSlider();
+		GridBagConstraints gbc_slider = new GridBagConstraints();
+		gbc_slider.insets = new Insets(0, 0, 5, 5);
+		gbc_slider.gridx = 2;
+		gbc_slider.gridy = 3;
+		prefMenu.add(sliderOutside, gbc_slider);
+
+		JSlider sliderStairs = new JSlider();
+		GridBagConstraints gbc_slider_1 = new GridBagConstraints();
+		gbc_slider_1.insets = new Insets(0, 0, 5, 5);
+		gbc_slider_1.gridx = 4;
+		gbc_slider_1.gridy = 3;
+		prefMenu.add(sliderStairs, gbc_slider_1);
+
+		JRadioButton rdbtnColorBlindMode = new JRadioButton("Color Blind Mode");
+		GridBagConstraints gbc_rdbtnColorBlindMode = new GridBagConstraints();
+		gbc_rdbtnColorBlindMode.insets = new Insets(0, 0, 5, 0);
+		gbc_rdbtnColorBlindMode.anchor = GridBagConstraints.WEST;
+		gbc_rdbtnColorBlindMode.gridx = 11;
+		gbc_rdbtnColorBlindMode.gridy = 3;
+
+		// Add action listener to swap color palette, needs to be set after buttons are initialized
+		rdbtnColorBlindMode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Switch to color blind friendly colors
+				previousColor = new Color(182, 109, 255);
+				nextColor = new Color(0, 146, 146);
+				pointColor = new Color(146, 0, 0);
+			}
+		});
+
+		ButtonGroup visualPreferences = new ButtonGroup();
+		prefMenu.add(rdbtnColorBlindMode, gbc_rdbtnColorBlindMode);
+		prefMenu.add(rdbtnStandard, gbc_rdbtnStandard);
+		visualPreferences.add(rdbtnStandard);
+		visualPreferences.add(rdbtnColorBlindMode);
+
+		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
+		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
+		gbc_btnSavePreferences.insets = new Insets(0, 0, 0, 5);
+		gbc_btnSavePreferences.gridx = 7;
+		gbc_btnSavePreferences.gridy = 4;
+		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
+		// Return to previous view
+		btnSavePreferences.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Set button colors based on preferences selected
+				btnPrevious.setColor(previousColor);
+				btnNext.setColor(nextColor);
+				// Return to view that preferences menu was accessed from
+				menuLayout.show(menus, returnMenu);
+				frame.repaint();
+			}
+		});
+
+		return prefMenu;
+	}
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 
@@ -834,6 +970,23 @@ public class GUI{
 
 	class DrawRoute extends JPanel {
 
+		public Shape createStar(int arms, int centerx, int centery, double rOuter, double rInner)
+		{
+			double angle = Math.PI / arms;
+
+			GeneralPath path = new GeneralPath();
+
+			for (int i = 0; i < 2 * arms; i++)
+			{
+				double r = (i & 1) == 0 ? rOuter : rInner;
+				Point2D.Double p = new Point2D.Double(centerx + Math.cos(i * angle) * r, centery + Math.sin(i * angle) * r);
+				if (i == 0) path.moveTo(p.getX(), p.getY());
+				else path.lineTo(p.getX(), p.getY());
+			}
+			path.closePath();
+			return path;
+		}
+
 		@Override
 		public void paintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
@@ -858,39 +1011,57 @@ public class GUI{
 				// Draw lines for all points up to current point, use previousColor (same color as "Previous" button)
 				g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
 				g2.setStroke(new BasicStroke(3));
-				for (int i = 0; i < textPos - 1; i++){
+				for (int i = 0; i < textPos; i++){
 					g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
 				}
 				// Draw a thicker line for the current step in the directions, use currentColor
 				if(DEBUG)
 					System.out.println("mapPos: " + mapPos);
-				if (textPos != 0 || (mapPos == multiMapFinalDir.size()-1 && multiMapFinalDir.get(mapPos).size()-1 == textPos)){
+				if (textPos !=  multiMapFinalDir.get(mapPos).size()){ //|| (mapPos == multiMapFinalDir.size()-1 && multiMapFinalDir.get(mapPos).size()-1 == textPos)){
 					g2.setStroke(new BasicStroke(6));
 					g.setColor(currentColor);
-					g2.drawLine(multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocY());
+					g2.drawLine(multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocY());
 					g2.setStroke(new BasicStroke(3));
-					// Prints a rectangle indicating where the user currently is, needs refinement
 				}
 
 				// Draw lines for all points until the end, use nextColor (same color as "Next" button)
 				g.setColor(nextColor);
-				for (int i = textPos; i < multiMapFinalDir.get(mapPos).size(); i++){
+				for (int i = textPos + 1; i < multiMapFinalDir.get(mapPos).size(); i++){
 					g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
 				}
 
 				// Draws ovals with black borders at each of the points along the path, needs to use an offset
 				for (int i = 0; i < multiMapFinalDir.get(mapPos).size(); i++){
-					g.setColor(Color.ORANGE);
-					g.fillOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);
-					g.setColor(Color.BLACK);
-					g.drawOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);						
+					if (i != textPos){
+						g.setColor(pointColor);
+						g.fillOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);
+						g.setColor(Color.BLACK);
+						g.drawOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);
+					}
+					else {
+						// Prints a star indicating where the user currently is
+						Shape star = createStar(5, multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY(), 7, 12);
+						g.setColor(pointColor);
+						g2.fill(star);
+						g.setColor(Color.BLACK);
+						g2.draw(star);
+					}
 				}
-				// Draws final oval in path
-				g.setColor(Color.ORANGE);
-				g.fillOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);
-				g.setColor(Color.BLACK);
-				g.drawOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);	
-				
+
+				// Draws final oval or star in path
+				if (textPos != multiMapFinalDir.get(mapPos).size()){
+					g.setColor(pointColor);
+					g.fillOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);
+					g.setColor(Color.BLACK);
+					g.drawOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);	
+				}	
+				else {
+					Shape star = createStar(5, multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocY(), 7, 12);
+					g.setColor(pointColor);
+					g2.fill(star);
+					g.setColor(Color.BLACK);
+					g2.draw(star);
+				}
 			}
 		}
 	}

@@ -787,7 +787,7 @@ public class ServerDB {
 		}
 	}
 	//----------------------------------------------------------Retrieval Functions------------------------------------------------------------
-
+	
 	public static Map getMapFromServer(int mapId) throws DoesNotExistException
 	{
 		try {
@@ -857,6 +857,30 @@ public class ServerDB {
 		return allMaps;
 	}
 
+	public static ArrayList<Map> getEmptyMapsFromServer()
+	{
+		ArrayList<Map> retMaps = new ArrayList<Map>();
+		try
+		{
+			conn = connect();
+			Statement statement = conn.createStatement();
+			
+			String retrievalString = "SELECT * FROM "+MAP_TABLE_NAME;
+			ResultSet rs = statement.executeQuery(retrievalString);
+			while (rs.next())
+			{
+				Map newMap = new Map();
+				newMap.setMapId(rs.getInt("id"));
+				newMap.setMapName(rs.getString("name"));
+				retMaps.add(newMap);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return retMaps;
+	}
+	
 	private static Point getPointFromLocal(String pointId) throws DoesNotExistException
 	{
 		int counter = 0;

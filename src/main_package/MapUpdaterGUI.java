@@ -51,7 +51,6 @@ public class MapUpdaterGUI{
 	int prevRadButtonVal = 0;
 
 	private Map currentMap = null;
-	private static ServerDB md = ServerDB.getInstance();
 
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private ArrayList<Edge> newEdges = new ArrayList<Edge>();
@@ -122,7 +121,7 @@ public class MapUpdaterGUI{
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		maps = md.getMapsFromLocal();
+		maps = ServerDB.getMapsFromLocal();
 
 		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
@@ -142,7 +141,6 @@ public class MapUpdaterGUI{
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
-
 
 	/*
 	 * Returns the currently selected radbutton in the form of an int. 1 for
@@ -215,7 +213,6 @@ public class MapUpdaterGUI{
 			}
 		});
 	}
-
 
 	public JComponent createMapsPanel(){
 		JPanel mapsPanel = new JPanel();
@@ -592,8 +589,6 @@ public class MapUpdaterGUI{
 		return mapsPanel;
 	}
 
-
-
 	public JComponent createPointsPanel(){
 
 		JPanel pointsPanel = new JPanel();
@@ -907,7 +902,7 @@ public class MapUpdaterGUI{
 			// Finds the highest mapID in the database and stores it in
 			// highestID
 			int highestID;
-			if(md.getMapsFromLocal().isEmpty()){
+			if(ServerDB.getMapsFromLocal().isEmpty()){
 				highestID = 0;
 				if(DEBUG)
 					System.out.print("Database contains no maps so highest ID is 1");
@@ -916,7 +911,7 @@ public class MapUpdaterGUI{
 			}
 			else{
 				//determines the highest mapID from the Maps stored in the database
-				ArrayList<Map> mdMapList = md.getMapsFromLocal();
+				ArrayList<Map> mdMapList = ServerDB.getMapsFromLocal();
 				highestID = mdMapList.get(0).getMapId();
 				for (int h = 0; h < mdMapList.size(); h++) {
 					if (highestID < mdMapList.get(h).getMapId()) {
@@ -931,7 +926,7 @@ public class MapUpdaterGUI{
 			if(DEBUG)
 				System.out.println("rotation angle = " + m.getRotationAngle());
 			try {
-				md.insertMap(m);
+				ServerDB.insertMap(m);
 			} catch (AlreadyExistsException e1) {
 				System.out.print("Look at me im  an error 1");
 				// TODO Auto-generated catch block
@@ -1380,9 +1375,6 @@ public class MapUpdaterGUI{
 
 	}
 
-
-
-
 	/*
 	 * Takes an input file directory path and a target directory path and copies
 	 * that File to the target location
@@ -1428,7 +1420,5 @@ public class MapUpdaterGUI{
 		}
 		return null;
 	}
-
-
 
 }

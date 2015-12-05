@@ -18,6 +18,8 @@ import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.print.*;
@@ -77,10 +79,10 @@ public class GUI{
 	private ArrayList<Point> pointArray;
 	private ArrayList<Edge> edgeArray;
 	private JFrame frame = new JFrame("Directions with Magnitude");
-	JComboBox mapsDropdown = new JComboBox();
+	JComboBox<String> mapsDropdown = new JComboBox();
 	JComboBox<Point> destBuilds = new JComboBox();
 	JComboBox<Point> startBuilds = new JComboBox();
-	JComboBox DestMaps = new JComboBox();
+	JComboBox<String> DestMaps = new JComboBox();
 	Map startMap;
 	
 	private static SplashPage loadingAnimation;
@@ -158,10 +160,32 @@ public class GUI{
 		mainMenu.setLayout(gbl_mainMenu);
 		mapsDropdown.addItem("Select Map");
 		DestMaps.addItem("Select Map");
+		boolean check = true;
+		ArrayList<String> temp = new ArrayList<String> ();
 		for(int i = 0; i < maps.size(); i++){	
-			mapsDropdown.addItem(maps.get(i).getMapName());
-			DestMaps.addItem(maps.get(i).getMapName());
+			if(i > 0){
+				for(int count = i-1;count >= 0 ; count--){
+					if(maps.get(i).getMapName().compareTo(maps.get(count).getMapName()) == 0){
+						check = false;
+						count = -1;
+					}
+				}
+			}
+			if(check){
+				temp.add(maps.get(i).getMapName());
+				//mapsDropdown.addItem(maps.get(i).getMapName());
+				//DestMaps.addItem(maps.get(i).getMapName());
+			}
+
 		}
+
+		Collections.sort(temp);
+		Collections.sort(maps);
+		for(int count = 0; count < temp.size(); count++){
+			mapsDropdown.addItem(temp.get(count));
+			DestMaps.addItem(temp.get(count));
+		}
+
 
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
@@ -179,7 +203,6 @@ public class GUI{
 		gbc_lblMaps.gridx = 1;
 		gbc_lblMaps.gridy = 1;
 		mainMenu.add(lblMaps, gbc_lblMaps);
-
 
 
 
@@ -227,18 +250,43 @@ public class GUI{
 							edgeArray.add(pointArray.get(i).getEdges().get(j));
 						}
 					}
-
+					ArrayList<Point> tempStartRoom = new ArrayList<Point>();
+					boolean check = true;
 					//System.out.println("building size: " + buildings.length);
 					for (int i = 0; i < maps.get(buildStartIndex-1).getPointList().size(); i++){
 						if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equals("Hallway")){
-							startBuilds.addItem(maps.get(buildStartIndex-1).getPointList().get(i));
-							if(DEBUG)
-								System.out.println("startBuildsSize: " + maps.get(buildStartIndex-1).getPointList().size());
-						}
-						//System.out.println("buildings[i] " + buildings[i]);
+							if(i > 0){
+								System.out.println("i>0");
+								for(int count = i-1;count >= 0 ; count--){
+									if(maps.get(buildStartIndex - 1).getPointList().get(i).getName().compareTo(maps.get(buildStartIndex-1).getPointList().get(count).getName()) == 0){
+										System.out.println("here");
+										check = false;
+										count = -1;
+									}
+								}
+							}
+							if(check){
+								tempStartRoom.add(maps.get(buildStartIndex - 1).getPointList().get(i));
+								//mapsDropdown.addItem(maps.get(i).getMapName());
+								//DestMaps.addItem(maps.get(i).getMapName());
+							}
 
-						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+						}
+
+						if(DEBUG)
+							System.out.println("startBuildsSize: " + maps.get(buildStartIndex-1).getPointList().size());
 					}
+					Collections.sort(tempStartRoom);
+					System.out.println("tempStartRoom size: " + tempStartRoom.size());
+					//tempStartRoom = sort(tempStartRoom);
+					for(int count = 0; count < tempStartRoom.size(); count++){
+						startBuilds.addItem(tempStartRoom.get(count));
+
+					}
+					//System.out.println("buildings[i] " + buildings[i]);
+
+					// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+					//}
 
 					/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
 						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
@@ -296,36 +344,60 @@ public class GUI{
 							edgeArray.add(pointArray.get(i).getEdges().get(j));
 						}
 					}
-
+					ArrayList<Point> tempDestRoom = new ArrayList<Point>();
+					boolean check = true;
 					//System.out.println("building size: " + buildings.length);
-					/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
-							startBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
-							System.out.println("startBuildsSize: " + maps.get(buildDestIndex-1).getPointList().size());
-						}
-						//System.out.println("buildings[i] " + buildings[i]);
-						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
-					}*/
-
 					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
 						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
-							destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
-						}
-						//System.out.println("buildings[i] " + buildings[i]);
+							if(i > 0){
+								System.out.println("i>0");
+								for(int count = i-1;count >= 0 ; count--){
+									if(maps.get(buildDestIndex - 1).getPointList().get(i).getName().compareTo(maps.get(buildStartIndex-1).getPointList().get(count).getName()) == 0){
+										System.out.println("here");
+										check = false;
+										count = -1;
+									}
+								}
+							}
+							if(check){
+								tempDestRoom.add(maps.get(buildDestIndex - 1).getPointList().get(i));
+								//mapsDropdown.addItem(maps.get(i).getMapName());
+								//DestMaps.addItem(maps.get(i).getMapName());
+							}
 
-						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+						}
+
+						if(DEBUG)
+							System.out.println("startBuildsSize: " + maps.get(buildStartIndex-1).getPointList().size());
+					}
+					Collections.sort(tempDestRoom);
+					System.out.println("tempDestRoom size: " + tempDestRoom.size());
+					//tempStartRoom = sort(tempStartRoom);
+					for(int count = 0; count < tempDestRoom.size(); count++){
+						destBuilds.addItem(tempDestRoom.get(count));
+
 					}
 				}
-				//startBuilds.removeAllItems();
-				//for (int i=0; i < buildings.length; i++){
-				//System.out.println("buildings[i] match: " + buildings[i]);
-				//startBuilds.addItem(buildings[i]);
-				//}
-				//destBuilds.removeAllItems();
-				//for (int i=0; i < buildings.length; i++){
-				///destBuilds.addItem(buildings[i]);
-				//}
+
+				/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
+						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
+							destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
+						}*/
+				//System.out.println("buildings[i] " + buildings[i]);
+
+				// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
 			}
+
+			//startBuilds.removeAllItems();
+			//for (int i=0; i < buildings.length; i++){
+			//System.out.println("buildings[i] match: " + buildings[i]);
+			//startBuilds.addItem(buildings[i]);
+			//}
+			//destBuilds.removeAllItems();
+			//for (int i=0; i < buildings.length; i++){
+			///destBuilds.addItem(buildings[i]);
+			//}
+
 		});
 
 
@@ -749,6 +821,7 @@ public class GUI{
 
 					if(textPos < multiMapFinalDir.get(mapPos).size()){ 
 						textPos++;
+						
 						if (textPos != multiMapFinalDir.get(mapPos).size()){
 							directionsText.setText(textDir.get(mapPos).get(textPos));
 						}
@@ -1064,6 +1137,7 @@ public class GUI{
 				}
 			}
 		}
+
 	}
 
 }

@@ -106,11 +106,13 @@ public class MapUpdaterGUI{
 	private ArrayList<Map> emptyMaps = new ArrayList<Map>();
 	private JButton btnConnectToOther;
 	private InterMapEdgeGUI connectMapGUI;
-
+	private static SplashPage loadingAnimation = new SplashPage();
+	
+	
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		frame.setVisible(true);
+		
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MapUpdaterGUI.class.getResource("/VectorLogo/Logo Icon.png")));
 		double framex = 932;
 		double framey = 778;
@@ -148,6 +150,8 @@ public class MapUpdaterGUI{
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		
+		loadingAnimation.hideSplash(0);
+		frame.setVisible(true);
 	}
 
 	/*
@@ -186,7 +190,15 @@ public class MapUpdaterGUI{
 	}
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException {
-
+		//added by JPG starts and plays the animation
+		loadingAnimation = new SplashPage();
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {

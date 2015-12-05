@@ -72,12 +72,26 @@ public class GUI{
 	JComboBox<Point> startBuilds = new JComboBox();
 	JComboBox DestMaps = new JComboBox();
 	Map startMap;
+	
+	private static SplashPage loadingAnimation;
+	
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 		
-		frame.setSize(932, 778);
+		//frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
+	
+		//added by JPG scales the GUI to the screensize.
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		Dimension screenSize = tk.getScreenSize();
+		float screenHeight = screenSize.height*4/5;
+		float screenWidth = screenSize.width*4/5;
+		frame.setSize((int)screenWidth, (int)screenHeight);
+		double xlocation = (screenSize.width / 2)-(frame.getWidth()/2);
+		double ylocation = (screenSize.height / 2)-(frame.getHeight()/2);
+		frame.setLocation((int)xlocation, (int)ylocation);
+
 
 		maps = md.getMapsFromLocal();
 		allPoints = new ArrayList<Point>();
@@ -761,12 +775,23 @@ public class GUI{
 
 		// Make frame visible after initializing everything
 		frame.setVisible(true);
+		loadingAnimation.hideSplash(0);
 	}
 
 
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 
+		//added by JPG starts and plays the animation
+		loadingAnimation = new SplashPage();
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
+		
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {

@@ -59,6 +59,7 @@ public class ServerDB {
 
 	public static void main (String args[])
 	{
+		clearDatabase();
 		updateAllPointIDIndexes();
 		//tryCreateDB();
 		conn = connect();

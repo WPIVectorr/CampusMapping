@@ -68,14 +68,21 @@ public class Map {
 		this.yBotRight = yBotRight;
 		this.rotationAngle = rotationAngle;
 		this.pointIDIndex = pointIDIndex;
-		double ourRotate = (Math.PI * 2) - rotationAngle;
+		double ourRotate = rotationAngle;
 		double xTopLeftDeRotate = xTopLeft * Math.cos(ourRotate) - yTopLeft * Math.sin(ourRotate);
 		double xBotRightDeRotate = xBotRight * Math.cos(ourRotate) - yBotRight * Math.sin(ourRotate);
-		this.width = Math.abs(xTopLeftDeRotate - xBotRightDeRotate);
 		
+		
+		System.out.println("X top left derotate is: " + xTopLeftDeRotate);
+		System.out.println("X bot right derotate is: " + xBotRightDeRotate);
+		this.width = Math.abs(xTopLeftDeRotate - xBotRightDeRotate);
+		System.out.println("Width is: " + this.width);
 		double yTopLeftDeRotate = yTopLeft * Math.cos(ourRotate) + xTopLeft * Math.sin(ourRotate);
 		double yBotRightDeRotate = yBotRight * Math.cos(ourRotate) + xBotRight * Math.sin(ourRotate);
+		System.out.println("Y top left derotate is: " + yTopLeftDeRotate);
+		System.out.println("Y bot right derotate is: " + yBotRightDeRotate);
 		this.height = Math.abs(yTopLeftDeRotate - yBotRightDeRotate);
+		System.out.println("Height is: " + this.height);
 	}
 	public double getWidth() {
 		return width;

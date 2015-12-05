@@ -574,7 +574,7 @@ public class MapUpdaterGUI{
 						a.printStackTrace();
 					}
 					if(maps == null || maps.size() == 0){
-						setInfo(0, 0, img.getWidth(), img.getHeight(), 0);
+						setInfo(0, 0, 1, 1, 0);
 					} else {
 						new MapInserterGUI();
 					}
@@ -931,7 +931,11 @@ public class MapUpdaterGUI{
 			}
 
 			// Create the Map object to be stored in the database
-			Map m = new Map(highestID + 1, maptitle, (double)x, (double)y, (double)x2, (double)y2, angle, 0);
+			Map m = new Map(highestID + 1, maptitle, x, y, x2, y2, angle, 0);
+			System.out.println("m top left x: " + x);
+			System.out.println("m top left y: " + y);
+			System.out.println("m bot right x: " + x2);
+			System.out.println("m bot right y: " + y2);
 			highestID++;
 			if(DEBUG)
 				System.out.println("rotation angle = " + m.getRotationAngle());
@@ -1017,30 +1021,69 @@ public class MapUpdaterGUI{
 				{
 					Integer nameNumber = currentMap.getPointIDIndex()+1;
 					double ourRotation = currentMap.getRotationAngle();
-					//ourRotation = 2 * Math.PI - ourRotation;
+					ourRotation = 2 * Math.PI - ourRotation;
 
-					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;
-					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
+					destinationFile = new File("src/VectorMaps/" + "Campus" + ".jpg");
+					destinationFile = new File(destinationFile.getAbsolutePath());
+					BufferedImage campusImage = null;
+					try {
+						if(DEBUG)
+							System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
+						//System.out.println("Map name " + currentMap.getMapName());
+
+						campusImage = ImageIO.read(destinationFile);
+					} catch (IOException e) {
+						System.out.println("Invalid Map Selection");
+						e.printStackTrace();
+					}
+					double centerCurrentMapX = (Math.floor(((currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2) * img.getWidth())) / (campusImage.getWidth());
+					double centerCurrentMapY = (Math.floor(((currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2) * img.getHeight())) / (campusImage.getHeight());
+					System.out.println("ROTATION IS: " + Math.toDegrees(currentMap.getRotationAngle()));
+					System.out.println("centerCurrentMapX: " + centerCurrentMapX);
+					System.out.println("centerCurrentMapY: " + centerCurrentMapY);
+					System.out.println("The X value of top left is: " + currentMap.getxTopLeft() + ". The X value of bot right is: " + currentMap.getxBotRight());
+					System.out.println("The Y value of top left is: " + currentMap.getyTopLeft() + ". The Y value of bot right is: " + currentMap.getyBotRight());
+					System.out.println("The width of currentMap is: " + currentMap.getWidth());
+					System.out.println("The height of currentMap is: " + currentMap.getHeight());
+					System.out.println("The width-height ratio is: " + currentMap.getWidth() / currentMap.getHeight());
 					double tempPreRotateX = lastMousex;
 					double tempPreRotateY = lastMousey;
+					System.out.println("At first step: x: " + tempPreRotateX + " y: " + tempPreRotateY);
 					
+					tempPreRotateX = tempPreRotateX/(img.getWidth()/windowScale);
+					tempPreRotateY = tempPreRotateY/(img.getHeight()/windowScale);
+					System.out.println("At second step: x: " + tempPreRotateX + " y: " + tempPreRotateY);
+					//System.out.println("Width * Scale = " + img.getWidth()/windowScale);
+					//System.out.println("Height * Scale = " + img.getHeight()/windowScale);
 					
-					
-					
-					
-					
-					
-					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
-					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
-					tempPreRotateX = (tempPreRotateX/img.getWidth()) * currentMap.getWidth();
-					tempPreRotateY = (tempPreRotateY/img.getHeight()) * currentMap.getHeight();
-					tempPreRotateX = tempPreRotateX * windowScale;
-					tempPreRotateY = tempPreRotateY * windowScale;
+					tempPreRotateX = tempPreRotateX - 0.5;
+					tempPreRotateY = tempPreRotateY - 0.5;
+					System.out.println("At third step: x: " + tempPreRotateX + " y: " + tempPreRotateY);
+					//System.out.println("Current Map Width is: " + currentMap.getWidth());
+					//System.out.println("Current Map Height is: " + currentMap.getHeight());
+					tempPreRotateX = tempPreRotateX * currentMap.getWidth();
+					tempPreRotateY = tempPreRotateY * currentMap.getHeight();
+					System.out.println("At thirdB step: x: " + tempPreRotateX + " y: " + tempPreRotateY);
+					//System.out.println("tempPreRotateX2 is: " + tempPreRotateX);
+					//System.out.println("tempPreRotateY2 is: " + tempPreRotateY);
 					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
 					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
-
-					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
-					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
+					System.out.println("At fourth step: x: " + rotateX + " y: " + rotateY);
+					//System.out.println("tempPreRotateX3 is: " + rotateX);
+					//System.out.println("tempPreRotateY3 is: " + rotateY);
+					rotateX = rotateX * campusImage.getWidth();
+					rotateY = rotateY * campusImage.getHeight();
+					System.out.println("At fifth step: x: " + rotateX + " y: " + rotateY);
+					//System.out.println("tempPreRotateX4 is: " + rotateX);
+					//System.out.println("tempPreRotateY4 is: " + rotateY);
+					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
+					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
+					System.out.println("At sixth step: x: " + finalGlobX + " y: " + finalGlobY);
+					
+					System.out.println("Campus height is: " + campusImage.getHeight() + " Campus Width is: " + campusImage.getWidth());
+					//System.out.println("tempPreRotateX5 is: " + finalGlobX);
+					//System.out.println("tempPreRotateY5 is: " + finalGlobY);
+					
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
@@ -1383,8 +1426,8 @@ public class MapUpdaterGUI{
 				int drawX = (int) pointArray.get(w).getLocX();
 				int drawY = (int) pointArray.get(w).getLocY();
 				
-				//System.out.println("For point: " + pointArray.get(w).getId() + " loc X val is: " + pointArray.get(w).getLocX() + " glob X val is: " + pointArray.get(w).getGlobX());
-				//System.out.println("For point: " + pointArray.get(w).getId() + " loc Y val is: " + pointArray.get(w).getLocY() + " glob Y val is: " + pointArray.get(w).getGlobY());
+				System.out.println("For point: " + pointArray.get(w).getId() + " loc X val is: " + pointArray.get(w).getLocX() + " glob X val is: " + pointArray.get(w).getGlobX());
+				System.out.println("For point: " + pointArray.get(w).getId() + " loc Y val is: " + pointArray.get(w).getLocY() + " glob Y val is: " + pointArray.get(w).getGlobY());
 				// draws the points onto the map.
 				g.setColor(Color.BLACK);
 				
@@ -1394,7 +1437,7 @@ public class MapUpdaterGUI{
 				g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 				g.setColor(Color.BLACK);
 			}
-			
+			System.out.println("Window scale is: " + windowScale);
 			drawnEdges.clear();
 			newClick = false;
 		}

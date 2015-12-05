@@ -51,9 +51,9 @@ public class MapInserterGUI extends JFrame{
 	private int pointSize = 5;
 	private boolean remove =false;
 	private boolean imageSet = false;
-	private BufferedImage CampusMap = null;
+	private static BufferedImage CampusMap = null;
 	private BufferedImage AddingMap = null;
-	private int windowScale = 0;
+	private static int windowScale = 0;
 	private static Point point1 = null;
 	private static double Rotation = 0;
 	private static double point3x;
@@ -164,7 +164,12 @@ public class MapInserterGUI extends JFrame{
 		System.out.println("Point 3x: " + point3x);
 		System.out.println("Point 3y: " + point3y);
 		System.out.println("Rotation: " + Rotation);
-		MapUpdaterGUI.setInfo((double) point1.getLocX(), (double) point1.getLocY(), point3x, point3y, Rotation);
+		
+		double point1LocalX = (double)point1.getLocX() * windowScale / (double)CampusMap.getWidth();
+		double point1LocalY = (double)point1.getLocY() * windowScale / (double)CampusMap.getHeight();
+		double point3LocalX = (double)point3x / (double)CampusMap.getWidth();
+		double point3LocalY = (double)point3y / (double)CampusMap.getHeight();
+		MapUpdaterGUI.setInfo(point1LocalX, point1LocalY, point3LocalX, point3LocalY, Rotation);
 		System.out.println("Sending info");
 		clearAlignmentPoints();
 		resetCornerNum();
@@ -308,8 +313,9 @@ public class MapInserterGUI extends JFrame{
 					//System.out.println("Image Scale Width " + WidthScale);
 					Rotation = -Math.atan2(point1.getLocY()-point2.getLocY(), point1.getLocX()-point2.getLocX())-Math.toRadians(90);
 					point3y = point2.getLocY() + (-(double)(Math.cos(Math.toRadians(90)-Rotation))*(double)ImageWidth);
-					point3x = point2.getLocX() + ((double)(Math.sin(Math.toRadians(90)-Rotation)*(double)ImageWidth));
-					
+					point3x = point2.getLocX() + ((double)(Math.sin(Math.toRadians(90)-Rotation))*(double)ImageWidth);
+					point3y = point3y * windowScale;
+					point3x = point3x * windowScale;
 					double HeightScale = Math.abs((double)ImageHeight/(double)AddingMap.getHeight());
 					double WidthScale = Math.abs((double)ImageWidth/(double)AddingMap.getWidth());
 					

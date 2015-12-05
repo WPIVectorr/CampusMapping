@@ -2,6 +2,7 @@ package main_package;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -104,6 +105,17 @@ public class MapUpdaterGUI{
 	private ArrayList<Map> maps = new ArrayList<Map>();
 	private JButton btnConnectToOther;
 	private InterMapEdgeGUI connectMapGUI;
+	private double scaleSize = 1;
+	private int mousex;
+	private int mousey;
+	private boolean drawnfirst = false;
+	private int screenHeight;
+	private int screenWidth;
+	private int centerx;
+	private int centery;
+	private int scroldirection;
+	private boolean atMaxZoom = false;
+	private boolean atMinZoom = false;
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
 
@@ -116,8 +128,8 @@ public class MapUpdaterGUI{
 		frame.setResizable(false);
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
-		int screenHeight = screenSize.height;
-		int screenWidth = screenSize.width;
+		screenHeight = screenSize.height;
+		screenWidth = screenSize.width;
 		double xlocation = (screenWidth / 2)-(framex/2);
 		double ylocation = (screenHeight / 2)-(framey/2);
 		frame.setLocation((int)xlocation, (int)ylocation);
@@ -765,7 +777,57 @@ public class MapUpdaterGUI{
 
 			}
 		});
+		
+		drawPanel.addMouseMotionListener(new MouseMotionListener(){
+			public void mouseMoved(MouseEvent f){
+				//System.out.println("moved");
+				mousex = f.getX() - (drawPanel.getWidth()/2);
+				mousey = f.getY() - (drawPanel.getHeight()/2);
+			}
 
+			public void mouseDragged(MouseEvent arg0) {
+				
+			}
+			
+		});
+		
+		frame.addMouseWheelListener(new MouseWheelListener(){
+		    public void mouseWheelMoved(MouseWheelEvent e) {
+		       String message;
+		       int notches = e.getWheelRotation();
+		       if (notches < 0) {
+		           message = "Mouse wheel moved UP "
+		                        + -notches + " notch(es)\n";
+		       } else {
+		           message = "Mouse wheel moved DOWN "
+		                        + notches + " notch(es)\n";
+		       }
+		       if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+		    	   scroldirection = e.getWheelRotation();
+		    	   if (e.getWheelRotation() > 0){
+		    		   if (scaleSize <= 3){
+		    			   scaleSize += (e.getWheelRotation()*.05);
+		    			   atMaxZoom = true;
+		    			   atMinZoom = false;
+		    		   }
+		    	   } else {
+		    		   if (scaleSize >= 0.5){
+		    			   scaleSize += (e.getWheelRotation()*.05);
+		    			   atMinZoom = true;
+		    			   atMaxZoom = false;
+		    		   }
+		    	   }
+		           
+		           message += "    Units to scroll: " + scaleSize
+                   + " unit increments\n";
+		           
+		       } else { //scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+		           
+		       }
+		       frame.repaint();
+		       System.out.println(message);
+		    }
+		});
 
 		btnSaveMap = new GradientButton("Save Map", buttonColor); // defined above to change text in
 		btnSaveMap.setEnabled(false);
@@ -978,19 +1040,52 @@ public class MapUpdaterGUI{
 			// -------------------------------
 			// if(img == null)
 			// img = ImageIO.read(new
+		
 			// File("/User/ibanatoski/git/CampusMapping/src/VectorMaps/"));
 			if (!(img == null)) {
 
 				// Scale the image to the appropriate screen size
 
-
+				if (drawnfirst == false){
 				windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
 				//System.out.println("Image Original Width " + img.getWidth());
 				int WidthSize = (int)((double) img.getHeight() / windowScale);
 				if (WidthSize > (double)drawPanel.getHeight()){
 					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
 				}
-				g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
+				int imagesizex = (int)((double)img.getWidth() / windowScale);
+				int imagesizey = (int)((double)img.getHeight() / windowScale);
+				centerx = (drawPanel.getWidth()/2)-(imagesizex/2);
+				centery = (drawPanel.getHeight()/2)-(imagesizey/2);
+				g.drawImage(img, centerx, centery, imagesizex, imagesizey, null);
+				} else{
+				
+				AffineTransform originalTransform = g2D.getTransform();
+				
+				g2D.scale(scaleSize, scaleSize);
+				int originalcenterx = centerx;
+				int originalcentery = centery;
+				
+				int translatex = 0;
+				int translatey = 0;
+				if (scroldirection < 0 && atMinZoom == false){
+					translatex = -(int)(-(mousex-centerx)*.05);
+					translatey = -(int)(-(mousey-centery)*.05);
+					centerx =  (int) (centerx+((mousex-centerx)*.05));
+					centery =  (int) (centery+((mousey-centery)*.05));
+				}else if (scroldirection > 0 && atMaxZoom == false){
+					translatex = (int)(-(mousex-centerx)*.05);
+					translatey = (int)(-(mousey-centery)*.05);
+					centerx =  (int) (centerx+(-(mousex-centerx)*.05));
+					centery =  (int) (centery+(-(mousey-centery)*.05));
+				}
+				g2D.translate(translatex,translatey);
+				System.out.println("X location: "+centerx);
+				System.out.println("Y location: "+centery);
+				g2D.drawImage(img,  originalcenterx, originalcentery, null);
+				g2D.setTransform(originalTransform);
+				}
+				drawnfirst = true;
 			}
 
 

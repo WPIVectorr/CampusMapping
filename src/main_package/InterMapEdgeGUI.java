@@ -245,10 +245,12 @@ public class InterMapEdgeGUI extends JFrame {
 							e.printStackTrace();
 						}
 						//System.out.println("edge Created ");
+						frame.dispose();
 						frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 					} else{
 						btnConfirmSelection.setText("Edge Already Exists");
-
+						buttonPanel.repaint();
+						buttonPanel.validate();
 					}
 				} else {
 					btnConfirmSelection.setText("Pease Select Point");

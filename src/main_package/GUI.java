@@ -96,9 +96,9 @@ public class GUI{
 		//added by JPG scales the GUI to the screensize.
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
-		float screenHeight = screenSize.height*4/5;
-		float screenWidth = screenSize.width*4/5;
-		frame.setSize((int)screenWidth, (int)screenHeight);
+		double frameHeight = screenSize.height*4/5;
+		double frameWidth = frameHeight*(1.15);
+		frame.setSize((int)frameWidth, (int)frameHeight);
 		double xlocation = (screenSize.width / 2)-(frame.getWidth()/2);
 		double ylocation = (screenSize.height / 2)-(frame.getHeight()/2);
 		frame.setLocation((int)xlocation, (int)ylocation);

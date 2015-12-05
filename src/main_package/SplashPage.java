@@ -107,14 +107,7 @@ private static SplashPage testSplash;
              setVisible(true);
              System.out.println("makesplashvisible");
              toFront();
-            // Wait a little while, maybe while loading resources
-/*            try {
-                Thread.sleep(5000);
-            } catch (Exception e) {
-            }
 
-            return null;
-*/
 			return null;
   
         }
@@ -137,6 +130,6 @@ private static SplashPage testSplash;
 			e.printStackTrace();
 		}
     	setVisible(false);    	
-    	//dispose();
+    	dispose();
     }
 }

@@ -22,9 +22,10 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Insets;
 
 public class SplashPage extends JWindow {
-
+private static SplashPage testSplash;
     public static void main(String[] args) {
     	try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -33,7 +34,12 @@ public class SplashPage extends JWindow {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        new SplashPage();
+        testSplash = new SplashPage();
+        testSplash.showSplash();
+        
+
+        testSplash.hideSplash(5000);
+
     }
 
 	private ImageIcon loadingIcon;
@@ -42,77 +48,95 @@ public class SplashPage extends JWindow {
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+            	new ResourceLoader().execute();
                 try {
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
                     ex.printStackTrace();
                 }
 
-                showSplash();
                 
             }
         });
+    	//showSplash();
     }
 
     public void showSplash() {
 
-        JPanel content = (JPanel) getContentPane();
-        //content.setBackground(Color.blue);
 
-        // Set the window's bounds, centering the window
-        int width = 850;
-        int height = 625;
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (screen.width - width) / 2;
-        int y = (screen.height - height) / 2;
-        setBounds(x, y, width, height);
-        loadingIcon = new ImageIcon("src/VectorLogo/animation.gif");
-        // Build the splash screen
-        JLabel label = new JLabel(loadingIcon);
-        label.setBounds(0, 0, 850, 625);
-        JLabel copyrt = new JLabel("Vectorr Solutions", JLabel.CENTER);
-        getContentPane().setLayout(null);
         
-        JButton btnCancelOpen = new JButton("Cancel Operation");
-        btnCancelOpen.setBounds(717, 591, 123, 23);
-        btnCancelOpen.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent arg0) {
-        		hideSplash();
-        	}
-        });
-        
-        JButton btnX = new JButton("X");
-        btnX.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		hideSplash();
-        	}
-        });
-        btnX.setBounds(801, 11, 39, 34);
-        getContentPane().add(btnX);
-        getContentPane().add(btnCancelOpen);
-
-        content.add(label);
-
-        label.setLayout(new GridBagLayout());
-        Font font = copyrt.getFont();
-        copyrt.setFont(font.deriveFont(Font.BOLD, 24f));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        //label.add(copyrt, gbc);
-
-
-
-
 
         // Display it
-        setVisible(true);
-        toFront();
+
 
     }
-    public void hideSplash()
+    public class ResourceLoader extends SwingWorker<Object, Object> {
+
+        @Override
+        protected Object doInBackground() throws Exception {
+            JPanel content = (JPanel) getContentPane();
+            //content.setBackground(Color.blue);
+
+            // Set the window's bounds, centering the window
+            int width = 850;
+            int height = 625;
+            Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+            int x = (screen.width - width) / 2;
+            int y = (screen.height - height) / 2;
+            setBounds(x, y, width, height);
+            loadingIcon = new ImageIcon("src/VectorLogo/animation.gif");
+            GridBagLayout gridBagLayout = new GridBagLayout();
+            gridBagLayout.columnWidths = new int[]{850, 0};
+            gridBagLayout.rowHeights = new int[]{45, 546, 34, 0};
+            gridBagLayout.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+            gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+            getContentPane().setLayout(gridBagLayout);
+            
+            JLabel label = new JLabel(loadingIcon);
+            
+                    GridBagConstraints gbc_label = new GridBagConstraints();
+                    gbc_label.fill = GridBagConstraints.BOTH;
+                    gbc_label.gridheight = 3;
+                    gbc_label.gridx = 0;
+                    gbc_label.gridy = 0;
+                    content.add(label, gbc_label);
+                    
+                         label.setLayout(new GridBagLayout());
+                         
+             
+             setVisible(true);
+             System.out.println("makesplashvisible");
+             toFront();
+            // Wait a little while, maybe while loading resources
+/*            try {
+                Thread.sleep(5000);
+            } catch (Exception e) {
+            }
+
+            return null;
+*/
+			return null;
+  
+        }
+        
+        
+      @Override
+        protected void done() {
+            //hideSplash();
+        }
+
+
+    }
+    public void hideSplash(long delay)
     {
+    	System.out.println("makeSplashInvisible delay: "+delay);
+    	try {
+			Thread.sleep(delay);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	setVisible(false);    	
-    	dispose();
+    	//dispose();
     }
 }

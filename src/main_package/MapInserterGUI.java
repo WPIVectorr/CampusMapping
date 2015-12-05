@@ -67,6 +67,7 @@ public class MapInserterGUI extends JFrame{
 	private int windowSizeY = 0;
 	private boolean alignedProperly = false;
 	private static JFrame frame = new JFrame("Add to Campus Map");
+	private static SplashPage loadingAnimation = new SplashPage();
 
 	public MapInserterGUI() {
 		//super("Add to Campus Map");
@@ -121,9 +122,11 @@ public class MapInserterGUI extends JFrame{
 		buttonPanel = new MapInserterGUIButtonPanel(frame.getLocation(),frame.getSize());
 		buttonPanel.setVisible(true);
 
+		loadingAnimation.hideSplash(5000);
 	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		loadingAnimation.showSplash();
 		MapInserterGUI insertMap = new MapInserterGUI();
 		//insertMap.setVisible(true);
 	}

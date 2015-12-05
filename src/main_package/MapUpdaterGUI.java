@@ -104,9 +104,13 @@ public class MapUpdaterGUI{
 	private ArrayList<Map> maps = new ArrayList<Map>();
 	private JButton btnConnectToOther;
 	private InterMapEdgeGUI connectMapGUI;
-
+	
+	private static SplashPage loadingAnimation = new SplashPage();
+	
+	
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
-
+		
+		
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		frame.setVisible(true);
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MapUpdaterGUI.class.getResource("/VectorLogo/Logo Icon.png")));
@@ -121,6 +125,8 @@ public class MapUpdaterGUI{
 		double xlocation = (screenWidth / 2)-(framex/2);
 		double ylocation = (screenHeight / 2)-(framey/2);
 		frame.setLocation((int)xlocation, (int)ylocation);
+		
+		
 
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -134,7 +140,7 @@ public class MapUpdaterGUI{
 		buttonPanel.setLayout(new BorderLayout());
 		frame.getContentPane().add(buttonPanel, BorderLayout.NORTH);
 
-		loadingIcon = new ImageIcon("src/VectorLogo/faster reverse.gif");
+		//loadingIcon = new ImageIcon("src/VectorLogo/faster reverse.gif");
 
 		tabs.addTab("Maps", createMapsPanel());
 		tabs.addTab("Points", createPointsPanel());
@@ -144,6 +150,7 @@ public class MapUpdaterGUI{
 		frame.getContentPane().add(drawPanel);
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		
 		
 	}
 
@@ -184,6 +191,7 @@ public class MapUpdaterGUI{
 	}
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException {
+		loadingAnimation.showSplash();
 
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -202,6 +210,7 @@ public class MapUpdaterGUI{
 				e1.printStackTrace();
 			}
 		}
+
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

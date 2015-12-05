@@ -70,7 +70,6 @@ public class MapInserterGUI extends JFrame{
 
 	public MapInserterGUI() {
 		//super("Add to Campus Map");
-		
 		createAndShowGUI();	
 		cornerNum = 0;
 		alignmentPoints = new ArrayList<Point>();
@@ -249,7 +248,13 @@ public class MapInserterGUI extends JFrame{
 			break;
 		}
 	}
-	
+	public static void setFrameSize(int width, int height)
+	{
+		System.out.println("setSize");
+		frame.setSize(width, height);
+		frame.validate();
+	}
+
 	class PaintFrame extends JPanel {
 
 		@Override
@@ -279,6 +284,7 @@ public class MapInserterGUI extends JFrame{
 			
 			
 			CampusMap = MapInserterGUIButtonPanel.getCampusMap();
+
 			if (!(CampusMap == null)) {
 				// Scale the image to the appropriate screen size
 				double wScale;
@@ -292,13 +298,17 @@ public class MapInserterGUI extends JFrame{
 					wScale = (double) CampusMap.getHeight() / (double) windowSizeY;
 					windowScale = CampusMap.getWidth() / windowSizeX;
 				}
-				int imagelocationx = (windowSizeX/2)-((int)(CampusMap.getWidth()/wScale)/2);
-				int imagelocationy = (windowSizeY/2)-((int)(CampusMap.getHeight()/wScale)/2);
+				int imagelocationx = 0;//(windowSizeX/2)-((int)(CampusMap.getWidth()/wScale)/2);
+				int imagelocationy = 0;//(windowSizeY/2)-((int)(CampusMap.getHeight()/wScale)/2);
 				// sets the correct dimensions for logo
+				if(CampusMap!=null)
+					setFrameSize((int)(CampusMap.getWidth()/wScale), (int)(CampusMap.getHeight()/wScale));
 				g.drawImage(CampusMap, imagelocationx, imagelocationy, (int)(CampusMap.getWidth()/wScale), (int)(CampusMap.getHeight()/wScale), null);
 			}
 
 			AddingMap = MapInserterGUIButtonPanel.getAddingMap();
+
+			
 			if (!(AddingMap == null) && (!(alignmentPoints == null)) && (alignmentPoints.size() > 1)) {
 				if (imageSet){
 					point1 = alignmentPoints.get(0);

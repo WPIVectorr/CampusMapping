@@ -270,7 +270,10 @@ public class MapInserterGUIButtonPanel extends JFrame {
 
 	public static void setAddingMap(BufferedImage addingMap) {
 		AddingMap = addingMap;
+		
 	}
+
+		
 
 
 	class InserterButtonPanel extends JPanel {

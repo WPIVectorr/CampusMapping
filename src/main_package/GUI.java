@@ -37,7 +37,11 @@ public class GUI{
 	private JTextField directionsText;
 	private JPanel mainMenu;
 	private JPanel navMenu;
+	private JPanel prefMenu;
 	private JPanel menus;
+	CardLayout menuLayout;
+	private GradientButton btnNext;
+	private GradientButton btnPrevious;
 	private DrawRoute drawPanel = new DrawRoute();
 	private double windowScale = 2;
 	private int windowSizeX = 932;
@@ -51,6 +55,9 @@ public class GUI{
 	private Color previousColor = new Color(255, 75, 75);
 	private Color currentColor = new Color(219, 209, 0);
 	private Color nextColor = new Color(51, 255, 51);
+	private Color pointColor = Color.ORANGE;
+	private Color backgroundColor = new Color(255, 235, 205);
+	private Color buttonColor = new Color(153, 204, 255);
 	private ArrayList<Point> pointArray;
 	private ArrayList<Edge> edgeArray;
 	private JFrame frame = new JFrame("Directions with Magnitude");
@@ -64,7 +71,7 @@ public class GUI{
 		frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(800, 600));
-		frame.getContentPane().setBackground(new Color(255, 235, 205));
+		frame.getContentPane().setBackground(backgroundColor);
 
 		maps = md.getMapsFromLocal();
 		allPoints = new ArrayList<Point>();
@@ -80,11 +87,11 @@ public class GUI{
 		//maps.get(0).getPointList().get(0).print();
 
 		mainMenu = new JPanel();
-		mainMenu.setBackground(new Color(255, 235, 205));
+		mainMenu.setBackground(backgroundColor);
 
 		navMenu = new JPanel();
-		navMenu.setBackground(new Color(255, 235, 205));
-
+		navMenu.setBackground(backgroundColor);
+	
 		GridBagLayout gbl_navMenu = new GridBagLayout();
 		gbl_navMenu.columnWidths = new int[]{0, 298, 298, 298, 0, 0};
 		gbl_navMenu.rowHeights = new int[]{0, 0, 56, 56, 0};
@@ -92,11 +99,12 @@ public class GUI{
 		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
 
-
 		menus = new JPanel(new CardLayout());
+		menuLayout = (CardLayout) menus.getLayout();
 		menus.add(mainMenu, "Main Menu");
 		menus.add(navMenu, "Nav Menu");
-		CardLayout menuLayout = (CardLayout) menus.getLayout();
+		menus.add(createPrefMenu(), "Pref Menu");
+
 
 		frame.getContentPane().add(menus, BorderLayout.NORTH);
 
@@ -550,10 +558,10 @@ public class GUI{
 		txtpnFullTextDir.setBorder(textBorder);
 
 		// Initalize this button first so it can be used in return button
-		GradientButton btnFullTextDirections = new GradientButton("Show Full Text Directions", new Color(153, 204, 255));
+		GradientButton btnFullTextDirections = new GradientButton("Show Full Text Directions", buttonColor);
 
 		// Button to return to main menu
-		GradientButton btnReturn = new GradientButton("Select New Route", new Color(153, 204, 255));
+		GradientButton btnReturn = new GradientButton("Select New Route", buttonColor);
 		btnReturn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Return to main menu, don't show route anymore
@@ -601,13 +609,23 @@ public class GUI{
 				}
 			}
 		});
-
-		JCheckBox chckbxColorBlindMode = new JCheckBox("Color Blind Mode");
-		GridBagConstraints gbc_chckbxColorBlindMode = new GridBagConstraints();
-		gbc_chckbxColorBlindMode.insets = new Insets(0, 0, 5, 5);
-		gbc_chckbxColorBlindMode.gridx = 3;
-		gbc_chckbxColorBlindMode.gridy = 1;
-		navMenu.add(chckbxColorBlindMode, gbc_chckbxColorBlindMode);
+		
+		GradientButton btnSetPreferencesNav = new GradientButton("Set Preferences", buttonColor);
+		GridBagConstraints gbc_btnSetPreferencesNav = new GridBagConstraints();
+		gbc_btnSetPreferencesNav.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSetPreferencesNav.gridx = 3;
+		gbc_btnSetPreferencesNav.gridy = 1;
+		navMenu.add(btnSetPreferencesNav, gbc_btnSetPreferencesNav);
+		btnSetPreferencesNav.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Return to main menu, don't show route anymore
+				menuLayout.show(menus, "Pref Menu");
+				showRoute = false;
+				txtpnFullTextDir.setVisible(false);
+				btnFullTextDirections.setText("Show Full Text Directions");
+				frame.repaint();
+			}
+		});
 
 		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_3 = new GridBagConstraints();
@@ -731,27 +749,6 @@ public class GUI{
 		gbc_btnNext.gridy = 3;
 		navMenu.add(btnNext, gbc_btnNext);
 
-		// Add action listener to swap color palette, needs to be set after buttons are initialized
-		chckbxColorBlindMode.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// If checkbox is selected, switch to color blind friendly colors
-				// Otherwise if it is unselected, switch to default colors
-				if (chckbxColorBlindMode.isSelected()){
-					previousColor = new Color(182, 109, 255);
-					//currentColor = new Color(219, 209, 0);
-					nextColor = new Color(0, 146, 146);
-				}
-				else{
-					previousColor = new Color(255, 75, 75);
-					//currentColor = new Color(219, 209, 0);
-					nextColor = new Color(51, 255, 51);
-				}
-				btnPrevious.setColor(previousColor);
-				btnNext.setColor(nextColor);
-				frame.repaint();
-			}
-		});
-
 		// Add panel for drawing
 		frame.getContentPane().add(drawPanel);
 
@@ -759,7 +756,121 @@ public class GUI{
 		frame.setVisible(true);
 	}
 
-
+	public JPanel createPrefMenu(){
+		prefMenu = new JPanel();
+		prefMenu.setBackground(backgroundColor);
+		GridBagLayout gbl_prefMenu = new GridBagLayout();
+		gbl_prefMenu.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_prefMenu.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
+		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		prefMenu.setLayout(gbl_prefMenu);
+		
+		
+		JLabel lblPathfinding = new JLabel("Pathfinding Preferences");
+		GridBagConstraints gbc_lblPathfinding = new GridBagConstraints();
+		gbc_lblPathfinding.gridwidth = 3;
+		gbc_lblPathfinding.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPathfinding.gridx = 2;
+		gbc_lblPathfinding.gridy = 1;
+		prefMenu.add(lblPathfinding, gbc_lblPathfinding);
+		
+		JLabel lblVisualPreferneces = new JLabel("Visual Preferneces");
+		GridBagConstraints gbc_lblVisualPreferneces = new GridBagConstraints();
+		gbc_lblVisualPreferneces.insets = new Insets(0, 0, 5, 0);
+		gbc_lblVisualPreferneces.gridx = 11;
+		gbc_lblVisualPreferneces.gridy = 1;
+		prefMenu.add(lblVisualPreferneces, gbc_lblVisualPreferneces);
+		
+		JLabel lblOutside = new JLabel("Outside");
+		GridBagConstraints gbc_lblOutside = new GridBagConstraints();
+		gbc_lblOutside.insets = new Insets(0, 0, 5, 5);
+		gbc_lblOutside.gridx = 2;
+		gbc_lblOutside.gridy = 2;
+		prefMenu.add(lblOutside, gbc_lblOutside);
+		
+		JLabel lblStairs = new JLabel("Stairs");
+		GridBagConstraints gbc_lblStairs = new GridBagConstraints();
+		gbc_lblStairs.insets = new Insets(0, 0, 5, 5);
+		gbc_lblStairs.gridx = 4;
+		gbc_lblStairs.gridy = 2;
+		prefMenu.add(lblStairs, gbc_lblStairs);
+		
+		JRadioButton rdbtnStandard = new JRadioButton("Standard");
+		GridBagConstraints gbc_rdbtnStandard = new GridBagConstraints();
+		gbc_rdbtnStandard.anchor = GridBagConstraints.WEST;
+		gbc_rdbtnStandard.insets = new Insets(0, 0, 5, 0);
+		gbc_rdbtnStandard.gridx = 11;
+		gbc_rdbtnStandard.gridy = 2;
+		prefMenu.add(rdbtnStandard, gbc_rdbtnStandard);
+		rdbtnStandard.setSelected(true);
+		
+		// Add action listener to swap color palette, needs to be set after buttons are initialized
+		rdbtnStandard.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Switch to standard colors
+					previousColor = new Color(255, 75, 75);
+					nextColor = new Color(51, 255, 51);
+					pointColor = Color.ORANGE;
+			}
+		});
+		
+		JSlider sliderOutside = new JSlider();
+		GridBagConstraints gbc_slider = new GridBagConstraints();
+		gbc_slider.insets = new Insets(0, 0, 5, 5);
+		gbc_slider.gridx = 2;
+		gbc_slider.gridy = 3;
+		prefMenu.add(sliderOutside, gbc_slider);
+		
+		JSlider sliderStairs = new JSlider();
+		GridBagConstraints gbc_slider_1 = new GridBagConstraints();
+		gbc_slider_1.insets = new Insets(0, 0, 5, 5);
+		gbc_slider_1.gridx = 4;
+		gbc_slider_1.gridy = 3;
+		prefMenu.add(sliderStairs, gbc_slider_1);
+		
+		JRadioButton rdbtnColorBlindMode = new JRadioButton("Color Blind Mode");
+		GridBagConstraints gbc_rdbtnColorBlindMode = new GridBagConstraints();
+		gbc_rdbtnColorBlindMode.insets = new Insets(0, 0, 5, 0);
+		gbc_rdbtnColorBlindMode.anchor = GridBagConstraints.WEST;
+		gbc_rdbtnColorBlindMode.gridx = 11;
+		gbc_rdbtnColorBlindMode.gridy = 3;
+		
+		// Add action listener to swap color palette, needs to be set after buttons are initialized
+		rdbtnColorBlindMode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Switch to color blind friendly colors
+					previousColor = new Color(182, 109, 255);
+					nextColor = new Color(0, 146, 146);
+					pointColor = new Color(146, 0, 0);
+			}
+		});
+		
+		ButtonGroup visualPreferences = new ButtonGroup();
+		prefMenu.add(rdbtnColorBlindMode, gbc_rdbtnColorBlindMode);
+		prefMenu.add(rdbtnStandard, gbc_rdbtnStandard);
+		visualPreferences.add(rdbtnStandard);
+		visualPreferences.add(rdbtnColorBlindMode);
+		
+		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
+		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
+		gbc_btnSavePreferences.insets = new Insets(0, 0, 0, 5);
+		gbc_btnSavePreferences.gridx = 7;
+		gbc_btnSavePreferences.gridy = 4;
+		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
+		// Return to previous view
+		btnSavePreferences.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Set button colors based on preferences selected
+				btnPrevious.setColor(previousColor);
+				btnNext.setColor(nextColor);
+				menuLayout.show(menus, "Nav Menu");
+				frame.repaint();
+			}
+		});
+		
+		return prefMenu;
+	}
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 
@@ -851,13 +962,13 @@ public class GUI{
 
 				// Draws ovals with black borders at each of the points along the path, needs to use an offset
 				for (int i = 0; i < multiMapFinalDir.get(mapPos).size(); i++){
-					g.setColor(Color.ORANGE);
+					g.setColor(pointColor);
 					g.fillOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);
 					g.setColor(Color.BLACK);
 					g.drawOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);						
 				}
 				// Draws final oval in path
-				g.setColor(Color.ORANGE);
+				g.setColor(pointColor);
 				g.fillOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);
 				g.setColor(Color.BLACK);
 				g.drawOval(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX() - 6, multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY() -6, 12, 12);	

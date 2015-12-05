@@ -106,13 +106,13 @@ public class MapUpdaterGUI{
 	private JButton btnConnectToOther;
 	private InterMapEdgeGUI connectMapGUI;
 	private double scaleSize = 1;
-	private int mousex;
-	private int mousey;
+	private int drawnposx;
+	private int drawnposy;
 	private boolean drawnfirst = false;
 	private int screenHeight;
 	private int screenWidth;
-	private int centerx;
-	private int centery;
+	private double imageX;
+	private double imageY;
 	private int scroldirection;
 	private boolean atMaxZoom = false;
 	private boolean atMinZoom = false;
@@ -778,19 +778,6 @@ public class MapUpdaterGUI{
 			}
 		});
 		
-		drawPanel.addMouseMotionListener(new MouseMotionListener(){
-			public void mouseMoved(MouseEvent f){
-				//System.out.println("moved");
-				mousex = f.getX() - (drawPanel.getWidth()/2);
-				mousey = f.getY() - (drawPanel.getHeight()/2);
-			}
-
-			public void mouseDragged(MouseEvent arg0) {
-				
-			}
-			
-		});
-		
 		frame.addMouseWheelListener(new MouseWheelListener(){
 		    public void mouseWheelMoved(MouseWheelEvent e) {
 		       String message;
@@ -802,25 +789,31 @@ public class MapUpdaterGUI{
 		           message = "Mouse wheel moved DOWN "
 		                        + notches + " notch(es)\n";
 		       }
+		       double oldWidth = img.getWidth()*scaleSize;
+		       double oldHeight = img.getHeight()*scaleSize;
 		       if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
 		    	   scroldirection = e.getWheelRotation();
 		    	   if (e.getWheelRotation() > 0){
 		    		   if (scaleSize <= 3){
 		    			   scaleSize += (e.getWheelRotation()*.05);
-		    			   atMaxZoom = true;
 		    			   atMinZoom = false;
+		    		   }else{
+		    			   atMaxZoom = true;
 		    		   }
 		    	   } else {
 		    		   if (scaleSize >= 0.5){
 		    			   scaleSize += (e.getWheelRotation()*.05);
-		    			   atMinZoom = true;
 		    			   atMaxZoom = false;
+		    		   }else{
+		    			   atMinZoom = true;
 		    		   }
 		    	   }
-		           
-		           message += "    Units to scroll: " + scaleSize
-                   + " unit increments\n";
-		           
+		    	   double newWidth = img.getWidth()*scaleSize;
+		    	   double newHeight = img.getHeight()*scaleSize;
+		    	   double difWidth = (oldWidth - newWidth)/2;
+		    	   double difHeight = (oldHeight - newHeight)/2;
+		    	   imageX += difWidth;
+		    	   imageY += difHeight;
 		       } else { //scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
 		           
 		       }
@@ -1047,43 +1040,59 @@ public class MapUpdaterGUI{
 				// Scale the image to the appropriate screen size
 
 				if (drawnfirst == false){
-				windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
-				//System.out.println("Image Original Width " + img.getWidth());
-				int WidthSize = (int)((double) img.getHeight() / windowScale);
-				if (WidthSize > (double)drawPanel.getHeight()){
-					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
-				}
-				int imagesizex = (int)((double)img.getWidth() / windowScale);
-				int imagesizey = (int)((double)img.getHeight() / windowScale);
-				centerx = (drawPanel.getWidth()/2)-(imagesizex/2);
-				centery = (drawPanel.getHeight()/2)-(imagesizey/2);
-				g.drawImage(img, centerx, centery, imagesizex, imagesizey, null);
+					windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
+					//System.out.println("Image Original Width " + img.getWidth());
+					int WidthSize = (int)((double) img.getHeight() / windowScale);
+					if (WidthSize > (double)drawPanel.getHeight()){
+						windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
+					}
+					int imagesizex = (int)((double)img.getWidth() / windowScale);
+					int imagesizey = (int)((double)img.getHeight() / windowScale);
+					int centerx = (drawPanel.getWidth()/2);
+					int centery = (drawPanel.getHeight()/2);
+					int drawx = centerx -(imagesizex/2);
+					int drawy = centery -(imagesizey/2);
+					g.drawImage(img, drawx, drawy, imagesizex, imagesizey, null);
+					drawnposx = centerx;
+					drawnposy = centery;
+					g.fillOval(drawnposx, drawnposy, 20, 20);
 				} else{
-				
-				AffineTransform originalTransform = g2D.getTransform();
-				
-				g2D.scale(scaleSize, scaleSize);
-				int originalcenterx = centerx;
-				int originalcentery = centery;
-				
-				int translatex = 0;
-				int translatey = 0;
-				if (scroldirection < 0 && atMinZoom == false){
-					translatex = -(int)(-(mousex-centerx)*.05);
-					translatey = -(int)(-(mousey-centery)*.05);
-					centerx =  (int) (centerx+((mousex-centerx)*.05));
-					centery =  (int) (centery+((mousey-centery)*.05));
-				}else if (scroldirection > 0 && atMaxZoom == false){
-					translatex = (int)(-(mousex-centerx)*.05);
-					translatey = (int)(-(mousey-centery)*.05);
-					centerx =  (int) (centerx+(-(mousex-centerx)*.05));
-					centery =  (int) (centery+(-(mousey-centery)*.05));
-				}
-				g2D.translate(translatex,translatey);
-				System.out.println("X location: "+centerx);
-				System.out.println("Y location: "+centery);
-				g2D.drawImage(img,  originalcenterx, originalcentery, null);
-				g2D.setTransform(originalTransform);
+					/*if(atMinZoom || atMaxZoom){
+						AffineTransform originalTransform = g2D.getTransform();
+						
+						g2D.scale(scaleSize, scaleSize);
+						int originalcenterx = centerx;
+						int originalcentery = centery;
+						mousex = mousex - centerx;
+						mousey = mousey - centery;
+						int translatex = 0;
+						int translatey = 0;
+						if (scroldirection < 0 && atMinZoom == false){
+							translatex = -(int)(-(mousex-centerx)*.05);
+							translatey = -(int)(-(mousey-centery)*.05);
+							centerx =  (int) (centerx+((mousex-centerx)*.05));
+							centery =  (int) (centery+((mousey-centery)*.05));
+						}else if (scroldirection > 0 && atMaxZoom == false){
+							translatex = (int)(-(mousex-centerx)*.05);
+							translatey = (int)(-(mousey-centery)*.05);
+							centerx =  (int) (centerx+(-(mousex-centerx)*.05));
+							centery =  (int) (centery+(-(mousey-centery)*.05));
+						}
+						System.out.println("translate: " + translatex+", " + translatey);
+						g2D.translate(translatex,translatey);
+						System.out.println("X location: "+mousex);
+						System.out.println("Y location: "+mousey);
+						g2D.drawImage(img,  originalcenterx, originalcentery, null);
+						g2D.setTransform(originalTransform);
+						g.fillOval(centerx, centery, 20, 20);*/
+					AffineTransform originalTransform = g2D.getTransform();
+					
+					g2D.scale(scaleSize, scaleSize);
+					g2D.translate(imageX/scaleSize, imageY/scaleSize);
+					g2D.drawImage(img,  0, 0, null);
+					drawnposx += imageX/scaleSize;
+					drawnposy += imageY/scaleSize;
+					g2D.setTransform(originalTransform);
 				}
 				drawnfirst = true;
 			}

@@ -155,7 +155,7 @@ public class GUI{
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
 		gbl_mainMenu.columnWidths = new int[]{0, 160, 209, 166, 298, 0, 0};
 		gbl_mainMenu.rowHeights = new int[]{27, 27, 27, 0, 0, 0};
-		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		mainMenu.setLayout(gbl_mainMenu);
 		mapsDropdown.addItem("Select Map");
@@ -474,10 +474,31 @@ public class GUI{
 		destBuilds.setBounds(122, 80, 148, 20);
 		lblDestination.setLabelFor(destBuilds);
 
+		GradientButton btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
+		GridBagConstraints gbc_btnSwapStartAndDest = new GridBagConstraints();
+		gbc_btnSwapStartAndDest.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSwapStartAndDest.gridx = 2;
+		gbc_btnSwapStartAndDest.gridy = 3;
+		mainMenu.add(btnSwapStartAndDest, gbc_btnSwapStartAndDest);
+		btnSwapStartAndDest.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (startBuilds.getItemCount() != 0 && destBuilds.getItemCount() != 0){
+					int startMapIndex = mapsDropdown.getSelectedIndex();
+					int startPointIndex = startBuilds.getSelectedIndex();
+
+					mapsDropdown.setSelectedIndex(DestMaps.getSelectedIndex());
+					startBuilds.setSelectedIndex(destBuilds.getSelectedIndex());
+
+					DestMaps.setSelectedIndex(startMapIndex);
+					destBuilds.setSelectedIndex(startPointIndex);
+				}
+			}
+		});
+
 		GradientButton btnSetPreferencesMain = new GradientButton("Set Preferences", buttonColor);
 		GridBagConstraints gbc_btnSetPreferencesMain = new GridBagConstraints();
 		gbc_btnSetPreferencesMain.insets = new Insets(0, 0, 5, 5);
-		gbc_btnSetPreferencesMain.gridx = 2;
+		gbc_btnSetPreferencesMain.gridx = 4;
 		gbc_btnSetPreferencesMain.gridy = 3;
 		mainMenu.add(btnSetPreferencesMain, gbc_btnSetPreferencesMain);
 		btnSetPreferencesMain.addActionListener(new ActionListener() {
@@ -493,9 +514,9 @@ public class GUI{
 		GradientButton directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
 		GridBagConstraints gbc_directionsButton = new GridBagConstraints();
 		gbc_directionsButton.fill = GridBagConstraints.BOTH;
-		gbc_directionsButton.insets = new Insets(0, 0, 5, 5);
+		gbc_directionsButton.insets = new Insets(0, 0, 0, 5);
 		gbc_directionsButton.gridx = 3;
-		gbc_directionsButton.gridy = 3;
+		gbc_directionsButton.gridy = 4;
 		mainMenu.add(directionsButton, gbc_directionsButton);
 		directionsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -532,9 +553,9 @@ public class GUI{
 
 					if(route != null){
 						/*System.out.println("route: ");
-																		for(int i = route.size() - 1; i >= 0; i--){
-																			System.out.println(route.get(i));
-																		}*/
+																				for(int i = route.size() - 1; i >= 0; i--){
+																					System.out.println(route.get(i));
+																				}*/
 
 					}
 					showRoute = true;
@@ -835,7 +856,7 @@ public class GUI{
 						}
 					}	
 
-					
+
 					else if (textPos == multiMapFinalDir.get(mapPos).size() && mapPos != multiMapFinalDir.size() - 1) {
 						textPos = 0; // For route coloring 
 						mapPos++;
@@ -852,9 +873,9 @@ public class GUI{
 							g.printStackTrace();
 						}
 						frame.repaint();
+					}
+					frame.repaint();
 				}
-				frame.repaint();
-			}
 			}});
 		GridBagConstraints gbc_btnNext = new GridBagConstraints();
 		gbc_btnNext.insets = new Insets(0, 0, 0, 5);

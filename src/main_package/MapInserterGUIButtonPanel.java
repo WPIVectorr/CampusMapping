@@ -40,7 +40,7 @@ public class MapInserterGUIButtonPanel extends JFrame {
 	private JComboBox mapDropDown;
 	private JComboBox secondMap;
 	private static BufferedImage CampusMap = null;
-	private static BufferedImage AddingMap = null;
+	private static BufferedImage addingMap = null;
 	private int windowSizeX = 0;
 	private int windowSizeY = 0;
 	private int windowScale = 0;
@@ -173,6 +173,7 @@ public class MapInserterGUIButtonPanel extends JFrame {
 				
 				if (!(name.equals("Select Map"))) {
 					try {
+						
 						setAddingMap(ImageIO.read(destinationFile));
 					} catch (IOException g) {
 						System.out.println("Invalid Map Selection");
@@ -264,16 +265,18 @@ public class MapInserterGUIButtonPanel extends JFrame {
 	}
 
 	public static BufferedImage getAddingMap() {
-		return AddingMap;
+		return addingMap;
 	}
 
 
-	public static void setAddingMap(BufferedImage addingMap) {
-		AddingMap = addingMap;
+	public static void setAddingMap(BufferedImage AM) {
+		addingMap = AM;
 		
 	}
-
-		
+	public static boolean isSecondMapSelect()
+	{
+		return addingMap != null;
+	}
 
 
 	class InserterButtonPanel extends JPanel {
@@ -282,20 +285,20 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		public void paintComponent(Graphics g) {
 			super.paintComponents(g);
 			
-			if (!(AddingMap == null)){
+			if (!(addingMap == null)){
 				double wScale;
 
-				if (AddingMap.getHeight() >= AddingMap.getWidth()) {
-					wScale = (double) AddingMap.getHeight() / (double) windowSizeY;
+				if (addingMap.getHeight() >= addingMap.getWidth()) {
+					wScale = (double) addingMap.getHeight() / (double) windowSizeY;
 				}
 
 				else {
-					wScale = (double) AddingMap.getWidth() / (double) windowSizeX;
+					wScale = (double) addingMap.getWidth() / (double) windowSizeX;
 				}
-				int imagelocationx = (windowSizeX/2)-((int)(AddingMap.getWidth()/wScale)/2);
-				int imagelocationy = (windowSizeY/2)-((int)(AddingMap.getHeight()/wScale)/2);
-				int lowerleft = imagelocationy+(int)(AddingMap.getHeight()/wScale)-5;
-				g.drawImage(AddingMap, imagelocationx, imagelocationy, (int)(AddingMap.getWidth()/wScale), (int)(AddingMap.getHeight()/wScale), null);
+				int imagelocationx = (windowSizeX/2)-((int)(addingMap.getWidth()/wScale)/2);
+				int imagelocationy = (windowSizeY/2)-((int)(addingMap.getHeight()/wScale)/2);
+				int lowerleft = imagelocationy+(int)(addingMap.getHeight()/wScale)-5;
+				g.drawImage(addingMap, imagelocationx, imagelocationy, (int)(addingMap.getWidth()/wScale), (int)(addingMap.getHeight()/wScale), null);
 				g.fillOval(imagelocationx, imagelocationy, 5, 5);
 				g.fillOval(imagelocationx, lowerleft, 5, 5);
 				g.drawString("Point 1", imagelocationx, imagelocationy+20);

@@ -270,9 +270,12 @@ public class MapInserterGUI extends JFrame{
 				public void mouseReleased(MouseEvent e) {
 
 					if (newClick == false) {
-						lastMousex = e.getX();
-						lastMousey = e.getY();
-						newClick = true;
+						if(buttonPanel.isSecondMapSelect())
+						{
+							lastMousex = e.getX();
+							lastMousey = e.getY();
+							newClick = true;
+						}
 					}
 					doRepaint();
 				}

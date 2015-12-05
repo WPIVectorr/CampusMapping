@@ -1036,53 +1036,24 @@ public class MapUpdaterGUI{
 						System.out.println("Invalid Map Selection");
 						e.printStackTrace();
 					}
-					double centerCurrentMapX = (Math.floor(((currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2) * img.getWidth())) / (campusImage.getWidth());
-					double centerCurrentMapY = (Math.floor(((currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2) * img.getHeight())) / (campusImage.getHeight());
-					System.out.println("ROTATION IS: " + Math.toDegrees(currentMap.getRotationAngle()));
-					System.out.println("centerCurrentMapX: " + centerCurrentMapX);
-					System.out.println("centerCurrentMapY: " + centerCurrentMapY);
-					System.out.println("The X value of top left is: " + currentMap.getxTopLeft() + ". The X value of bot right is: " + currentMap.getxBotRight());
-					System.out.println("The Y value of top left is: " + currentMap.getyTopLeft() + ". The Y value of bot right is: " + currentMap.getyBotRight());
-					System.out.println("The width of currentMap is: " + currentMap.getWidth());
-					System.out.println("The height of currentMap is: " + currentMap.getHeight());
-					System.out.println("The width-height ratio is: " + currentMap.getWidth() / currentMap.getHeight());
+					//double centerCurrentMapX = (Math.floor(((currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2) * img.getWidth())) / (campusImage.getWidth());
+					//double centerCurrentMapY = (Math.floor(((currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2) * img.getHeight())) / (campusImage.getHeight());
 					double tempPreRotateX = lastMousex;
 					double tempPreRotateY = lastMousey;
-					System.out.println("At first step: x: " + tempPreRotateX + " y: " + tempPreRotateY);
 					
 					tempPreRotateX = tempPreRotateX/(img.getWidth()/windowScale);
 					tempPreRotateY = tempPreRotateY/(img.getHeight()/windowScale);
-					System.out.println("At second step: x: " + tempPreRotateX + " y: " + tempPreRotateY);
-					//System.out.println("Width * Scale = " + img.getWidth()/windowScale);
-					//System.out.println("Height * Scale = " + img.getHeight()/windowScale);
-					
 					tempPreRotateX = tempPreRotateX - 0.5;
 					tempPreRotateY = tempPreRotateY - 0.5;
-					System.out.println("At third step: x: " + tempPreRotateX + " y: " + tempPreRotateY);
-					//System.out.println("Current Map Width is: " + currentMap.getWidth());
-					//System.out.println("Current Map Height is: " + currentMap.getHeight());
 					tempPreRotateX = tempPreRotateX * currentMap.getWidth();
 					tempPreRotateY = tempPreRotateY * currentMap.getHeight();
-					System.out.println("At thirdB step: x: " + tempPreRotateX + " y: " + tempPreRotateY);
-					//System.out.println("tempPreRotateX2 is: " + tempPreRotateX);
-					//System.out.println("tempPreRotateY2 is: " + tempPreRotateY);
 					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
 					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
-					System.out.println("At fourth step: x: " + rotateX + " y: " + rotateY);
-					//System.out.println("tempPreRotateX3 is: " + rotateX);
-					//System.out.println("tempPreRotateY3 is: " + rotateY);
 					rotateX = rotateX * campusImage.getWidth();
 					rotateY = rotateY * campusImage.getHeight();
-					System.out.println("At fifth step: x: " + rotateX + " y: " + rotateY);
-					//System.out.println("tempPreRotateX4 is: " + rotateX);
-					//System.out.println("tempPreRotateY4 is: " + rotateY);
 					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
 					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
-					System.out.println("At sixth step: x: " + finalGlobX + " y: " + finalGlobY);
 					
-					System.out.println("Campus height is: " + campusImage.getHeight() + " Campus Width is: " + campusImage.getWidth());
-					//System.out.println("tempPreRotateX5 is: " + finalGlobX);
-					//System.out.println("tempPreRotateY5 is: " + finalGlobY);
 					
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());

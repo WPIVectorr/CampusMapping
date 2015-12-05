@@ -216,15 +216,28 @@ public class InterMapEdgeGUI extends JFrame {
 				for(int count = 0; count < maps.size(); count++){
 					if(maps.get(count).getMapName().compareTo(temp) == 0){
 						mapDropDown.addItem(temp);
-
+						System.out.println("Number of edges: " + edgeArray.size());
 					}
 				}
 			}
 		}	
 		btnConfirmSelection.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent a){
+				boolean alreadyExists = false;
 				if(connectPoint != null) {
-					if (!((edgeArray.contains(new Edge(srcPoint, connectPoint)) || (!(edgeArray.contains(new Edge(connectPoint, srcPoint))))))){
+					String edgeIDPossibility1 = (srcPoint.getId()+"-"+connectPoint.getId());
+					String edgeIDPossibility2 = (connectPoint.getId()+"-"+srcPoint.getId());
+					for (int j = 0; j < edgeArray.size(); j++)
+					{
+						Edge currEdge =  edgeArray.get(j);
+						String edgeId = currEdge.getId();
+						if (edgeId.contentEquals(edgeIDPossibility1) || edgeId.contentEquals(edgeIDPossibility2))
+						{
+							alreadyExists = true;
+						}
+					}
+					
+					if (!alreadyExists){
 						try {
 							ServerDB.insertEdge(new Edge(srcPoint, connectPoint));
 						} catch (InsertFailureException | AlreadyExistsException | SQLException | DoesNotExistException e) {
@@ -235,6 +248,7 @@ public class InterMapEdgeGUI extends JFrame {
 						frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 					} else{
 						btnConfirmSelection.setText("Edge Already Exists");
+
 					}
 				} else {
 					btnConfirmSelection.setText("Pease Select Point");

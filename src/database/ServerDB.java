@@ -34,12 +34,13 @@ public class ServerDB {
 	private static String EDGE_SCHEMA = "id VARCHAR(30), idPoint1 VARCHAR(30), idPoint2 VARCHAR(30), weight INTEGER, isOutside BOOLEAN, isStairs INTEGER";
 	//-------------------------------------------------------------Variables-----------------------------------------------------------------------
 	private static Connection conn = null;
-	public final static boolean DEBUG = false;
+	public final static boolean DEBUG = true;
 
 	private static ArrayList<Map> allMaps = new ArrayList<Map>();
 	private static ArrayList<Point> allPoints = new ArrayList<Point>();
 	private static ArrayList<Edge> allEdges = new ArrayList<Edge>();
 	
+	private static boolean databaseChanged = true;
 	//--------------------------------------------------------Singleton Handling--------------------------------------------------------------
 	private static ServerDB instance;	
 	private ServerDB()
@@ -58,8 +59,9 @@ public class ServerDB {
 	//-------------------------------------------------------------Functions--------------------------------------------------------------------
 
 	public static void main (String args[])
-	{
-		updateAllPointIDIndexes();
+	{ 
+		//updateAllPointIDIndexes();
+		//clearDatabase();
 		//tryCreateDB();
 		conn = connect();
 		//testDB();
@@ -87,6 +89,7 @@ public class ServerDB {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		databaseChanged = true;
 	}
 
 	public static Connection connect()
@@ -157,6 +160,7 @@ public class ServerDB {
 			insertStatement += map.getPointIDIndex();
 			insertStatement += ")";
 			statement.executeUpdate(insertStatement);
+			databaseChanged = true;
 			//---------------------------------------------Finish inserting-------------------------------------------------------------------
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -221,9 +225,6 @@ public class ServerDB {
 
 		RELEVANT_TABLE_NAME += ("Map"+map.getMapId()+"Points");
 
-		/*
-		int index = getNewPointIndex(map);
-		pt.setIndex(index);*/
 		{
 			//--------------------------------------------------Add to Database--------------------------------------------------------
 			try {
@@ -247,7 +248,6 @@ public class ServerDB {
 				}
 				
 				rs.close();																	//Close resultSet to prevent errors
-				//TODO Take care of point having a mapId attribute
 				//----------------------------------------------Build insert statement---------------------------------------------------
 				String insertStatement = "insert into " +RELEVANT_TABLE_NAME+" values(";	//Start building MySQL insert statement
 				insertStatement += ("'"+pointID+"'");													
@@ -281,6 +281,7 @@ public class ServerDB {
 				insertStatement += "null";													//Formatting, last value must not have comma after it
 				insertStatement += ")";
 				statement.executeUpdate(insertStatement);									//Insert data
+				databaseChanged = true;
 				if (DEBUG)
 					System.out.println("Sucessfully inserted point into database");
 				//--------------------------------------------------Finish inserting------------------------------------------------------
@@ -330,6 +331,7 @@ public class ServerDB {
 						throw new InsertFailureException("Failed to add to object database");
 				}																			//End map search check
 			}																				//End empty check
+			databaseChanged = true;
 			//---------------------------------------------------------Add to allPoints array------------------------------------------------------------
 			if (allPoints == null || allPoints.isEmpty())									//If empty or null, safe to add								
 			{
@@ -362,6 +364,7 @@ public class ServerDB {
 				System.out.println("Succesfully inserted point into object database");
 
 		}																					//End checkObjectExists check
+		databaseChanged = true;
 	}																						//End insertPoint
 
 	public static void insertEdge(Edge edge) throws InsertFailureException, AlreadyExistsException, SQLException, DoesNotExistException
@@ -405,6 +408,7 @@ public class ServerDB {
 			insertStatement += stairsInt;
 			insertStatement += ")";
 			statement.executeUpdate(insertStatement);
+			databaseChanged = true;
 			if (DEBUG)
 				System.out.println("Sucessfully inserted edge:"+edgeId+" into database");
 			//--------------------------------------------------Finish inserting------------------------------------------------------
@@ -454,12 +458,14 @@ public class ServerDB {
 					throw new InsertFailureException("Failed to add edge to object database");
 			}																			
 		}
+		databaseChanged = true;
 		//-----------------------------------------------Refresh all local objects------------------------------------
 		try {
 			populateFromDatabase();
 		} catch (PopulateErrorException e) {
 			e.printStackTrace();
 		}
+		databaseChanged = true;
 		if (DEBUG)
 			System.out.println("Successfully inserted edge into object database");
 	}
@@ -491,7 +497,8 @@ public class ServerDB {
 		updateStatement += ", ";
 		updateStatement += "pointIDIndex = "+map.getPointIDIndex();
 		updateStatement +=(" WHERE ID = '"+mapId+"'");
-		int updateResult = statement.executeUpdate(updateStatement);			
+		int updateResult = statement.executeUpdate(updateStatement);
+		databaseChanged = true;
 		
 		conn.close();
 		if (updateResult == 0)
@@ -562,6 +569,7 @@ public class ServerDB {
 				updateStatement += ("idEdge"+(i+1)+" = "+"null");						//Formatting, last value must not have comma after it
 				updateStatement +=(" WHERE ID = '"+ptId+"'");
 				statement.executeUpdate(updateStatement);								//Insert data
+				databaseChanged = true;
 				if (DEBUG)
 					System.out.println("Sucessfully updated point:"+ptId+" in database");
 			}
@@ -645,6 +653,7 @@ public class ServerDB {
 		{
 			throw new DoesNotExistException("Could not find point in database");
 		}
+		databaseChanged = true;
 		//------------------------------------------------------Refresh local objects---------------------------------------------------------
 		try {
 			populateFromDatabase();
@@ -657,6 +666,7 @@ public class ServerDB {
 	
 	public static void removeEdge(Edge edge) throws DoesNotExistException
 	{
+		databaseChanged = true;
 		if (DEBUG)
 			System.out.println("remove Edge called");
 		Point p1 = edge.getPoint1();
@@ -764,6 +774,7 @@ public class ServerDB {
 	
 	private static void clearDatabase()
 	{
+		databaseChanged = true;
 		try {
 			conn = connect();
 			Statement statement = conn.createStatement();
@@ -777,6 +788,48 @@ public class ServerDB {
 		}
 	}
 	//----------------------------------------------------------Retrieval Functions------------------------------------------------------------
+	
+	public static Map getMapFromServer(int mapId) throws DoesNotExistException
+	{
+		try {
+			Map map = new Map();
+			conn = connect();
+			Statement statement;
+			statement = conn.createStatement();
+			statement.setQueryTimeout(30);  											// set timeout to 30 sec.
+			
+			String retrieveStatement = "SELECT * FROM "+MAP_TABLE_NAME+" WHERE id = "+mapId;
+			ResultSet rs = statement.executeQuery(retrieveStatement);
+			if (rs.next())
+			{
+				map.setMapId(rs.getInt("id"));
+				map.setMapName(rs.getString("name"));
+				map.setxTopLeft(rs.getDouble("xTopLeft"));
+				map.setyTopLeft(rs.getDouble("yTopLeft"));
+				map.setxBotRight(rs.getDouble("xBotRight"));
+				map.setyBotRight(rs.getDouble("yBotRight"));
+				map.setRotationAngle(rs.getDouble("rotation"));
+				map.setPointIDIndex(rs.getInt("pointIDIndex"));
+				ArrayList<Point> tempPts = new ArrayList<Point>();
+				try {
+					tempPts = getPointsFromServer(map);
+				} catch (PopulateErrorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				map.setPointList(tempPts); 							//Automatically sets numPoints
+				return map;
+			}
+			else
+			{
+				throw new DoesNotExistException("Could not find map in database");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	public static ArrayList<Map> getMapsFromLocal()
 	{
@@ -805,6 +858,30 @@ public class ServerDB {
 		return allMaps;
 	}
 
+	public static ArrayList<Map> getEmptyMapsFromServer()
+	{
+		ArrayList<Map> retMaps = new ArrayList<Map>();
+		try
+		{
+			conn = connect();
+			Statement statement = conn.createStatement();
+			
+			String retrievalString = "SELECT * FROM "+MAP_TABLE_NAME;
+			ResultSet rs = statement.executeQuery(retrievalString);
+			while (rs.next())
+			{
+				Map newMap = new Map();
+				newMap.setMapId(rs.getInt("id"));
+				newMap.setMapName(rs.getString("name"));
+				retMaps.add(newMap);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return retMaps;
+	}
+	
 	private static Point getPointFromLocal(String pointId) throws DoesNotExistException
 	{
 		int counter = 0;
@@ -828,12 +905,18 @@ public class ServerDB {
 		{
 			System.out.println("Failed to get point:"+pointId);
 			printObjects(true, true, true);
-			throw new DoesNotExistException("Point does not exist in object database");
+			throw new DoesNotExistException("Point:"+pointId+" does not exist in object database");
 		}
 	}
 
 	public static ArrayList<Point> getPointsFromServer(Map map) throws PopulateErrorException
 	{
+		try {
+			populateFromDatabase();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		if (DEBUG)
 			System.out.println("getPointsFromServer called");
 		ArrayList<Point> retArray = new ArrayList<Point>();
@@ -915,159 +998,167 @@ public class ServerDB {
 
 	private static void populateFromDatabase() throws PopulateErrorException, SQLException
 	{
-		allMaps.clear();
-		allPoints.clear();
-		allEdges.clear();
-
-		try {
-			String newPtId;
-			int newPtMapId;
-			String newPtName;
-			int newPtIndex;
-			int newPtLocX;
-			int newPtLocY;
-			int newPtGlobX;
-			int newPtGlobY;
-			int newPtNumberEdges;
-
-			String newEdgeId;
-			String newEdgePt1;
-			String newEdgePt2;
-			int newEdgeWeight;
-			int newEdgeOutside;
-			int newEdgeStairs;
-
-			ArrayList<Edge> newPtEdges = new ArrayList<Edge>();
-
-			conn = connect();
-			ResultSet rs1 = conn.createStatement().executeQuery("SELECT table_name FROM information_schema.tables");
-			ResultSet rs2;
-			ResultSet rs3;
-			ResultSet rs4;
-
-			ArrayList<String> tableNames = new ArrayList<String>();
-
-			while (rs1.next())
-			{
-				if (rs1.getString("table_name").toLowerCase().contains("Points".toLowerCase()) ||
-						rs1.getString("table_name").toLowerCase().contains("Edges".toLowerCase())||
-						rs1.getString("table_name").toLowerCase().contentEquals(MAP_TABLE_NAME.toLowerCase()))
-					tableNames.add(rs1.getString("table_name"));
-			}
-			Collections.sort(tableNames);
-			int nameCounter = 0;
-			rs4 = conn.createStatement().executeQuery("SELECT table_name FROM information_schema.tables");
-			for (nameCounter = 0; nameCounter < tableNames.size(); nameCounter++)
-			{
-				//----------------------------------------Populate Map--------------------------------------------
-				if (tableNames.get(nameCounter).toLowerCase().contentEquals(MAP_TABLE_NAME.toLowerCase()))
+		if (databaseChanged)
+		{
+			allMaps.clear();
+			allPoints.clear();
+			allEdges.clear();
+	
+			try {
+				String newPtId;
+				int newPtMapId;
+				String newPtName;
+				int newPtIndex;
+				int newPtLocX;
+				int newPtLocY;
+				int newPtGlobX;
+				int newPtGlobY;
+				int newPtNumberEdges;
+	
+				String newEdgeId;
+				String newEdgePt1;
+				String newEdgePt2;
+				int newEdgeWeight;
+				int newEdgeOutside;
+				int newEdgeStairs;
+	
+				ArrayList<Edge> newPtEdges = new ArrayList<Edge>();
+	
+				conn = connect();
+				ResultSet rs1 = conn.createStatement().executeQuery("SELECT table_name FROM information_schema.tables");
+				ResultSet rs2;
+				ResultSet rs3;
+				ResultSet rs4;
+	
+				ArrayList<String> tableNames = new ArrayList<String>();
+	
+				while (rs1.next())
 				{
-					if (DEBUG)
-						System.out.println("Populating from table: "+tableNames.get(nameCounter)+" which is at row: " + nameCounter);
-
-					rs4 = conn.createStatement().executeQuery("SELECT * FROM "+tableNames.get(nameCounter));
-					while (rs4.next())
-					{
-						int newMapId = rs4.getInt("id");
-						String newMapName = rs4.getString("name");
-						double newXTopLeft = rs4.getDouble("xTopLeft");
-						double newYTopLeft = rs4.getDouble("yTopLeft");
-						double newXBotRight = rs4.getDouble("xBotRight");
-						double newYBotRight = rs4.getDouble("yBotRight");
-						double newRotationAngle = rs4.getDouble("rotation");
-						int newPointIDIndex = rs4.getInt("pointIDIndex");
-						Map newMap = new Map(newMapId, newMapName, newXTopLeft, newYTopLeft, newXBotRight, newYBotRight,
-								newRotationAngle, newPointIDIndex);
-						allMaps.add(newMap);
-					}
-					rs4.close();
+					if (rs1.getString("table_name").toLowerCase().contains("Points".toLowerCase()) ||
+							rs1.getString("table_name").toLowerCase().contains("Edges".toLowerCase())||
+							rs1.getString("table_name").toLowerCase().contentEquals(MAP_TABLE_NAME.toLowerCase()))
+						tableNames.add(rs1.getString("table_name"));
 				}
-				//------------------------------------------Populate Points-------------------------------------------
-				else if (tableNames.get(nameCounter).toLowerCase().contains("Points".toLowerCase()))
+				Collections.sort(tableNames);
+				int nameCounter = 0;
+				rs4 = conn.createStatement().executeQuery("SELECT table_name FROM information_schema.tables");
+				for (nameCounter = 0; nameCounter < tableNames.size(); nameCounter++)
 				{
-					String tableName = tableNames.get(nameCounter);
-					if (DEBUG)
-						System.out.println("Populating from table: "+tableNames.get(nameCounter)+" which is at row: " + nameCounter);
-					int mapID = Integer.parseInt(tableName.substring(3, 4));															//Gets the mapId
-					int j = 0;
-					Map currentMap = null;
-					for (j = 0; j < allMaps.size(); j++)
+					//----------------------------------------Populate Map--------------------------------------------
+					if (tableNames.get(nameCounter).toLowerCase().contentEquals(MAP_TABLE_NAME.toLowerCase()))
 					{
-						if (allMaps.get(j).getMapId() == mapID)
+						if (DEBUG)
+							System.out.println("Populating from table: "+tableNames.get(nameCounter)+" which is at row: " + nameCounter);
+	
+						rs4 = conn.createStatement().executeQuery("SELECT * FROM "+tableNames.get(nameCounter));
+						while (rs4.next())
 						{
-							currentMap = allMaps.get(j);
+							int newMapId = rs4.getInt("id");
+							String newMapName = rs4.getString("name");
+							double newXTopLeft = rs4.getDouble("xTopLeft");
+							double newYTopLeft = rs4.getDouble("yTopLeft");
+							double newXBotRight = rs4.getDouble("xBotRight");
+							double newYBotRight = rs4.getDouble("yBotRight");
+							double newRotationAngle = rs4.getDouble("rotation");
+							int newPointIDIndex = rs4.getInt("pointIDIndex");
+							Map newMap = new Map(newMapId, newMapName, newXTopLeft, newYTopLeft, newXBotRight, newYBotRight,
+									newRotationAngle, newPointIDIndex);
+							allMaps.add(newMap);
 						}
+						rs4.close();
 					}
-					if (currentMap == null)
+					//------------------------------------------Populate Points-------------------------------------------
+					else if (tableNames.get(nameCounter).toLowerCase().contains("Points".toLowerCase()))
 					{
-						throw new PopulateErrorException("Couldn't find map object to add point to");
-					}
-					
-					rs2 = conn.createStatement().executeQuery("SELECT * FROM "+tableNames.get(nameCounter));
-					while(rs2.next())
-					{
-						newPtId = rs2.getString("id");
-						newPtMapId = rs2.getInt("mapId");
-						newPtName = rs2.getString("name");
-						newPtIndex = rs2.getInt("localIndex");
-						newPtLocX = rs2.getInt("locX");
-						newPtLocY = rs2.getInt("locY");
-						newPtGlobX = rs2.getInt("globX");
-						newPtGlobY = rs2.getInt("globY");
-						newPtNumberEdges = 0;															//This should be automatically rectified when adding in edges
-						Point newPt = new Point(newPtId, newPtName, newPtLocX, newPtLocY, newPtGlobX, newPtGlobY, newPtNumberEdges);
-						newPt.setIndex(newPtIndex);
-						newPt.setMapId(newPtMapId);
-						currentMap.addPoint(newPt);
-						allPoints.add(newPt);
-					}
-					rs2.close();
-				}
-				//------------------------------------------Populate Edges-------------------------------------------
-				else if (tableNames.get(nameCounter).toLowerCase().contains("Edges".toLowerCase()))
-				{
-					if (DEBUG)
-						System.out.println("Populating from table: "+tableNames.get(nameCounter)+" which is at row: " + nameCounter);
-					rs3 = conn.createStatement().executeQuery("SELECT * FROM "+tableNames.get(nameCounter));
-					while(rs3.next())
-					{
-						newEdgeId = rs3.getString("id");
-						newEdgePt1 = rs3.getString("idPoint1");
-						Point pt1 = new Point();
-						Point pt2 = new Point();
-						try {
-							pt1 = getPointFromLocal(newEdgePt1);
-						} catch (DoesNotExistException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						String tableName = tableNames.get(nameCounter);
+						if (DEBUG)
+							System.out.println("Populating from table: "+tableNames.get(nameCounter)+" which is at row: " + nameCounter);
+						int mapID = Integer.parseInt(tableName.substring(3, 4));															//Gets the mapId
+						int j = 0;
+						Map currentMap = null;
+						for (j = 0; j < allMaps.size(); j++)
+						{
+							if (allMaps.get(j).getMapId() == mapID)
+							{
+								currentMap = allMaps.get(j);
+							}
 						}
-						newEdgePt2 = rs3.getString("idPoint2");
-						try {
-							pt2 = getPointFromLocal(newEdgePt2);
-						} catch (DoesNotExistException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						if (currentMap == null)
+						{
+							throw new PopulateErrorException("Couldn't find map object to add point to");
 						}
-						newEdgeWeight = rs3.getInt("weight");
-						newEdgeOutside = rs3.getInt("isOutside");
-						newEdgeStairs = rs3.getInt("isStairs");
-						boolean out = (newEdgeOutside==1);
-						boolean stairs = (newEdgeStairs == 1);
-
-						Edge newEdge = new Edge(pt1, pt2, newEdgeWeight, out, stairs);						//Automatically adds to points
-						allEdges.add(newEdge);
+						
+						rs2 = conn.createStatement().executeQuery("SELECT * FROM "+tableNames.get(nameCounter));
+						while(rs2.next())
+						{
+							newPtId = rs2.getString("id");
+							newPtMapId = rs2.getInt("mapId");
+							newPtName = rs2.getString("name");
+							newPtIndex = rs2.getInt("localIndex");
+							newPtLocX = rs2.getInt("locX");
+							newPtLocY = rs2.getInt("locY");
+							newPtGlobX = rs2.getInt("globX");
+							newPtGlobY = rs2.getInt("globY");
+							newPtNumberEdges = 0;															//This should be automatically rectified when adding in edges
+							Point newPt = new Point(newPtId, newPtName, newPtLocX, newPtLocY, newPtGlobX, newPtGlobY, newPtNumberEdges);
+							newPt.setIndex(newPtIndex);
+							newPt.setMapId(newPtMapId);
+							currentMap.addPoint(newPt);
+							allPoints.add(newPt);
+						}
+						rs2.close();
 					}
-					rs3.close();
+					//------------------------------------------Populate Edges-------------------------------------------
+					else if (tableNames.get(nameCounter).toLowerCase().contains("Edges".toLowerCase()))
+					{
+						if (DEBUG)
+							System.out.println("Populating from table: "+tableNames.get(nameCounter)+" which is at row: " + nameCounter);
+						rs3 = conn.createStatement().executeQuery("SELECT * FROM "+tableNames.get(nameCounter));
+						while(rs3.next())
+						{
+							newEdgeId = rs3.getString("id");
+							newEdgePt1 = rs3.getString("idPoint1");
+							Point pt1 = new Point();
+							Point pt2 = new Point();
+							try {
+								pt1 = getPointFromLocal(newEdgePt1);
+							} catch (DoesNotExistException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							newEdgePt2 = rs3.getString("idPoint2");
+							try {
+								pt2 = getPointFromLocal(newEdgePt2);
+							} catch (DoesNotExistException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							newEdgeWeight = rs3.getInt("weight");
+							newEdgeOutside = rs3.getInt("isOutside");
+							newEdgeStairs = rs3.getInt("isStairs");
+							boolean out = (newEdgeOutside==1);
+							boolean stairs = (newEdgeStairs == 1);
+	
+							Edge newEdge = new Edge(pt1, pt2, newEdgeWeight, out, stairs);						//Automatically adds to points
+							allEdges.add(newEdge);
+						}
+						rs3.close();
+					}
+					else
+					{
+						System.out.println("Couldn't resolve table name");
+						throw new PopulateErrorException("Invalid table type. Can't resolve name:"+rs1.getString("table_name"));
+					}
 				}
-				else
-				{
-					System.out.println("Couldn't resolve table name");
-					throw new PopulateErrorException("Invalid table type. Can't resolve name:"+rs1.getString("table_name"));
-				}
+				databaseChanged = false;
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}
+		else
+		{
+			System.out.println("No change in database, not populating");
 		}
 	}
 
@@ -1228,6 +1319,7 @@ public class ServerDB {
 	
 	public static void updateAllPointIDIndexes()
 	{
+		databaseChanged = true;
 		try {
 			populateFromDatabase();
 		} catch (PopulateErrorException e) {

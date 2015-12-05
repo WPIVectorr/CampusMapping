@@ -208,11 +208,6 @@ public class MapInserterGUIButtonPanel extends JFrame {
 				// drop-down menu for selecting a map
 				File[] imgList = vectorMapDir.listFiles();
 				for (int f = 0; f < imgList.length; f++) {
-					/*
-					 * tempMapName = imgList[f].getName(); nameLength =
-					 * tempMapName.length();
-					 * mapDropDown.addItem(tempMapName.substring(0, nameLength - 4));
-					 */
 					// includes extension
 					if(!(imgList[f].getName().equals(".DS_Store"))){
 						
@@ -220,31 +215,6 @@ public class MapInserterGUIButtonPanel extends JFrame {
 						mapDropDown.addItem(imgList[f].getName());
 					}
 				}
-				
-
-/*		// When the Updater opens the software the list will be populated with
-		// the files in
-		// the VectorMapps resource folder
-		File vectorMapDir = new File("src/VectorMaps");
-		vectorMapDir = new File(vectorMapDir.getAbsolutePath());
-		//System.out.println("Vectormap abs path: " + vectorMapDir.getAbsolutePath());
-
-		// Truncates the extensions off of the map name so only the name is
-		// displayed in the
-		// drop-down menu for selecting a map
-		File[] imgList = vectorMapDir.listFiles();
-		for (int f = 0; f < imgList.length; f++) {
-			
-			 * tempMapName = imgList[f].getName(); nameLength =
-			 * tempMapName.length();
-			 * mapDropDown.addItem(tempMapName.substring(0, nameLength - 4));
-			 
-			// includes extension
-			if(!(imgList[f].getName().equals(".DS_Store"))){
-				secondMap.addItem(imgList[f].getName());
-			}
-		}*/
-
 	}
 
 

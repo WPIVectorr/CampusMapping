@@ -296,15 +296,11 @@ public class MapInserterGUI extends JFrame{
 				if (CampusMap.getHeight() >= CampusMap.getWidth()) {
 					wScale = (double) CampusMap.getHeight() / (double) windowSizeY;
 					windowScale = (int)wScale;
-					System.out.println("WScale is: " + wScale);
-					System.out.println("Window Scale is: " + windowScale);
 				}
 
 				else {
 					wScale = (double) CampusMap.getHeight() / (double) windowSizeY;
 					windowScale = (int)wScale;
-					System.out.println("WScale is: " + wScale);
-					System.out.println("Window Scale is: " + windowScale);
 				}
 				int imagelocationx = 0;//(windowSizeX/2)-((int)(CampusMap.getWidth()/wScale)/2);
 				int imagelocationy = 0;//(windowSizeY/2)-((int)(CampusMap.getHeight()/wScale)/2);
@@ -335,6 +331,7 @@ public class MapInserterGUI extends JFrame{
 					point3x = point2.getLocX() + ((double)(Math.sin(Math.toRadians(90)-Rotation))*(double)ImageWidth);
 					point3y = point3y * wScale;
 					point3x = point3x * wScale;
+
 					double HeightScale = Math.abs((double)ImageHeight/(double)AddingMap.getHeight());
 					double WidthScale = Math.abs((double)ImageWidth/(double)AddingMap.getWidth());
 					

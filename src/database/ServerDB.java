@@ -16,7 +16,7 @@ import main_package.Point;
 
 public class ServerDB {
 	//------------------------------------------------------------Constants--------------------------------------------------------------------
-	private static String DATABASE_URL = "jdbc:mysql://dev-instance.c5bohpl1biax.us-west-2.rds.amazonaws.com:3306/";	
+	private static String DATABASE_URL = "jdbc:mysql://campusmapping.c5bohpl1biax.us-west-2.rds.amazonaws.com:3306/";	
 	private static String DATABASE_NAME = "campusMapping_db";
 	private static String userName = "Vectorr";
 	private static String password = "mag";
@@ -40,7 +40,7 @@ public class ServerDB {
 	private static ArrayList<Point> allPoints = new ArrayList<Point>();
 	private static ArrayList<Edge> allEdges = new ArrayList<Edge>();
 	
-	private static boolean databaseChanged = false;
+	private static boolean databaseChanged = true;
 	//--------------------------------------------------------Singleton Handling--------------------------------------------------------------
 	private static ServerDB instance;	
 	private ServerDB()
@@ -801,8 +801,8 @@ public class ServerDB {
 			ResultSet rs = statement.executeQuery(retrieveStatement);
 			if (rs.next())
 			{
-				map.setMapId(rs.getInt("mapId"));
-				map.setMapName(rs.getString("mapName"));
+				map.setMapId(rs.getInt("id"));
+				map.setMapName(rs.getString("name"));
 				map.setxTopLeft(rs.getDouble("xTopLeft"));
 				map.setyTopLeft(rs.getDouble("yTopLeft"));
 				map.setxBotRight(rs.getDouble("xBotRight"));
@@ -910,6 +910,12 @@ public class ServerDB {
 
 	public static ArrayList<Point> getPointsFromServer(Map map) throws PopulateErrorException
 	{
+		try {
+			populateFromDatabase();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		if (DEBUG)
 			System.out.println("getPointsFromServer called");
 		ArrayList<Point> retArray = new ArrayList<Point>();
@@ -1143,6 +1149,7 @@ public class ServerDB {
 						throw new PopulateErrorException("Invalid table type. Can't resolve name:"+rs1.getString("table_name"));
 					}
 				}
+				databaseChanged = false;
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

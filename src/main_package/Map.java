@@ -3,7 +3,7 @@ package main_package;
 import java.util.ArrayList;
 
 
-public class Map {
+public class Map implements Comparable{
 	private ArrayList<Point> Points; 
 	private int mapId;
 	private int numPoints;
@@ -254,4 +254,12 @@ public class Map {
 	{
 		this.pointIDIndex = newIndex;
 	}
+
+	@Override
+	public int compareTo(Object o) {
+		int temp = this.getMapName().compareTo(((Map) o).getMapName());
+		return temp;		
+	}
+	
+	
 }

@@ -1137,10 +1137,12 @@ public class MapUpdaterGUI{
 					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());
+					
+					//needs to include boolean for isStair and isOutside now
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
 							roomNumber.getText(), currentMap.getPointIDIndex(),
 							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
-
+					
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
 						//System.out.println(pointArray.get(k).getId());

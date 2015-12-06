@@ -840,7 +840,6 @@ public class MapUpdaterGUI{
 			public void mouseDragged(MouseEvent g){
 				//System.out.println("dragged");
 				Dragged = true;
-				drawnfirst = true;
 				mousex = g.getX();
 				mousey = g.getY();
 				frame.repaint();
@@ -863,7 +862,7 @@ public class MapUpdaterGUI{
 				}
 				double oldWidth = img.getWidth() * scaleSize;
 				double oldHeight = img.getHeight() * scaleSize;
-				if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+				if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(name.equals("Select Map")))) {
 					scroldirection = e.getWheelRotation();
 					if (e.getWheelRotation() > 0) {
 						if (scaleSize <= 2) {
@@ -1149,23 +1148,27 @@ public class MapUpdaterGUI{
 					newImageWidth = (int)img.getWidth()*scaleSize;
 					if(!(name.equals("Select Map"))){
 						if(Dragged){
+							System.out.println("dragged");
 							deltax = -(originx - mousex);
 							deltay = -(originy - mousey);
 							originx = mousex;
 							originy = mousey;
 							difWidth = 0;
 							difHeight = 0;
-						} else if (scrolled){
-							//System.out.println("I did it");
+						} else if(scrolled){
+							System.out.println("I did it");
 							deltax = difWidth;
 							deltay = difWidth;
 							scrolled = false;
 						}
 					}
+					System.out.println(drawnposx+", "+drawnposy);
 					drawnposx += deltax;
 					drawnposy += deltay;
+					System.out.println(drawnposx+", "+drawnposy);
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
 				}
+			drawnfirst = true;
 
 			// add point to the point array (has to take place outside of below
 			// loop)
@@ -1175,31 +1178,41 @@ public class MapUpdaterGUI{
 				{
 					Integer nameNumber = currentMap.getPointIDIndex()+1;
 					double ourRotation = currentMap.getRotationAngle();
-					//ourRotation = 2 * Math.PI - ourRotation;
+					ourRotation = 2 * Math.PI - ourRotation;
 
-					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;
-					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
+					destinationFile = new File("src/VectorMaps/" + "Campus" + ".jpg");
+					destinationFile = new File(destinationFile.getAbsolutePath());
+					BufferedImage campusImage = null;
+					try {
+						if(DEBUG)
+							System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
+						//System.out.println("Map name " + currentMap.getMapName());
+
+						campusImage = ImageIO.read(destinationFile);
+					} catch (IOException e) {
+						System.out.println("Invalid Map Selection");
+						e.printStackTrace();
+					}
+					//double centerCurrentMapX = (Math.floor(((currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2) * img.getWidth())) / (campusImage.getWidth());
+					//double centerCurrentMapY = (Math.floor(((currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2) * img.getHeight())) / (campusImage.getHeight());
 					double tempPreRotateX = lastMousex;
 					double tempPreRotateY = lastMousey;
 					double LocalX = (lastMousex-drawnposx)/newImageWidth;
 					double LocalY = (lastMousey-drawnposy)/newImageHeight;
-					
-					
-					
-					
-					
-					
-					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
-					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
-					tempPreRotateX = (tempPreRotateX/img.getWidth()) * currentMap.getWidth();
-					tempPreRotateY = (tempPreRotateY/img.getHeight()) * currentMap.getHeight();
-					tempPreRotateX = tempPreRotateX * windowScale;
-					tempPreRotateY = tempPreRotateY * windowScale;
+					tempPreRotateX = tempPreRotateX/(img.getWidth()/windowScale);
+					tempPreRotateY = tempPreRotateY/(img.getHeight()/windowScale);
+					tempPreRotateX = tempPreRotateX - 0.5;
+					tempPreRotateY = tempPreRotateY - 0.5;
+					tempPreRotateX = tempPreRotateX * currentMap.getWidth();
+					tempPreRotateY = tempPreRotateY * currentMap.getHeight();
 					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
 					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
-
-					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
-					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
+					rotateX = rotateX * campusImage.getWidth();
+					rotateY = rotateY * campusImage.getHeight();
+					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
+					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
+					
+					
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),

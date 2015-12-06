@@ -2,7 +2,7 @@ package main_package;
 
 import java.util.ArrayList;
 
-public class Point {
+public class Point implements Comparable{
 	private String id;
 	private int mapId;
 	private String name;
@@ -13,6 +13,8 @@ public class Point {
 	private double globY;
 	private ArrayList<Edge> edges = new ArrayList<Edge>();
 	private int numberEdges;
+	private boolean stairPref;
+	private boolean outsidePref;
 	
 	public Point()
 	{
@@ -64,6 +66,8 @@ public class Point {
 		this.index = index;
 		this.globX = globX;
 		this.globY = globY;
+		this.stairPref = stairPref;
+		this.outsidePref = outsidePref;
 	}
 	
 	public Point(String id, String name, int index, double x, double y, int numberEdges) {
@@ -208,5 +212,11 @@ public class Point {
 			this.numberEdges++;
 			return true;
 		}
+	}
+	
+	@Override
+	public int compareTo(Object o) {
+		int temp = this.getName().compareTo(((Point) o).getName());
+		return temp;
 	}
 }

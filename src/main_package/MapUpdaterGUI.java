@@ -1,9 +1,7 @@
-
 package main_package;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -54,7 +52,7 @@ public class MapUpdaterGUI{
 	int prevRadButtonVal = 0;
 
 	private Map currentMap = null;
-	private static ServerDB md = ServerDB.getInstance();
+	//private static ServerDB md = ServerDB.getInstance();
 
 	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
 	private ArrayList<Edge> newEdges = new ArrayList<Edge>();
@@ -104,9 +102,11 @@ public class MapUpdaterGUI{
 	private JLabel mapsLoadingLabel;
 	private JLabel pointsLoadingLabel;
 	private JTabbedPane tabs = new JTabbedPane();
-	private ArrayList<Map> maps = new ArrayList<Map>();
+	//private ArrayList<Map> maps = new ArrayList<Map>();
+	private ArrayList<Map> emptyMaps = new ArrayList<Map>();
 	private JButton btnConnectToOther;
 	private InterMapEdgeGUI connectMapGUI;
+	private static SplashPage loadingAnimation = new SplashPage();
 	private double scaleSize = 1;
 	private int drawnposx;
 	private int drawnposy;
@@ -131,11 +131,11 @@ public class MapUpdaterGUI{
 	private double upperx;
 	private double uppery;
 	
-
+	
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		frame.setVisible(true);
+		
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MapUpdaterGUI.class.getResource("/VectorLogo/Logo Icon.png")));
 		double framex = 932;
 		double framey = 778;
@@ -143,8 +143,8 @@ public class MapUpdaterGUI{
 		frame.setResizable(false);
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
-		screenHeight = screenSize.height;
-		screenWidth = screenSize.width;
+		int screenHeight = screenSize.height;
+		int screenWidth = screenSize.width;
 		double xlocation = (screenWidth / 2)-(framex/2);
 		double ylocation = (screenHeight / 2)-(framey/2);
 		frame.setLocation((int)xlocation, (int)ylocation);
@@ -152,8 +152,9 @@ public class MapUpdaterGUI{
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		maps = md.getMapsFromLocal();
-
+		//maps = ServerDB.getMapsFromLocal();
+		emptyMaps = ServerDB.getEmptyMapsFromServer();
+		
 		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
 
@@ -172,8 +173,9 @@ public class MapUpdaterGUI{
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		
+		loadingAnimation.hideSplash(0);
+		frame.setVisible(true);
 	}
-
 
 	/*
 	 * Returns the currently selected radbutton in the form of an int. 1 for
@@ -211,7 +213,15 @@ public class MapUpdaterGUI{
 	}
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException {
-
+		//added by JPG starts and plays the animation
+		loadingAnimation = new SplashPage();
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
@@ -247,7 +257,6 @@ public class MapUpdaterGUI{
 			}
 		});
 	}
-
 
 	public JComponent createMapsPanel(){
 		JPanel mapsPanel = new JPanel();
@@ -298,10 +307,10 @@ public class MapUpdaterGUI{
 
 				//checks to make sure the names populating the drop down are in both the vector maps package and 
 				//the database
-				for(int count = 0; count < maps.size(); count++){
+				for(int count = 0; count < emptyMaps.size(); count++){
 					if(DEBUG)
-						System.out.println("printing from database: " + maps.get(count).getMapName());
-					if(maps.get(count).getMapName().compareTo(temp) == 0){
+						System.out.println("printing from database: " + emptyMaps.get(count).getMapName());
+					if(emptyMaps.get(count).getMapName().compareTo(temp) == 0){
 						mapDropDown.addItem(temp);
 
 					}
@@ -346,7 +355,6 @@ public class MapUpdaterGUI{
 
 		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
-				drawnfirst = false;
 				mapsLoadingLabel.setVisible(true);
 
 				btnSaveMap.setEnabled(true);		
@@ -376,13 +384,18 @@ public class MapUpdaterGUI{
 					newEdges.clear();
 					//ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
 					if(DEBUG)
-						System.out.println("MapList size is "+maps.size());//Print out the size of the maps from the database
-					for(int i = 0; i < maps.size(); i++){//Iterate through the mapList until we find the item we are looking for
+						System.out.println("MapList size is "+emptyMaps.size());//Print out the size of the maps from the database
+					for(int i = 0; i < emptyMaps.size(); i++){//Iterate through the mapList until we find the item we are looking for
 						if(DEBUG)
 							System.out.println("Trying to find name:"+ name + ".jpg");
-						if(name.equals(maps.get(i).getMapName()))//Once we find the map:
+						if(name.equals(emptyMaps.get(i).getMapName()))//Once we find the map:
 						{
-							currentMap = maps.get(i);//Grab the current map at this position.
+							try {
+								currentMap = ServerDB.getMapFromServer(emptyMaps.get(i).getMapId());
+							} catch (DoesNotExistException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}//Grab the current map at this position.
 							try {
 								pointArray = ServerDB.getPointsFromServer(currentMap);
 							} catch (PopulateErrorException e) {
@@ -391,7 +404,7 @@ public class MapUpdaterGUI{
 							}//Populate the point array with all the points found.
 							oldPoints = pointArray;
 							if(DEBUG)
-								System.out.println("Map list size:"+maps.size());
+								System.out.println("Map list size:"+emptyMaps.size());
 
 							for(int j = 0; j < pointArray.size(); j++){
 								ArrayList<Edge> tmpEdges = pointArray.get(j).getEdges();
@@ -407,7 +420,7 @@ public class MapUpdaterGUI{
 
 							if(DEBUG)
 								System.out.println("Found map with number of points: "+currentMap.getPointList().size());
-							i = maps.size();
+							i = emptyMaps.size();
 						}
 					}
 
@@ -600,7 +613,7 @@ public class MapUpdaterGUI{
 							System.out.println("invalid copy");
 						a.printStackTrace();
 					}
-					if(maps == null || maps.size() == 0){
+					if(emptyMaps == null || emptyMaps.size() == 0){
 						setInfo(0, 0, img.getWidth(), img.getHeight(), 0);
 					} else {
 						new MapInserterGUI();
@@ -624,8 +637,6 @@ public class MapUpdaterGUI{
 
 		return mapsPanel;
 	}
-
-
 
 	public JComponent createPointsPanel(){
 
@@ -788,12 +799,12 @@ public class MapUpdaterGUI{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(editPoint != null && maps != null)
-					connectMapGUI = new InterMapEdgeGUI(maps, editPoint, drawPanel.getWidth(), drawPanel.getHeight());
+				if(editPoint != null && emptyMaps != null)
+					connectMapGUI = new InterMapEdgeGUI(ServerDB.getMapsFromLocal(), editPoint, drawPanel.getWidth(), drawPanel.getHeight());
 
 			}
 		});
-		
+
 		drawPanel.addMouseListener(new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
 				if (!Dragged){
@@ -896,6 +907,15 @@ public class MapUpdaterGUI{
 				btnSaveMap.setText("Saving");
 				pointsLoadingLabel.setVisible(true);
 				btnSaveMap.setText("Saving");
+				try {
+					ServerDB.updateMap(currentMap);
+				} catch (SQLException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (DoesNotExistException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
 				for (int i = 0; i < newPoints.size(); i++){
 					try {
 						ServerDB.insertPoint(currentMap, newPoints.get(i));
@@ -925,7 +945,6 @@ public class MapUpdaterGUI{
 						e1.printStackTrace();
 					}
 				}
-
 
 				if(DEBUG)
 					System.out.println("Edge array size is: " + edgeArray.size());
@@ -1025,14 +1044,14 @@ public class MapUpdaterGUI{
 			// Finds the highest mapID in the database and stores it in
 			// highestID
 			int highestID;
-			if(md.getMapsFromLocal().isEmpty()){
+			if(ServerDB.getMapsFromLocal().isEmpty()){
 				highestID = 0;
 				if(DEBUG)
 					System.out.print("Database contains no maps so highest ID is 1");
 			}
 			else{
 				//determines the highest mapID from the Maps stored in the database
-				ArrayList<Map> mdMapList = md.getMapsFromLocal();
+				ArrayList<Map> mdMapList = ServerDB.getMapsFromLocal();
 				highestID = mdMapList.get(0).getMapId();
 				for (int h = 0; h < mdMapList.size(); h++) {
 					if (highestID < mdMapList.get(h).getMapId()) {
@@ -1047,7 +1066,7 @@ public class MapUpdaterGUI{
 			if(DEBUG)
 				System.out.println("rotation angle = " + m.getRotationAngle());
 			try {
-				md.insertMap(m);
+				ServerDB.insertMap(m);
 			} catch (AlreadyExistsException e1) {
 				System.out.print("Look at me im  an error 1");
 				// TODO Auto-generated catch block
@@ -1065,7 +1084,6 @@ public class MapUpdaterGUI{
 
 		}
 	}
-	
 
 	class DrawPanel extends JPanel {
 
@@ -1086,13 +1104,11 @@ public class MapUpdaterGUI{
 
 			super.paintComponent(g);
 			
-			//Graphics2D g2D = (Graphics2D) g;
-			
+			Graphics2D g2D = (Graphics2D) g;
 
 			// -------------------------------
 			// if(img == null)
 			// img = ImageIO.read(new
-		
 			// File("/User/ibanatoski/git/CampusMapping/src/VectorMaps/"));
 			if (!(img == null)) {
 
@@ -1163,12 +1179,6 @@ public class MapUpdaterGUI{
 				}
 				drawnfirst = true;
 				pointSize = (int) (originalpointSize*scaleSize);
-			
-
-
-
-			//selecting points on the map
-			
 
 			// add point to the point array (has to take place outside of below
 			// loop)
@@ -1185,9 +1195,10 @@ public class MapUpdaterGUI{
 					double tempPreRotateX = lastMousex;
 					double tempPreRotateY = lastMousey;
 					double LocalX = (lastMousex-drawnposx)/newImageWidth;
-					double LocalY = (lastMousey-drawnposy)/newImageHeight;		
-					System.out.println("Local X: "+LocalX*newImageWidth+", Local Y: "+LocalY*newImageHeight);
-					//System.out.println(drawnposx+", "+ drawnposy);
+					double LocalY = (lastMousey-drawnposy)/newImageHeight;
+					
+					
+					
 					
 					
 					
@@ -1200,14 +1211,13 @@ public class MapUpdaterGUI{
 					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
 					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
 
-					int finalGlobX = (int)Math.round(rotateX + centerCurrentMapX);
-					int finalGlobY = (int)Math.round(rotateY + centerCurrentMapY);
+					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
+					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());
-					System.out.println("adding point");
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
 							roomNumber.getText(), currentMap.getPointIDIndex(),
-							LocalX, LocalY, finalGlobX, finalGlobY, numEdges);
+							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
 
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
@@ -1521,7 +1531,6 @@ public class MapUpdaterGUI{
 						g.fillOval((int)(posx - ((pointSize / 2) + (2*scaleSize))), (int)(posy - ((pointSize / 2)+(2*scaleSize))), (int)(pointSize + (4*scaleSize)), (int)(pointSize + (4*scaleSize)));
 						g.setColor(Color.BLACK);
 						g.drawOval((int)(posx - ((pointSize / 2) + (2*scaleSize))), (int)(posy - ((pointSize / 2)+(2*scaleSize))), (int)(pointSize + (4*scaleSize)), (int)(pointSize + (4*scaleSize)));
-
 					}
 					//draw lines between points
 				}
@@ -1570,9 +1579,6 @@ public class MapUpdaterGUI{
 
 	}
 
-
-
-
 	/*
 	 * Takes an input file directory path and a target directory path and copies
 	 * that File to the target location
@@ -1597,18 +1603,19 @@ public class MapUpdaterGUI{
 		os.close();
 	}
 
+	/*
 	private Map updateCurrentMap(Map map)
 	{
 		int mapId = map.getMapId();
 		//ArrayList<Map> mapList = md.getMapsFromLocal();
 		boolean foundMap = false;
 		int j = 0;
-		for (j = 0; j<maps.size(); j++)
+		for (j = 0; j<emptyMaps.size(); j++)
 		{
-			if (mapId == maps.get(j).getMapId())
+			if (mapId == emptyMaps.get(j).getMapId())
 			{
 				foundMap = true;
-				return maps.get(j);
+				return emptyMaps.get(j);
 			}
 		}
 		if (foundMap == false)
@@ -1617,8 +1624,5 @@ public class MapUpdaterGUI{
 				System.out.println("Failed to find and update map");
 		}
 		return null;
-	}
-
-
-
+	} */
 }

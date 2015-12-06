@@ -59,8 +59,9 @@ public class ServerDB {
 	//-------------------------------------------------------------Functions--------------------------------------------------------------------
 
 	public static void main (String args[])
-	{
-		updateAllPointIDIndexes();
+	{ 
+		//updateAllPointIDIndexes();
+		//clearDatabase();
 		//tryCreateDB();
 		conn = connect();
 		//testDB();

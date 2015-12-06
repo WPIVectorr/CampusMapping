@@ -31,8 +31,7 @@ import database.PopulateErrorException;
 public class MapUpdaterGUI{
 
 	private int lastMousex, lastMousey;
-	private int pointSize;
-	private int originalpointSize = 25;
+	private int pointSize = 10;
 	private boolean newClick = false;
 	private boolean editingPoint = false;
 	private static boolean addingMap = false;
@@ -46,7 +45,7 @@ public class MapUpdaterGUI{
 	private Point currentPoint;
 	private Point editPoint;
 	private int editPointIndex;
-	String name;
+	String name = "Select Map";
 	File destinationFile;
 	File logo;
 	int prevRadButtonVal = 0;
@@ -113,8 +112,6 @@ public class MapUpdaterGUI{
 	private boolean drawnfirst = false;
 	private int screenHeight;
 	private int screenWidth;
-	private double imageX;
-	private double imageY;
 	private int scroldirection;
 	private boolean atMaxZoom = false;
 	private boolean atMinZoom = false;
@@ -128,8 +125,6 @@ public class MapUpdaterGUI{
 	private double newImageHeight;
 	private double newImageWidth;
 	private boolean scrolled = false;
-	private double upperx;
-	private double uppery;
 	
 	
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
@@ -137,16 +132,16 @@ public class MapUpdaterGUI{
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MapUpdaterGUI.class.getResource("/VectorLogo/Logo Icon.png")));
-		double framex = 932;
-		double framey = 778;
-		frame.setSize((int)framex, (int)framey);
-		frame.setResizable(false);
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
-		int screenHeight = screenSize.height;
-		int screenWidth = screenSize.width;
+		screenHeight = screenSize.height;
+		screenWidth = screenSize.width;
+		double framex = screenWidth*.9;
+		double framey = screenHeight*.9;
+		frame.setSize((int)framex, (int)framey);
 		double xlocation = (screenWidth / 2)-(framex/2);
 		double ylocation = (screenHeight / 2)-(framey/2);
+		frame.setResizable(true);
 		frame.setLocation((int)xlocation, (int)ylocation);
 
 
@@ -355,6 +350,7 @@ public class MapUpdaterGUI{
 
 		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
+				drawnfirst = false;
 				mapsLoadingLabel.setVisible(true);
 
 				btnSaveMap.setEnabled(true);		
@@ -808,7 +804,7 @@ public class MapUpdaterGUI{
 		drawPanel.addMouseListener(new MouseAdapter() {
 			public void mouseReleased(MouseEvent e) {
 				if (!Dragged){
-					System.out.println("not dragged");
+					//System.out.println("not dragged");
 					newClick = false;
 					lastMousex = e.getX();
 					lastMousey = e.getY();
@@ -817,7 +813,7 @@ public class MapUpdaterGUI{
 
 					frame.repaint();
 				} else{
-					System.out.println("dragged = true");
+					//System.out.println("dragged = true");
 					Dragged = false;
 				}
 			}
@@ -827,10 +823,24 @@ public class MapUpdaterGUI{
 			}
 		});
 		
+		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
+			 
+            @Override
+            public void ancestorMoved(HierarchyEvent e) {
+                           
+            }
+            @Override
+            public void ancestorResized(HierarchyEvent e) {
+                frame.repaint();
+                 
+            }           
+        });
+		
 		drawPanel.addMouseMotionListener(new MouseMotionListener(){
 			public void mouseDragged(MouseEvent g){
-				System.out.println("dragged");
+				//System.out.println("dragged");
 				Dragged = true;
+				drawnfirst = true;
 				mousex = g.getX();
 				mousey = g.getY();
 				frame.repaint();
@@ -844,50 +854,48 @@ public class MapUpdaterGUI{
 		frame.addMouseWheelListener(new MouseWheelListener(){
 		    public void mouseWheelMoved(MouseWheelEvent e) {
 		    	scrolled = true;
-		       String message;
-		       int notches = e.getWheelRotation();
-		       if (notches < 0) {
-		           message = "Mouse wheel moved UP "
-		                        + -notches + " notch(es)\n";
-		       } else {
-		           message = "Mouse wheel moved DOWN "
-		                        + notches + " notch(es)\n";
-		       }
-		       double oldWidth = img.getWidth()*scaleSize;
-		       double oldHeight = img.getHeight()*scaleSize;
-		       if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-		    	   scroldirection = e.getWheelRotation();
-		    	   if (e.getWheelRotation() > 0){
-		    		   if (scaleSize <= 2){
-		    			   //System.out.println("scale before plus: " + scaleSize);
-		    			   scaleSize += (e.getWheelRotation()*.01);
-		    			   //System.out.println("scale plus: " + scaleSize);
-		    			   atMinZoom = false;
-		    		   }else{
-		    			   atMaxZoom = true;
-		    		   }
-		    	   } else {
-		    		   if (scaleSize >= 0.1){
-		    			   //System.out.println("scale before minus: " + scaleSize);
-		    			   scaleSize += (e.getWheelRotation()*.01);
-		    			   //System.out.println("scale minus: " + scaleSize);
-		    			   atMaxZoom = false;
-		    		   }else{
-		    			   atMinZoom = true;
-		    		   }
-		    	   }
-		    	   double newWidth = img.getWidth()*scaleSize;
-		    	   double newHeight = img.getHeight()*scaleSize;
-		    	   difWidth = (oldWidth - newWidth)/2;
-		    	   difHeight = (oldHeight - newHeight)/2;
-		    	   imageX += difWidth;
-		    	   imageY += difHeight;
-		       } else { //scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
-		           
-		       }
-		       frame.repaint();
-		       //System.out.println(message);
-		    }
+		    	String message;
+				int notches = e.getWheelRotation();
+				if (notches < 0) {
+					message = "Mouse wheel moved UP " + -notches + " notch(es)\n";
+				} else {
+					message = "Mouse wheel moved DOWN " + notches + " notch(es)\n";
+				}
+				double oldWidth = img.getWidth() * scaleSize;
+				double oldHeight = img.getHeight() * scaleSize;
+				if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+					scroldirection = e.getWheelRotation();
+					if (e.getWheelRotation() > 0) {
+						if (scaleSize <= 2) {
+							// System.out.println("scale before plus: " +
+							// scaleSize);
+							scaleSize += (e.getWheelRotation() * .01);
+							// System.out.println("scale plus: " + scaleSize);
+							atMinZoom = false;
+						} else {
+							atMaxZoom = true;
+						}
+					} else {
+						if (scaleSize >= 0.1) {
+							// System.out.println("scale before minus: " +
+							// scaleSize);
+							scaleSize += (e.getWheelRotation() * .01);
+							// System.out.println("scale minus: " + scaleSize);
+							atMaxZoom = false;
+						} else {
+							atMinZoom = true;
+						}
+					}
+					double newWidth = img.getWidth() * scaleSize;
+					double newHeight = img.getHeight() * scaleSize;
+					difWidth = (oldWidth - newWidth);
+					difHeight = (oldHeight - newHeight);
+				} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+
+				}
+				frame.repaint();
+				// System.out.println(message);
+			}
 		});
 
 		btnSaveMap = new GradientButton("Save Map", buttonColor); // defined above to change text in
@@ -1104,7 +1112,6 @@ public class MapUpdaterGUI{
 
 			super.paintComponent(g);
 			
-			Graphics2D g2D = (Graphics2D) g;
 
 			// -------------------------------
 			// if(img == null)
@@ -1132,9 +1139,7 @@ public class MapUpdaterGUI{
 					drawnposx = centerx -(int)(newImageWidth/2);
 					drawnposy = centery -(int)(newImageHeight/2);
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
-					System.out.println("image width og: "+img.getWidth()+"*"+scaleSize+"="+newImageWidth);
-					System.out.println("image height og: "+img.getHeight()+"*"+scaleSize+"="+newImageHeight);
-					
+					//System.out.println(newImageWidth+", "+newImageHeight);
 				} else{
 				}
 					
@@ -1142,43 +1147,25 @@ public class MapUpdaterGUI{
 					double deltay = 0;
 					newImageHeight = (int)img.getHeight()*scaleSize;
 					newImageWidth = (int)img.getWidth()*scaleSize;
-					//System.out.println("Image Width: " + newImageWidth);
-					//System.out.println("Image Height: " + newImageHeight);
-					if(Dragged){
-						deltax = -(originx - mousex);
-						deltay = -(originy - mousey);
-						originx = mousex;
-						originy = mousey;
-						difWidth = 0;
-						difHeight = 0;
-					} else if (scrolled){
-						System.out.println("I did it");
-						deltax = difWidth;
-						deltay = difWidth;
-						//deltax = -difWidth;
-						//deltay = -difHeight;
-						scrolled = false;
+					if(!(name.equals("Select Map"))){
+						if(Dragged){
+							deltax = -(originx - mousex);
+							deltay = -(originy - mousey);
+							originx = mousex;
+							originy = mousey;
+							difWidth = 0;
+							difHeight = 0;
+						} else if (scrolled){
+							//System.out.println("I did it");
+							deltax = difWidth;
+							deltay = difWidth;
+							scrolled = false;
+						}
 					}
 					drawnposx += deltax;
 					drawnposy += deltay;
-					System.out.println("image width: "+img.getWidth()+"*"+scaleSize+"="+newImageWidth);
-					System.out.println("image height: "+img.getHeight()+"*"+scaleSize+"="+newImageHeight);
-					//System.out.println("x and y: " + drawnposx + ", "+drawnposy);
-					//System.out.println("frame x and y: " + drawPanel.getWidth()+", "+drawPanel.getHeight());
-					//upperx += deltax*scaleSize;
-					//uppery += deltay*scaleSize;
-					//System.out.println(upperx+", "+uppery);
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
-					g.fillOval(drawnposx, drawnposy, 5, 5);
-					//System.out.println("scale: " + scaleSize);
-					//System.out.println("drawn position x: " + drawnposx);
-					//System.out.println("drawn position y: " + drawnposy);
-					
-					
-					
 				}
-				drawnfirst = true;
-				pointSize = (int) (originalpointSize*scaleSize);
 
 			// add point to the point array (has to take place outside of below
 			// loop)
@@ -1217,7 +1204,7 @@ public class MapUpdaterGUI{
 						System.out.println("newest map id: "+currentMap.getNewPointID());
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
 							roomNumber.getText(), currentMap.getPointIDIndex(),
-							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
+							LocalX, LocalY, finalGlobX, finalGlobY, numEdges);
 
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
@@ -1228,6 +1215,8 @@ public class MapUpdaterGUI{
 							shouldAdd = false;
 						}
 					}
+					if(LocalX < 0 || LocalX > 1 || LocalY < 0 || LocalY > 1)
+						shouldAdd = false;
 					if(shouldAdd){
 						pointArray.add(point);
 						newPoints.add(point);

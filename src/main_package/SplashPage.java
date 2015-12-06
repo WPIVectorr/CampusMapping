@@ -39,6 +39,7 @@ private static SplashPage testSplash;
         
 
         testSplash.hideSplash(5000);
+        testSplash.setVisible(false);
 
     }
 

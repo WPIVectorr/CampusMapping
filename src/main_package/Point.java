@@ -7,10 +7,10 @@ public class Point implements Comparable{
 	private int mapId;
 	private String name;
 	private int index;
-	private int locX;
-	private int locY;
-	private int globX;
-	private int globY;
+	private double locX;
+	private double locY;
+	private double globX;
+	private double globY;
 	private ArrayList<Edge> edges = new ArrayList<Edge>();
 	private int numberEdges;
 	private boolean stairPref;
@@ -21,7 +21,7 @@ public class Point implements Comparable{
 		
 	}
 	//TODO UPdate Constructors
-	public Point(String id, String name, int x, int y) {
+	public Point(String id, String name, double x, double y) {
 		this.id = id;
 		this.name = name;
 		this.locX = x;
@@ -45,7 +45,7 @@ public class Point implements Comparable{
 	}
 	
 
-	public Point(String id, String name, int locX, int locY, int globX, int globY, int numberEdges) {
+	public Point(String id, String name, double locX, double locY, double globX, double globY, int numberEdges) {
 		this.id = id;
 		this.name = name;
 		this.locX = locX;
@@ -56,7 +56,7 @@ public class Point implements Comparable{
 		this.globY = globY;
 	}
 	
-	public Point(String id, int mapId, String name, int index, int locX, int locY, int globX, int globY, int numberEdges) {
+	public Point(String id, int mapId, String name, int index, double locX, double locY, double globX, double globY, int numberEdges) {
 		this.id = id;
 		this.mapId = mapId;
 		this.name = name;
@@ -70,7 +70,7 @@ public class Point implements Comparable{
 		this.outsidePref = outsidePref;
 	}
 	
-	public Point(String id, String name, int index, int x, int y, int numberEdges) {
+	public Point(String id, String name, int index, double x, double y, int numberEdges) {
 		this.id = id;
 		this.name = name;
 		this.index = index;
@@ -108,28 +108,28 @@ public class Point implements Comparable{
 	{
 		this.name = newName;
 	}
-	public int getLocX() {
+	public double getLocX() {
 		return locX;
 	}
-	public void setLocX(int x) {
+	public void setLocX(double x) {
 		this.locX = x;
 	}
-	public int getLocY() {
+	public double getLocY() {
 		return locY;
 	}
-	public void setLocY(int y) {
+	public void setLocY(double y) {
 		this.locX = y;
 	}
-	public int getGlobX() {
+	public double getGlobX() {
 		return globX;
 	}
-	public void setGlobX(int x) {
+	public void setGlobX(double x) {
 		this.globX = x;
 	}
-	public int getGlobY() {
+	public double getGlobY() {
 		return globY;
 	}
-	public void setGlobY(int y) {
+	public void setGlobY(double y) {
 		this.globY = y;
 	}
 	public ArrayList<Edge> getEdges() {

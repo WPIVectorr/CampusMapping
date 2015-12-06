@@ -1,4 +1,3 @@
-
 package main_package;
 
 import java.awt.*;
@@ -32,7 +31,7 @@ import database.PopulateErrorException;
 public class MapUpdaterGUI{
 
 	private int lastMousex, lastMousey;
-	private int pointSize = 7;
+	private int pointSize = 10;
 	private boolean newClick = false;
 	private boolean editingPoint = false;
 	private static boolean addingMap = false;
@@ -46,7 +45,7 @@ public class MapUpdaterGUI{
 	private Point currentPoint;
 	private Point editPoint;
 	private int editPointIndex;
-	String name;
+	String name = "Select Map";
 	File destinationFile;
 	File logo;
 	int prevRadButtonVal = 0;
@@ -107,6 +106,25 @@ public class MapUpdaterGUI{
 	private JButton btnConnectToOther;
 	private InterMapEdgeGUI connectMapGUI;
 	private static SplashPage loadingAnimation = new SplashPage();
+	private double scaleSize = 1;
+	private int drawnposx;
+	private int drawnposy;
+	private boolean drawnfirst = false;
+	private int screenHeight;
+	private int screenWidth;
+	private int scroldirection;
+	private boolean atMaxZoom = false;
+	private boolean atMinZoom = false;
+	private boolean Dragged = false;
+	private int mousex;
+	private int mousey;
+	private int originx;
+	private int originy;
+	private double difWidth;
+	private double difHeight;
+	private double newImageHeight;
+	private double newImageWidth;
+	private boolean scrolled = false;
 	
 	
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
@@ -114,16 +132,16 @@ public class MapUpdaterGUI{
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MapUpdaterGUI.class.getResource("/VectorLogo/Logo Icon.png")));
-		double framex = 932;
-		double framey = 778;
-		frame.setSize((int)framex, (int)framey);
-		frame.setResizable(false);
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
-		int screenHeight = screenSize.height;
-		int screenWidth = screenSize.width;
+		screenHeight = screenSize.height;
+		screenWidth = screenSize.width;
+		double framex = screenWidth*.9;
+		double framey = screenHeight*.9;
+		frame.setSize((int)framex, (int)framey);
 		double xlocation = (screenWidth / 2)-(framex/2);
 		double ylocation = (screenHeight / 2)-(framey/2);
+		frame.setResizable(true);
 		frame.setLocation((int)xlocation, (int)ylocation);
 
 
@@ -332,6 +350,7 @@ public class MapUpdaterGUI{
 
 		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
+				drawnfirst = false;
 				mapsLoadingLabel.setVisible(true);
 
 				btnSaveMap.setEnabled(true);		
@@ -782,6 +801,101 @@ public class MapUpdaterGUI{
 			}
 		});
 
+		drawPanel.addMouseListener(new MouseAdapter() {
+			public void mouseReleased(MouseEvent e) {
+				if (!Dragged){
+					//System.out.println("not dragged");
+					newClick = false;
+					lastMousex = e.getX();
+					lastMousey = e.getY();
+					if(tabs.getSelectedIndex() == 1)
+						newClick = true;
+
+					frame.repaint();
+				} else{
+					//System.out.println("dragged = true");
+					Dragged = false;
+				}
+			}
+			public void mousePressed(MouseEvent e) {
+				originx = e.getX();
+				originy = e.getY();
+			}
+		});
+		
+		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
+			 
+            @Override
+            public void ancestorMoved(HierarchyEvent e) {
+                           
+            }
+            @Override
+            public void ancestorResized(HierarchyEvent e) {
+                frame.repaint();
+                 
+            }           
+        });
+		
+		drawPanel.addMouseMotionListener(new MouseMotionListener(){
+			public void mouseDragged(MouseEvent g){
+				//System.out.println("dragged");
+				Dragged = true;
+				mousex = g.getX();
+				mousey = g.getY();
+				frame.repaint();
+			}
+
+			public void mouseMoved(MouseEvent arg0) {
+				
+			}
+		});
+		
+		frame.addMouseWheelListener(new MouseWheelListener(){
+		    public void mouseWheelMoved(MouseWheelEvent e) {
+		    	scrolled = true;
+		    	String message;
+				int notches = e.getWheelRotation();
+				if (notches < 0) {
+					message = "Mouse wheel moved UP " + -notches + " notch(es)\n";
+				} else {
+					message = "Mouse wheel moved DOWN " + notches + " notch(es)\n";
+				}
+				double oldWidth = img.getWidth() * scaleSize;
+				double oldHeight = img.getHeight() * scaleSize;
+				if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(name.equals("Select Map")))) {
+					scroldirection = e.getWheelRotation();
+					if (e.getWheelRotation() > 0) {
+						if (scaleSize <= 2) {
+							// System.out.println("scale before plus: " +
+							// scaleSize);
+							scaleSize += (e.getWheelRotation() * .01);
+							// System.out.println("scale plus: " + scaleSize);
+							atMinZoom = false;
+						} else {
+							atMaxZoom = true;
+						}
+					} else {
+						if (scaleSize >= 0.1) {
+							// System.out.println("scale before minus: " +
+							// scaleSize);
+							scaleSize += (e.getWheelRotation() * .01);
+							// System.out.println("scale minus: " + scaleSize);
+							atMaxZoom = false;
+						} else {
+							atMinZoom = true;
+						}
+					}
+					double newWidth = img.getWidth() * scaleSize;
+					double newHeight = img.getHeight() * scaleSize;
+					difWidth = (oldWidth - newWidth);
+					difHeight = (oldHeight - newHeight);
+				} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+
+				}
+				frame.repaint();
+				// System.out.println(message);
+			}
+		});
 
 		btnSaveMap = new GradientButton("Save Map", buttonColor); // defined above to change text in
 		btnSaveMap.setEnabled(false);
@@ -997,7 +1111,6 @@ public class MapUpdaterGUI{
 
 			super.paintComponent(g);
 			
-			Graphics2D g2D = (Graphics2D) g;
 
 			// -------------------------------
 			// if(img == null)
@@ -1007,30 +1120,55 @@ public class MapUpdaterGUI{
 
 				// Scale the image to the appropriate screen size
 
-
-				windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
-				//System.out.println("Image Original Width " + img.getWidth());
-				int WidthSize = (int)((double) img.getHeight() / windowScale);
-				if (WidthSize > (double)drawPanel.getHeight()){
-					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
+				if (drawnfirst == false){
+					windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
+					scaleSize = 1/((double)img.getWidth() / (double)drawPanel.getWidth());
+					//System.out.println("setting: "+scaleSize);
+					//System.out.println("Image Original Width " + img.getWidth());
+					int WidthSize = (int)((double) img.getHeight() / windowScale);
+					if (WidthSize > (double)drawPanel.getHeight()){
+						windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
+						scaleSize = 1/((double)img.getHeight() / (double)drawPanel.getHeight());
+						//System.out.println("setting: "+scaleSize);
+					}
+					newImageWidth = (int)((double)img.getWidth() / windowScale);
+					newImageHeight = (int)((double)img.getHeight() / windowScale);
+					int centerx = (drawPanel.getWidth()/2);
+					int centery = (drawPanel.getHeight()/2);
+					drawnposx = centerx -(int)(newImageWidth/2);
+					drawnposy = centery -(int)(newImageHeight/2);
+					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
+					//System.out.println(newImageWidth+", "+newImageHeight);
+				} else{
 				}
-				g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
-			}
-
-
-
-			//selecting points on the map
-			addMouseListener(new MouseAdapter() {
-				public void mouseReleased(MouseEvent e) {
-					newClick = false;
-					lastMousex = e.getX();
-					lastMousey = e.getY();
-					if(tabs.getSelectedIndex() == 1)
-						newClick = true;
-
-					repaint();
+					
+					double deltax = 0;
+					double deltay = 0;
+					newImageHeight = (int)img.getHeight()*scaleSize;
+					newImageWidth = (int)img.getWidth()*scaleSize;
+					if(!(name.equals("Select Map"))){
+						if(Dragged){
+							System.out.println("dragged");
+							deltax = -(originx - mousex);
+							deltay = -(originy - mousey);
+							originx = mousex;
+							originy = mousey;
+							difWidth = 0;
+							difHeight = 0;
+						} else if(scrolled){
+							System.out.println("I did it");
+							deltax = difWidth;
+							deltay = difWidth;
+							scrolled = false;
+						}
+					}
+					System.out.println(drawnposx+", "+drawnposy);
+					drawnposx += deltax;
+					drawnposy += deltay;
+					System.out.println(drawnposx+", "+drawnposy);
+					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
 				}
-			});
+			drawnfirst = true;
 
 			// add point to the point array (has to take place outside of below
 			// loop)
@@ -1040,35 +1178,46 @@ public class MapUpdaterGUI{
 				{
 					Integer nameNumber = currentMap.getPointIDIndex()+1;
 					double ourRotation = currentMap.getRotationAngle();
-					//ourRotation = 2 * Math.PI - ourRotation;
+					ourRotation = 2 * Math.PI - ourRotation;
 
-					double centerCurrentMapX = (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2;
-					double centerCurrentMapY = (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2;
+					destinationFile = new File("src/VectorMaps/" + "Campus" + ".jpg");
+					destinationFile = new File(destinationFile.getAbsolutePath());
+					BufferedImage campusImage = null;
+					try {
+						if(DEBUG)
+							System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
+						//System.out.println("Map name " + currentMap.getMapName());
+
+						campusImage = ImageIO.read(destinationFile);
+					} catch (IOException e) {
+						System.out.println("Invalid Map Selection");
+						e.printStackTrace();
+					}
+					//double centerCurrentMapX = (Math.floor(((currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2) * img.getWidth())) / (campusImage.getWidth());
+					//double centerCurrentMapY = (Math.floor(((currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2) * img.getHeight())) / (campusImage.getHeight());
 					double tempPreRotateX = lastMousex;
 					double tempPreRotateY = lastMousey;
-					
-					
-					
-					
-					
-					
-					
-					tempPreRotateX = tempPreRotateX - (img.getWidth() / 2);
-					tempPreRotateY = tempPreRotateY - (img.getHeight() / 2);
-					tempPreRotateX = (tempPreRotateX/img.getWidth()) * currentMap.getWidth();
-					tempPreRotateY = (tempPreRotateY/img.getHeight()) * currentMap.getHeight();
-					tempPreRotateX = tempPreRotateX * windowScale;
-					tempPreRotateY = tempPreRotateY * windowScale;
+					double LocalX = (lastMousex-drawnposx)/newImageWidth;
+					double LocalY = (lastMousey-drawnposy)/newImageHeight;
+					tempPreRotateX = tempPreRotateX/(img.getWidth()/windowScale);
+					tempPreRotateY = tempPreRotateY/(img.getHeight()/windowScale);
+					tempPreRotateX = tempPreRotateX - 0.5;
+					tempPreRotateY = tempPreRotateY - 0.5;
+					tempPreRotateX = tempPreRotateX * currentMap.getWidth();
+					tempPreRotateY = tempPreRotateY * currentMap.getHeight();
 					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
 					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
-
-					int finalGlobX = (int) Math.round(rotateX + centerCurrentMapX);
-					int finalGlobY = (int) Math.round(rotateY + centerCurrentMapY);
+					rotateX = rotateX * campusImage.getWidth();
+					rotateY = rotateY * campusImage.getHeight();
+					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
+					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
+					
+					
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
 							roomNumber.getText(), currentMap.getPointIDIndex(),
-							lastMousex, lastMousey, finalGlobX, finalGlobY, numEdges);
+							LocalX, LocalY, finalGlobX, finalGlobY, numEdges);
 
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){
@@ -1079,6 +1228,8 @@ public class MapUpdaterGUI{
 							shouldAdd = false;
 						}
 					}
+					if(LocalX < 0 || LocalX > 1 || LocalY < 0 || LocalY > 1)
+						shouldAdd = false;
 					if(shouldAdd){
 						pointArray.add(point);
 						newPoints.add(point);
@@ -1376,10 +1527,12 @@ public class MapUpdaterGUI{
 						//g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5.0f));
 						g.setColor(Color.RED);
 						//g2D.setColor(Color.RED);
-						g.fillOval(editPoint.getLocX() - ((pointSize / 2) + 2), editPoint.getLocY() - ((pointSize / 2)+2), pointSize + 4, pointSize + 4);
+						double posx = ((editPoint.getLocX()*newImageWidth)+drawnposx);
+						double posy = ((editPoint.getLocY()*newImageHeight)+drawnposy);
+						
+						g.fillOval((int)(posx - ((pointSize / 2) + (2*scaleSize))), (int)(posy - ((pointSize / 2)+(2*scaleSize))), (int)(pointSize + (4*scaleSize)), (int)(pointSize + (4*scaleSize)));
 						g.setColor(Color.BLACK);
-						g.drawOval(editPoint.getLocX() - ((pointSize / 2) + 2), editPoint.getLocY() - ((pointSize / 2)+2), pointSize + 4, pointSize + 4);
-
+						g.drawOval((int)(posx - ((pointSize / 2) + (2*scaleSize))), (int)(posy - ((pointSize / 2)+(2*scaleSize))), (int)(pointSize + (4*scaleSize)), (int)(pointSize + (4*scaleSize)));
 					}
 					//draw lines between points
 				}
@@ -1395,17 +1548,21 @@ public class MapUpdaterGUI{
 				g.setColor(Color.ORANGE);
 				
 				//if(!(drawnEdges.contains(edgeArray.get(j)))){
-					g.drawLine(edgeArray.get(j).getPoint1().getLocX(), edgeArray.get(j).getPoint1().getLocY(),
-						edgeArray.get(j).getPoint2().getLocX(), edgeArray.get(j).getPoint2().getLocY());
+				int point1x = (int)((edgeArray.get(j).getPoint1().getLocX()*newImageWidth)+drawnposx);
+				int point1y = (int)((edgeArray.get(j).getPoint1().getLocY()*newImageHeight)+drawnposy);
+				int point2x = (int)((edgeArray.get(j).getPoint2().getLocX()*newImageWidth)+drawnposx);
+				int point2y = (int)((edgeArray.get(j).getPoint2().getLocY()*newImageHeight)+drawnposy);
+					g.drawLine(point1x, point1y, point2x, point2y);
 					drawnEdges.add(edgeArray.get(j));
 					g.setColor(Color.BLACK);
 				//}
 			}
 			
 			for( int w = 0; w < pointArray.size(); w++){
-				int drawX = (int) pointArray.get(w).getLocX();
-				int drawY = (int) pointArray.get(w).getLocY();
-				
+				int drawX = (int) (double)((pointArray.get(w).getLocX()*newImageWidth)+drawnposx);
+				int drawY = (int) (double)((pointArray.get(w).getLocY()*newImageHeight)+drawnposy);
+				//System.out.println("drawn x: "+drawX+", drawn y: "+drawY);
+				//System.out.println(drawnposx+", "+drawnposy);
 				//System.out.println("For point: " + pointArray.get(w).getId() + " loc X val is: " + pointArray.get(w).getLocX() + " glob X val is: " + pointArray.get(w).getGlobX());
 				//System.out.println("For point: " + pointArray.get(w).getId() + " loc Y val is: " + pointArray.get(w).getLocY() + " glob Y val is: " + pointArray.get(w).getGlobY());
 				// draws the points onto the map.
@@ -1471,4 +1628,3 @@ public class MapUpdaterGUI{
 		return null;
 	} */
 }
-

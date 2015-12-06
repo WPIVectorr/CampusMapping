@@ -82,7 +82,32 @@ public class GUI{
 	JComboBox<String> mapsDropdown = new JComboBox();
 	JComboBox<Point> destBuilds = new JComboBox();
 	JComboBox<Point> startBuilds = new JComboBox();
-	JComboBox<String> DestMaps = new JComboBox();
+	JComboBox DestMaps = new JComboBox();
+	private int pointSize;
+	private int originalpointSize = 25;
+	private double scaleSize = 1;
+	private int drawnposx;
+	private int drawnposy;
+	private boolean drawnfirst = false;
+	private int screenHeight;
+	private int screenWidth;
+	private double imageX;
+	private double imageY;
+	private int scroldirection;
+	private boolean atMaxZoom = false;
+	private boolean atMinZoom = false;
+	private boolean Dragged = false;
+	private int mousex;
+	private int mousey;
+	private int originx;
+	private int originy;
+	private double difWidth;
+	private double difHeight;
+	private double newImageHeight;
+	private double newImageWidth;
+	private boolean scrolled = false;
+	private double upperx;
+	private double uppery;
 	Map startMap;
 	
 	private static SplashPage loadingAnimation;
@@ -1088,15 +1113,71 @@ public class GUI{
 
 				// Scale the image to the appropriate screen size
 
-
-				windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
-				//System.out.println("Image Original Width " + img.getWidth());
-				int WidthSize = (int)((double) img.getHeight() / windowScale);
-				if (WidthSize > (double)drawPanel.getHeight()){
-					windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
+				if (drawnfirst == false){
+					windowScale = ((double)img.getWidth() / (double)drawPanel.getWidth());
+					scaleSize = 1/((double)img.getWidth() / (double)drawPanel.getWidth());
+					//System.out.println("setting: "+scaleSize);
+					//System.out.println("Image Original Width " + img.getWidth());
+					int WidthSize = (int)((double) img.getHeight() / windowScale);
+					if (WidthSize > (double)drawPanel.getHeight()){
+						windowScale = (double)img.getHeight() / (double)drawPanel.getHeight();
+						scaleSize = 1/((double)img.getHeight() / (double)drawPanel.getHeight());
+						//System.out.println("setting: "+scaleSize);
+					}
+					newImageWidth = (int)((double)img.getWidth() / windowScale);
+					newImageHeight = (int)((double)img.getHeight() / windowScale);
+					int centerx = (drawPanel.getWidth()/2);
+					int centery = (drawPanel.getHeight()/2);
+					drawnposx = centerx -(int)(newImageWidth/2);
+					drawnposy = centery -(int)(newImageHeight/2);
+					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
+					System.out.println("image width og: "+img.getWidth()+"*"+scaleSize+"="+newImageWidth);
+					System.out.println("image height og: "+img.getHeight()+"*"+scaleSize+"="+newImageHeight);
+					
+				} else{
 				}
-				g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
-			}
+					
+					double deltax = 0;
+					double deltay = 0;
+					newImageHeight = (int)img.getHeight()*scaleSize;
+					newImageWidth = (int)img.getWidth()*scaleSize;
+					//System.out.println("Image Width: " + newImageWidth);
+					//System.out.println("Image Height: " + newImageHeight);
+					if(Dragged){
+						deltax = -(originx - mousex);
+						deltay = -(originy - mousey);
+						originx = mousex;
+						originy = mousey;
+						difWidth = 0;
+						difHeight = 0;
+					} else if (scrolled){
+						System.out.println("I did it");
+						deltax = difWidth;
+						deltay = difWidth;
+						//deltax = -difWidth;
+						//deltay = -difHeight;
+						scrolled = false;
+					}
+					drawnposx += deltax;
+					drawnposy += deltay;
+					System.out.println("image width: "+img.getWidth()+"*"+scaleSize+"="+newImageWidth);
+					System.out.println("image height: "+img.getHeight()+"*"+scaleSize+"="+newImageHeight);
+					//System.out.println("x and y: " + drawnposx + ", "+drawnposy);
+					//System.out.println("frame x and y: " + drawPanel.getWidth()+", "+drawPanel.getHeight());
+					//upperx += deltax*scaleSize;
+					//uppery += deltay*scaleSize;
+					//System.out.println(upperx+", "+uppery);
+					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
+					g.fillOval(drawnposx, drawnposy, 5, 5);
+					//System.out.println("scale: " + scaleSize);
+					//System.out.println("drawn position x: " + drawnposx);
+					//System.out.println("drawn position y: " + drawnposy);
+					
+					
+					
+				}
+				drawnfirst = true;
+				pointSize = (int) (originalpointSize*scaleSize);
 
 
 			if (showRoute && route != null){
@@ -1105,8 +1186,12 @@ public class GUI{
 				// Draw lines for all points up to current point, use previousColor (same color as "Previous" button)
 				g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
 				g2.setStroke(new BasicStroke(3));
-				for (int i = 0; i < textPos; i++){
-					g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
+				for (int i = 0; i < textPos - 1; i++){
+					int point1x = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
+					int point1y = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
+					int point2x = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX()*newImageWidth)+drawnposx);
+					int point2y = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY()*newImageHeight)+drawnposy);
+					g2.drawLine(point1x, point1y, point2x, point2y);
 				}
 				// Draw a thicker line for the current step in the directions, use currentColor
 				if(DEBUG)
@@ -1114,18 +1199,36 @@ public class GUI{
 				if (textPos !=  multiMapFinalDir.get(mapPos).size()){ //|| (mapPos == multiMapFinalDir.size()-1 && multiMapFinalDir.get(mapPos).size()-1 == textPos)){
 					g2.setStroke(new BasicStroke(6));
 					g.setColor(currentColor);
-					g2.drawLine(multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(textPos).getDestination().getLocY());
+					int point1x = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocX()*newImageWidth)+drawnposx);
+					int point1y = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocY()*newImageHeight)+drawnposy);
+					int point2x = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocX()*newImageWidth)+drawnposx);
+					int point2y = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocY()*newImageHeight)+drawnposy);
+					g2.drawLine(point1x, point1y, point2x, point2y);
+
 					g2.setStroke(new BasicStroke(3));
 				}
 
 				// Draw lines for all points until the end, use nextColor (same color as "Next" button)
 				g.setColor(nextColor);
-				for (int i = textPos + 1; i < multiMapFinalDir.get(mapPos).size(); i++){
-					g2.drawLine(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX(), multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX(), multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY());
+				for (int i = textPos; i < multiMapFinalDir.get(mapPos).size(); i++){
+					int point1x = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
+					int point1y = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
+					int point2x = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX()*newImageWidth)+drawnposx);
+					int point2y = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY()*newImageHeight)+drawnposy);
+					g2.drawLine(point1x, point1y, point2x, point2y);
 				}
 
 				// Draws ovals with black borders at each of the points along the path, needs to use an offset
 				for (int i = 0; i < multiMapFinalDir.get(mapPos).size(); i++){
+					g.setColor(Color.ORANGE);
+					int pointx = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
+					int pointy = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
+					g.fillOval((int)(pointx - (pointSize / 2)), (int)(pointy - (pointSize / 2)), pointSize, pointSize);
+					g.setColor(Color.BLACK);
+					int point1x = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
+					int point1y = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
+					g.drawOval((int)(point1x - (pointSize / 2)), (int)(point1y - (pointSize / 2)), pointSize, pointSize);						
+/*see what this is
 					if (i != textPos){
 						g.setColor(pointColor);
 						g.fillOval(multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() - 6, multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY() -6, 12, 12);
@@ -1140,7 +1243,17 @@ public class GUI{
 						g.setColor(Color.BLACK);
 						g2.draw(star);
 					}
+*/
 				}
+
+				// Draws final oval in path
+				g.setColor(Color.ORANGE);
+				int pointx = (int)((multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX()*newImageWidth)+drawnposx);
+				int pointy = (int)((multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY()*newImageHeight)+drawnposy);
+				g.fillOval((int)(pointx - (pointSize / 2)), (int)(pointy - (pointSize / 2)), pointSize, pointSize);
+				g.setColor(Color.BLACK);
+				g.drawOval((int)(pointx - (pointSize / 2)), (int)(pointy - (pointSize / 2)), pointSize, pointSize);
+/* see what this is
 
 				// Draws final oval or star in path
 				if (textPos != multiMapFinalDir.get(mapPos).size()){
@@ -1156,6 +1269,7 @@ public class GUI{
 					g.setColor(Color.BLACK);
 					g2.draw(star);
 				}
+*/
 			}
 		}
 

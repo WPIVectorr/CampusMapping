@@ -12,7 +12,7 @@ public class Edge {
 		this.id = (point1.getId() + "-" + point2.getId());
 		this.point1 = point1;
 		this.point2 = point2;
-		this.weight = (int)Math.sqrt((double)((point1.getGlobX()-point2.getGlobX())^2)+((point1.getGlobY()-point2.getGlobY())^2));
+		this.weight = (int)Math.sqrt((double)(Math.pow((point1.getGlobX()-point2.getGlobX()),2)+Math.pow((point1.getGlobY()-point2.getGlobY()),2)));
 		point1.addEdge(this);								//TODO this may be duplicating edges
 		point2.addEdge(this);
 	}

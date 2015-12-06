@@ -17,6 +17,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -27,6 +29,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -70,6 +73,26 @@ public class InterMapEdgeGUI extends JFrame {
 	
 	private double imagewidth;
 	private double imageheight;
+	private double scaleSize = 1;
+	private int drawnposx;
+	private int drawnposy;
+	private boolean drawnfirst = false;
+	private int screenHeight;
+	private int screenWidth;
+	private double imageX;
+	private double imageY;
+	private int scroldirection;
+	private boolean atMaxZoom = false;
+	private boolean atMinZoom = false;
+	private boolean Dragged = false;
+	private int mousex;
+	private int mousey;
+	private int originx;
+	private int originy;
+	private double difWidth;
+	private double difHeight;
+	private double newImageHeight;
+	private double newImageWidth;
 
 
 
@@ -399,7 +422,7 @@ public class InterMapEdgeGUI extends JFrame {
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-
+			Graphics2D g2D = (Graphics2D) g;
 			// -------------------------------
 			// if(img == null)
 			// img = ImageIO.read(new
@@ -408,17 +431,65 @@ public class InterMapEdgeGUI extends JFrame {
 			if (!(img == null)) {
 
 				// Scale the image to the appropriate screen size
-				//System.out.println("painting Image");
-				//System.out.println("Map Frame Width: "+ mapFrame.getWidth());
-				//System.out.println("Map Frame Height: "+ mapFrame.getHeight());
-				windowScale = ((double)img.getWidth() / (double)imagewidth);
-				int WidthSize = (int)((double) img.getHeight() / windowScale);
-				if (WidthSize > (double)imageheight){
-					windowScale =  ((double)img.getHeight() / (double)imageheight);
+
+				if (drawnfirst == false){
+					windowScale = ((double)img.getWidth() / (double)mapFrame.getWidth());
+					scaleSize = 1/((double)img.getWidth() / (double)mapFrame.getWidth());
+					//System.out.println("setting: "+scaleSize);
+					//System.out.println("Image Original Width " + img.getWidth());
+					int WidthSize = (int)((double) img.getHeight() / windowScale);
+					if (WidthSize > (double)mapFrame.getHeight()){
+						windowScale = (double)img.getHeight() / (double)mapFrame.getHeight();
+						scaleSize = 1/((double)img.getHeight() / (double)mapFrame.getHeight());
+						//System.out.println("setting: "+scaleSize);
+					}
+					int imagesizex = (int)((double)img.getWidth() / windowScale);
+					int imagesizey = (int)((double)img.getHeight() / windowScale);
+					int centerx = (mapFrame.getWidth()/2);
+					int centery = (mapFrame.getHeight()/2);
+					int drawx = centerx -(imagesizex/2);
+					int drawy = centery -(imagesizey/2);
+					g.drawImage(img, drawx, drawy, imagesizex, imagesizey, null);
+					drawnposx = drawx;
+					drawnposy = drawy;
+					
+				} else{
+					AffineTransform originalTransform = g2D.getTransform();
+					double deltax = 0;
+					double deltay = 0;
+					g2D.scale(scaleSize, scaleSize);
+					if(Dragged){
+						deltax = -(originx - mousex)/scaleSize;
+						deltay = -(originy - mousey)/scaleSize;
+						//System.out.println("change in x: " + deltax);
+						//System.out.println("change in y: " + deltay);
+						originx = mousex;
+						originy = mousey;
+						g2D.translate(deltax, deltay);
+						imageX =0;
+						imageY = 0;
+						difWidth = 0;
+						difHeight = 0;
+					} else{
+						//System.out.println("I did it");
+						g2D.translate(0, 0);
+						deltax = -difWidth;
+						deltay = -difHeight;
+					}
+					//System.out.println("Before Draw Scale: " + scaleSize);
+					g2D.drawImage(img,  drawnposx, drawnposy, null);
+					g.fillOval(drawnposx, drawnposy, 20, 20);
+					//System.out.println("scale: " + scaleSize);
+					//System.out.println("drawn position x: " + drawnposx);
+					//System.out.println("drawn position y: " + drawnposy);
+					drawnposx += deltax;
+					drawnposy += deltay;
+					g2D.setTransform(originalTransform);
+					newImageHeight = img.getHeight()*scaleSize;
+					newImageWidth = img.getWidth()*scaleSize;
 				}
-				//System.out.println("SCALE!: "+ windowScale);
-				//System.out.println((int)((double)img.getWidth() / windowScale)+", "+(int)((double)img.getHeight() / windowScale));
-				g.drawImage(img, 0, 0, (int)((double)img.getWidth() / windowScale), (int)((double)img.getHeight() / windowScale), null);
+				drawnfirst = true;
+				
 			}
 
 
@@ -435,7 +506,9 @@ public class InterMapEdgeGUI extends JFrame {
 					if(connectPoint != null)
 					{
 						g.setColor(Color.ORANGE);
-						g.fillOval(connectPoint.getLocX()-((pointSize / 2) + 2),connectPoint.getLocY()-((pointSize / 2) + 2), pointSize+2, pointSize+2);
+						int pointx = (int)((connectPoint.getLocX()*newImageWidth)+drawnposx);
+						int pointy = (int)((connectPoint.getLocY()*newImageHeight)+drawnposy);
+						g.fillOval(pointx-((pointSize / 2) + 2),pointy-((pointSize / 2) + 2), pointSize+2, pointSize+2);
 						g.setColor(Color.BLACK);
 					}
 				}

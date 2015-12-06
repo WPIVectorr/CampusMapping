@@ -59,9 +59,11 @@ public class ServerDB {
 	//-------------------------------------------------------------Functions--------------------------------------------------------------------
 
 	public static void main (String args[])
+
 	{ 
 		//updateAllPointIDIndexes();
 		//clearDatabase();
+
 		//tryCreateDB();
 		conn = connect();
 		//testDB();
@@ -217,8 +219,8 @@ public class ServerDB {
 		int counter = 0;
 		String pointID = pt.getId();
 		String ptName = pt.getName();
-		int ptX = pt.getLocX();
-		int ptY = pt.getLocY();
+		double ptX = pt.getLocX();
+		double ptY = pt.getLocY();
 		ArrayList<Edge> edgeArray = pt.getEdges();
 		int numberEdges = pt.getNumEdges();
 		pt.setMapId(map.getMapId());

@@ -102,7 +102,7 @@ public class MapUpdaterGUI{
 	private JLabel pointsLoadingLabel;
 	private JTabbedPane tabs = new JTabbedPane();
 	//private ArrayList<Map> maps = new ArrayList<Map>();
-	private ArrayList<Map> emptyMaps = new ArrayList<Map>();
+	private static ArrayList<Map> emptyMaps = new ArrayList<Map>();
 	private JButton btnConnectToOther;
 	private InterMapEdgeGUI connectMapGUI;
 	private static SplashPage loadingAnimation = new SplashPage();
@@ -149,6 +149,7 @@ public class MapUpdaterGUI{
 
 		//maps = ServerDB.getMapsFromLocal();
 		emptyMaps = ServerDB.getEmptyMapsFromServer();
+		System.out.println("Size of emptyMaps: "+emptyMaps.size());
 		
 		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
@@ -1076,6 +1077,7 @@ public class MapUpdaterGUI{
 				System.out.println("rotation angle = " + m.getRotationAngle());
 			try {
 				ServerDB.insertMap(m);
+				emptyMaps = ServerDB.getEmptyMapsFromServer();
 			} catch (AlreadyExistsException e1) {
 				System.out.print("Look at me im  an error 1");
 				// TODO Auto-generated catch block
@@ -1164,10 +1166,8 @@ public class MapUpdaterGUI{
 							scrolled = false;
 						}
 					}
-					System.out.println(drawnposx+", "+drawnposy);
 					drawnposx += deltax;
 					drawnposy += deltay;
-					System.out.println(drawnposx+", "+drawnposy);
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
 				}
 			drawnfirst = true;
@@ -1215,7 +1215,7 @@ public class MapUpdaterGUI{
 					rotateY = rotateY * campusImage.getHeight();
 					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
 					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
-					System.out.println("At step 6 x is: " + finalGlobX + " y is: " + finalGlobY);
+
 					
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());

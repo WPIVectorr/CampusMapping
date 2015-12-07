@@ -30,6 +30,8 @@ import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import database.AlreadyExistsException;
 import database.ServerDB;
@@ -108,13 +110,15 @@ public class GUI{
 	private boolean scrolled = false;
 	private double upperx;
 	private double uppery;
+	private int outside;
+	private int stairs;
 	Map startMap;
 	private String mapTitle = "Select Map";
-	
 	private static SplashPage loadingAnimation;
-	
+	private JTextField txtFieldEmail;
+
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
-		
+
 		//frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(800, 600));
@@ -150,9 +154,9 @@ public class GUI{
 
 		GridBagLayout gbl_navMenu = new GridBagLayout();
 		gbl_navMenu.columnWidths = new int[]{0, 298, 298, 298, 0, 0};
-		gbl_navMenu.rowHeights = new int[]{0, 0, 56, 56, 0};
-		gbl_navMenu.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 0, 31, 30, 7, 0};
+		gbl_navMenu.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
 
 		menus = new JPanel(new CardLayout());
@@ -179,7 +183,7 @@ public class GUI{
             }
         });*/
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
-		gbl_mainMenu.columnWidths = new int[]{0, 160, 209, 166, 298, 0, 0};
+		gbl_mainMenu.columnWidths = new int[]{30, 134, 209, 146, 223, 0, 0};
 		gbl_mainMenu.rowHeights = new int[]{27, 27, 27, 0, 0, 0};
 		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
@@ -211,14 +215,6 @@ public class GUI{
 			mapsDropdown.addItem(temp.get(count));
 			DestMaps.addItem(temp.get(count));
 		}
-
-
-		Component horizontalStrut = Box.createHorizontalStrut(20);
-		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
-		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 5);
-		gbc_horizontalStrut.gridx = 0;
-		gbc_horizontalStrut.gridy = 1;
-		mainMenu.add(horizontalStrut, gbc_horizontalStrut);
 
 
 		JLabel lblMaps = new JLabel("Starting Map:");
@@ -443,6 +439,10 @@ public class GUI{
 
 		//	         buttonPanel.add(startRooms);
 		//startRooms.setBounds(296, 30, 148, 20);
+		
+
+		// Initalize this button first so it can be used in return button
+		GradientButton btnFullTextDirections = new GradientButton("Show Full Text Directions", buttonColor);
 
 
 
@@ -502,6 +502,7 @@ public class GUI{
 
 		GradientButton btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
 		GridBagConstraints gbc_btnSwapStartAndDest = new GridBagConstraints();
+		gbc_btnSwapStartAndDest.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnSwapStartAndDest.insets = new Insets(0, 0, 5, 5);
 		gbc_btnSwapStartAndDest.gridx = 2;
 		gbc_btnSwapStartAndDest.gridy = 3;
@@ -523,6 +524,7 @@ public class GUI{
 
 		GradientButton btnSetPreferencesMain = new GradientButton("Set Preferences", buttonColor);
 		GridBagConstraints gbc_btnSetPreferencesMain = new GridBagConstraints();
+		gbc_btnSetPreferencesMain.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnSetPreferencesMain.insets = new Insets(0, 0, 5, 5);
 		gbc_btnSetPreferencesMain.gridx = 4;
 		gbc_btnSetPreferencesMain.gridy = 3;
@@ -574,7 +576,7 @@ public class GUI{
 					AStar astar = new AStar();
 					astar.reset();
 
-					route = astar.PathFind(start, end);
+					route = astar.PathFind(start, end, outside, stairs);
 					//System.out.println("route variable: " + (route == null));
 
 					if(route != null){
@@ -716,8 +718,12 @@ public class GUI{
 		Border textBorder = BorderFactory.createLineBorder(Color.BLACK, 2);
 		txtpnFullTextDir.setBorder(textBorder);
 
-		// Initalize this button first so it can be used in return button
-		GradientButton btnFullTextDirections = new GradientButton("Show Full Text Directions", buttonColor);
+		Component verticalStrut = Box.createVerticalStrut(20);
+		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
+		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
+		gbc_verticalStrut.gridx = 2;
+		gbc_verticalStrut.gridy = 0;
+		navMenu.add(verticalStrut, gbc_verticalStrut);
 
 		// Button to return to main menu
 		GradientButton btnReturn = new GradientButton("Select New Route", buttonColor);
@@ -731,43 +737,11 @@ public class GUI{
 				frame.repaint();
 			}
 		});
-
-		Component verticalStrut = Box.createVerticalStrut(20);
-		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
-		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
-		gbc_verticalStrut.gridx = 2;
-		gbc_verticalStrut.gridy = 0;
-		navMenu.add(verticalStrut, gbc_verticalStrut);
-
-		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
-		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();
-		gbc_horizontalStrut_2.insets = new Insets(0, 0, 5, 5);
-		gbc_horizontalStrut_2.gridx = 0;
-		gbc_horizontalStrut_2.gridy = 1;
-		navMenu.add(horizontalStrut_2, gbc_horizontalStrut_2);
 		GridBagConstraints gbc_btnReturn = new GridBagConstraints();
 		gbc_btnReturn.insets = new Insets(0, 0, 5, 5);
 		gbc_btnReturn.gridx = 1;
 		gbc_btnReturn.gridy = 1;
 		navMenu.add(btnReturn, gbc_btnReturn);
-
-		GridBagConstraints gbc_btnFullTextDirections = new GridBagConstraints();
-		gbc_btnFullTextDirections.insets = new Insets(0, 0, 5, 5);
-		gbc_btnFullTextDirections.gridx = 2;
-		gbc_btnFullTextDirections.gridy = 1;
-		navMenu.add(btnFullTextDirections, gbc_btnFullTextDirections);
-		btnFullTextDirections.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(txtpnFullTextDir.isVisible()){
-					txtpnFullTextDir.setVisible(false);
-					btnFullTextDirections.setText("Show Full Text Directions");
-				}
-				else{
-					txtpnFullTextDir.setVisible(true);
-					btnFullTextDirections.setText("Hide Full Text Directions");
-				}
-			}
-		});
 
 		GradientButton btnSetPreferencesNav = new GradientButton("Set Preferences", buttonColor);
 		GridBagConstraints gbc_btnSetPreferencesNav = new GridBagConstraints();
@@ -787,11 +761,18 @@ public class GUI{
 			}
 		});
 
+		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();
+		gbc_horizontalStrut_2.insets = new Insets(0, 0, 5, 5);
+		gbc_horizontalStrut_2.gridx = 0;
+		gbc_horizontalStrut_2.gridy = 2;
+		navMenu.add(horizontalStrut_2, gbc_horizontalStrut_2);
+
 		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_3 = new GridBagConstraints();
 		gbc_horizontalStrut_3.insets = new Insets(0, 0, 5, 0);
 		gbc_horizontalStrut_3.gridx = 4;
-		gbc_horizontalStrut_3.gridy = 1;
+		gbc_horizontalStrut_3.gridy = 2;
 		navMenu.add(horizontalStrut_3, gbc_horizontalStrut_3);
 
 
@@ -807,7 +788,7 @@ public class GUI{
 		gbc_directionsText.fill = GridBagConstraints.HORIZONTAL;
 		gbc_directionsText.insets = new Insets(0, 0, 5, 5);
 		gbc_directionsText.gridx = 1;
-		gbc_directionsText.gridy = 2;
+		gbc_directionsText.gridy = 3;
 		navMenu.add(directionsText, gbc_directionsText);
 
 
@@ -848,9 +829,9 @@ public class GUI{
 		GridBagConstraints gbc_btnPrevious = new GridBagConstraints();
 		gbc_btnPrevious.anchor = GridBagConstraints.NORTH;
 		gbc_btnPrevious.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnPrevious.insets = new Insets(0, 0, 0, 5);
+		gbc_btnPrevious.insets = new Insets(0, 0, 5, 5);
 		gbc_btnPrevious.gridx = 1;
-		gbc_btnPrevious.gridy = 3;
+		gbc_btnPrevious.gridy = 4;
 		navMenu.add(btnPrevious, gbc_btnPrevious);
 
 		// Button to get next step in directions
@@ -868,7 +849,7 @@ public class GUI{
 
 					if(textPos < multiMapFinalDir.get(mapPos).size()){ 
 						textPos++;
-						
+
 						if (textPos != multiMapFinalDir.get(mapPos).size()){
 							directionsText.setText(textDir.get(mapPos).get(textPos));
 						}
@@ -904,12 +885,51 @@ public class GUI{
 				}
 			}});
 		GridBagConstraints gbc_btnNext = new GridBagConstraints();
-		gbc_btnNext.insets = new Insets(0, 0, 0, 5);
+		gbc_btnNext.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNext.anchor = GridBagConstraints.NORTH;
 		gbc_btnNext.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnNext.gridx = 3;
-		gbc_btnNext.gridy = 3;
+		gbc_btnNext.gridy = 4;
 		navMenu.add(btnNext, gbc_btnNext);
+
+		txtFieldEmail = new JTextField();
+		GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
+		gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
+		gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtFieldEmail.gridx = 1;
+		gbc_txtFieldEmail.gridy = 5;
+		navMenu.add(txtFieldEmail, gbc_txtFieldEmail);
+		txtFieldEmail.setColumns(10);
+
+		GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
+		GridBagConstraints gbc_btnEmailDirections = new GridBagConstraints();
+		gbc_btnEmailDirections.insets = new Insets(0, 0, 5, 5);
+		gbc_btnEmailDirections.gridx = 2;
+		gbc_btnEmailDirections.gridy = 5;
+		navMenu.add(btnEmailDirections, gbc_btnEmailDirections);
+
+		GridBagConstraints gbc_btnFullTextDirections = new GridBagConstraints();
+		gbc_btnFullTextDirections.insets = new Insets(0, 0, 5, 5);
+		gbc_btnFullTextDirections.gridx = 3;
+		gbc_btnFullTextDirections.gridy = 5;
+		navMenu.add(btnFullTextDirections, gbc_btnFullTextDirections);
+		btnFullTextDirections.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(txtpnFullTextDir.isVisible()){
+					txtpnFullTextDir.setVisible(false);
+					btnFullTextDirections.setText("Show Full Text Directions");
+				}
+				else{
+					txtpnFullTextDir.setVisible(true);
+					btnFullTextDirections.setText("Hide Full Text Directions");
+				}
+			}
+		});
+		btnEmailDirections.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		});
 
 		// Add panel for drawing
 		frame.getContentPane().add(drawPanel);
@@ -978,14 +998,53 @@ public class GUI{
 			}
 		});
 
-		JSlider sliderOutside = new JSlider();
+		JSlider sliderOutside = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
+		sliderOutside.addChangeListener(new ChangeListener(){
+			 public void stateChanged(ChangeEvent event) {
+			        int value = sliderOutside.getValue();
+			        if (value == 0) {
+			        	outside = 0;
+			          //System.out.println("0");
+			        } else if (value > 0 ) {
+			        	outside = 1;
+			          //System.out.println("value > 0 " + value);
+			        } else{
+			        	outside = -1;
+			          //System.out.println("value < 0" + value);
+			        } 
+			      }
+			    });
+	
+		sliderOutside.setMajorTickSpacing(1);
+		sliderOutside.setPaintTicks(true);
+		sliderOutside.setPaintLabels(true);
+		
 		GridBagConstraints gbc_slider = new GridBagConstraints();
 		gbc_slider.insets = new Insets(0, 0, 5, 5);
 		gbc_slider.gridx = 2;
 		gbc_slider.gridy = 3;
 		prefMenu.add(sliderOutside, gbc_slider);
 
-		JSlider sliderStairs = new JSlider();
+		JSlider sliderStairs = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
+		sliderStairs.addChangeListener(new ChangeListener(){
+			 public void stateChanged(ChangeEvent event) {
+			        int value = sliderStairs.getValue();
+			        if (value == 0) {
+			        	stairs = 0;
+			          //System.out.println("0");
+			        } else if (value > 0 ) {
+			        	stairs = 1;
+			          //System.out.println("value > 0 " + value);
+			        } else{
+			        	stairs = -1;
+			          //System.out.println("value < 0" + value);
+			        } 
+			      }
+			    });
+	
+		sliderStairs.setMajorTickSpacing(1);
+		sliderStairs.setPaintTicks(true);
+		sliderStairs.setPaintLabels(true);
 		GridBagConstraints gbc_slider_1 = new GridBagConstraints();
 		gbc_slider_1.insets = new Insets(0, 0, 5, 5);
 		gbc_slider_1.gridx = 4;
@@ -1046,8 +1105,8 @@ public class GUI{
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-		
-		
+
+
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
@@ -1132,10 +1191,10 @@ public class GUI{
 					drawnposx = centerx -(int)(newImageWidth/2);
 					drawnposy = centery -(int)(newImageHeight/2);
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
-					//System.out.println(newImageWidth+", "+newImageHeight);
+					System.out.println("image width og: "+img.getWidth()+"*"+scaleSize+"="+newImageWidth);
+					System.out.println("image height og: "+img.getHeight()+"*"+scaleSize+"="+newImageHeight);
+
 				} else{
-				}
-					
 					double deltax = 0;
 					double deltay = 0;
 					newImageHeight = (int)img.getHeight()*scaleSize;
@@ -1201,14 +1260,7 @@ public class GUI{
 
 				// Draws ovals with black borders at each of the points along the path, needs to use an offset
 				for (int i = 0; i < multiMapFinalDir.get(mapPos).size(); i++){
-					/*g.setColor(Color.ORANGE);
-					int pointx = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
-					int pointy = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
-					g.fillOval((int)(pointx - (pointSize / 2)), (int)(pointy - (pointSize / 2)), pointSize, pointSize);
-					g.setColor(Color.BLACK);
-					int point1x = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
-					int point1y = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
-					g.drawOval((int)(point1x - (pointSize / 2)), (int)(point1y - (pointSize / 2)), pointSize, pointSize);*/					
+				
 					int pointx = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
 					int pointy = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
 					if (i != textPos){
@@ -1227,16 +1279,7 @@ public class GUI{
 						g.setColor(Color.BLACK);
 						g2.draw(star);
 					}
-
 				}
-
-				// Draws final oval in path
-				/*g.setColor(Color.ORANGE);
-				int pointx = (int)((multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX()*newImageWidth)+drawnposx);
-				int pointy = (int)((multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY()*newImageHeight)+drawnposy);
-				g.fillOval((int)(pointx - (pointSize / 2)), (int)(pointy - (pointSize / 2)), pointSize, pointSize);
-				g.setColor(Color.BLACK);
-				g.drawOval((int)(pointx - (pointSize / 2)), (int)(pointy - (pointSize / 2)), pointSize, pointSize);*/
 
 				// Draws final oval or star in path
 				int pointx = (int)((multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX()*newImageWidth)+drawnposx);
@@ -1256,10 +1299,9 @@ public class GUI{
 					g.setColor(Color.BLACK);
 					g2.draw(star);
 				}
-
 			}
 		}
 
 	}
-
+	}
 }

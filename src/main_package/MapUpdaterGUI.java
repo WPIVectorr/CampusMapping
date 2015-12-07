@@ -125,12 +125,12 @@ public class MapUpdaterGUI{
 	private double newImageHeight;
 	private double newImageWidth;
 	private boolean scrolled = false;
-	
-	
+
+
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		
+
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MapUpdaterGUI.class.getResource("/VectorLogo/Logo Icon.png")));
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
@@ -149,8 +149,7 @@ public class MapUpdaterGUI{
 
 		//maps = ServerDB.getMapsFromLocal();
 		emptyMaps = ServerDB.getEmptyMapsFromServer();
-		System.out.println("Size of emptyMaps: "+emptyMaps.size());
-		
+
 		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
 
@@ -170,7 +169,7 @@ public class MapUpdaterGUI{
 		drawPanel.setBackground(Color.WHITE);
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		
+
 		loadingAnimation.hideSplash(0);
 		frame.setVisible(true);
 	}
@@ -219,7 +218,7 @@ public class MapUpdaterGUI{
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-		
+
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
@@ -597,10 +596,10 @@ public class MapUpdaterGUI{
 					String destInput = dest.getAbsolutePath();
 					// System.out.println("Destination Input: " + destInput);
 					// System.out.println("Source Input: " + srcInput);
-					
+
 					if(DEBUG)
 						System.out.println("Mapname after addingMap: "+maptitle);
-					
+
 					destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
 					if(DEBUG)
 						System.out.println("dest input: "+destInput);
@@ -827,7 +826,7 @@ public class MapUpdaterGUI{
 				originy = e.getY();
 			}
 		});
-		
+
 		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
 			 
             @Override
@@ -850,14 +849,14 @@ public class MapUpdaterGUI{
 			}
 
 			public void mouseMoved(MouseEvent arg0) {
-				
+
 			}
 		});
-		
+
 		frame.addMouseWheelListener(new MouseWheelListener(){
-		    public void mouseWheelMoved(MouseWheelEvent e) {
-		    	scrolled = true;
-		    	String message;
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				scrolled = true;
+				String message;
 				int notches = e.getWheelRotation();
 				if (notches < 0) {
 					message = "Mouse wheel moved UP " + -notches + " notch(es)\n";
@@ -1117,7 +1116,7 @@ public class MapUpdaterGUI{
 		public void paintComponent(Graphics g) {
 
 			super.paintComponent(g);
-			
+
 
 			// -------------------------------
 			// if(img == null)
@@ -1148,31 +1147,34 @@ public class MapUpdaterGUI{
 					//System.out.println(newImageWidth+", "+newImageHeight);
 				} else{
 				}
-					
-					double deltax = 0;
-					double deltay = 0;
-					newImageHeight = (int)img.getHeight()*scaleSize;
-					newImageWidth = (int)img.getWidth()*scaleSize;
-					if(!(name.equals("Select Map"))){
-						if(Dragged){
-							System.out.println("dragged");
-							deltax = -(originx - mousex);
-							deltay = -(originy - mousey);
-							originx = mousex;
-							originy = mousey;
-							difWidth = 0;
-							difHeight = 0;
-						} else if(scrolled){
-							System.out.println("I did it");
-							deltax = difWidth;
-							deltay = difWidth;
-							scrolled = false;
-						}
+
+				double deltax = 0;
+				double deltay = 0;
+				newImageHeight = (int)img.getHeight()*scaleSize;
+				newImageWidth = (int)img.getWidth()*scaleSize;
+				if(!(name.equals("Select Map"))){
+					if(Dragged){
+						System.out.println("dragged");
+						deltax = -(originx - mousex);
+						deltay = -(originy - mousey);
+						originx = mousex;
+						originy = mousey;
+						difWidth = 0;
+						difHeight = 0;
+					} else if(scrolled){
+						System.out.println("I did it");
+						deltax = difWidth;
+						deltay = difWidth;
+						scrolled = false;
 					}
+
+
 					drawnposx += deltax;
 					drawnposy += deltay;
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
+
 				}
+
 
 			// add point to the point array (has to take place outside of below
 			// loop)
@@ -1218,7 +1220,8 @@ public class MapUpdaterGUI{
 					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
 					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
 
-					
+
+
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
@@ -1339,9 +1342,9 @@ public class MapUpdaterGUI{
 										{
 											for (int j = 0; j < currentPoint.getNumEdges(); j++) {
 												if(DEBUG){
-												System.out.println("Adding clicked edge between: "
-														+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
-														+ currentPoint.getEdges().get(j).getPoint2().getName());
+													System.out.println("Adding clicked edge between: "
+															+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
+															+ currentPoint.getEdges().get(j).getPoint2().getName());
 												}
 											}
 										}
@@ -1379,8 +1382,8 @@ public class MapUpdaterGUI{
 							for (int j = 0; j < pointArray.size(); j++)
 							{
 								if(DEBUG){
-								System.out.println("Number of edges in point "
-										+pointArray.get(j).getId()+": "+pointArray.get(j).getEdges().size());
+									System.out.println("Number of edges in point "
+											+pointArray.get(j).getId()+": "+pointArray.get(j).getEdges().size());
 								}
 							}
 							double posx2 = ((currentPoint.getLocX()*newImageWidth)+drawnposx);
@@ -1528,9 +1531,9 @@ public class MapUpdaterGUI{
 						markForDelete.remove(j);
 					}
 
-					
 
-					
+
+
 
 					if(editPoint != null)
 					{
@@ -1546,28 +1549,28 @@ public class MapUpdaterGUI{
 					}
 					//draw lines between points
 				}
-				
-				
+
+
 
 			}//end of traversing pointArray
-			
-			
+
+
 			//draws all edges in the edge array
 			for (int j = 0; j < edgeArray.size(); j++) {
-				
+
 				g.setColor(Color.ORANGE);
-				
+
 				//if(!(drawnEdges.contains(edgeArray.get(j)))){
 				int point1x = (int)((edgeArray.get(j).getPoint1().getLocX()*newImageWidth)+drawnposx);
 				int point1y = (int)((edgeArray.get(j).getPoint1().getLocY()*newImageHeight)+drawnposy);
 				int point2x = (int)((edgeArray.get(j).getPoint2().getLocX()*newImageWidth)+drawnposx);
 				int point2y = (int)((edgeArray.get(j).getPoint2().getLocY()*newImageHeight)+drawnposy);
-					g.drawLine(point1x, point1y, point2x, point2y);
-					drawnEdges.add(edgeArray.get(j));
-					g.setColor(Color.BLACK);
+				g.drawLine(point1x, point1y, point2x, point2y);
+				drawnEdges.add(edgeArray.get(j));
+				g.setColor(Color.BLACK);
 				//}
 			}
-			
+
 			for( int w = 0; w < pointArray.size(); w++){
 				int drawX = (int) (double)((pointArray.get(w).getLocX()*newImageWidth)+drawnposx);
 				int drawY = (int) (double)((pointArray.get(w).getLocY()*newImageHeight)+drawnposy);
@@ -1577,19 +1580,21 @@ public class MapUpdaterGUI{
 				//System.out.println("For point: " + pointArray.get(w).getId() + " loc Y val is: " + pointArray.get(w).getLocY() + " glob Y val is: " + pointArray.get(w).getGlobY());
 				// draws the points onto the map.
 				g.setColor(Color.BLACK);
-				
+
 				g.drawOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 				//g2D.drawPolygon();
 				g.setColor(Color.getHSBColor(0.12f, 0.74f, 0.7f));
 				g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 				g.setColor(Color.BLACK);
 			}
-			
+
 			drawnEdges.clear();
 			newClick = false;
 		}
 
 	}
+}
+
 
 	/*
 	 * Takes an input file directory path and a target directory path and copies
@@ -1614,6 +1619,7 @@ public class MapUpdaterGUI{
 		is.close();
 		os.close();
 	}
+}
 
 	/*
 	private Map updateCurrentMap(Map map)
@@ -1637,4 +1643,4 @@ public class MapUpdaterGUI{
 		}
 		return null;
 	} */
-}
+

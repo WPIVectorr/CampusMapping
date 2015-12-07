@@ -1154,7 +1154,8 @@ public class MapUpdaterGUI{
 				newImageWidth = (int)img.getWidth()*scaleSize;
 				if(!(name.equals("Select Map"))){
 					if(Dragged){
-						System.out.println("dragged");
+						if(DEBUG)
+							System.out.println("dragged");
 						deltax = -(originx - mousex);
 						deltay = -(originy - mousey);
 						originx = mousex;
@@ -1162,7 +1163,8 @@ public class MapUpdaterGUI{
 						difWidth = 0;
 						difHeight = 0;
 					} else if(scrolled){
-						System.out.println("I did it");
+						if(DEBUG)
+							System.out.println("I did it");
 						deltax = difWidth;
 						deltay = difWidth;
 						scrolled = false;
@@ -1182,6 +1184,7 @@ public class MapUpdaterGUI{
 				//System.out.println(newClick);
 				if (getRadButton() == 1) // if addpoint
 				{
+					
 					Integer nameNumber = currentMap.getPointIDIndex()+1;
 					double ourRotation = currentMap.getRotationAngle();
 					ourRotation = 2 * Math.PI - ourRotation;
@@ -1220,13 +1223,9 @@ public class MapUpdaterGUI{
 					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
 					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
 
-					System.out.println("");
-					System.out.println("");
-					System.out.println("");
-					System.out.println("Global X is: " + finalGlobX + " and Y is: " + finalGlobY);
-					System.out.println("");
-					System.out.println("");
-					System.out.println("");
+					if(DEBUG)
+						System.out.println("Global X is: " + finalGlobX + " and Y is: " + finalGlobY);
+					
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),

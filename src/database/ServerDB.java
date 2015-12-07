@@ -34,7 +34,7 @@ public class ServerDB {
 	private static String EDGE_SCHEMA = "id VARCHAR(30), idPoint1 VARCHAR(30), idPoint2 VARCHAR(30), weight INTEGER, isOutside BOOLEAN, isStairs INTEGER";
 	//-------------------------------------------------------------Variables-----------------------------------------------------------------------
 	private static Connection conn = null;
-	public final static boolean DEBUG = false;
+	public final static boolean DEBUG = true;
 
 	private static ArrayList<Map> allMaps = new ArrayList<Map>();
 	private static ArrayList<Point> allPoints = new ArrayList<Point>();

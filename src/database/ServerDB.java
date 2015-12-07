@@ -812,6 +812,16 @@ public class ServerDB {
 				map.setyBotRight(rs.getDouble("yBotRight"));
 				map.setRotationAngle(rs.getDouble("rotation"));
 				map.setPointIDIndex(rs.getInt("pointIDIndex"));
+				double xTopLeftDeRotate = map.getxTopLeft() * Math.cos(map.getRotationAngle()) - map.getyTopLeft() * Math.sin(map.getRotationAngle());
+				double xBotRightDeRotate = map.getxBotRight() * Math.cos(map.getRotationAngle()) - map.getyBotRight() * Math.sin(map.getRotationAngle());
+				map.setWidth(Math.abs(xTopLeftDeRotate - xBotRightDeRotate));
+				
+				double yTopLeftDeRotate = map.getyTopLeft() * Math.cos(map.getRotationAngle()) + map.getxTopLeft() * Math.sin(map.getRotationAngle());
+				double yBotRightDeRotate = map.getyBotRight() * Math.cos(map.getRotationAngle()) + map.getxBotRight() * Math.sin(map.getRotationAngle());
+				System.out.println("Y top left derotate is: " + yTopLeftDeRotate);
+				System.out.println("Y bot right derotate is: " + yBotRightDeRotate);
+				map.setHeight(Math.abs(yTopLeftDeRotate - yBotRightDeRotate));
+				
 				ArrayList<Point> tempPts = new ArrayList<Point>();
 				try {
 					tempPts = getPointsFromServer(map);

@@ -826,8 +826,8 @@ public class ServerDB {
 				
 				double yTopLeftDeRotate = map.getyTopLeft() * Math.cos(map.getRotationAngle()) + map.getxTopLeft() * Math.sin(map.getRotationAngle());
 				double yBotRightDeRotate = map.getyBotRight() * Math.cos(map.getRotationAngle()) + map.getxBotRight() * Math.sin(map.getRotationAngle());
-				System.out.println("Y top left derotate is: " + yTopLeftDeRotate);
-				System.out.println("Y bot right derotate is: " + yBotRightDeRotate);
+				//System.out.println("Y top left derotate is: " + yTopLeftDeRotate);
+				//System.out.println("Y bot right derotate is: " + yBotRightDeRotate);
 				map.setHeight(Math.abs(yTopLeftDeRotate - yBotRightDeRotate));
 				
 				ArrayList<Point> tempPts = new ArrayList<Point>();
@@ -972,7 +972,7 @@ public class ServerDB {
 				newPtGlobX = rs.getInt("globX");
 				newPtGlobY = rs.getInt("globY");
 				newPtNumberEdges = rs.getInt("numEdges");
-				newPtIsStairs = rs.getBoolean("isOutside");
+				newPtIsStairs = rs.getBoolean("isStairs");
 				newPtIsOutside = rs.getBoolean("isOutside");
 				newPtEdges = new ArrayList<Edge>();
 

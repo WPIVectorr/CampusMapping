@@ -21,7 +21,6 @@ import javax.activation.*;
 
 
 public class PrintDirections {
-
 	public PrintDirections(ArrayList<ArrayList<String>> directions, String emailFilename) throws AddressException
 	{
 		try {
@@ -111,6 +110,7 @@ public class PrintDirections {
 			e.printStackTrace();
 		}
 	}
+
 
 
 
@@ -259,6 +259,7 @@ public class PrintDirections {
 			printout += '\n'+"<br>" + System.getProperty("line.separator");
 			printout += "<h4>";
 		}
+<<<<<<< HEAD
 
 		return printout;
 	}

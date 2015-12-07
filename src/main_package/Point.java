@@ -13,8 +13,21 @@ public class Point implements Comparable{
 	private double globY;
 	private ArrayList<Edge> edges = new ArrayList<Edge>();
 	private int numberEdges;
-	private boolean stairPref;
-	private boolean outsidePref;
+	private boolean isStairs;
+	public boolean isStairs() {
+		return isStairs;
+	}
+	public void setStairs(boolean isStairs) {
+		this.isStairs = isStairs;
+	}
+	public boolean isOutside() {
+		return isOutside;
+	}
+	public void setOutside(boolean isOutside) {
+		this.isOutside = isOutside;
+	}
+
+	private boolean isOutside;
 	
 	public Point()
 	{
@@ -45,7 +58,8 @@ public class Point implements Comparable{
 	}
 	
 
-	public Point(String id, String name, double locX, double locY, double globX, double globY, int numberEdges) {
+	public Point(String id, String name, double locX, double locY, double globX, double globY,
+			int numberEdges) {
 		this.id = id;
 		this.name = name;
 		this.locX = locX;
@@ -56,7 +70,9 @@ public class Point implements Comparable{
 		this.globY = globY;
 	}
 	
-	public Point(String id, int mapId, String name, int index, double locX, double locY, double globX, double globY, int numberEdges) {
+	//TODO phase out this constructor
+	public Point(String id, int mapId, String name, int index, double locX, double locY, double globX, 
+			double globY, int numberEdges) {
 		this.id = id;
 		this.mapId = mapId;
 		this.name = name;
@@ -66,19 +82,23 @@ public class Point implements Comparable{
 		this.index = index;
 		this.globX = globX;
 		this.globY = globY;
-		this.stairPref = stairPref;
-		this.outsidePref = outsidePref;
+		this.isStairs = false;
+		this.isOutside = false;
 	}
 	
-	public Point(String id, String name, int index, double x, double y, int numberEdges) {
+	public Point(String id, int mapId, String name, int index, double locX, double locY, double globX, 
+			double globY, int numberEdges, boolean isStairs, boolean isOutside) {
 		this.id = id;
+		this.mapId = mapId;
 		this.name = name;
-		this.index = index;
-		this.locX = x;
-		this.locY = y;
+		this.locX = locX;
+		this.locY = locY;
 		this.numberEdges = numberEdges;
-		this.globX = x;
-		this.globY = y;
+		this.index = index;
+		this.globX = globX;
+		this.globY = globY;
+		this.isStairs = isStairs;
+		this.isOutside = isOutside;
 	}
 	
 	public String getId() {

@@ -16,6 +16,7 @@ public class Map implements Comparable{
 	private int pointIDIndex = 0;
 	private double width;
 	private double height;
+	
 
 	public Map ()
 	{

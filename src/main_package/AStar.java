@@ -11,7 +11,7 @@ public class AStar {
 	static HashMap<String, Integer> gscore = new HashMap<String, Integer>(); // Time taken to each node
 	static HashMap<String, Integer> fscore = new HashMap<String, Integer>(); // Estimated time from each node to end
 	
-	public static ArrayList<Point> PathFind(Point start, Point end) {		
+	public static ArrayList<Point> PathFind(Point start, Point end, int outside, int stairs) {		
 		gscore.put(start.getId(), 0); // Initialize scores
 		fscore.put(start.getId(), CostEstimate(start, end));
 		
@@ -31,7 +31,26 @@ public class AStar {
 					//If point2 on this edge isnt this one and is already closed, dont do things
 				}
 				else{ //This edge has a new point on it
-					int tentGScore = gscore.get(Current.getId()) + Current.getEdges().get(i).getWeight(); // How far we have gone to get to this point
+					double prefOutsideScale = 1;
+					double prefStairsScale = 1;
+					if(outside == -1){
+						prefOutsideScale = 4;
+					} else if (outside == 1){
+						prefOutsideScale = 0.5;
+					}
+					
+					if(stairs == -1){
+						prefStairsScale = 4;
+					} else if(stairs == 1){
+						prefStairsScale = 0.5;
+					}
+					if(!Current.getEdges().get(i).getPoint1().isOutside() && !Current.getEdges().get(i).getPoint2().isOutside()){
+						prefOutsideScale = 1;
+					}
+					if(!Current.getEdges().get(i).getPoint1().isStairs() || !Current.getEdges().get(i).getPoint2().isStairs()){
+						prefStairsScale = 1;
+					}
+					int tentGScore = gscore.get(Current.getId()) + (int)(Current.getEdges().get(i).getWeight() * prefStairsScale * prefOutsideScale); // How far we have gone to get to this point
 					if(Current.getEdges().get(i).getPoint1().equals(Current)){ // Check which point is the new one
 						// Point2 is the new point
 						if(!Open.contains(Current.getEdges().get(i).getPoint2()) || gscore.get(Current.getEdges().get(i).getPoint2().getId()) > tentGScore){ // If the point is not on the open list OR this is a faster route to it

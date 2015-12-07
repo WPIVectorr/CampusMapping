@@ -102,7 +102,7 @@ public class MapUpdaterGUI{
 	private JLabel pointsLoadingLabel;
 	private JTabbedPane tabs = new JTabbedPane();
 	//private ArrayList<Map> maps = new ArrayList<Map>();
-	private ArrayList<Map> emptyMaps = new ArrayList<Map>();
+	private static ArrayList<Map> emptyMaps = new ArrayList<Map>();
 	private JButton btnConnectToOther;
 	private InterMapEdgeGUI connectMapGUI;
 	private static SplashPage loadingAnimation = new SplashPage();
@@ -125,12 +125,12 @@ public class MapUpdaterGUI{
 	private double newImageHeight;
 	private double newImageWidth;
 	private boolean scrolled = false;
-	
-	
+
+
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		
+
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MapUpdaterGUI.class.getResource("/VectorLogo/Logo Icon.png")));
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		Dimension screenSize = tk.getScreenSize();
@@ -149,7 +149,7 @@ public class MapUpdaterGUI{
 
 		//maps = ServerDB.getMapsFromLocal();
 		emptyMaps = ServerDB.getEmptyMapsFromServer();
-		
+
 		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
 
@@ -165,9 +165,11 @@ public class MapUpdaterGUI{
 		buttonPanel.add(tabs, BorderLayout.NORTH);
 
 		frame.getContentPane().add(drawPanel);
+		
+		drawPanel.setBackground(Color.WHITE);
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		
+
 		loadingAnimation.hideSplash(0);
 		frame.setVisible(true);
 	}
@@ -216,7 +218,7 @@ public class MapUpdaterGUI{
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-		
+
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
@@ -388,6 +390,7 @@ public class MapUpdaterGUI{
 						{
 							try {
 								currentMap = ServerDB.getMapFromServer(emptyMaps.get(i).getMapId());
+								System.out.println("Map ID is: " + currentMap.getMapId());
 							} catch (DoesNotExistException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -593,10 +596,10 @@ public class MapUpdaterGUI{
 					String destInput = dest.getAbsolutePath();
 					// System.out.println("Destination Input: " + destInput);
 					// System.out.println("Source Input: " + srcInput);
-					
+
 					if(DEBUG)
 						System.out.println("Mapname after addingMap: "+maptitle);
-					
+
 					destInput = destInput + "/" + maptitle + srcInput.substring(srcInput.length() - 4);
 					if(DEBUG)
 						System.out.println("dest input: "+destInput);
@@ -610,7 +613,7 @@ public class MapUpdaterGUI{
 						a.printStackTrace();
 					}
 					if(emptyMaps == null || emptyMaps.size() == 0){
-						setInfo(0, 0, img.getWidth(), img.getHeight(), 0);
+						setInfo(0, 0, 1, 1, 0);
 					} else {
 						new MapInserterGUI();
 					}
@@ -815,6 +818,7 @@ public class MapUpdaterGUI{
 				} else{
 					//System.out.println("dragged = true");
 					Dragged = false;
+					drawnfirst = true;
 				}
 			}
 			public void mousePressed(MouseEvent e) {
@@ -822,7 +826,7 @@ public class MapUpdaterGUI{
 				originy = e.getY();
 			}
 		});
-		
+
 		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
 			 
             @Override
@@ -832,7 +836,6 @@ public class MapUpdaterGUI{
             @Override
             public void ancestorResized(HierarchyEvent e) {
                 frame.repaint();
-                 
             }           
         });
 		
@@ -846,14 +849,14 @@ public class MapUpdaterGUI{
 			}
 
 			public void mouseMoved(MouseEvent arg0) {
-				
+
 			}
 		});
-		
+
 		frame.addMouseWheelListener(new MouseWheelListener(){
-		    public void mouseWheelMoved(MouseWheelEvent e) {
-		    	scrolled = true;
-		    	String message;
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				scrolled = true;
+				String message;
 				int notches = e.getWheelRotation();
 				if (notches < 0) {
 					message = "Mouse wheel moved UP " + -notches + " notch(es)\n";
@@ -863,6 +866,7 @@ public class MapUpdaterGUI{
 				double oldWidth = img.getWidth() * scaleSize;
 				double oldHeight = img.getHeight() * scaleSize;
 				if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(name.equals("Select Map")))) {
+					drawnfirst = true;
 					scroldirection = e.getWheelRotation();
 					if (e.getWheelRotation() > 0) {
 						if (scaleSize <= 2) {
@@ -915,6 +919,7 @@ public class MapUpdaterGUI{
 				pointsLoadingLabel.setVisible(true);
 				btnSaveMap.setText("Saving");
 				try {
+					System.out.println("Current Map ID is: " + currentMap.getMapId());
 					ServerDB.updateMap(currentMap);
 				} catch (SQLException e2) {
 					// TODO Auto-generated catch block
@@ -1074,6 +1079,7 @@ public class MapUpdaterGUI{
 				System.out.println("rotation angle = " + m.getRotationAngle());
 			try {
 				ServerDB.insertMap(m);
+				emptyMaps = ServerDB.getEmptyMapsFromServer();
 			} catch (AlreadyExistsException e1) {
 				System.out.print("Look at me im  an error 1");
 				// TODO Auto-generated catch block
@@ -1110,7 +1116,7 @@ public class MapUpdaterGUI{
 		public void paintComponent(Graphics g) {
 
 			super.paintComponent(g);
-			
+
 
 			// -------------------------------
 			// if(img == null)
@@ -1141,34 +1147,34 @@ public class MapUpdaterGUI{
 					//System.out.println(newImageWidth+", "+newImageHeight);
 				} else{
 				}
-					
-					double deltax = 0;
-					double deltay = 0;
-					newImageHeight = (int)img.getHeight()*scaleSize;
-					newImageWidth = (int)img.getWidth()*scaleSize;
-					if(!(name.equals("Select Map"))){
-						if(Dragged){
-							System.out.println("dragged");
-							deltax = -(originx - mousex);
-							deltay = -(originy - mousey);
-							originx = mousex;
-							originy = mousey;
-							difWidth = 0;
-							difHeight = 0;
-						} else if(scrolled){
-							System.out.println("I did it");
-							deltax = difWidth;
-							deltay = difWidth;
-							scrolled = false;
-						}
+
+				double deltax = 0;
+				double deltay = 0;
+				newImageHeight = (int)img.getHeight()*scaleSize;
+				newImageWidth = (int)img.getWidth()*scaleSize;
+				if(!(name.equals("Select Map"))){
+					if(Dragged){
+						System.out.println("dragged");
+						deltax = -(originx - mousex);
+						deltay = -(originy - mousey);
+						originx = mousex;
+						originy = mousey;
+						difWidth = 0;
+						difHeight = 0;
+					} else if(scrolled){
+						System.out.println("I did it");
+						deltax = difWidth;
+						deltay = difWidth;
+						scrolled = false;
 					}
-					System.out.println(drawnposx+", "+drawnposy);
+
+
 					drawnposx += deltax;
 					drawnposy += deltay;
-					System.out.println(drawnposx+", "+drawnposy);
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
+
 				}
-			drawnfirst = true;
+
 
 			// add point to the point array (has to take place outside of below
 			// loop)
@@ -1199,8 +1205,10 @@ public class MapUpdaterGUI{
 					double tempPreRotateY = lastMousey;
 					double LocalX = (lastMousex-drawnposx)/newImageWidth;
 					double LocalY = (lastMousey-drawnposy)/newImageHeight;
-					tempPreRotateX = tempPreRotateX/(img.getWidth()/windowScale);
-					tempPreRotateY = tempPreRotateY/(img.getHeight()/windowScale);
+					tempPreRotateX = tempPreRotateX - drawnposx;
+					tempPreRotateY = tempPreRotateY - drawnposy;
+					tempPreRotateX = tempPreRotateX/(img.getWidth()*scaleSize);
+					tempPreRotateY = tempPreRotateY/(img.getHeight()*scaleSize);
 					tempPreRotateX = tempPreRotateX - 0.5;
 					tempPreRotateY = tempPreRotateY - 0.5;
 					tempPreRotateX = tempPreRotateX * currentMap.getWidth();
@@ -1211,8 +1219,9 @@ public class MapUpdaterGUI{
 					rotateY = rotateY * campusImage.getHeight();
 					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
 					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
-					
-					
+
+
+
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
@@ -1269,11 +1278,13 @@ public class MapUpdaterGUI{
 						MapUpdaterGUI.btnSaveMap.setText("Save Map, X:" + lastMousex + ", Y:" + lastMousey);
 
 						switch (getRadButton()) {
-						case 2:// edit points
-							if ((lastMousex > currentPoint.getLocX() - (pointSize + 1)
-									&& lastMousex < currentPoint.getLocX() + (pointSize + 1))
-									&& (lastMousey > currentPoint.getLocY() - (pointSize + 1)
-											&& lastMousey < currentPoint.getLocY() + (pointSize + 1))) {
+						case 2:// edit points\
+							double posx = ((currentPoint.getLocX()*newImageWidth)+drawnposx);
+							double posy = ((currentPoint.getLocY()*newImageHeight)+drawnposy);
+							if ((lastMousex > posx - (pointSize + (1*scaleSize))
+									&& lastMousex < posx + (pointSize + (1*scaleSize)))
+									&& (lastMousey > posy - (pointSize + (1*scaleSize))
+											&& lastMousey < posy + (pointSize + (1*scaleSize)))) {
 								if (newClick == true && editingPoint == false) {
 									editPoint = currentPoint;
 									editPointIndex = i;
@@ -1331,9 +1342,9 @@ public class MapUpdaterGUI{
 										{
 											for (int j = 0; j < currentPoint.getNumEdges(); j++) {
 												if(DEBUG){
-												System.out.println("Adding clicked edge between: "
-														+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
-														+ currentPoint.getEdges().get(j).getPoint2().getName());
+													System.out.println("Adding clicked edge between: "
+															+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
+															+ currentPoint.getEdges().get(j).getPoint2().getName());
 												}
 											}
 										}
@@ -1371,14 +1382,16 @@ public class MapUpdaterGUI{
 							for (int j = 0; j < pointArray.size(); j++)
 							{
 								if(DEBUG){
-								System.out.println("Number of edges in point "
-										+pointArray.get(j).getId()+": "+pointArray.get(j).getEdges().size());
+									System.out.println("Number of edges in point "
+											+pointArray.get(j).getId()+": "+pointArray.get(j).getEdges().size());
 								}
 							}
-							if ((lastMousex > currentPoint.getLocX() - (pointSize + 5)
-									&& lastMousex < currentPoint.getLocX() + (pointSize + 5))
-									&& (lastMousey > currentPoint.getLocY() - (pointSize + 5)
-											&& lastMousey < currentPoint.getLocY() + (pointSize + 5))) {
+							double posx2 = ((currentPoint.getLocX()*newImageWidth)+drawnposx);
+							double posy2 = ((currentPoint.getLocY()*newImageHeight)+drawnposy);
+							if ((lastMousex > posx2 - (pointSize + (5*scaleSize))
+									&& lastMousex < posx2 + (pointSize + (5*scaleSize)))
+									&& (lastMousey > posy2 - (pointSize + (5*scaleSize))
+											&& lastMousey < posy2 + (pointSize + (5*scaleSize)))) {
 								if (newClick == true){
 									/* The error lies in the fact that edges, when created, are not being added to the points in the pointArray,
 									 * as a result, the code breaks when trying to remove said edge. The code below is the first half of a quick
@@ -1518,9 +1531,9 @@ public class MapUpdaterGUI{
 						markForDelete.remove(j);
 					}
 
-					
 
-					
+
+
 
 					if(editPoint != null)
 					{
@@ -1530,34 +1543,34 @@ public class MapUpdaterGUI{
 						double posx = ((editPoint.getLocX()*newImageWidth)+drawnposx);
 						double posy = ((editPoint.getLocY()*newImageHeight)+drawnposy);
 						
-						g.fillOval((int)(posx - ((pointSize / 2) + (2*scaleSize))), (int)(posy - ((pointSize / 2)+(2*scaleSize))), (int)(pointSize + (4*scaleSize)), (int)(pointSize + (4*scaleSize)));
+						g.fillOval((int)(posx - ((pointSize / 2) + (2))), (int)(posy - ((pointSize / 2)+(2))), (int)(pointSize + (4)), (int)(pointSize + (4)));
 						g.setColor(Color.BLACK);
-						g.drawOval((int)(posx - ((pointSize / 2) + (2*scaleSize))), (int)(posy - ((pointSize / 2)+(2*scaleSize))), (int)(pointSize + (4*scaleSize)), (int)(pointSize + (4*scaleSize)));
+						g.drawOval((int)(posx - ((pointSize / 2) + (2))), (int)(posy - ((pointSize / 2)+(2))), (int)(pointSize + (4)), (int)(pointSize + (4)));
 					}
 					//draw lines between points
 				}
-				
-				
+
+
 
 			}//end of traversing pointArray
-			
-			
+
+
 			//draws all edges in the edge array
 			for (int j = 0; j < edgeArray.size(); j++) {
-				
+
 				g.setColor(Color.ORANGE);
-				
+
 				//if(!(drawnEdges.contains(edgeArray.get(j)))){
 				int point1x = (int)((edgeArray.get(j).getPoint1().getLocX()*newImageWidth)+drawnposx);
 				int point1y = (int)((edgeArray.get(j).getPoint1().getLocY()*newImageHeight)+drawnposy);
 				int point2x = (int)((edgeArray.get(j).getPoint2().getLocX()*newImageWidth)+drawnposx);
 				int point2y = (int)((edgeArray.get(j).getPoint2().getLocY()*newImageHeight)+drawnposy);
-					g.drawLine(point1x, point1y, point2x, point2y);
-					drawnEdges.add(edgeArray.get(j));
-					g.setColor(Color.BLACK);
+				g.drawLine(point1x, point1y, point2x, point2y);
+				drawnEdges.add(edgeArray.get(j));
+				g.setColor(Color.BLACK);
 				//}
 			}
-			
+
 			for( int w = 0; w < pointArray.size(); w++){
 				int drawX = (int) (double)((pointArray.get(w).getLocX()*newImageWidth)+drawnposx);
 				int drawY = (int) (double)((pointArray.get(w).getLocY()*newImageHeight)+drawnposy);
@@ -1567,19 +1580,21 @@ public class MapUpdaterGUI{
 				//System.out.println("For point: " + pointArray.get(w).getId() + " loc Y val is: " + pointArray.get(w).getLocY() + " glob Y val is: " + pointArray.get(w).getGlobY());
 				// draws the points onto the map.
 				g.setColor(Color.BLACK);
-				
+
 				g.drawOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 				//g2D.drawPolygon();
 				g.setColor(Color.getHSBColor(0.12f, 0.74f, 0.7f));
 				g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 				g.setColor(Color.BLACK);
 			}
-			
+
 			drawnEdges.clear();
 			newClick = false;
 		}
 
 	}
+}
+
 
 	/*
 	 * Takes an input file directory path and a target directory path and copies
@@ -1604,6 +1619,7 @@ public class MapUpdaterGUI{
 		is.close();
 		os.close();
 	}
+}
 
 	/*
 	private Map updateCurrentMap(Map map)
@@ -1627,4 +1643,4 @@ public class MapUpdaterGUI{
 		}
 		return null;
 	} */
-}
+

@@ -44,7 +44,7 @@ public class baseClass {
 		Edge e18 = new Edge(p14, p15, 1);
 		
 		testGenDir();
-		testAStar(p1, p8);
+		//testAStar(p1, p8);
 	}
 	public static void testDatabase ()
 	{
@@ -154,7 +154,7 @@ public class baseClass {
 		System.out.println(testOneString[5]);*/
 		//int id, String name, int x, int y, int numberEdges
 	}
-	public static void testAStar(Point start, Point end){
+	/*public static void testAStar(Point start, Point end){
 		System.out.print("Start: ");
 		System.out.println(start);
 		System.out.print("End: ");
@@ -166,5 +166,5 @@ public class baseClass {
 		for(int i = 0; i < fin.size(); i++){
 			System.out.println(fin.get(i));
 		}
-	}
+	}*/
 }

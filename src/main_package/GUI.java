@@ -30,6 +30,8 @@ import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import database.AlreadyExistsException;
 import database.ServerDB;
@@ -108,6 +110,8 @@ public class GUI{
 	private boolean scrolled = false;
 	private double upperx;
 	private double uppery;
+	private int outside;
+	private int stairs;
 	Map startMap;
 	
 	private static SplashPage loadingAnimation;
@@ -573,7 +577,7 @@ public class GUI{
 					AStar astar = new AStar();
 					astar.reset();
 
-					route = astar.PathFind(start, end);
+					route = astar.PathFind(start, end, outside, stairs);
 					//System.out.println("route variable: " + (route == null));
 
 					if(route != null){
@@ -977,14 +981,53 @@ public class GUI{
 			}
 		});
 
-		JSlider sliderOutside = new JSlider();
+		JSlider sliderOutside = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
+		sliderOutside.addChangeListener(new ChangeListener(){
+			 public void stateChanged(ChangeEvent event) {
+			        int value = sliderOutside.getValue();
+			        if (value == 0) {
+			        	outside = 0;
+			          //System.out.println("0");
+			        } else if (value > 0 ) {
+			        	outside = 1;
+			          //System.out.println("value > 0 " + value);
+			        } else{
+			        	outside = -1;
+			          //System.out.println("value < 0" + value);
+			        } 
+			      }
+			    });
+	
+		sliderOutside.setMajorTickSpacing(1);
+		sliderOutside.setPaintTicks(true);
+		sliderOutside.setPaintLabels(true);
+		
 		GridBagConstraints gbc_slider = new GridBagConstraints();
 		gbc_slider.insets = new Insets(0, 0, 5, 5);
 		gbc_slider.gridx = 2;
 		gbc_slider.gridy = 3;
 		prefMenu.add(sliderOutside, gbc_slider);
 
-		JSlider sliderStairs = new JSlider();
+		JSlider sliderStairs = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
+		sliderStairs.addChangeListener(new ChangeListener(){
+			 public void stateChanged(ChangeEvent event) {
+			        int value = sliderStairs.getValue();
+			        if (value == 0) {
+			        	stairs = 0;
+			          //System.out.println("0");
+			        } else if (value > 0 ) {
+			        	stairs = 1;
+			          //System.out.println("value > 0 " + value);
+			        } else{
+			        	stairs = -1;
+			          //System.out.println("value < 0" + value);
+			        } 
+			      }
+			    });
+	
+		sliderStairs.setMajorTickSpacing(1);
+		sliderStairs.setPaintTicks(true);
+		sliderStairs.setPaintLabels(true);
 		GridBagConstraints gbc_slider_1 = new GridBagConstraints();
 		gbc_slider_1.insets = new Insets(0, 0, 5, 5);
 		gbc_slider_1.gridx = 4;

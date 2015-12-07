@@ -1242,7 +1242,7 @@ public class GUI{
 				// Draw a thicker line for the current step in the directions, use currentColor
 				if(DEBUG)
 					System.out.println("mapPos: " + mapPos);
-				if (textPos !=  multiMapFinalDir.get(mapPos).size()){ //|| (mapPos == multiMapFinalDir.size()-1 && multiMapFinalDir.get(mapPos).size()-1 == textPos)){
+				if (textPos != 0){ //|| (mapPos == multiMapFinalDir.size()-1 && multiMapFinalDir.get(mapPos).size()-1 == textPos)){
 					g2.setStroke(new BasicStroke(6));
 					g.setColor(currentColor);
 					int point1x = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocX()*newImageWidth)+drawnposx);

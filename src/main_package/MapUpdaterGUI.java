@@ -388,6 +388,7 @@ public class MapUpdaterGUI{
 						{
 							try {
 								currentMap = ServerDB.getMapFromServer(emptyMaps.get(i).getMapId());
+								System.out.println("Map ID is: " + currentMap.getMapId());
 							} catch (DoesNotExistException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -610,7 +611,7 @@ public class MapUpdaterGUI{
 						a.printStackTrace();
 					}
 					if(emptyMaps == null || emptyMaps.size() == 0){
-						setInfo(0, 0, img.getWidth(), img.getHeight(), 0);
+						setInfo(0, 0, 1, 1, 0);
 					} else {
 						new MapInserterGUI();
 					}
@@ -915,6 +916,7 @@ public class MapUpdaterGUI{
 				pointsLoadingLabel.setVisible(true);
 				btnSaveMap.setText("Saving");
 				try {
+					System.out.println("Current Map ID is: " + currentMap.getMapId());
 					ServerDB.updateMap(currentMap);
 				} catch (SQLException e2) {
 					// TODO Auto-generated catch block
@@ -1199,8 +1201,10 @@ public class MapUpdaterGUI{
 					double tempPreRotateY = lastMousey;
 					double LocalX = (lastMousex-drawnposx)/newImageWidth;
 					double LocalY = (lastMousey-drawnposy)/newImageHeight;
-					tempPreRotateX = tempPreRotateX/(img.getWidth()/windowScale);
-					tempPreRotateY = tempPreRotateY/(img.getHeight()/windowScale);
+					tempPreRotateX = tempPreRotateX - drawnposx;
+					tempPreRotateY = tempPreRotateY - drawnposy;
+					tempPreRotateX = tempPreRotateX/(img.getWidth()*scaleSize);
+					tempPreRotateY = tempPreRotateY/(img.getHeight()*scaleSize);
 					tempPreRotateX = tempPreRotateX - 0.5;
 					tempPreRotateY = tempPreRotateY - 0.5;
 					tempPreRotateX = tempPreRotateX * currentMap.getWidth();
@@ -1211,7 +1215,7 @@ public class MapUpdaterGUI{
 					rotateY = rotateY * campusImage.getHeight();
 					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
 					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
-					
+					System.out.println("At step 6 x is: " + finalGlobX + " y is: " + finalGlobY);
 					
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());

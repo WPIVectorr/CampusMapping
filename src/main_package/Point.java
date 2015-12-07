@@ -58,7 +58,8 @@ public class Point implements Comparable{
 	}
 	
 
-	public Point(String id, String name, double locX, double locY, double globX, double globY, int numberEdges) {
+	public Point(String id, String name, double locX, double locY, double globX, double globY,
+			int numberEdges) {
 		this.id = id;
 		this.name = name;
 		this.locX = locX;
@@ -69,7 +70,24 @@ public class Point implements Comparable{
 		this.globY = globY;
 	}
 	
-	public Point(String id, int mapId, String name, int index, double locX, double locY, double globX, double globY, int numberEdges) {
+	//TODO phase out this constructor
+	public Point(String id, int mapId, String name, int index, double locX, double locY, double globX, 
+			double globY, int numberEdges) {
+		this.id = id;
+		this.mapId = mapId;
+		this.name = name;
+		this.locX = locX;
+		this.locY = locY;
+		this.numberEdges = numberEdges;
+		this.index = index;
+		this.globX = globX;
+		this.globY = globY;
+		this.isStairs = false;
+		this.isOutside = false;
+	}
+	
+	public Point(String id, int mapId, String name, int index, double locX, double locY, double globX, 
+			double globY, int numberEdges, boolean isStairs, boolean isOutside) {
 		this.id = id;
 		this.mapId = mapId;
 		this.name = name;
@@ -81,17 +99,6 @@ public class Point implements Comparable{
 		this.globY = globY;
 		this.isStairs = isStairs;
 		this.isOutside = isOutside;
-	}
-	
-	public Point(String id, String name, int index, double x, double y, int numberEdges) {
-		this.id = id;
-		this.name = name;
-		this.index = index;
-		this.locX = x;
-		this.locY = y;
-		this.numberEdges = numberEdges;
-		this.globX = x;
-		this.globY = y;
 	}
 	
 	public String getId() {

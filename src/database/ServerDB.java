@@ -28,7 +28,7 @@ public class ServerDB {
 	private static String MAP_SCHEMA = "id INTEGER, name VARCHAR(30), xTopLeft DOUBLE, yTopLeft DOUBLE, "
 			+ " xBotRight DOUBLE, yBotRight DOUBLE, rotation DOUBLE, pointIDIndex INTEGER";
 	private static String POINT_SCHEMA = "id VARCHAR(30), mapId INTEGER, name VARCHAR(30), localIndex INTEGER, "
-			+ "locX INTEGER, locY INTEGER, globX INTEGER, globY INTEGER, numEdges INTEGER, idEdge1 VARCHAR(30),"
+			+ "locX DOUBLE, locY DOUBLE, globX INTEGER, globY INTEGER, numEdges INTEGER, idEdge1 VARCHAR(30),"
 			+ " idEdge2 VARCHAR(30), idEdge3 VARCHAR(30), idEdge4 VARCHAR(30), idEdge5 VARCHAR(30), idEdge6 VARCHAR(30), idEdge7 VARCHAR(30), idEdge8 VARCHAR(30),"
 			+ "idEdge9 VARCHAR(30), idEdge10 VARCHAR(30)";
 	private static String EDGE_SCHEMA = "id VARCHAR(30), idPoint1 VARCHAR(30), idPoint2 VARCHAR(30), weight INTEGER, isOutside BOOLEAN, isStairs INTEGER";
@@ -62,7 +62,7 @@ public class ServerDB {
 
 	{ 
 		//updateAllPointIDIndexes();
-		//clearDatabase();
+		clearDatabase();
 
 		//tryCreateDB();
 		conn = connect();
@@ -812,6 +812,16 @@ public class ServerDB {
 				map.setyBotRight(rs.getDouble("yBotRight"));
 				map.setRotationAngle(rs.getDouble("rotation"));
 				map.setPointIDIndex(rs.getInt("pointIDIndex"));
+				double xTopLeftDeRotate = map.getxTopLeft() * Math.cos(map.getRotationAngle()) - map.getyTopLeft() * Math.sin(map.getRotationAngle());
+				double xBotRightDeRotate = map.getxBotRight() * Math.cos(map.getRotationAngle()) - map.getyBotRight() * Math.sin(map.getRotationAngle());
+				map.setWidth(Math.abs(xTopLeftDeRotate - xBotRightDeRotate));
+				
+				double yTopLeftDeRotate = map.getyTopLeft() * Math.cos(map.getRotationAngle()) + map.getxTopLeft() * Math.sin(map.getRotationAngle());
+				double yBotRightDeRotate = map.getyBotRight() * Math.cos(map.getRotationAngle()) + map.getxBotRight() * Math.sin(map.getRotationAngle());
+				System.out.println("Y top left derotate is: " + yTopLeftDeRotate);
+				System.out.println("Y bot right derotate is: " + yBotRightDeRotate);
+				map.setHeight(Math.abs(yTopLeftDeRotate - yBotRightDeRotate));
+				
 				ArrayList<Point> tempPts = new ArrayList<Point>();
 				try {
 					tempPts = getPointsFromServer(map);
@@ -933,8 +943,8 @@ public class ServerDB {
 			int newPtMapId;
 			String newPtName;
 			int newPtIndex;
-			int newPtLocX;
-			int newPtLocY;
+			double newPtLocX;
+			double newPtLocY;
 			int newPtGlobX;
 			int newPtGlobY;
 			int newPtNumberEdges;
@@ -947,8 +957,8 @@ public class ServerDB {
 				newPtMapId = rs.getInt("mapId");
 				newPtName = rs.getString("name");
 				newPtIndex = rs.getInt("localIndex");
-				newPtLocX = rs.getInt("locX");
-				newPtLocY = rs.getInt("locY");
+				newPtLocX = rs.getDouble("locX");
+				newPtLocY = rs.getDouble("locY");
 				newPtGlobX = rs.getInt("globX");
 				newPtGlobY = rs.getInt("globY");
 				newPtNumberEdges = rs.getInt("numEdges");
@@ -1011,8 +1021,8 @@ public class ServerDB {
 				int newPtMapId;
 				String newPtName;
 				int newPtIndex;
-				int newPtLocX;
-				int newPtLocY;
+				double newPtLocX;
+				double newPtLocY;
 				int newPtGlobX;
 				int newPtGlobY;
 				int newPtNumberEdges;
@@ -1097,8 +1107,8 @@ public class ServerDB {
 							newPtMapId = rs2.getInt("mapId");
 							newPtName = rs2.getString("name");
 							newPtIndex = rs2.getInt("localIndex");
-							newPtLocX = rs2.getInt("locX");
-							newPtLocY = rs2.getInt("locY");
+							newPtLocX = rs2.getDouble("locX");
+							newPtLocY = rs2.getDouble("locY");
 							newPtGlobX = rs2.getInt("globX");
 							newPtGlobY = rs2.getInt("globY");
 							newPtNumberEdges = 0;															//This should be automatically rectified when adding in edges

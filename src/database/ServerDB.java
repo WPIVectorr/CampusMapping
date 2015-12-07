@@ -34,7 +34,7 @@ public class ServerDB {
 	private static String EDGE_SCHEMA = "id VARCHAR(30), idPoint1 VARCHAR(30), idPoint2 VARCHAR(30), weight INTEGER, isOutside BOOLEAN, isStairs INTEGER";
 	//-------------------------------------------------------------Variables-----------------------------------------------------------------------
 	private static Connection conn = null;
-	public final static boolean DEBUG = true;
+	public final static boolean DEBUG = false;
 
 	private static ArrayList<Map> allMaps = new ArrayList<Map>();
 	private static ArrayList<Point> allPoints = new ArrayList<Point>();
@@ -826,8 +826,8 @@ public class ServerDB {
 				
 				double yTopLeftDeRotate = map.getyTopLeft() * Math.cos(map.getRotationAngle()) + map.getxTopLeft() * Math.sin(map.getRotationAngle());
 				double yBotRightDeRotate = map.getyBotRight() * Math.cos(map.getRotationAngle()) + map.getxBotRight() * Math.sin(map.getRotationAngle());
-				System.out.println("Y top left derotate is: " + yTopLeftDeRotate);
-				System.out.println("Y bot right derotate is: " + yBotRightDeRotate);
+				//System.out.println("Y top left derotate is: " + yTopLeftDeRotate);
+				//System.out.println("Y bot right derotate is: " + yBotRightDeRotate);
 				map.setHeight(Math.abs(yTopLeftDeRotate - yBotRightDeRotate));
 				
 				ArrayList<Point> tempPts = new ArrayList<Point>();

@@ -390,7 +390,7 @@ public class MapUpdaterGUI{
 						{
 							try {
 								currentMap = ServerDB.getMapFromServer(emptyMaps.get(i).getMapId());
-								System.out.println("Map ID is: " + currentMap.getMapId());
+								//System.out.println("Map ID is: " + currentMap.getMapId());
 							} catch (DoesNotExistException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -919,7 +919,7 @@ public class MapUpdaterGUI{
 				pointsLoadingLabel.setVisible(true);
 				btnSaveMap.setText("Saving");
 				try {
-					System.out.println("Current Map ID is: " + currentMap.getMapId());
+					//System.out.println("Current Map ID is: " + currentMap.getMapId());
 					ServerDB.updateMap(currentMap);
 				} catch (SQLException e2) {
 					// TODO Auto-generated catch block
@@ -1220,8 +1220,13 @@ public class MapUpdaterGUI{
 					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
 					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
 
-
-
+					System.out.println("");
+					System.out.println("");
+					System.out.println("");
+					System.out.println("Global X is: " + finalGlobX + " and Y is: " + finalGlobY);
+					System.out.println("");
+					System.out.println("");
+					System.out.println("");
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),

@@ -16,11 +16,11 @@ public class Map implements Comparable{
 	private int pointIDIndex = 0;
 	private double width;
 	private double height;
-	
+	private boolean DEBUG = false;
 
 	public Map ()
 	{
-		
+
 	}
 	public Map (int mapId, String mapName)
 	{
@@ -29,7 +29,7 @@ public class Map implements Comparable{
 		this.numPoints = 0;
 		this.Points = new ArrayList<Point>();
 	}
-	
+
 	public Map (int mapId, String mapName, double xTopLeft, double yTopLeft, double rotationAngle)
 	{
 		this.Points = new ArrayList<Point>();
@@ -40,7 +40,7 @@ public class Map implements Comparable{
 		this.yTopLeft = yTopLeft;
 		this.rotationAngle = rotationAngle;
 	}
-	
+
 	public Map (ArrayList<Point> points, int mapId, String mapName, double xTopLeft, double yTopLeft, double rotationAngle)
 	{
 		this.Points = points;
@@ -51,7 +51,7 @@ public class Map implements Comparable{
 		this.yTopLeft = yTopLeft;
 		this.rotationAngle = rotationAngle;
 	}
-	
+
 	public Map (int mapId, String mapName, double xTopLeft, double yTopLeft, double xBotRight, double yBotRight, double rotationAngle, int pointIDIndex)
 	{
 		this.Points = new ArrayList<Point>();
@@ -67,18 +67,25 @@ public class Map implements Comparable{
 		double ourRotate = rotationAngle;
 		double xTopLeftDeRotate = xTopLeft * Math.cos(ourRotate) - yTopLeft * Math.sin(ourRotate);
 		double xBotRightDeRotate = xBotRight * Math.cos(ourRotate) - yBotRight * Math.sin(ourRotate);
-		
-		
-		System.out.println("X top left derotate is: " + xTopLeftDeRotate);
-		System.out.println("X bot right derotate is: " + xBotRightDeRotate);
+
+		if(DEBUG){
+			System.out.println("X top left derotate is: " + xTopLeftDeRotate);
+			System.out.println("X bot right derotate is: " + xBotRightDeRotate);
+		}
 		this.width = Math.abs(xTopLeftDeRotate - xBotRightDeRotate);
-		System.out.println("Width is: " + this.width);
+		if(DEBUG){
+			System.out.println("Width is: " + this.width);
+		}
 		double yTopLeftDeRotate = yTopLeft * Math.cos(ourRotate) + xTopLeft * Math.sin(ourRotate);
 		double yBotRightDeRotate = yBotRight * Math.cos(ourRotate) + xBotRight * Math.sin(ourRotate);
-		System.out.println("Y top left derotate is: " + yTopLeftDeRotate);
-		System.out.println("Y bot right derotate is: " + yBotRightDeRotate);
+		if(DEBUG){
+			System.out.println("Y top left derotate is: " + yTopLeftDeRotate);
+			System.out.println("Y bot right derotate is: " + yBotRightDeRotate);
+		}
 		this.height = Math.abs(yTopLeftDeRotate - yBotRightDeRotate);
-		System.out.println("Height is: " + this.height);
+		if(DEBUG){
+			System.out.println("Height is: " + this.height);
+		}
 	}
 	public double getWidth() {
 		return width;
@@ -134,7 +141,7 @@ public class Map implements Comparable{
 	public void setyTopLeft(double yTopLeft) {
 		this.yTopLeft = yTopLeft;
 	}
-	
+
 	public double getxBotRight() {
 		return xBotRight;
 	}
@@ -158,7 +165,7 @@ public class Map implements Comparable{
 	public void setRotationAngle(double rotationAngle) {
 		this.rotationAngle = rotationAngle;
 	}
-	
+
 	public boolean addPoint(Point a){
 		if (a == null)
 		{
@@ -191,21 +198,21 @@ public class Map implements Comparable{
 		else
 			return false;
 	}
-	
+
 	public Point getPoint(int xcoord, int ycoord){
 		//TODO change this to account for Offsets
 		//goes through arraylist Points and returns the Point with
 		//the x and y coordinates inputted
-		 for (int count = 0; count < Points.size(); count++){
-			 Point temp = Points.get(count);
-			 if(temp.getLocX() == xcoord && temp.getLocY() == ycoord){
-				 return temp;
-			 }
-		 }
-		 //if point is not in Points, returns null
-		 return null;
+		for (int count = 0; count < Points.size(); count++){
+			Point temp = Points.get(count);
+			if(temp.getLocX() == xcoord && temp.getLocY() == ycoord){
+				return temp;
+			}
+		}
+		//if point is not in Points, returns null
+		return null;
 	}
-	
+
 	public ArrayList<Point> getPointList()
 	{
 		return Points;
@@ -218,7 +225,7 @@ public class Map implements Comparable{
 	public int getPointIDIndex(){
 		return pointIDIndex;
 	}
-	
+
 	public void printMap()
 	{
 		System.out.println("--------------------Printing Map:"+this.mapName+"--------------------");
@@ -236,13 +243,13 @@ public class Map implements Comparable{
 			Points.get(j).print();
 		}
 	}
-	
+
 	public int getNewPointIndex()
 	{
 		this.pointIDIndex++;
 		return this.pointIDIndex;
 	}
-	
+
 	public String getNewPointID()
 	{
 		int index = getNewPointIndex();
@@ -252,7 +259,7 @@ public class Map implements Comparable{
 		retVal+=index;
 		return retVal;
 	}
-	
+
 	public void setPointIDIndex(int newIndex)
 	{
 		this.pointIDIndex = newIndex;
@@ -263,6 +270,6 @@ public class Map implements Comparable{
 		int temp = this.getMapName().compareTo(((Map) o).getMapName());
 		return temp;		
 	}
-	
-	
+
+
 }

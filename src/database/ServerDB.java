@@ -972,7 +972,7 @@ public class ServerDB {
 				newPtGlobX = rs.getInt("globX");
 				newPtGlobY = rs.getInt("globY");
 				newPtNumberEdges = rs.getInt("numEdges");
-				newPtIsStairs = rs.getBoolean("isOutside");
+				newPtIsStairs = rs.getBoolean("isStairs");
 				newPtIsOutside = rs.getBoolean("isOutside");
 				newPtEdges = new ArrayList<Edge>();
 

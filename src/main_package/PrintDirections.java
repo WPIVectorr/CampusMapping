@@ -19,7 +19,7 @@ import javax.activation.*;
 
 public class PrintDirections {
 
-	public PrintDirections(ArrayList<String> directions)
+	public PrintDirections(ArrayList<ArrayList<String>> directions)
 	{
 		File outputFilename = null;
 		String fileName = null;
@@ -52,84 +52,10 @@ public class PrintDirections {
 		}
 	}
 
-	/*	//email
-	public PrintDirections(ArrayList<String> directions, String toEmailAddress)
-	{ 
-
-	    Properties props = System.getProperties();
-	    props.put("mail.smtp.starttls.enable", true); // added this line
-	    props.put("mail.smtp.host", "smtp.gmail.com");
-	    props.put("mail.smtp.user", "JPGIndustry");
-	    props.put("mail.smtp.password", "jntdpnxrrafnlklj");
-	    props.put("mail.smtp.port", "587");
-	    props.put("mail.smtp.from", "vectorr@wpi.edu");
-	    props.put("mail.smtp.auth", true);
 
 
 
-	    Session session = Session.getInstance(props,null);
-	    MimeMessage message = new MimeMessage(session);
-
-	    System.out.println("Port: "+session.getProperty("mail.smtp.port"));
-
-	    // Create the email addresses involved
-	    try {
-	        InternetAddress from = new InternetAddress("Vectorr@WPI.edu");
-	        try {
-	        	from.setAddress("Vectorr@wpi.edu");
-				from.setPersonal("Vectorr Solutions");
-
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        message.setFrom(from);
-	        message.setReplyTo(InternetAddress.parse("Vectorr@wpi.edu"));
-	        message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmailAddress));
-
-	        // Create a multi-part to combine the parts
-	        Multipart multipart = new MimeMultipart("alternative");
-
-			message.setSubject("Vectorr, directions with magnitude from: "+directions.get(0)+" to: "
-					+directions.get(directions.size()-1));
-
-	        // Create your text message part
-	        BodyPart messageBodyPart = new MimeBodyPart();
-	        messageBodyPart.setText(generatePrintout(directions));
-
-	        // Add the text part to the multipart
-	        multipart.addBodyPart(messageBodyPart);
-
-	        // Create the html part
-	        messageBodyPart = new MimeBodyPart();
-	        String htmlMessage = generatePrintout(directions);
-	        messageBodyPart.setContent(htmlMessage, "text/html");
-
-
-	        // Add html part to multi part
-	        multipart.addBodyPart(messageBodyPart);
-
-	        // Associate multi-part with message
-	        message.setContent(multipart);
-
-	        // Send message
-	        Transport transport = session.getTransport("smtp");
-	        transport.connect("smtp.gmail.com", "JPGIndustry", "jntdpnxrrafnlklj");
-	        transport.sendMessage(message, message.getAllRecipients());
-	        System.out.println("Sendmail Success");
-
-	    } catch (AddressException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-	    } catch (MessagingException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-	    }
-	}*/
-
-
-
-	public PrintDirections(ArrayList<String> directions, String to)
+	public PrintDirections(ArrayList<ArrayList<String>> directions, String to) throws AddressException
 	{
 
 		boolean canSend =true;
@@ -139,8 +65,8 @@ public class PrintDirections {
 			toEmailAddress.validate();
 		} catch (AddressException e1) {
 			// TODO Auto-generated catch block
-			System.out.println("bad address");	
 			canSend=false;
+			throw new AddressException("Bad Address");	
 		}
 
 		// Sender's email ID needs to be mentioned
@@ -188,7 +114,7 @@ public class PrintDirections {
 		}
 	}
 
-	public PrintDirections(ArrayList<String> directions, String to,String from,String subject)
+	public PrintDirections(ArrayList<ArrayList<String>> directions, String to,String from,String subject)
 	{
 
 		boolean canSend =true;
@@ -247,7 +173,7 @@ public class PrintDirections {
 	}
 
 
-	private String generatePrintout(ArrayList<String> directions) {
+/*	private String generatePrintout(ArrayList<String> directions) {
 		// TODO Auto-generated method stub
 		String printout = "<h4>";
 		for(String step:directions)
@@ -257,8 +183,25 @@ public class PrintDirections {
 		}
 		printout += "<h4>";
 		return printout;
-	}
+	}*/
+	private String generatePrintout(ArrayList<ArrayList<String>> directions) {
+		// TODO Auto-generated method stub
+		String printout = "<h4>";
+		for(ArrayList<String> map:directions)
+		{
+			
+			for(String step:map)
+			{
+				printout += step+'\n'+"<br>";
+				printout += System.getProperty("line.separator");
+		
+			}
+			printout += '\n'+"<br>" + System.getProperty("line.separator");
+			printout += "<h4>";
+		}
 
+		return printout;
+	}
 
 
 

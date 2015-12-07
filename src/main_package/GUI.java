@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.mail.internet.AddressException;
 import javax.print.*;
 import javax.print.attribute.DocAttributeSet;
 import javax.print.attribute.HashDocAttributeSet;
@@ -927,7 +928,12 @@ public class GUI{
 		});
 		btnEmailDirections.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				try {
+					new PrintDirections(textDir,txtFieldEmail.getText());
+				} catch (AddressException e1) {
+					// TODO Auto-generated catch block
+					btnEmailDirections.setText("Invalid Address");
+				}
 			}
 		});
 

@@ -1,5 +1,8 @@
 package main_package;
 
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
+import java.io.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,21 +15,77 @@ import javax.swing.JFrame;
 
 import javax.mail.*;
 import javax.mail.internet.*;
-
+import javax.print.*;
 import javax.activation.*;
 
 
 
 public class PrintDirections {
-
+	public PrintDirections(ArrayList<ArrayList<String>> directions, String emailFilename) throws AddressException
+	{
+		try {
+			emailDirections(directions, new InternetAddress(emailFilename));
+		} catch (AddressException e) {
+			// TODO Auto-generated catch block
+			if(emailFilename.contains("print"))
+			{
+				printDirectionstoFile(directions, emailFilename);
+			}else
+				throw new AddressException();
+			
+		}
+		
+		
+	}
+	
 	public PrintDirections(ArrayList<ArrayList<String>> directions)
+	{
+
+
+		  InputStream is = null;    
+		  try
+		  { 
+		     PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+		     DocPrintJob printerJob = defaultPrintService.createPrintJob();
+		 
+		     //File pdfFile = new File(arg);
+		     is = new BufferedInputStream(new ByteArrayInputStream(generatePrintout(directions).getBytes("UTF-8")));
+		     Doc simpleDoc =  new SimpleDoc(is, DocFlavor.INPUT_STREAM.AUTOSENSE, null);
+		     //printerJob.print(simpleDoc, null);
+		     PrinterJob pj = PrinterJob.getPrinterJob(); 
+		     pj.printDialog();
+
+		 
+		  }
+		  catch (Exception e) 
+		  {
+		     e.printStackTrace(System.out);
+		  }
+		
+		
+
+
+/*		FileWriter writer;
+		try {
+			writer = new FileWriter(fileName);
+			String printout = generatePrintout(directions);
+			writer.write(printout);
+
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+	}
+
+	private void printDirectionstoFile(ArrayList<ArrayList<String>> directions,String filename)
 	{
 		File outputFilename = null;
 		String fileName = null;
 		JFrame chooseFile = new JFrame();
 
 		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Specify File to Print");
+		fileChooser.setDialogTitle("Specify Filename");
 
 		int userSelection = fileChooser.showSaveDialog(chooseFile);
 
@@ -55,13 +114,14 @@ public class PrintDirections {
 
 
 
-	public PrintDirections(ArrayList<ArrayList<String>> directions, String to) throws AddressException
+
+	private void emailDirections(ArrayList<ArrayList<String>> directions, InternetAddress to) throws AddressException
 	{
 
 		boolean canSend =true;
 		InternetAddress toEmailAddress = null;
 		try {
-			toEmailAddress = new InternetAddress(to);
+			toEmailAddress = to;
 			toEmailAddress.validate();
 		} catch (AddressException e1) {
 			// TODO Auto-generated catch block
@@ -199,10 +259,60 @@ public class PrintDirections {
 			printout += '\n'+"<br>" + System.getProperty("line.separator");
 			printout += "<h4>";
 		}
+<<<<<<< HEAD
 
 		return printout;
 	}
 
+	public static void main(String[] args)
+	{
+		ArrayList<ArrayList<String>> testDirections = new ArrayList<ArrayList<String>>();
+		ArrayList<String> building1 = new ArrayList<String>();
+		ArrayList<String> building2 = new ArrayList<String>();
+		ArrayList<String> building3 = new ArrayList<String>();
+		ArrayList<String> building4 = new ArrayList<String>();
+		testDirections.add(building1);
+		testDirections.add(building2);
+		testDirections.add(building3);
+		testDirections.add(building4);
+		
+		building1.add("Build1-room1");
+		building1.add("Build1-room2");
+		building1.add("Build1-room3");
+		building1.add("Build1-room4");
+		building1.add("Build1-room5");
+		building1.add("Build1-room6");
+		building1.add("Build1-room7");
+
+		building2.add("Build2-room1");
+		building2.add("Build2-room2");
+		building2.add("Build2-room3");
+		building2.add("Build2-room4");
+		building2.add("Build2-room5");
+		building2.add("Build2-room6");
+		building2.add("Build2-room7");
+		
+		building3.add("Build3-room1");
+		building3.add("Build3-room2");
+		building3.add("Build3-room3");
+		building3.add("Build3-room4");
+		building3.add("Build3-room5");
+		building3.add("Build3-room6");
+		building3.add("Build3-room7");
+		
+		building4.add("Build4-room1");
+		building4.add("Build4-room2");
+		building4.add("Build4-room3");
+		building4.add("Build4-room4");
+		building4.add("Build4-room5");
+		building4.add("Build4-room6");
+		building4.add("Build4-room7");
+		
+		
+		
+		new PrintDirections(testDirections);
+		
+	}
 
 
 

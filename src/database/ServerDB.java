@@ -28,7 +28,7 @@ public class ServerDB {
 	private static String MAP_SCHEMA = "id INTEGER, name VARCHAR(30), xTopLeft DOUBLE, yTopLeft DOUBLE, "
 			+ " xBotRight DOUBLE, yBotRight DOUBLE, rotation DOUBLE, pointIDIndex INTEGER";
 	private static String POINT_SCHEMA = "id VARCHAR(30), mapId INTEGER, name VARCHAR(30), localIndex INTEGER, "
-			+ "locX DOUBLE, locY DOUBLE, globX INTEGER, globY INTEGER, numEdges INTEGER, idEdge1 VARCHAR(30),"
+			+ "locX DOUBLE, locY DOUBLE, globX INTEGER, globY INTEGER, numEdges INTEGER, isStairs BOOLEAN, isOutside BOOLEAN, idEdge1 VARCHAR(30),"
 			+ " idEdge2 VARCHAR(30), idEdge3 VARCHAR(30), idEdge4 VARCHAR(30), idEdge5 VARCHAR(30), idEdge6 VARCHAR(30), idEdge7 VARCHAR(30), idEdge8 VARCHAR(30),"
 			+ "idEdge9 VARCHAR(30), idEdge10 VARCHAR(30)";
 	private static String EDGE_SCHEMA = "id VARCHAR(30), idPoint1 VARCHAR(30), idPoint2 VARCHAR(30), weight INTEGER, isOutside BOOLEAN, isStairs INTEGER";
@@ -269,6 +269,10 @@ public class ServerDB {
 				insertStatement += pt.getGlobY();
 				insertStatement += ", ";
 				insertStatement += numberEdges;
+				insertStatement += ", ";
+				insertStatement += pt.isStairs();
+				insertStatement += ", ";
+				insertStatement += pt.isOutside();
 				insertStatement += ", ";
 				for (counter =0; counter < numberEdges; counter++)							//Add number of edges edges to the point
 				{
@@ -555,6 +559,10 @@ public class ServerDB {
 				updateStatement += ("globY = "+ point.getGlobY());
 				updateStatement += ", ";
 				updateStatement += ("numEdges = "+point.getNumEdges());
+				updateStatement += ", ";
+				updateStatement += ("isStairs = "+point.isStairs());
+				updateStatement += ", ";
+				updateStatement += ("isOutside = "+point.isOutside());
 				updateStatement += ", ";
 				int i = 0;
 				for (i =0; i < point.getNumEdges(); i++)								//Add number of edges edges to the point
@@ -948,6 +956,8 @@ public class ServerDB {
 			int newPtGlobX;
 			int newPtGlobY;
 			int newPtNumberEdges;
+			boolean newPtIsStairs;
+			boolean newPtIsOutside;
 			ArrayList<Edge> newPtEdges = new ArrayList<Edge>();
 			
 			ResultSet rs = statement.executeQuery("SELECT * FROM "+TABLE_NAME);
@@ -962,6 +972,8 @@ public class ServerDB {
 				newPtGlobX = rs.getInt("globX");
 				newPtGlobY = rs.getInt("globY");
 				newPtNumberEdges = rs.getInt("numEdges");
+				newPtIsStairs = rs.getBoolean("isOutside");
+				newPtIsOutside = rs.getBoolean("isOutside");
 				newPtEdges = new ArrayList<Edge>();
 
 				String edgeSelect = "idEdge";
@@ -992,7 +1004,8 @@ public class ServerDB {
 					}
 				}
 
-				Point newPt = new Point(newPtId, newPtName, newPtLocX, newPtLocY, newPtGlobX, newPtGlobY, newPtNumberEdges);
+				Point newPt = new Point(newPtId, newPtMapId, newPtName, newPtIndex, newPtLocX, newPtLocY, newPtGlobX,
+						newPtGlobY, newPtNumberEdges, newPtIsStairs, newPtIsOutside);
 				newPt.setIndex(newPtIndex);
 				newPt.setEdges(newPtEdges);
 				newPt.setMapId(newPtMapId);
@@ -1026,6 +1039,8 @@ public class ServerDB {
 				int newPtGlobX;
 				int newPtGlobY;
 				int newPtNumberEdges;
+				boolean newPtIsStairs;
+				boolean newPtIsOutside;
 	
 				String newEdgeId;
 				String newEdgePt1;
@@ -1111,10 +1126,11 @@ public class ServerDB {
 							newPtLocY = rs2.getDouble("locY");
 							newPtGlobX = rs2.getInt("globX");
 							newPtGlobY = rs2.getInt("globY");
-							newPtNumberEdges = 0;															//This should be automatically rectified when adding in edges
-							Point newPt = new Point(newPtId, newPtName, newPtLocX, newPtLocY, newPtGlobX, newPtGlobY, newPtNumberEdges);
-							newPt.setIndex(newPtIndex);
-							newPt.setMapId(newPtMapId);
+							newPtNumberEdges = 0;						//This should be automatically rectified when adding in edges
+							newPtIsStairs = rs2.getBoolean("isOutside");
+							newPtIsOutside = rs2.getBoolean("isOutside");
+							Point newPt = new Point(newPtId, newPtMapId, newPtName, newPtIndex, newPtLocX, newPtLocY, newPtGlobX,
+									newPtGlobY, newPtNumberEdges, newPtIsStairs, newPtIsOutside);
 							currentMap.addPoint(newPt);
 							allPoints.add(newPt);
 						}
@@ -1369,7 +1385,7 @@ public class ServerDB {
 	
 	public static void testDB()
 	{
-		clearDatabase();
+		/*clearDatabase();
 		System.out.println("Database cleared");
 		ArrayList<Point> insertablePoints = new ArrayList<Point>();
 		ArrayList<Edge> insertableEdges = new ArrayList<Edge>();
@@ -1525,7 +1541,7 @@ public class ServerDB {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		System.out.println("--------------------Finished Point removal--------------------");
+		System.out.println("--------------------Finished Point removal--------------------");*/
 	}
 
 	public static void testRetrieval()

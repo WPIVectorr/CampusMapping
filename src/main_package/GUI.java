@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -440,7 +441,7 @@ public class GUI{
 
 		//	         buttonPanel.add(startRooms);
 		//startRooms.setBounds(296, 30, 148, 20);
-		
+
 
 		// Initalize this button first so it can be used in return button
 		GradientButton btnFullTextDirections = new GradientButton("Show Full Text Directions", buttonColor);
@@ -1006,25 +1007,31 @@ public class GUI{
 
 		JSlider sliderOutside = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
 		sliderOutside.addChangeListener(new ChangeListener(){
-			 public void stateChanged(ChangeEvent event) {
-			        int value = sliderOutside.getValue();
-			        if (value == 0) {
-			        	outside = 0;
-			          //System.out.println("0");
-			        } else if (value > 0 ) {
-			        	outside = 1;
-			          //System.out.println("value > 0 " + value);
-			        } else{
-			        	outside = -1;
-			          //System.out.println("value < 0" + value);
-			        } 
-			      }
-			    });
-	
+			public void stateChanged(ChangeEvent event) {
+				int value = sliderOutside.getValue();
+				if (value == 0) {
+					outside = 0;
+					//System.out.println("0");
+				} else if (value > 0 ) {
+					outside = 1;
+					//System.out.println("value > 0 " + value);
+				} else{
+					outside = -1;
+					//System.out.println("value < 0" + value);
+				} 
+			}
+		});
+
 		sliderOutside.setMajorTickSpacing(1);
+		Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
+		labels.put(0, new JLabel("Neutral"));
+		labels.put(-1, new JLabel("Avoid"));
+		labels.put(1, new JLabel("Priority"));
+
+		sliderOutside.setLabelTable(labels);
 		sliderOutside.setPaintTicks(true);
 		sliderOutside.setPaintLabels(true);
-		
+
 		GridBagConstraints gbc_slider = new GridBagConstraints();
 		gbc_slider.insets = new Insets(0, 0, 5, 5);
 		gbc_slider.gridx = 2;
@@ -1033,22 +1040,23 @@ public class GUI{
 
 		JSlider sliderStairs = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
 		sliderStairs.addChangeListener(new ChangeListener(){
-			 public void stateChanged(ChangeEvent event) {
-			        int value = sliderStairs.getValue();
-			        if (value == 0) {
-			        	stairs = 0;
-			          //System.out.println("0");
-			        } else if (value > 0 ) {
-			        	stairs = 1;
-			          //System.out.println("value > 0 " + value);
-			        } else{
-			        	stairs = -1;
-			          //System.out.println("value < 0" + value);
-			        } 
-			      }
-			    });
-	
+			public void stateChanged(ChangeEvent event) {
+				int value = sliderStairs.getValue();
+				if (value == 0) {
+					stairs = 0;
+					//System.out.println("0");
+				} else if (value > 0 ) {
+					stairs = 1;
+					//System.out.println("value > 0 " + value);
+				} else{
+					stairs = -1;
+					//System.out.println("value < 0" + value);
+				} 
+			}
+		});
+
 		sliderStairs.setMajorTickSpacing(1);
+		sliderStairs.setLabelTable(labels);
 		sliderStairs.setPaintTicks(true);
 		sliderStairs.setPaintLabels(true);
 		GridBagConstraints gbc_slider_1 = new GridBagConstraints();
@@ -1226,59 +1234,79 @@ public class GUI{
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
 				}
 
-			if (showRoute && route != null){
+				if (showRoute && route != null){
 
-				// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)
-				// Draw lines for all points up to current point, use previousColor (same color as "Previous" button)
-				g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
-				g2.setStroke(new BasicStroke(3));
-				for (int i = 0; i < textPos - 1; i++){
-					int point1x = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
-					int point1y = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
-					int point2x = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX()*newImageWidth)+drawnposx);
-					int point2y = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY()*newImageHeight)+drawnposy);
-					g2.drawLine(point1x, point1y, point2x, point2y);
-				}
-				// Draw a thicker line for the current step in the directions, use currentColor
-				if(DEBUG)
-					System.out.println("mapPos: " + mapPos);
-				if (textPos !=  multiMapFinalDir.get(mapPos).size()){ //|| (mapPos == multiMapFinalDir.size()-1 && multiMapFinalDir.get(mapPos).size()-1 == textPos)){
-					g2.setStroke(new BasicStroke(6));
-					g.setColor(currentColor);
-					int point1x = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocX()*newImageWidth)+drawnposx);
-					int point1y = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocY()*newImageHeight)+drawnposy);
-					int point2x = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocX()*newImageWidth)+drawnposx);
-					int point2y = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocY()*newImageHeight)+drawnposy);
-					g2.drawLine(point1x, point1y, point2x, point2y);
-
+					// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)
+					// Draw lines for all points up to current point, use previousColor (same color as "Previous" button)
+					g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
 					g2.setStroke(new BasicStroke(3));
-				}
-
-				// Draw lines for all points until the end, use nextColor (same color as "Next" button)
-				g.setColor(nextColor);
-				for (int i = textPos; i < multiMapFinalDir.get(mapPos).size(); i++){
-					int point1x = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
-					int point1y = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
-					int point2x = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX()*newImageWidth)+drawnposx);
-					int point2y = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY()*newImageHeight)+drawnposy);
-					g2.drawLine(point1x, point1y, point2x, point2y);
-				}
-
-				// Draws ovals with black borders at each of the points along the path, needs to use an offset
-				for (int i = 0; i < multiMapFinalDir.get(mapPos).size(); i++){
-				
-					int pointx = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
-					int pointy = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
-					if (i != textPos){
-						g.setColor(pointColor);
-						g.fillOval( - 6,  -6, 12, 12);
-						g.setColor(Color.BLACK);
-						g.drawOval((int)(pointx - (pointSize/2)), (int)(pointy - (pointSize/2)), pointSize, pointSize);
+					for (int i = 0; i < textPos - 1; i++){
+						int point1x = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
+						int point1y = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
+						int point2x = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX()*newImageWidth)+drawnposx);
+						int point2y = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY()*newImageHeight)+drawnposy);
+						g2.drawLine(point1x, point1y, point2x, point2y);
 					}
+					// Draw a thicker line for the current step in the directions, use currentColor
+					if(DEBUG)
+						System.out.println("mapPos: " + mapPos);
+					if (textPos !=  multiMapFinalDir.get(mapPos).size()){ //|| (mapPos == multiMapFinalDir.size()-1 && multiMapFinalDir.get(mapPos).size()-1 == textPos)){
+						g2.setStroke(new BasicStroke(6));
+						g.setColor(currentColor);
+						int point1x = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocX()*newImageWidth)+drawnposx);
+						int point1y = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getOrigin().getLocY()*newImageHeight)+drawnposy);
+						int point2x = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocX()*newImageWidth)+drawnposx);
+						int point2y = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocY()*newImageHeight)+drawnposy);
+						g2.drawLine(point1x, point1y, point2x, point2y);
+
+						g2.setStroke(new BasicStroke(3));
+					}
+
+					// Draw lines for all points until the end, use nextColor (same color as "Next" button)
+					g.setColor(nextColor);
+					for (int i = textPos; i < multiMapFinalDir.get(mapPos).size(); i++){
+						int point1x = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
+						int point1y = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
+						int point2x = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX()*newImageWidth)+drawnposx);
+						int point2y = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocY()*newImageHeight)+drawnposy);
+						g2.drawLine(point1x, point1y, point2x, point2y);
+					}
+
+					// Draws ovals with black borders at each of the points along the path, needs to use an offset
+					for (int i = 0; i < multiMapFinalDir.get(mapPos).size(); i++){
+
+						int pointx = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
+						int pointy = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
+						if (i != textPos){
+							g.setColor(pointColor);
+							g.fillOval( - 6,  -6, 12, 12);
+							g.setColor(Color.BLACK);
+							g.drawOval((int)(pointx - (pointSize/2)), (int)(pointy - (pointSize/2)), pointSize, pointSize);
+						}
+						else {
+							int point1x = (int)((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX()*newImageWidth)+drawnposx);
+							int point1y = (int)((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY()*newImageHeight)+drawnposy);
+							// Prints a star indicating where the user currently is
+							Shape star = createStar(5, point1x, point1y, 7, 12);
+							g.setColor(pointColor);
+							g2.fill(star);
+							g.setColor(Color.BLACK);
+							g2.draw(star);
+						}
+					}
+
+					// Draws final oval or star in path
+					int pointx = (int)((multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX()*newImageWidth)+drawnposx);
+					int pointy = (int)((multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY()*newImageHeight)+drawnposy);
+					if (textPos != multiMapFinalDir.get(mapPos).size()){
+						g.setColor(pointColor);
+						g.fillOval(pointx - (pointSize/2), pointy - (pointSize/2), pointSize, pointSize);
+						g.setColor(Color.BLACK);
+						g.drawOval(pointx - (pointSize/2), pointy - (pointSize/2), pointSize, pointSize);	
+					}	
 					else {
-						int point1x = (int)((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX()*newImageWidth)+drawnposx);
-						int point1y = (int)((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY()*newImageHeight)+drawnposy);
-						// Prints a star indicating where the user currently is
+						int point1x = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocX()*newImageWidth)+drawnposx);
+						int point1y = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocY()*newImageHeight)+drawnposy);
 						Shape star = createStar(5, point1x, point1y, 7, 12);
 						g.setColor(pointColor);
 						g2.fill(star);
@@ -1286,28 +1314,8 @@ public class GUI{
 						g2.draw(star);
 					}
 				}
-
-				// Draws final oval or star in path
-				int pointx = (int)((multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX()*newImageWidth)+drawnposx);
-				int pointy = (int)((multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocY()*newImageHeight)+drawnposy);
-				if (textPos != multiMapFinalDir.get(mapPos).size()){
-					g.setColor(pointColor);
-					g.fillOval(pointx - (pointSize/2), pointy - (pointSize/2), pointSize, pointSize);
-					g.setColor(Color.BLACK);
-					g.drawOval(pointx - (pointSize/2), pointy - (pointSize/2), pointSize, pointSize);	
-				}	
-				else {
-					int point1x = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocX()*newImageWidth)+drawnposx);
-					int point1y = (int)((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocY()*newImageHeight)+drawnposy);
-					Shape star = createStar(5, point1x, point1y, 7, 12);
-					g.setColor(pointColor);
-					g2.fill(star);
-					g.setColor(Color.BLACK);
-					g2.draw(star);
-				}
 			}
-		}
 
-	}
+		}
 	}
 }

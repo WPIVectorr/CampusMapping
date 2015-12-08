@@ -26,8 +26,13 @@ import javax.swing.JTextField;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyBoundsListener;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -63,14 +68,14 @@ public class InterMapEdgeGUI extends JFrame {
 	private JButton btnConfirmSelection;
 
 	private Point connectPoint;
-	String name;
+	String name = "Select Map";
 	File destinationFile;
 	File logo;
 
 	private Map connectMap = null;
 	private Map srcMap = null;
 	private ServerDB md = ServerDB.getInstance();
-	
+
 	private double imagewidth;
 	private double imageheight;
 	private double scaleSize = 1;
@@ -79,8 +84,6 @@ public class InterMapEdgeGUI extends JFrame {
 	private boolean drawnfirst = false;
 	private int screenHeight;
 	private int screenWidth;
-	private double imageX;
-	private double imageY;
 	private int scroldirection;
 	private boolean atMaxZoom = false;
 	private boolean atMinZoom = false;
@@ -93,6 +96,7 @@ public class InterMapEdgeGUI extends JFrame {
 	private double difHeight;
 	private double newImageHeight;
 	private double newImageWidth;
+	private boolean scrolled = false;
 
 
 
@@ -199,20 +203,10 @@ public class InterMapEdgeGUI extends JFrame {
 		gbc_btnConfirmSelection.gridy = 1;
 		buttonPanel.add(btnConfirmSelection, gbc_btnConfirmSelection);
 		btnConfirmSelection.setEnabled(false);
-		
+
 		buttonPanel.repaint();
 		mapFrame.repaint();
 
-		mapFrame.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				btnConfirmSelection.setText("Confirm Selection");
-				//System.out.println("Clicked");
-				lastMousex = e.getX();
-				lastMousey = e.getY();
-				selectPoint();
-			}
-		});
 		getContentPane().add(mapFrame, BorderLayout.CENTER);
 
 		buttonPanel.setBounds(0, 178, 394, 394);
@@ -259,7 +253,7 @@ public class InterMapEdgeGUI extends JFrame {
 							alreadyExists = true;
 						}
 					}
-					
+
 					if (!alreadyExists){
 						try {
 							ServerDB.insertEdge(new Edge(srcPoint, connectPoint));
@@ -281,6 +275,102 @@ public class InterMapEdgeGUI extends JFrame {
 			}
 		});
 
+		mapFrame.addMouseListener(new MouseAdapter() {
+			public void mouseReleased(MouseEvent e) {
+				if (!Dragged){
+					//System.out.println("not dragged");
+					btnConfirmSelection.setText("Confirm Selection");
+					//System.out.println("Clicked");
+					lastMousex = e.getX();
+					lastMousey = e.getY();
+					selectPoint();
+				} else{
+					//System.out.println("dragged = true");
+					Dragged = false;
+
+				}
+			}
+			public void mousePressed(MouseEvent e) {
+				originx = e.getX();
+				originy = e.getY();
+			}
+		});
+
+		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
+
+			@Override
+			public void ancestorMoved(HierarchyEvent e) {
+
+			}
+			@Override
+			public void ancestorResized(HierarchyEvent e) {
+				frame.repaint();
+			}           
+		});
+
+		mapFrame.addMouseMotionListener(new MouseMotionListener(){
+			public void mouseDragged(MouseEvent g){
+				//System.out.println("dragged");
+				drawnfirst = true;
+				Dragged = true;
+				mousex = g.getX();
+				mousey = g.getY();
+				frame.repaint();
+			}
+
+			public void mouseMoved(MouseEvent arg0) {
+
+			}
+		});
+
+		frame.addMouseWheelListener(new MouseWheelListener(){
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				scrolled = true;
+				String message;
+				int notches = e.getWheelRotation();
+				if (notches < 0) {
+					message = "Mouse wheel moved UP " + -notches + " notch(es)\n";
+				} else {
+					message = "Mouse wheel moved DOWN " + notches + " notch(es)\n";
+				}
+				double oldWidth = img.getWidth() * scaleSize;
+				double oldHeight = img.getHeight() * scaleSize;
+				if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(name.equals("Select Map")))) {
+					drawnfirst = true;
+					scroldirection = e.getWheelRotation();
+					if (e.getWheelRotation() > 0) {
+						if (scaleSize <= 2) {
+							// System.out.println("scale before plus: " +
+							// scaleSize);
+							scaleSize += (e.getWheelRotation() * .01);
+							// System.out.println("scale plus: " + scaleSize);
+							atMinZoom = false;
+						} else {
+							atMaxZoom = true;
+						}
+					} else {
+						if (scaleSize >= 0.1) {
+							// System.out.println("scale before minus: " +
+							// scaleSize);
+							scaleSize += (e.getWheelRotation() * .01);
+							// System.out.println("scale minus: " + scaleSize);
+							atMaxZoom = false;
+						} else {
+							atMinZoom = true;
+						}
+					}
+					double newWidth = img.getWidth() * scaleSize;
+					double newHeight = img.getHeight() * scaleSize;
+					difWidth = (oldWidth - newWidth);
+					difHeight = (oldHeight - newHeight);
+				} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+
+				}
+				frame.repaint();
+				// System.out.println(message);
+			}
+		});
+
 		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
 				pointArray.clear();
@@ -290,12 +380,12 @@ public class InterMapEdgeGUI extends JFrame {
 
 				destinationFile = new File("src/VectorMaps/" + name+".png");
 				destinationFile = new File(destinationFile.getAbsolutePath());
-				
+
 				//System.out.println("Got "+maps.size() + " maps from Updater");
 				destDropDown.setText("Select Point");
 				if (!(name.equals("Select Map"))) {//If the name is not the default: "Select map", go further
 
-					
+
 					for(Map currMap:maps){//Iterate through the maps until we find the item we are looking for
 						//System.out.println("Trying to find name:"+name);
 						if(name.equals(currMap.getMapName()))//Once we find the map:
@@ -306,7 +396,7 @@ public class InterMapEdgeGUI extends JFrame {
 								pointArray.add(pointBreak);//Populate the point array with all the points found.
 							}
 						}
-						
+
 					}
 					//System.out.println("getting edges");
 					if(pointArray != null){
@@ -443,53 +533,39 @@ public class InterMapEdgeGUI extends JFrame {
 						scaleSize = 1/((double)img.getHeight() / (double)mapFrame.getHeight());
 						//System.out.println("setting: "+scaleSize);
 					}
-					int imagesizex = (int)((double)img.getWidth() / windowScale);
-					int imagesizey = (int)((double)img.getHeight() / windowScale);
+					newImageWidth = (int)((double)img.getWidth() / windowScale);
+					newImageHeight = (int)((double)img.getHeight() / windowScale);
 					int centerx = (mapFrame.getWidth()/2);
 					int centery = (mapFrame.getHeight()/2);
-					int drawx = centerx -(imagesizex/2);
-					int drawy = centery -(imagesizey/2);
-					g.drawImage(img, drawx, drawy, imagesizex, imagesizey, null);
-					drawnposx = drawx;
-					drawnposy = drawy;
-					
+					drawnposx = centerx -(int)(newImageWidth/2);
+					drawnposy = centery -(int)(newImageHeight/2);
+					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
+					//System.out.println(newImageWidth+", "+newImageHeight);
 				} else{
-					AffineTransform originalTransform = g2D.getTransform();
+
 					double deltax = 0;
 					double deltay = 0;
-					g2D.scale(scaleSize, scaleSize);
-					if(Dragged){
-						deltax = -(originx - mousex)/scaleSize;
-						deltay = -(originy - mousey)/scaleSize;
-						//System.out.println("change in x: " + deltax);
-						//System.out.println("change in y: " + deltay);
-						originx = mousex;
-						originy = mousey;
-						g2D.translate(deltax, deltay);
-						imageX =0;
-						imageY = 0;
-						difWidth = 0;
-						difHeight = 0;
-					} else{
-						//System.out.println("I did it");
-						g2D.translate(0, 0);
-						deltax = -difWidth;
-						deltay = -difHeight;
+					newImageHeight = (int)img.getHeight()*scaleSize;
+					newImageWidth = (int)img.getWidth()*scaleSize;
+					if(!(name.equals("Select Map"))){
+						if(Dragged){
+							deltax = -(originx - mousex);
+							deltay = -(originy - mousey);
+							originx = mousex;
+							originy = mousey;
+							difWidth = 0;
+							difHeight = 0;
+						} else if(scrolled){
+							deltax = difWidth;
+							deltay = difWidth;
+							scrolled = false;
+						}
+						drawnposx += deltax;
+						drawnposy += deltay;
+						g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
 					}
-					//System.out.println("Before Draw Scale: " + scaleSize);
-					g2D.drawImage(img,  drawnposx, drawnposy, null);
-					g.fillOval(drawnposx, drawnposy, 20, 20);
-					//System.out.println("scale: " + scaleSize);
-					//System.out.println("drawn position x: " + drawnposx);
-					//System.out.println("drawn position y: " + drawnposy);
-					drawnposx += deltax;
-					drawnposy += deltay;
-					g2D.setTransform(originalTransform);
-					newImageHeight = img.getHeight()*scaleSize;
-					newImageWidth = img.getWidth()*scaleSize;
+
 				}
-				drawnfirst = true;
-				
 			}
 
 
@@ -497,8 +573,10 @@ public class InterMapEdgeGUI extends JFrame {
 			// cleans the array of deleted points.
 			if (pointArray.size() > 0) {
 				for (Point loopPoint: pointArray) {
-					int drawX = (int) loopPoint.getLocX();
-					int drawY = (int) loopPoint.getLocY();
+					double posx = ((loopPoint.getLocX()*newImageWidth)+drawnposx);
+					double posy = ((loopPoint.getLocY()*newImageHeight)+drawnposy);
+					int drawX = (int) posx;
+					int drawY = (int) posy;
 					// draws the points onto the map.
 					//System.out.println("printoval");
 					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
@@ -521,11 +599,12 @@ public class InterMapEdgeGUI extends JFrame {
 
 	private boolean checkInPoint(Point selectPoint)
 	{
-
-		if ((lastMousex > selectPoint.getLocX() - (pointSize + 5)
-				&& lastMousex < selectPoint.getLocX() + (pointSize + 5))
-				&& (lastMousey > selectPoint.getLocY() - (pointSize + 5)
-						&& lastMousey < selectPoint.getLocY() + (pointSize + 5))) {
+		double posx = ((selectPoint.getLocX()*newImageWidth)+drawnposx);
+		double posy = ((selectPoint.getLocY()*newImageHeight)+drawnposy);
+		if ((lastMousex > posx - (pointSize + 5)
+				&& lastMousex < posx + (pointSize + 5))
+				&& (lastMousey > posy - (pointSize + 5)
+						&& lastMousey < posy + (pointSize + 5))) {
 			//System.out.println("in Point");
 			return true;
 		}else{

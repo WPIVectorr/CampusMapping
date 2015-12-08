@@ -112,12 +112,16 @@ public class GUI{
 	private boolean scrolled = false;
 	private double upperx;
 	private double uppery;
+	private int timeEst = 0;
 	private int outside;
 	private int stairs;
+	private double walkSpeed = 4.5;
 	Map startMap;
 	private String mapTitle = "Select Map";
 	private static SplashPage loadingAnimation;
 	private JTextField txtFieldEmail;
+	private JTextField txtTimeToDestination;
+	private boolean resetPath = false;
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
@@ -136,7 +140,6 @@ public class GUI{
 		frame.setLocation((int)xlocation, (int)ylocation);
 
 		frame.getContentPane().setBackground(backgroundColor);
-
 
 		maps = md.getMapsFromLocal();
 		allPoints = new ArrayList<Point>();
@@ -166,6 +169,42 @@ public class GUI{
 		menus.add(mainMenu, "Main Menu");
 		menus.add(navMenu, "Nav Menu");
 		menus.add(createPrefMenu(), "Pref Menu");
+
+		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
+		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
+		gbc_btnSavePreferences.insets = new Insets(0, 0, 5, 0);
+		gbc_btnSavePreferences.gridx = 3;
+		gbc_btnSavePreferences.gridy = 5;
+		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
+		// Return to previous view
+		btnSavePreferences.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// If the position in the route should be reset, does that
+				if (resetPath){
+					textPos = 0;
+					mapPos = 0;
+					resetPath = false;
+					
+					double estimatedDirDist = 0;
+					for(int g = 0; g < multiMapFinalDir.size(); g++){
+						for(int p = 0; p < multiMapFinalDir.get(g).size(); p++){
+							estimatedDirDist+=multiMapFinalDir.get(g).get(p).getDistance();
+						}
+					}
+
+					timeEst = (int) (estimatedDirDist / walkSpeed);
+					int minEst = (int) Math.floor(timeEst / 60);
+					int secEst = timeEst % 60;
+					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
+				}
+				// Set button colors based on preferences selected
+				btnPrevious.setColor(previousColor);
+				btnNext.setColor(nextColor);
+				// Return to view that preferences menu was accessed from
+				menuLayout.show(menus, returnMenu);
+				frame.repaint();
+			}
+		});
 
 
 		frame.getContentPane().add(menus, BorderLayout.NORTH);
@@ -507,11 +546,27 @@ public class GUI{
 		destBuilds.setBounds(122, 80, 148, 20);
 		lblDestination.setLabelFor(destBuilds);
 
+		GradientButton btnSetPreferencesMain = new GradientButton("Set Preferences", buttonColor);
+		GridBagConstraints gbc_btnSetPreferencesMain = new GridBagConstraints();
+		gbc_btnSetPreferencesMain.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnSetPreferencesMain.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSetPreferencesMain.gridx = 2;
+		gbc_btnSetPreferencesMain.gridy = 3;
+		mainMenu.add(btnSetPreferencesMain, gbc_btnSetPreferencesMain);
+		btnSetPreferencesMain.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Note which menu to return to
+				returnMenu = "Main Menu";
+				// Show preferences menu
+				menuLayout.show(menus, "Pref Menu");
+			}
+		});
+
 		GradientButton btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
 		GridBagConstraints gbc_btnSwapStartAndDest = new GridBagConstraints();
 		gbc_btnSwapStartAndDest.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnSwapStartAndDest.insets = new Insets(0, 0, 5, 5);
-		gbc_btnSwapStartAndDest.gridx = 2;
+		gbc_btnSwapStartAndDest.gridx = 4;
 		gbc_btnSwapStartAndDest.gridy = 3;
 		mainMenu.add(btnSwapStartAndDest, gbc_btnSwapStartAndDest);
 		btnSwapStartAndDest.addActionListener(new ActionListener() {
@@ -526,22 +581,6 @@ public class GUI{
 					DestMaps.setSelectedIndex(startMapIndex);
 					destBuilds.setSelectedIndex(startPointIndex);
 				}
-			}
-		});
-
-		GradientButton btnSetPreferencesMain = new GradientButton("Set Preferences", buttonColor);
-		GridBagConstraints gbc_btnSetPreferencesMain = new GridBagConstraints();
-		gbc_btnSetPreferencesMain.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnSetPreferencesMain.insets = new Insets(0, 0, 5, 5);
-		gbc_btnSetPreferencesMain.gridx = 4;
-		gbc_btnSetPreferencesMain.gridy = 3;
-		mainMenu.add(btnSetPreferencesMain, gbc_btnSetPreferencesMain);
-		btnSetPreferencesMain.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// Note which menu to return to
-				returnMenu = "Main Menu";
-				// Show preferences menu
-				menuLayout.show(menus, "Pref Menu");
 			}
 		});
 
@@ -653,8 +692,20 @@ public class GUI{
 								e.printStackTrace();
 							}
 						}
+						double estimatedDirDist = 0;
+						for(int g = 0; g < multiMapFinalDir.size(); g++){
+							for(int p = 0; p < multiMapFinalDir.get(g).size(); p++){
+								estimatedDirDist+=multiMapFinalDir.get(g).get(p).getDistance();
+							}
+						}
+
+						timeEst = (int) (estimatedDirDist / walkSpeed);
+						int minEst = (int) Math.floor(timeEst / 60);
+						int secEst = timeEst % 60;
+						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
 
 						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
+
 						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
 							img = ImageIO.read(destinationFile);
@@ -827,6 +878,12 @@ public class GUI{
 					}
 					frame.repaint();
 				} else {
+					if (textPos != 0){
+						timeEst += (Math.floor(multiMapFinalDir.get(mapPos).get(textPos-1).getDistance() / walkSpeed));
+					}
+					int minEst = (int) Math.floor(timeEst / 60);
+					int secEst = timeEst % 60;
+					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
 					textPos--;
 					directionsText.setText(textDir.get(mapPos).get(textPos));
 				}
@@ -855,6 +912,11 @@ public class GUI{
 
 
 					if(textPos < multiMapFinalDir.get(mapPos).size()){ 
+						timeEst -= Math.floor((multiMapFinalDir.get(mapPos).get(textPos).getDistance()/walkSpeed));
+						int minEst = (int) Math.floor(timeEst / 60);
+						int secEst = timeEst % 60;
+						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
+
 						textPos++;
 
 						if (textPos != multiMapFinalDir.get(mapPos).size()){
@@ -866,6 +928,7 @@ public class GUI{
 						else {
 							textPos = multiMapFinalDir.get(mapPos).size();
 							//mapPos = multiMapFinalDir.size() - 1;
+							txtTimeToDestination.setText("");
 							directionsText.setText("You have arrived at your destination");
 						}
 					}	
@@ -891,6 +954,17 @@ public class GUI{
 					frame.repaint();
 				}
 			}});
+
+		txtTimeToDestination = new JTextField();
+		txtTimeToDestination.setText("Estimated Time to Destination: ");
+		GridBagConstraints gbc_txtTimeToDestination = new GridBagConstraints();
+		gbc_txtTimeToDestination.insets = new Insets(0, 0, 5, 5);
+		gbc_txtTimeToDestination.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtTimeToDestination.gridx = 2;
+		gbc_txtTimeToDestination.gridy = 4;
+		navMenu.add(txtTimeToDestination, gbc_txtTimeToDestination);
+		txtTimeToDestination.setColumns(10);
+
 		GridBagConstraints gbc_btnNext = new GridBagConstraints();
 		gbc_btnNext.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNext.anchor = GridBagConstraints.NORTH;
@@ -955,47 +1029,66 @@ public class GUI{
 		prefMenu = new JPanel();
 		prefMenu.setBackground(backgroundColor);
 		GridBagLayout gbl_prefMenu = new GridBagLayout();
-		gbl_prefMenu.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_prefMenu.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
-		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_prefMenu.columnWidths = new int[]{58, 0, 0, 56, 99, 147, 38, 0};
+		gbl_prefMenu.rowHeights = new int[]{0, 0, 0, 0, 0, 12, 11, 0};
+		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		prefMenu.setLayout(gbl_prefMenu);
 
+		Component verticalStrut = Box.createVerticalStrut(20);
+		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
+		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
+		gbc_verticalStrut.gridx = 5;
+		gbc_verticalStrut.gridy = 0;
+		prefMenu.add(verticalStrut, gbc_verticalStrut);
 
-		JLabel lblPathfinding = new JLabel("Pathfinding Preferences");
-		GridBagConstraints gbc_lblPathfinding = new GridBagConstraints();
-		gbc_lblPathfinding.gridwidth = 3;
-		gbc_lblPathfinding.insets = new Insets(0, 0, 5, 5);
-		gbc_lblPathfinding.gridx = 2;
-		gbc_lblPathfinding.gridy = 1;
-		prefMenu.add(lblPathfinding, gbc_lblPathfinding);
-
-		JLabel lblVisualPreferences = new JLabel("Visual Preferneces");
-		GridBagConstraints gbc_lblVisualPreferences = new GridBagConstraints();
-		gbc_lblVisualPreferences.insets = new Insets(0, 0, 5, 0);
-		gbc_lblVisualPreferences.gridx = 11;
-		gbc_lblVisualPreferences.gridy = 1;
-		prefMenu.add(lblVisualPreferences, gbc_lblVisualPreferences);
+		Component horizontalStrut = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
+		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 5);
+		gbc_horizontalStrut.gridx = 0;
+		gbc_horizontalStrut.gridy = 1;
+		prefMenu.add(horizontalStrut, gbc_horizontalStrut);
 
 		JLabel lblOutside = new JLabel("Outside");
 		GridBagConstraints gbc_lblOutside = new GridBagConstraints();
 		gbc_lblOutside.insets = new Insets(0, 0, 5, 5);
-		gbc_lblOutside.gridx = 2;
-		gbc_lblOutside.gridy = 2;
+		gbc_lblOutside.gridx = 1;
+		gbc_lblOutside.gridy = 1;
 		prefMenu.add(lblOutside, gbc_lblOutside);
 
 		JLabel lblStairs = new JLabel("Stairs");
 		GridBagConstraints gbc_lblStairs = new GridBagConstraints();
 		gbc_lblStairs.insets = new Insets(0, 0, 5, 5);
-		gbc_lblStairs.gridx = 4;
-		gbc_lblStairs.gridy = 2;
+		gbc_lblStairs.gridx = 3;
+		gbc_lblStairs.gridy = 1;
 		prefMenu.add(lblStairs, gbc_lblStairs);
+
+		JLabel lblVisualPreferences = new JLabel("Theme\r\n");
+		GridBagConstraints gbc_lblVisualPreferences = new GridBagConstraints();
+		gbc_lblVisualPreferences.insets = new Insets(0, 0, 5, 5);
+		gbc_lblVisualPreferences.gridx = 5;
+		gbc_lblVisualPreferences.gridy = 1;
+		prefMenu.add(lblVisualPreferences, gbc_lblVisualPreferences);
+
+		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
+		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 0);
+		gbc_horizontalStrut_1.gridx = 6;
+		gbc_horizontalStrut_1.gridy = 1;
+		prefMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
+
+		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();
+		gbc_horizontalStrut_2.insets = new Insets(0, 0, 5, 5);
+		gbc_horizontalStrut_2.gridx = 4;
+		gbc_horizontalStrut_2.gridy = 2;
+		prefMenu.add(horizontalStrut_2, gbc_horizontalStrut_2);
 
 		JRadioButton rdbtnStandard = new JRadioButton("Standard");
 		GridBagConstraints gbc_rdbtnStandard = new GridBagConstraints();
 		gbc_rdbtnStandard.anchor = GridBagConstraints.WEST;
-		gbc_rdbtnStandard.insets = new Insets(0, 0, 5, 0);
-		gbc_rdbtnStandard.gridx = 11;
+		gbc_rdbtnStandard.insets = new Insets(0, 0, 5, 5);
+		gbc_rdbtnStandard.gridx = 5;
 		gbc_rdbtnStandard.gridy = 2;
 		prefMenu.add(rdbtnStandard, gbc_rdbtnStandard);
 		rdbtnStandard.setSelected(true);
@@ -1011,6 +1104,12 @@ public class GUI{
 		});
 
 		JSlider sliderOutside = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
+		sliderOutside.setPaintLabels(true);
+		GridBagConstraints gbc_slider = new GridBagConstraints();
+		gbc_slider.insets = new Insets(0, 0, 5, 5);
+		gbc_slider.gridx = 1;
+		gbc_slider.gridy = 2;
+		prefMenu.add(sliderOutside, gbc_slider);
 		sliderOutside.addChangeListener(new ChangeListener(){
 			public void stateChanged(ChangeEvent event) {
 				int value = sliderOutside.getValue();
@@ -1035,15 +1134,14 @@ public class GUI{
 
 		sliderOutside.setLabelTable(labels);
 		sliderOutside.setPaintTicks(true);
-		sliderOutside.setPaintLabels(true);
-
-		GridBagConstraints gbc_slider = new GridBagConstraints();
-		gbc_slider.insets = new Insets(0, 0, 5, 5);
-		gbc_slider.gridx = 2;
-		gbc_slider.gridy = 3;
-		prefMenu.add(sliderOutside, gbc_slider);
 
 		JSlider sliderStairs = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
+		sliderStairs.setPaintLabels(true);
+		GridBagConstraints gbc_slider_1 = new GridBagConstraints();
+		gbc_slider_1.insets = new Insets(0, 0, 5, 5);
+		gbc_slider_1.gridx = 3;
+		gbc_slider_1.gridy = 2;
+		prefMenu.add(sliderStairs, gbc_slider_1);
 		sliderStairs.addChangeListener(new ChangeListener(){
 			public void stateChanged(ChangeEvent event) {
 				int value = sliderStairs.getValue();
@@ -1063,18 +1161,48 @@ public class GUI{
 		sliderStairs.setMajorTickSpacing(1);
 		sliderStairs.setLabelTable(labels);
 		sliderStairs.setPaintTicks(true);
-		sliderStairs.setPaintLabels(true);
-		GridBagConstraints gbc_slider_1 = new GridBagConstraints();
-		gbc_slider_1.insets = new Insets(0, 0, 5, 5);
-		gbc_slider_1.gridx = 4;
-		gbc_slider_1.gridy = 3;
-		prefMenu.add(sliderStairs, gbc_slider_1);
+		
+		JSlider sliderWalkingSpeed = new JSlider(-1, 1, 0);
+		sliderWalkingSpeed.setPaintLabels(true);
+		GridBagConstraints gbc_walkingSpeed = new GridBagConstraints();
+		gbc_walkingSpeed.insets = new Insets(0, 0, 5, 5);
+		gbc_walkingSpeed.gridx = 1;
+		gbc_walkingSpeed.gridy = 4;
+		prefMenu.add(sliderWalkingSpeed, gbc_walkingSpeed);
+		sliderWalkingSpeed.addChangeListener(new ChangeListener(){
+			public void stateChanged(ChangeEvent event) {
+				int value = sliderWalkingSpeed.getValue();
+				if (value > 0) {
+					walkSpeed = 6;
+					resetPath = true;
+					//System.out.println("0");
+				} else if (value == 0 ) {
+					walkSpeed = 4.5;
+					resetPath = true;
+					//System.out.println("value > 0 " + value);
+				} else{
+					walkSpeed = 3;
+					resetPath = true;
+					//System.out.println("value < 0" + value);
+				} 
+			}
+		});
+		
+		sliderWalkingSpeed.setMajorTickSpacing(1);
+		Hashtable<Integer, JLabel> speeds = new Hashtable<Integer, JLabel>();
+		speeds.put(0, new JLabel("Medium"));
+		speeds.put(-1, new JLabel("Slow"));
+		speeds.put(1, new JLabel("Fast"));
+
+		sliderWalkingSpeed.setLabelTable(speeds);
+		sliderWalkingSpeed.setPaintTicks(true);
+		sliderStairs.setMajorTickSpacing(1);
 
 		JRadioButton rdbtnColorBlindMode = new JRadioButton("Color Blind Mode");
 		GridBagConstraints gbc_rdbtnColorBlindMode = new GridBagConstraints();
-		gbc_rdbtnColorBlindMode.insets = new Insets(0, 0, 5, 0);
+		gbc_rdbtnColorBlindMode.insets = new Insets(0, 0, 5, 5);
 		gbc_rdbtnColorBlindMode.anchor = GridBagConstraints.WEST;
-		gbc_rdbtnColorBlindMode.gridx = 11;
+		gbc_rdbtnColorBlindMode.gridx = 5;
 		gbc_rdbtnColorBlindMode.gridy = 3;
 
 		// Add action listener to swap color palette, needs to be set after buttons are initialized
@@ -1088,28 +1216,17 @@ public class GUI{
 		});
 
 		ButtonGroup visualPreferences = new ButtonGroup();
+
+		JLabel lblWalkingSpeed = new JLabel("Walking Speed");
+		GridBagConstraints gbc_lblWalkingSpeed = new GridBagConstraints();
+		gbc_lblWalkingSpeed.insets = new Insets(0, 0, 5, 5);
+		gbc_lblWalkingSpeed.gridx = 1;
+		gbc_lblWalkingSpeed.gridy = 3;
+		prefMenu.add(lblWalkingSpeed, gbc_lblWalkingSpeed);
 		prefMenu.add(rdbtnColorBlindMode, gbc_rdbtnColorBlindMode);
 		prefMenu.add(rdbtnStandard, gbc_rdbtnStandard);
 		visualPreferences.add(rdbtnStandard);
 		visualPreferences.add(rdbtnColorBlindMode);
-
-		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
-		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
-		gbc_btnSavePreferences.insets = new Insets(0, 0, 0, 5);
-		gbc_btnSavePreferences.gridx = 7;
-		gbc_btnSavePreferences.gridy = 4;
-		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
-		// Return to previous view
-		btnSavePreferences.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// Set button colors based on preferences selected
-				btnPrevious.setColor(previousColor);
-				btnNext.setColor(nextColor);
-				// Return to view that preferences menu was accessed from
-				menuLayout.show(menus, returnMenu);
-				frame.repaint();
-			}
-		});
 
 		return prefMenu;
 	}
@@ -1244,9 +1361,9 @@ public class GUI{
 
 					// Draw multi colored lines depending on current step in directions and color settings (color blind mode or not)
 					// Draw lines for all points up to current point, use previousColor (same color as "Previous" button)
-					g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 50));
+					g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 150));
 					g2.setStroke(new BasicStroke(3));
-					for (int i = 0; i < textPos - 1; i++){
+					for (int i = 0; i < textPos; i++){
 						int point1x = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX()*newImageWidth)+drawnposx);
 						int point1y = (int)((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocY()*newImageHeight)+drawnposy);
 						int point2x = (int)((multiMapFinalDir.get(mapPos).get(i).getDestination().getLocX()*newImageWidth)+drawnposx);

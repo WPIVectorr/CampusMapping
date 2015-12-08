@@ -147,6 +147,7 @@ public class InterMapEdgeGUI extends JFrame {
 		int locationy = screenHeight / 2;
 		setLocation(locationx-(framex/2), locationy-(framey/2));
 		setVisible(true);
+		mapFrame.setBackground(Color.WHITE);
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
@@ -315,7 +316,7 @@ public class InterMapEdgeGUI extends JFrame {
 				Dragged = true;
 				mousex = g.getX();
 				mousey = g.getY();
-				frame.repaint();
+				mapFrame.repaint();
 			}
 
 			public void mouseMoved(MouseEvent arg0) {
@@ -323,16 +324,9 @@ public class InterMapEdgeGUI extends JFrame {
 			}
 		});
 
-		frame.addMouseWheelListener(new MouseWheelListener(){
+		mapFrame.addMouseWheelListener(new MouseWheelListener(){
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				scrolled = true;
-				String message;
-				int notches = e.getWheelRotation();
-				if (notches < 0) {
-					message = "Mouse wheel moved UP " + -notches + " notch(es)\n";
-				} else {
-					message = "Mouse wheel moved DOWN " + notches + " notch(es)\n";
-				}
 				double oldWidth = img.getWidth() * scaleSize;
 				double oldHeight = img.getHeight() * scaleSize;
 				if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(name.equals("Select Map")))) {
@@ -366,7 +360,7 @@ public class InterMapEdgeGUI extends JFrame {
 				} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
 
 				}
-				frame.repaint();
+				mapFrame.repaint();
 				// System.out.println(message);
 			}
 		});
@@ -512,7 +506,7 @@ public class InterMapEdgeGUI extends JFrame {
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			Graphics2D g2D = (Graphics2D) g;
+			Graphics2D g2d = (Graphics2D) g;
 			// -------------------------------
 			// if(img == null)
 			// img = ImageIO.read(new
@@ -562,6 +556,7 @@ public class InterMapEdgeGUI extends JFrame {
 					}
 					drawnposx += deltax;
 					drawnposy += deltay;
+					System.out.println(drawnposx+", "+drawnposy);
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
 				}
 
@@ -579,11 +574,14 @@ public class InterMapEdgeGUI extends JFrame {
 					int drawY = (int) posy;
 					// draws the points onto the map.
 					//System.out.println("printoval");
+					g.setColor(Color.BLACK);
+					g.setColor(Color.getHSBColor(0.12f, 0.74f, 0.7f));
 					g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
+					g.setColor(Color.BLACK);
 
 					if(connectPoint != null)
 					{
-						g.setColor(Color.ORANGE);
+						g.setColor(Color.RED);
 						int pointx = (int)((connectPoint.getLocX()*newImageWidth)+drawnposx);
 						int pointy = (int)((connectPoint.getLocY()*newImageHeight)+drawnposy);
 						g.fillOval(pointx-((pointSize / 2) + 2),pointy-((pointSize / 2) + 2), pointSize+2, pointSize+2);

@@ -160,6 +160,31 @@ public class GUI{
 		menus.add(mainMenu, "Main Menu");
 		menus.add(navMenu, "Nav Menu");
 		menus.add(createPrefMenu(), "Pref Menu");
+				
+				JSlider slider = new JSlider();
+				GridBagConstraints gbc_slider = new GridBagConstraints();
+				gbc_slider.insets = new Insets(0, 0, 5, 5);
+				gbc_slider.gridx = 1;
+				gbc_slider.gridy = 4;
+				prefMenu.add(slider, gbc_slider);
+		
+				GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
+				GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
+				gbc_btnSavePreferences.insets = new Insets(0, 0, 5, 0);
+				gbc_btnSavePreferences.gridx = 3;
+				gbc_btnSavePreferences.gridy = 5;
+				prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
+				// Return to previous view
+				btnSavePreferences.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						// Set button colors based on preferences selected
+						btnPrevious.setColor(previousColor);
+						btnNext.setColor(nextColor);
+						// Return to view that preferences menu was accessed from
+						menuLayout.show(menus, returnMenu);
+						frame.repaint();
+					}
+				});
 
 
 		frame.getContentPane().add(menus, BorderLayout.NORTH);
@@ -495,44 +520,44 @@ public class GUI{
 		//buttonPanel.add(destBuilds);
 		destBuilds.setBounds(122, 80, 148, 20);
 		lblDestination.setLabelFor(destBuilds);
+				
+						GradientButton btnSetPreferencesMain = new GradientButton("Set Preferences", buttonColor);
+						GridBagConstraints gbc_btnSetPreferencesMain = new GridBagConstraints();
+						gbc_btnSetPreferencesMain.fill = GridBagConstraints.HORIZONTAL;
+						gbc_btnSetPreferencesMain.insets = new Insets(0, 0, 5, 5);
+						gbc_btnSetPreferencesMain.gridx = 2;
+						gbc_btnSetPreferencesMain.gridy = 3;
+						mainMenu.add(btnSetPreferencesMain, gbc_btnSetPreferencesMain);
+						btnSetPreferencesMain.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								// Note which menu to return to
+								returnMenu = "Main Menu";
+								// Show preferences menu
+								menuLayout.show(menus, "Pref Menu");
+							}
+						});
+		
+				GradientButton btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
+				GridBagConstraints gbc_btnSwapStartAndDest = new GridBagConstraints();
+				gbc_btnSwapStartAndDest.fill = GridBagConstraints.HORIZONTAL;
+				gbc_btnSwapStartAndDest.insets = new Insets(0, 0, 5, 5);
+				gbc_btnSwapStartAndDest.gridx = 4;
+				gbc_btnSwapStartAndDest.gridy = 3;
+				mainMenu.add(btnSwapStartAndDest, gbc_btnSwapStartAndDest);
+				btnSwapStartAndDest.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						if (startBuilds.getItemCount() != 0 && destBuilds.getItemCount() != 0){
+							int startMapIndex = mapsDropdown.getSelectedIndex();
+							int startPointIndex = startBuilds.getSelectedIndex();
 
-		GradientButton btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
-		GridBagConstraints gbc_btnSwapStartAndDest = new GridBagConstraints();
-		gbc_btnSwapStartAndDest.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnSwapStartAndDest.insets = new Insets(0, 0, 5, 5);
-		gbc_btnSwapStartAndDest.gridx = 2;
-		gbc_btnSwapStartAndDest.gridy = 3;
-		mainMenu.add(btnSwapStartAndDest, gbc_btnSwapStartAndDest);
-		btnSwapStartAndDest.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (startBuilds.getItemCount() != 0 && destBuilds.getItemCount() != 0){
-					int startMapIndex = mapsDropdown.getSelectedIndex();
-					int startPointIndex = startBuilds.getSelectedIndex();
+							mapsDropdown.setSelectedIndex(DestMaps.getSelectedIndex());
+							startBuilds.setSelectedIndex(destBuilds.getSelectedIndex());
 
-					mapsDropdown.setSelectedIndex(DestMaps.getSelectedIndex());
-					startBuilds.setSelectedIndex(destBuilds.getSelectedIndex());
-
-					DestMaps.setSelectedIndex(startMapIndex);
-					destBuilds.setSelectedIndex(startPointIndex);
-				}
-			}
-		});
-
-		GradientButton btnSetPreferencesMain = new GradientButton("Set Preferences", buttonColor);
-		GridBagConstraints gbc_btnSetPreferencesMain = new GridBagConstraints();
-		gbc_btnSetPreferencesMain.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnSetPreferencesMain.insets = new Insets(0, 0, 5, 5);
-		gbc_btnSetPreferencesMain.gridx = 4;
-		gbc_btnSetPreferencesMain.gridy = 3;
-		mainMenu.add(btnSetPreferencesMain, gbc_btnSetPreferencesMain);
-		btnSetPreferencesMain.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// Note which menu to return to
-				returnMenu = "Main Menu";
-				// Show preferences menu
-				menuLayout.show(menus, "Pref Menu");
-			}
-		});
+							DestMaps.setSelectedIndex(startMapIndex);
+							destBuilds.setSelectedIndex(startPointIndex);
+						}
+					}
+				});
 
 		// Button that generates a route and switches to nav display
 		GradientButton directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
@@ -939,47 +964,80 @@ public class GUI{
 		prefMenu = new JPanel();
 		prefMenu.setBackground(backgroundColor);
 		GridBagLayout gbl_prefMenu = new GridBagLayout();
-		gbl_prefMenu.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_prefMenu.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
-		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_prefMenu.columnWidths = new int[]{58, 0, 0, 56, 99, 147, 38, 0};
+		gbl_prefMenu.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 11, 0};
+		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		prefMenu.setLayout(gbl_prefMenu);
+		
+		Component verticalStrut = Box.createVerticalStrut(20);
+		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
+		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
+		gbc_verticalStrut.gridx = 5;
+		gbc_verticalStrut.gridy = 0;
+		prefMenu.add(verticalStrut, gbc_verticalStrut);
+		
+		Component horizontalStrut = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
+		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 5);
+		gbc_horizontalStrut.gridx = 0;
+		gbc_horizontalStrut.gridy = 1;
+		prefMenu.add(horizontalStrut, gbc_horizontalStrut);
+		
+				JLabel lblOutside = new JLabel("Outside");
+				GridBagConstraints gbc_lblOutside = new GridBagConstraints();
+				gbc_lblOutside.insets = new Insets(0, 0, 5, 5);
+				gbc_lblOutside.gridx = 1;
+				gbc_lblOutside.gridy = 1;
+				prefMenu.add(lblOutside, gbc_lblOutside);
+		
+				JLabel lblStairs = new JLabel("Stairs");
+				GridBagConstraints gbc_lblStairs = new GridBagConstraints();
+				gbc_lblStairs.insets = new Insets(0, 0, 5, 5);
+				gbc_lblStairs.gridx = 3;
+				gbc_lblStairs.gridy = 1;
+				prefMenu.add(lblStairs, gbc_lblStairs);
 
-
-		JLabel lblPathfinding = new JLabel("Pathfinding Preferences");
-		GridBagConstraints gbc_lblPathfinding = new GridBagConstraints();
-		gbc_lblPathfinding.gridwidth = 3;
-		gbc_lblPathfinding.insets = new Insets(0, 0, 5, 5);
-		gbc_lblPathfinding.gridx = 2;
-		gbc_lblPathfinding.gridy = 1;
-		prefMenu.add(lblPathfinding, gbc_lblPathfinding);
-
-		JLabel lblVisualPreferences = new JLabel("Visual Preferneces");
+		JLabel lblVisualPreferences = new JLabel("Theme\r\n");
 		GridBagConstraints gbc_lblVisualPreferences = new GridBagConstraints();
-		gbc_lblVisualPreferences.insets = new Insets(0, 0, 5, 0);
-		gbc_lblVisualPreferences.gridx = 11;
+		gbc_lblVisualPreferences.insets = new Insets(0, 0, 5, 5);
+		gbc_lblVisualPreferences.gridx = 5;
 		gbc_lblVisualPreferences.gridy = 1;
 		prefMenu.add(lblVisualPreferences, gbc_lblVisualPreferences);
-
-		JLabel lblOutside = new JLabel("Outside");
-		GridBagConstraints gbc_lblOutside = new GridBagConstraints();
-		gbc_lblOutside.insets = new Insets(0, 0, 5, 5);
-		gbc_lblOutside.gridx = 2;
-		gbc_lblOutside.gridy = 2;
-		prefMenu.add(lblOutside, gbc_lblOutside);
-
-		JLabel lblStairs = new JLabel("Stairs");
-		GridBagConstraints gbc_lblStairs = new GridBagConstraints();
-		gbc_lblStairs.insets = new Insets(0, 0, 5, 5);
-		gbc_lblStairs.gridx = 4;
-		gbc_lblStairs.gridy = 2;
-		prefMenu.add(lblStairs, gbc_lblStairs);
+		
+		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
+		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 0);
+		gbc_horizontalStrut_1.gridx = 6;
+		gbc_horizontalStrut_1.gridy = 1;
+		prefMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
+				
+						JSlider sliderOutside = new JSlider();
+						GridBagConstraints gbc_slider = new GridBagConstraints();
+						gbc_slider.insets = new Insets(0, 0, 5, 5);
+						gbc_slider.gridx = 1;
+						gbc_slider.gridy = 2;
+						prefMenu.add(sliderOutside, gbc_slider);
+		
+				JSlider sliderStairs = new JSlider();
+				GridBagConstraints gbc_slider_1 = new GridBagConstraints();
+				gbc_slider_1.insets = new Insets(0, 0, 5, 5);
+				gbc_slider_1.gridx = 3;
+				gbc_slider_1.gridy = 2;
+				prefMenu.add(sliderStairs, gbc_slider_1);
+		
+		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();
+		gbc_horizontalStrut_2.insets = new Insets(0, 0, 5, 5);
+		gbc_horizontalStrut_2.gridx = 4;
+		gbc_horizontalStrut_2.gridy = 2;
+		prefMenu.add(horizontalStrut_2, gbc_horizontalStrut_2);
 
 		JRadioButton rdbtnStandard = new JRadioButton("Standard");
 		GridBagConstraints gbc_rdbtnStandard = new GridBagConstraints();
 		gbc_rdbtnStandard.anchor = GridBagConstraints.WEST;
-		gbc_rdbtnStandard.insets = new Insets(0, 0, 5, 0);
-		gbc_rdbtnStandard.gridx = 11;
+		gbc_rdbtnStandard.insets = new Insets(0, 0, 5, 5);
+		gbc_rdbtnStandard.gridx = 5;
 		gbc_rdbtnStandard.gridy = 2;
 		prefMenu.add(rdbtnStandard, gbc_rdbtnStandard);
 		rdbtnStandard.setSelected(true);
@@ -994,25 +1052,11 @@ public class GUI{
 			}
 		});
 
-		JSlider sliderOutside = new JSlider();
-		GridBagConstraints gbc_slider = new GridBagConstraints();
-		gbc_slider.insets = new Insets(0, 0, 5, 5);
-		gbc_slider.gridx = 2;
-		gbc_slider.gridy = 3;
-		prefMenu.add(sliderOutside, gbc_slider);
-
-		JSlider sliderStairs = new JSlider();
-		GridBagConstraints gbc_slider_1 = new GridBagConstraints();
-		gbc_slider_1.insets = new Insets(0, 0, 5, 5);
-		gbc_slider_1.gridx = 4;
-		gbc_slider_1.gridy = 3;
-		prefMenu.add(sliderStairs, gbc_slider_1);
-
 		JRadioButton rdbtnColorBlindMode = new JRadioButton("Color Blind Mode");
 		GridBagConstraints gbc_rdbtnColorBlindMode = new GridBagConstraints();
-		gbc_rdbtnColorBlindMode.insets = new Insets(0, 0, 5, 0);
+		gbc_rdbtnColorBlindMode.insets = new Insets(0, 0, 5, 5);
 		gbc_rdbtnColorBlindMode.anchor = GridBagConstraints.WEST;
-		gbc_rdbtnColorBlindMode.gridx = 11;
+		gbc_rdbtnColorBlindMode.gridx = 5;
 		gbc_rdbtnColorBlindMode.gridy = 3;
 
 		// Add action listener to swap color palette, needs to be set after buttons are initialized
@@ -1026,28 +1070,17 @@ public class GUI{
 		});
 
 		ButtonGroup visualPreferences = new ButtonGroup();
+		
+		JLabel lblWalkingSpeed = new JLabel("Walking Speed");
+		GridBagConstraints gbc_lblWalkingSpeed = new GridBagConstraints();
+		gbc_lblWalkingSpeed.insets = new Insets(0, 0, 5, 5);
+		gbc_lblWalkingSpeed.gridx = 1;
+		gbc_lblWalkingSpeed.gridy = 3;
+		prefMenu.add(lblWalkingSpeed, gbc_lblWalkingSpeed);
 		prefMenu.add(rdbtnColorBlindMode, gbc_rdbtnColorBlindMode);
 		prefMenu.add(rdbtnStandard, gbc_rdbtnStandard);
 		visualPreferences.add(rdbtnStandard);
 		visualPreferences.add(rdbtnColorBlindMode);
-
-		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
-		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
-		gbc_btnSavePreferences.insets = new Insets(0, 0, 0, 5);
-		gbc_btnSavePreferences.gridx = 7;
-		gbc_btnSavePreferences.gridy = 4;
-		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
-		// Return to previous view
-		btnSavePreferences.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// Set button colors based on preferences selected
-				btnPrevious.setColor(previousColor);
-				btnNext.setColor(nextColor);
-				// Return to view that preferences menu was accessed from
-				menuLayout.show(menus, returnMenu);
-				frame.repaint();
-			}
-		});
 
 		return prefMenu;
 	}

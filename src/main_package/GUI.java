@@ -275,7 +275,7 @@ public class GUI{
 				File start = new File("src/VectorMaps");
 				String startInput = start.getAbsolutePath();
 				//assuming all maps saved in vectorMaps are in jpg
-				startInput = startInput + "/" + mapTitle + ".jpg";
+				startInput = startInput + "/" + mapTitle + ".png";
 
 				File destFile = new File(startInput);
 				try{
@@ -369,7 +369,7 @@ public class GUI{
 				File dest = new File("src/VectorMaps");
 				String destInput = dest.getAbsolutePath();
 				//assuming all maps saved in vectorMaps are in jpg
-				destInput = destInput + "/" + mapTitle + ".jpg";
+				destInput = destInput + "/" + mapTitle + ".png";
 
 				File destFile = new File(destInput);
 				try{
@@ -685,8 +685,8 @@ public class GUI{
 						int secEst = timeEst % 60;
 						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
 
+						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
 
-						File destinationFile = new File("src/VectorLogo/VectorrLogo.png"); //+ dirMaps.get(mapPos).getMapName() + ".jpg");
 						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
 							img = ImageIO.read(destinationFile);
@@ -849,7 +849,7 @@ public class GUI{
 						//directionsText.setText(textDir.get(mapPos).get(textPos));
 						directionsText.setText("Enter " + dirMaps.get(mapPos + 1).getMapName());
 					}
-					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
+					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
 					destinationFile = new File(destinationFile.getAbsolutePath());
 					try {
 						img = ImageIO.read(destinationFile);
@@ -916,7 +916,7 @@ public class GUI{
 						textPos = 0; // For route coloring 
 						mapPos++;
 						//change map
-						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".jpg");
+						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
 						directionsText.setText(textDir.get(mapPos).get(textPos));
 
 

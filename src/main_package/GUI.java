@@ -278,7 +278,9 @@ public class GUI{
 					boolean check = true;
 					System.out.println("number of points: " + maps.get(buildStartIndex-1).getPointList().size());
 					for (int i = 0; i < maps.get(buildStartIndex-1).getPointList().size(); i++){
-						if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equals("Hallway")){
+						if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
+								!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Stairs") &&
+								!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path")){
 							if(i > 0){
 								System.out.println("i>0");
 								for(int count = i-1;count >= 0 ; count--){
@@ -372,7 +374,10 @@ public class GUI{
 					boolean check = true;
 					//System.out.println("building size: " + buildings.length);
 					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
+						if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
+								!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Stairs") &&
+								!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path")){
+						
 							if(i > 0){
 								System.out.println("i>0");
 								for(int count = i-1;count >= 0 ; count--){

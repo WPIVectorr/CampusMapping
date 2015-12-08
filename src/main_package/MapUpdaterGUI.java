@@ -1210,24 +1210,32 @@ public class MapUpdaterGUI{
 					double LocalY = (lastMousey-drawnposy)/newImageHeight;
 					tempPreRotateX = tempPreRotateX - drawnposx;
 					tempPreRotateY = tempPreRotateY - drawnposy;
+					//System.out.println("At step 1 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
 					tempPreRotateX = tempPreRotateX/(img.getWidth()*scaleSize);
 					tempPreRotateY = tempPreRotateY/(img.getHeight()*scaleSize);
+					//System.out.println("At step 2 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
 					tempPreRotateX = tempPreRotateX - 0.5;
 					tempPreRotateY = tempPreRotateY - 0.5;
+					//System.out.println("At step 3 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
 					tempPreRotateX = tempPreRotateX * currentMap.getWidth();
 					tempPreRotateY = tempPreRotateY * currentMap.getHeight();
+					//System.out.println("At step 4 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
 					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
 					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+					//System.out.println("At step 5 x is: " + rotateX + " y is: " + rotateY);
 					rotateX = rotateX * campusImage.getWidth();
 					rotateY = rotateY * campusImage.getHeight();
+					//System.out.println("At step 6 x is: " + rotateX + " y is: " + rotateY);
 					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
 					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
-
+					//System.out.println("At step 7 x is: " + finalGlobX + " y is: " + finalGlobY);
 					//if(DEBUG)
-					System.out.println("Global X is: " + finalGlobX + " and Y is: " + finalGlobY);
+					//System.out.println("Global X is: " + finalGlobX + " and Y is: " + finalGlobY);
 					
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());
+					
+					System.out.println("Point(x, " + currentMap.getMapId() + ", " + roomNumber.getText() + ", y, " + LocalX + ", " + LocalY + ", " + finalGlobX + ", " + finalGlobY + ", " + numEdges + ");");
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
 							roomNumber.getText(), currentMap.getPointIDIndex(),
 							LocalX, LocalY, finalGlobX, finalGlobY, numEdges);

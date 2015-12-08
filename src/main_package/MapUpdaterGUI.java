@@ -1176,6 +1176,7 @@ public class MapUpdaterGUI{
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
 
 				}
+			}
 
 
 			// add point to the point array (has to take place outside of below
@@ -1597,7 +1598,6 @@ public class MapUpdaterGUI{
 		}
 
 	}
-}
 
 
 	/*

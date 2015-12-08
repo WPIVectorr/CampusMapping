@@ -282,6 +282,16 @@ public class MapUpdaterGUI{
 		vectorMapDir = new File(vectorMapDir.getAbsolutePath());
 		//System.out.println("Vectormap abs path: " + vectorMapDir.getAbsolutePath());
 
+		/*ArrayList<Map> mapList = new ArrayList<Map>();
+		mapList = ServerDB.getMapsFromLocal();
+		for(int f = 0; f < mapList.size(); f++){
+			for(int g = 0; g < mapList.get(f).getPointList().size(); g++){
+				pointArray.add(mapList.get(f).getPointList().get(g));
+			}
+		}
+		System.out.println("\tPointArray size: " +  pointArray.size());*/
+		
+		
 		mapDropDown = new JComboBox();
 		mapDropDown.addItem("Select Map");
 		// Truncates the extensions off of the map name so only the name is
@@ -383,10 +393,16 @@ public class MapUpdaterGUI{
 					//ArrayList<Map> mapList = md.getMapsFromLocal(); //Grab all the maps from the database
 					if(DEBUG)
 						System.out.println("MapList size is "+emptyMaps.size());//Print out the size of the maps from the database
+					
+					
+					
 					for(int i = 0; i < emptyMaps.size(); i++){//Iterate through the mapList until we find the item we are looking for
 						if(DEBUG)
 							System.out.println("Trying to find name:"+ name + ".jpg");
-						if(name.equals(emptyMaps.get(i).getMapName()))//Once we find the map:
+						
+						
+						//if(name.equals(emptyMaps.get(i).getMapName()))//Once we find the map:
+						if(true)
 						{
 							try {
 								currentMap = ServerDB.getMapFromServer(emptyMaps.get(i).getMapId());
@@ -395,12 +411,18 @@ public class MapUpdaterGUI{
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}//Grab the current map at this position.
+							
 							try {
-								pointArray = ServerDB.getPointsFromServer(currentMap);
+								for(int g = 0; g < ServerDB.getPointsFromServer(emptyMaps.get(i)).size(); g++){
+									pointArray.add(ServerDB.getPointsFromServer(emptyMaps.get(i)).get(g));
+								}
+								//pointArray = ServerDB.getPointsFromServer(currentMap);
+								System.out.println("\tPointArray size: " +  pointArray.size());
 							} catch (PopulateErrorException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}//Populate the point array with all the points found.
+							
 							oldPoints = pointArray;
 							if(DEBUG)
 								System.out.println("Map list size:"+emptyMaps.size());
@@ -419,7 +441,7 @@ public class MapUpdaterGUI{
 
 							if(DEBUG)
 								System.out.println("Found map with number of points: "+currentMap.getPointList().size());
-							i = emptyMaps.size();
+							//i = emptyMaps.size();
 						}
 					}
 
@@ -1137,8 +1159,15 @@ public class MapUpdaterGUI{
 						scaleSize = 1/((double)img.getHeight() / (double)drawPanel.getHeight());
 						//System.out.println("setting: "+scaleSize);
 					}
-					newImageWidth = (int)((double)img.getWidth() / windowScale);
-					newImageHeight = (int)((double)img.getHeight() / windowScale);
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+					//newImageWidth = (int)((double)img.getWidth() / windowScale);
+					//newImageHeight = (int)((double)img.getHeight() / windowScale);
+					
+					newImageWidth = (int)((double)img.getWidth());
+					newImageHeight = (int)((double)img.getHeight());
+					
+					
 					int centerx = (drawPanel.getWidth()/2);
 					int centery = (drawPanel.getHeight()/2);
 					drawnposx = centerx -(int)(newImageWidth/2);
@@ -1150,8 +1179,12 @@ public class MapUpdaterGUI{
 
 				double deltax = 0;
 				double deltay = 0;
-				newImageHeight = (int)img.getHeight()*scaleSize;
-				newImageWidth = (int)img.getWidth()*scaleSize;
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------
+				//newImageHeight = (int)img.getHeight()*scaleSize;
+				//newImageWidth = (int)img.getWidth()*scaleSize;
+				
+				newImageHeight = (int)img.getHeight();
+				newImageWidth = (int)img.getWidth();
 				if(!(name.equals("Select Map"))){
 					if(Dragged){
 						if(DEBUG)
@@ -1569,15 +1602,19 @@ public class MapUpdaterGUI{
 				int point1y = (int)((edgeArray.get(j).getPoint1().getLocY()*newImageHeight)+drawnposy);
 				int point2x = (int)((edgeArray.get(j).getPoint2().getLocX()*newImageWidth)+drawnposx);
 				int point2y = (int)((edgeArray.get(j).getPoint2().getLocY()*newImageHeight)+drawnposy);
-				g.drawLine(point1x, point1y, point2x, point2y);
+				//g.drawLine(point1x, point1y, point2x, point2y);
 				drawnEdges.add(edgeArray.get(j));
 				g.setColor(Color.BLACK);
 				//}
 			}
 
 			for( int w = 0; w < pointArray.size(); w++){
-				int drawX = (int) (double)((pointArray.get(w).getLocX()*newImageWidth)+drawnposx);
-				int drawY = (int) (double)((pointArray.get(w).getLocY()*newImageHeight)+drawnposy);
+				//int drawX = (int) (double)((pointArray.get(w).getLocX()*newImageWidth)+drawnposx);
+				//int drawY = (int) (double)((pointArray.get(w).getLocY()*newImageHeight)+drawnposy);
+				
+				int drawX = (int) (double)((pointArray.get(w).getGlobX())+drawnposx);
+				int drawY = (int) (double)((pointArray.get(w).getGlobY())+drawnposy);
+				
 				//System.out.println("drawn x: "+drawX+", drawn y: "+drawY);
 				//System.out.println(drawnposx+", "+drawnposy);
 				//System.out.println("For point: " + pointArray.get(w).getId() + " loc X val is: " + pointArray.get(w).getLocX() + " glob X val is: " + pointArray.get(w).getGlobX());
@@ -1590,6 +1627,10 @@ public class MapUpdaterGUI{
 				g.setColor(Color.getHSBColor(0.12f, 0.74f, 0.7f));
 				g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 				g.setColor(Color.BLACK);
+				System.out.println("\tDrawing Point: " + w);
+				//System.out.println("\tPoint Array Size: " + pointArray.size());
+				System.out.println("\tDrawX: " + drawX);
+				System.out.println("\tDrawY: " + drawY + "\n");
 			}
 
 			drawnEdges.clear();

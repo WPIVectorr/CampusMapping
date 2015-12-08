@@ -369,7 +369,7 @@ public class MapUpdaterGUI{
 					System.out.println("Selected item:"+name);
 
 
-				destinationFile = new File("src/VectorMaps/" + name + ".jpg");
+				destinationFile = new File("src/VectorMaps/" + name + ".png");
 
 
 				destinationFile = new File(destinationFile.getAbsolutePath());
@@ -389,7 +389,7 @@ public class MapUpdaterGUI{
 						System.out.println("MapList size is "+emptyMaps.size());//Print out the size of the maps from the database
 					for(int i = 0; i < emptyMaps.size(); i++){//Iterate through the mapList until we find the item we are looking for
 						if(DEBUG)
-							System.out.println("Trying to find name:"+ name + ".jpg");
+							System.out.println("Trying to find name:"+ name + ".png");
 						if(name.equals(emptyMaps.get(i).getMapName()))//Once we find the map:
 						{
 							try {
@@ -1211,7 +1211,7 @@ public class MapUpdaterGUI{
 					double ourRotation = currentMap.getRotationAngle();
 					ourRotation = 2 * Math.PI - ourRotation;
 
-					destinationFile = new File("src/VectorMaps/" + "Campus" + ".jpg");
+					destinationFile = new File("src/VectorMaps/" + "Campus" + ".png");
 					destinationFile = new File(destinationFile.getAbsolutePath());
 					BufferedImage campusImage = null;
 					try {

@@ -288,7 +288,7 @@ public class InterMapEdgeGUI extends JFrame {
 				name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
 				//System.out.println("Selected item:"+name);
 
-				destinationFile = new File("src/VectorMaps/" + name+".jpg");
+				destinationFile = new File("src/VectorMaps/" + name+".png");
 				destinationFile = new File(destinationFile.getAbsolutePath());
 				
 				//System.out.println("Got "+maps.size() + " maps from Updater");

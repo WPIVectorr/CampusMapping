@@ -1223,8 +1223,8 @@ public class MapUpdaterGUI{
 					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
 					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
 
-					if(DEBUG)
-						System.out.println("Global X is: " + finalGlobX + " and Y is: " + finalGlobY);
+					//if(DEBUG)
+					System.out.println("Global X is: " + finalGlobX + " and Y is: " + finalGlobY);
 					
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());

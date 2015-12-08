@@ -20,6 +20,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Box;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.border.Border;
 
 import database.AlreadyExistsException;
 import database.DoesNotExistException;
@@ -125,6 +126,9 @@ public class MapUpdaterGUI{
 	private double newImageHeight;
 	private double newImageWidth;
 	private boolean scrolled = false;
+	private Border errBorder = BorderFactory.createLineBorder(Color.RED, 2);
+	private Border ogBorder;
+
 
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
@@ -527,6 +531,16 @@ public class MapUpdaterGUI{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (!(errBorder.equals(mapName.getBorder()))){
+					ogBorder = mapName.getBorder();
+					//System.out.print("Hey dude like im an error or something");	
+				}
+				if (!(errBorder.equals(txtImageDirectoryPath.getBorder()))){
+					ogBorder = mapName.getBorder();
+				}
+				mapName.setBorder(ogBorder);
+				txtImageDirectoryPath.setBorder(ogBorder);
+				
 				if (mapToAdd == null){
 					mapToAdd = new File(txtImageDirectoryPath.getText());
 				}
@@ -541,6 +555,7 @@ public class MapUpdaterGUI{
 				rdbtnRemovePoints.setEnabled(true);
 
 				//maptitle = mapName.getText();
+				
 				if(DEBUG)
 					System.out.println("Map title is: "+maptitle);
 				maptitle = maptitle.trim();
@@ -564,11 +579,14 @@ public class MapUpdaterGUI{
 					}
 				}else {
 					txtImageDirectoryPath.setText("Error Map Directory is Invalid");
+					txtImageDirectoryPath.setBorder(errBorder);
 					addingMap = false;
+					
 				}
-				if ((maptitle == null || maptitle.equals("Map Name") || maptitle.equals("")) || MapNameExists) {
+				if ( (maptitle == null || maptitle.equals("Map Name") || maptitle.equals("")  || maptitle.equals("Map Name Invalid")) || MapNameExists ) {
 					if(MapNameExists){
 						addingMap = false;
+						
 					}else{
 						mapName.setText("Map Name Invalid");
 						addingMap = false;
@@ -617,6 +635,10 @@ public class MapUpdaterGUI{
 					} else {
 						new MapInserterGUI();
 					}
+				}
+				else{
+					mapName.setBorder(errBorder);
+					txtImageDirectoryPath.setBorder(errBorder);
 				}
 				if(DEBUG)
 					System.out.println("maptitle: " + maptitle);

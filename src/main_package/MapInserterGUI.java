@@ -1,34 +1,22 @@
 package main_package;
 
-import javax.imageio.ImageIO;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JSplitPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import main_package.MapUpdaterGUI.DrawPanel;
+
 
 //import main_package.MapUpdaterGUI.UpdateMap;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
-
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import java.awt.Panel;
-import java.awt.RenderingHints;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseAdapter;
@@ -36,13 +24,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.lang.Math;
 
@@ -88,12 +71,34 @@ public class MapInserterGUI extends JFrame{
 	Dimension screenSize = tk.getScreenSize();
 	int screenHeight = screenSize.height;
 	int screenWidth = screenSize.width;
-	private int windowSizeX = 0;
-	private int windowSizeY = 0;
+	private int windowSizeX;
+	private int windowSizeY;
 	private boolean alignedProperly = false;
-	private static JFrame frame = new JFrame("Add to Campus Map");
+	private static JFrame frame;
 
 	public MapInserterGUI() {
+		frame = new JFrame("Add to Campus Map");
+		windowSizeX = 0;
+		windowSizeY = 0;
+		alignedProperly = false;
+		scrolled = false;
+		atMaxZoom = false;
+		atMinZoom = false;
+		Dragged = false;
+		drawnfirst = false;
+		scaleSize = 1;
+		pointSize = 5;
+		remove =false;
+		imageSet = false;
+		CampusMap = null;
+		AddingMap = null;
+		windowScale = 0;
+		point1 = null;
+		Rotation = 0;
+		newClick = false;
+		lastMousex = 0;
+		lastMousey = 0;
+		numSelectionPoints = 2;
 		//super("Add to Campus Map");
 		//frame.removeAll();
 		//frame.revalidate();
@@ -142,7 +147,7 @@ public class MapInserterGUI extends JFrame{
 		frame.setLocation((int)(xlocation/2), (int)(ylocation/2));
 		frame.setVisible(true);
 		pointFrame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		//frame.getContentPane().add(frame);
 		//getContentPane().setLayout(null);
 		windowSizeX = frame.getContentPane().getWidth();
@@ -289,7 +294,6 @@ public class MapInserterGUI extends JFrame{
 	}
 	
 	public static void DisposeFrame(){
-		frame.removeAll();
 		frame.setVisible(false);
 		frame.dispose();
 	}

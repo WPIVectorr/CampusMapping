@@ -123,7 +123,7 @@ private static SplashPage testSplash;
     }
     public void hideSplash(long delay)
     {
-    	System.out.println("makeSplashInvisible delay: "+delay);
+    	System.out.println("Make Splash Invisible delay: "+delay);
     	try {
 			Thread.sleep(delay);
 		} catch (InterruptedException e) {

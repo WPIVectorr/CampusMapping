@@ -53,9 +53,12 @@ public class PrintDirections {
 		     Doc simpleDoc =  new SimpleDoc(is, DocFlavor.INPUT_STREAM.AUTOSENSE, null);
 		     //printerJob.print(simpleDoc, null);
 		     PrinterJob pj = PrinterJob.getPrinterJob(); 
-		     pj.printDialog();
-
-		 
+		     if (pj.printDialog()) {
+		         try {pj.print();}
+		         catch (PrinterException exc) {
+		             System.out.println(exc);
+		          }
+		      }   
 		  }
 		  catch (Exception e) 
 		  {
@@ -259,7 +262,6 @@ public class PrintDirections {
 			printout += '\n'+"<br>" + System.getProperty("line.separator");
 			printout += "<h4>";
 		}
-<<<<<<< HEAD
 
 		return printout;
 	}

@@ -583,6 +583,7 @@ public class MapUpdaterGUI{
 					addingMap = false;
 					
 				}
+				
 				if ( (maptitle == null || maptitle.equals("Map Name") || maptitle.equals("")  || maptitle.equals("Map Name Invalid")) || MapNameExists ) {
 					if(MapNameExists){
 						addingMap = false;
@@ -604,6 +605,12 @@ public class MapUpdaterGUI{
 						}
 					}
 				}
+				int srcFileLength = srcFile.getAbsolutePath().length();
+				if(!(srcFile.getAbsolutePath().substring(srcFileLength-4, srcFileLength).equals(".png"))){
+					addingMap = false;
+					txtImageDirectoryPath.setText("Choose a valid .png image to import");
+				}
+				
 				if (addingMap){
 					// /Users/ibanatoski/Downloads/AtwaterKent2.jpg
 					if(DEBUG)

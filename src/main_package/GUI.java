@@ -143,7 +143,7 @@ public class GUI{
 		double ylocation = (screenSize.height / 2)-(frame.getHeight()/2);
 		frame.setLocation((int)xlocation, (int)ylocation);
 
-		frame.getContentPane().setBackground(backgroundColor);
+		frame.getContentPane().setBackground(Color.WHITE);
 
 		maps = md.getMapsFromLocal();
 		allPoints = new ArrayList<Point>();
@@ -343,10 +343,14 @@ public class GUI{
 						for (int i = 0; i < maps.get(buildStartIndex-1).getPointList().size(); i++){
 							check = true;
 							if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
-									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Stairs") &&
-									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path")){
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().contains("Stair") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().contains("stair") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("room") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().contains("Elevator") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().contains("elevator")) {
 								if(i > 0){
-									System.out.println("i>0");
+									//System.out.println("i>0");
 									for(int count = i-1;count >= 0 ; count--){
 										if(maps.get(buildStartIndex - 1).getPointList().get(i).getName().compareTo(maps.get(buildStartIndex-1).getPointList().get(count).getName()) == 0){
 											System.out.println("here");
@@ -458,8 +462,12 @@ public class GUI{
 						for (int i = 0; i < pointArray.size(); i++){
 							check = true;
 							if(!pointArray.get(i).getName().equalsIgnoreCase("Hallway") &&
-									!pointArray.get(i).getName().equalsIgnoreCase("Stairs") &&
-									!pointArray.get(i).getName().equalsIgnoreCase("Path")){
+									!pointArray.get(i).getName().contains("Stair") &&
+									!pointArray.get(i).getName().equalsIgnoreCase("Path") &&
+									!pointArray.get(i).getName().contains("stair") &&
+									!pointArray.get(i).getName().equalsIgnoreCase("room") &&
+									!pointArray.get(i).getName().contains("Elevator") &&
+									!pointArray.get(i).getName().contains("elevator")){
 
 								if(i > 0){
 									System.out.println("i>0");
@@ -690,6 +698,8 @@ public class GUI{
 						directionsText.setText(start.getName() + "->" + end.getName());
 					}
 					else{
+						btnNext.setEnabled(true);
+						btnPrevious.setEnabled(false);
 						//System.out.println(route.size());
 						GenTextDir gentextdir = new GenTextDir();
 						ArrayList<Directions> tempDir = gentextdir.genTextDir(route, 2.8);
@@ -1316,8 +1326,11 @@ public class GUI{
 		gbc_slider_1.gridx = 3;
 		gbc_slider_1.gridy = 2;
 		prefMenu.add(sliderStairs, gbc_slider_1);
+		
+		
 		sliderStairs.addChangeListener(new ChangeListener(){
 			public void stateChanged(ChangeEvent event) {
+				
 				int value = sliderStairs.getValue();
 				if (value == 0) {
 					stairs = 0;

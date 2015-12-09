@@ -344,7 +344,9 @@ public class GUI{
 							check = true;
 							if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
 									!maps.get(buildStartIndex-1).getPointList().get(i).getName().contains("Stair") &&
-									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path")){
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().contains("stair") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("room")) {
 								if(i > 0){
 									System.out.println("i>0");
 									for(int count = i-1;count >= 0 ; count--){
@@ -458,7 +460,9 @@ public class GUI{
 							check = true;
 							if(!pointArray.get(i).getName().equalsIgnoreCase("Hallway") &&
 									!pointArray.get(i).getName().equalsIgnoreCase("Stairs") &&
-									!pointArray.get(i).getName().equalsIgnoreCase("Path")){
+									!pointArray.get(i).getName().equalsIgnoreCase("Path") &&
+									!pointArray.get(i).getName().contains("stair") &&
+									!pointArray.get(i).getName().equalsIgnoreCase("room")){
 
 								if(i > 0){
 									System.out.println("i>0");

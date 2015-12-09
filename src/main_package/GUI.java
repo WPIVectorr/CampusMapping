@@ -124,6 +124,8 @@ public class GUI{
 	private boolean resetPath = false;
 	private GradientButton btnSwapStartAndDest;
 	private GradientButton directionsButton;
+	private JPanel panelDirections;
+	private JTextPane txtpnFullTextDir;
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
@@ -212,8 +214,6 @@ public class GUI{
 
 		frame.getContentPane().add(menus, BorderLayout.NORTH);
 
-		JTextPane txtpnFullTextDir = new JTextPane();
-
 
 		/*adds the room numbers based off of building name
         startBuilds.addActionListener (new ActionListener () {
@@ -259,7 +259,7 @@ public class GUI{
 			mapsDropdown.addItem(temp.get(count));
 			DestMaps.addItem(temp.get(count));
 		}
-		
+
 		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
 		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 5);
@@ -549,7 +549,7 @@ public class GUI{
 		startBuilds.setEnabled(false);
 		mainMenu.add(startBuilds, gbc_startBuilds);
 		startBuilds.setBounds(122, 30, 148, 20);
-		
+
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
 		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 0);
@@ -783,7 +783,7 @@ public class GUI{
 							tempPos++;
 							for(int j = 0; j < textDir.get(i).size(); j++){
 								tempPos++;
-								fullText += " " + (tempPos + 1) + ". " + textDir.get(i).get(j) + "\n\n";
+								fullText += " " + tempPos + ". " + textDir.get(i).get(j) + "\n\n";
 							}
 						}
 
@@ -902,14 +902,7 @@ public class GUI{
 			System.out.println("Invalid logo1");
 			g.printStackTrace();
 		}
-
-		// Text box for full list of directions, initially invisible, appears when directions button pressed
-		txtpnFullTextDir.setText("Full List of Directions:");
-		frame.getContentPane().add(txtpnFullTextDir, BorderLayout.WEST);
-		txtpnFullTextDir.setVisible(false);
-		txtpnFullTextDir.setEditable(false);
 		Border textBorder = BorderFactory.createLineBorder(Color.BLACK, 2);
-		txtpnFullTextDir.setBorder(textBorder);
 
 		Component verticalStrut = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
@@ -925,7 +918,7 @@ public class GUI{
 				// Return to main menu, don't show route anymore
 				menuLayout.show(menus, "Main Menu");
 				showRoute = false;
-				txtpnFullTextDir.setVisible(false);
+				panelDirections.setVisible(false);
 				btnFullTextDirections.setText("Show Full Text Directions");
 				frame.repaint();
 			}
@@ -1123,22 +1116,6 @@ public class GUI{
 		gbc_btnNext.gridy = 4;
 		navMenu.add(btnNext, gbc_btnNext);
 
-		txtFieldEmail = new JTextField();
-		GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
-		gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
-		gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtFieldEmail.gridx = 1;
-		gbc_txtFieldEmail.gridy = 5;
-		navMenu.add(txtFieldEmail, gbc_txtFieldEmail);
-		txtFieldEmail.setColumns(10);
-
-		GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
-		GridBagConstraints gbc_btnEmailDirections = new GridBagConstraints();
-		gbc_btnEmailDirections.insets = new Insets(0, 0, 5, 5);
-		gbc_btnEmailDirections.gridx = 2;
-		gbc_btnEmailDirections.gridy = 5;
-		navMenu.add(btnEmailDirections, gbc_btnEmailDirections);
-
 		GridBagConstraints gbc_btnFullTextDirections = new GridBagConstraints();
 		gbc_btnFullTextDirections.insets = new Insets(0, 0, 5, 5);
 		gbc_btnFullTextDirections.gridx = 3;
@@ -1146,16 +1123,65 @@ public class GUI{
 		navMenu.add(btnFullTextDirections, gbc_btnFullTextDirections);
 		btnFullTextDirections.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(txtpnFullTextDir.isVisible()){
-					txtpnFullTextDir.setVisible(false);
+				if(panelDirections.isVisible()){
+					panelDirections.setVisible(false);
 					btnFullTextDirections.setText("Show Full Text Directions");
 				}
 				else{
-					txtpnFullTextDir.setVisible(true);
+					panelDirections.setVisible(true);
 					btnFullTextDirections.setText("Hide Full Text Directions");
 				}
 			}
 		});
+
+		// Add panel for drawing
+		frame.getContentPane().add(drawPanel);
+
+		panelDirections = new JPanel();
+		frame.getContentPane().add(panelDirections, BorderLayout.WEST);
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[]{106, 111, 0};
+		gbl_panel.rowHeights = new int[]{23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		panelDirections.setLayout(gbl_panel);
+		panelDirections.setVisible(false);
+
+		txtpnFullTextDir = new JTextPane();
+		GridBagConstraints gbc_txtpnFullTextDir = new GridBagConstraints();
+		gbc_txtpnFullTextDir.fill = GridBagConstraints.BOTH;
+		gbc_txtpnFullTextDir.gridheight = 8;
+		gbc_txtpnFullTextDir.gridwidth = 2;
+		gbc_txtpnFullTextDir.insets = new Insets(0, 0, 5, 0);
+		gbc_txtpnFullTextDir.gridx = 0;
+		gbc_txtpnFullTextDir.gridy = 0;
+		panelDirections.add(txtpnFullTextDir, gbc_txtpnFullTextDir);
+
+		// Text box for full list of directions, initially invisible, appears when directions button pressed
+		txtpnFullTextDir.setText("Full List of Directions:");
+		txtpnFullTextDir.setVisible(false);
+		txtpnFullTextDir.setEditable(false);
+		txtpnFullTextDir.setBorder(textBorder);
+
+		GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
+		GridBagConstraints gbc_btnEmailDirections = new GridBagConstraints();
+		gbc_btnEmailDirections.gridwidth = 2;
+		gbc_btnEmailDirections.anchor = GridBagConstraints.NORTH;
+		gbc_btnEmailDirections.insets = new Insets(0, 0, 5, 0);
+		gbc_btnEmailDirections.gridx = 0;
+		gbc_btnEmailDirections.gridy = 9;
+		panelDirections.add(btnEmailDirections, gbc_btnEmailDirections);
+
+		txtFieldEmail = new JTextField();
+		txtFieldEmail.setText("Enter E-Mail Here");
+		GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
+		gbc_txtFieldEmail.gridwidth = 2;
+		gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtFieldEmail.insets = new Insets(0, 0, 0, 5);
+		gbc_txtFieldEmail.gridx = 0;
+		gbc_txtFieldEmail.gridy = 10;
+		panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
+		txtFieldEmail.setColumns(10);
 		btnEmailDirections.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -1167,9 +1193,6 @@ public class GUI{
 				}
 			}
 		});
-
-		// Add panel for drawing
-		frame.getContentPane().add(drawPanel);
 
 		// Make frame visible after initializing everything
 		frame.setVisible(true);

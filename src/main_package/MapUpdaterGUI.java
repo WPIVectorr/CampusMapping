@@ -773,10 +773,28 @@ public class MapUpdaterGUI{
 		isStairsBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent g) {
 				if(isStairsBox.isSelected()){
-					isStairsBox.setSelected(false);
+					isStairsBox.setSelected(true);
+					if(editPoint != null){
+						editPoint.setStairs(true);
+						if(!(updatedPoints.contains(editPoint))){
+							updatedPoints.add(editPoint);
+						}
+						
+					}
+						
+					if(DEBUG)
+						System.out.println("IsOutsideBox: true");
 				}
 				else{
 					isStairsBox.setSelected(false);
+					if(editPoint != null){
+						editPoint.setStairs(false);
+						if(!(updatedPoints.contains(editPoint))){
+							updatedPoints.add(editPoint);
+						}
+					}
+					if(DEBUG)
+						System.out.println("IsStairsBox: false");
 				}
 			}
 		});
@@ -1321,7 +1339,7 @@ public class MapUpdaterGUI{
 					System.out.println("Point(x, " + currentMap.getMapId() + ", " + roomNumber.getText() + ", y, " + LocalX + ", " + LocalY + ", " + finalGlobX + ", " + finalGlobY + ", " + numEdges + ");");
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
 							roomNumber.getText(), currentMap.getPointIDIndex(),
-							LocalX, LocalY, finalGlobX, finalGlobY, numEdges, isOutsideBox.isSelected(), isStairsBox.isSelected());
+							LocalX, LocalY, finalGlobX, finalGlobY, numEdges, isStairsBox.isSelected(), isOutsideBox.isSelected());
 
 					boolean shouldAdd = true;
 					for(int k = 0; k < pointArray.size(); k++){

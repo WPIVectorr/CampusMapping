@@ -459,7 +459,7 @@ public class GUI{
 						for (int i = 0; i < pointArray.size(); i++){
 							check = true;
 							if(!pointArray.get(i).getName().equalsIgnoreCase("Hallway") &&
-									!pointArray.get(i).getName().equalsIgnoreCase("Stairs") &&
+									!pointArray.get(i).getName().contains("Stair") &&
 									!pointArray.get(i).getName().equalsIgnoreCase("Path") &&
 									!pointArray.get(i).getName().contains("stair") &&
 									!pointArray.get(i).getName().equalsIgnoreCase("room")){

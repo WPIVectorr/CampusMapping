@@ -11,7 +11,8 @@ public class AStar {
 	static HashMap<String, Integer> gscore = new HashMap<String, Integer>(); // Time taken to each node
 	static HashMap<String, Integer> fscore = new HashMap<String, Integer>(); // Estimated time from each node to end
 	
-	public static ArrayList<Point> PathFind(Point start, Point end, int outside, int stairs) {		
+	public static ArrayList<Point> PathFind(Point start, Point end, int outside, int stairs) {	
+		System.out.println("outside: " + outside + " stairs: " + stairs);
 		gscore.put(start.getId(), 0); // Initialize scores
 		fscore.put(start.getId(), CostEstimate(start, end));
 		
@@ -34,23 +35,40 @@ public class AStar {
 					double prefOutsideScale = 1;
 					double prefStairsScale = 1;
 					if(outside == -1){
-						prefOutsideScale = 4;
+						prefOutsideScale = 10.0;
 					} else if (outside == 1){
-						prefOutsideScale = 0.5;
+						prefOutsideScale = .1;
 					}
 					
 					if(stairs == -1){
-						prefStairsScale = 4;
+						prefStairsScale = 100.0;
 					} else if(stairs == 1){
-						prefStairsScale = 0.5;
+						prefStairsScale = .01;
 					}
-					if(!Current.getEdges().get(i).getPoint1().isOutside() && !Current.getEdges().get(i).getPoint2().isOutside()){
+					//checks if name contains stairs
+					if(Current.getEdges().get(i).getPoint1().getName().contains("Stair")){
+						Current.getEdges().get(i).getPoint1().setStairs(true);
+					}
+					if(Current.getEdges().get(i).getPoint2().getName().contains("Stair")){
+						Current.getEdges().get(i).getPoint2().setStairs(true);
+					}
+					if((!Current.getEdges().get(i).getPoint1().isOutside()) && (!Current.getEdges().get(i).getPoint2().isOutside())){
+						System.out.println("alsdkfj");
+						System.out.println(Current.getEdges().get(i).getPoint1().getName());
+						System.out.println(Current.getEdges().get(i).getPoint2().getName());
 						prefOutsideScale = 1;
 					}
-					if(!Current.getEdges().get(i).getPoint1().isStairs() || !Current.getEdges().get(i).getPoint2().isStairs()){
+					if((!Current.getEdges().get(i).getPoint1().isStairs()) && (!Current.getEdges().get(i).getPoint2().isStairs())){
 						prefStairsScale = 1;
+						System.out.println("qwerty");
+
+						System.out.println(Current.getEdges().get(i).getPoint1().getName() +  " " + Current.getEdges().get(i).getPoint1().isStairs());
+						System.out.println(Current.getEdges().get(i).getPoint2().getName()+  " " + Current.getEdges().get(i).getPoint2().isStairs());
 					}
-					int tentGScore = gscore.get(Current.getId()) + (int)(Current.getEdges().get(i).getWeight() * prefStairsScale * prefOutsideScale); // How far we have gone to get to this point
+					//System.out.println("Edge weight sample : " + Current.getEdges().get(i).getWeight());
+					//System.out.println("prefOutsideScale: " + prefOutsideScale + " prefStairsScale: "+ prefStairsScale);
+					int tentGScore = gscore.get(Current.getId()) + Math.abs((int)(Current.getEdges().get(i).getWeight() * prefStairsScale * prefOutsideScale)); // How far we have gone to get to this point
+					System.out.println("testGSCore: "+ tentGScore + " Weight: " + Current.getEdges().get(i).getWeight());
 					if(Current.getEdges().get(i).getPoint1().equals(Current)){ // Check which point is the new one
 						// Point2 is the new point
 						if(!Open.contains(Current.getEdges().get(i).getPoint2()) || gscore.get(Current.getEdges().get(i).getPoint2().getId()) > tentGScore){ // If the point is not on the open list OR this is a faster route to it

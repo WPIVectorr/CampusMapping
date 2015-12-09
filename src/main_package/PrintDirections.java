@@ -1,34 +1,37 @@
 package main_package;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
+import junit.framework.Test;
+
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.print.*;
+import javax.print.attribute.DocAttributeSet;
+import javax.print.attribute.HashDocAttributeSet;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
 import javax.activation.*;
 
 
 
 public class PrintDirections {
-	public PrintDirections(ArrayList<ArrayList<String>> directions, String emailFilename) throws AddressException
+	public PrintDirections(ArrayList<ArrayList<String>> directions,ArrayList<Directions> points, String emailFilename) throws AddressException
 	{
 		try {
-			emailDirections(directions, new InternetAddress(emailFilename));
+			emailDirections(directions, points, new InternetAddress(emailFilename));
 		} catch (AddressException e) {
 			// TODO Auto-generated catch block
-			if(emailFilename.contains("print"))
+			if(emailFilename.contains("save"))
 			{
 				printDirectionstoFile(directions, emailFilename);
 			}else
@@ -39,10 +42,30 @@ public class PrintDirections {
 		
 	}
 	
-	public PrintDirections(ArrayList<ArrayList<String>> directions)
+	public PrintDirections(ArrayList<ArrayList<String>> directions) throws FileNotFoundException
 	{
+		
+		
+		PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
+		DocFlavor flavor = DocFlavor.INPUT_STREAM.AUTOSENSE;
+		PrintService printService[] = PrintServiceLookup.lookupPrintServices(flavor, pras);
+		PrintService defaultService = PrintServiceLookup.lookupDefaultPrintService();
+		PrintService service = ServiceUI.printDialog(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration(), 200, 200,
+		                      printService, defaultService, flavor, pras);
+		if (service != null) {
+		    DocPrintJob job = service.createPrintJob();
+		    FileInputStream fis = new FileInputStream(printDirectionstoFile(directions, "Test.html"));
+		    DocAttributeSet das = new HashDocAttributeSet();
+		    Doc document = new SimpleDoc(fis, flavor, das);
+		    try {
+				job.print(document, pras);
+			} catch (PrintException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
-
+/*
 		  InputStream is = null;    
 		  try
 		  { 
@@ -73,7 +96,7 @@ public class PrintDirections {
 		  }
 		
 		
-
+*/
 
 /*		FileWriter writer;
 		try {
@@ -88,44 +111,51 @@ public class PrintDirections {
 		}*/
 	}
 
-	private void printDirectionstoFile(ArrayList<ArrayList<String>> directions,String filename)
+	private File printDirectionstoFile(ArrayList<ArrayList<String>> directions,String fileName)
 	{
 		File outputFilename = null;
-		String fileName = null;
-		JFrame chooseFile = new JFrame();
 
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Specify Filename");
+		if(fileName == null)
+		{
+			JFrame chooseFile = new JFrame();
 
-		int userSelection = fileChooser.showSaveDialog(chooseFile);
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setDialogTitle("Specify Filename");
+
+			int userSelection = fileChooser.showSaveDialog(chooseFile);
 
 
-		if (userSelection == JFileChooser.APPROVE_OPTION) {
-			outputFilename = fileChooser.getSelectedFile();
-			fileName = outputFilename.toString();
+			if (userSelection == JFileChooser.APPROVE_OPTION) {
+				outputFilename = fileChooser.getSelectedFile();
+				fileName = outputFilename.toString();
+			}
+
+		}else{
+			outputFilename = new File(fileName);
 		}
-
-
-
-
-		FileWriter writer;
-		try {
-			writer = new FileWriter(fileName);
-			String printout = generatePrintout(directions);
-			writer.write(printout);
-
-			writer.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		
+			FileWriter writer;
+			try {
+				writer = new FileWriter(fileName);
+				String printout = generatePrintout(directions);
+				writer.write(printout);
+				writer.close();
+				System.out.println("Printed "+outputFilename.getName());
+				return outputFilename;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+		
 	}
 
 
 
 
 
-	private void emailDirections(ArrayList<ArrayList<String>> directions, InternetAddress to) throws AddressException
+	private void emailDirections(ArrayList<ArrayList<String>> directions,ArrayList<Directions> points, InternetAddress to) throws AddressException
 	{
 
 		boolean canSend =true;
@@ -165,9 +195,9 @@ public class PrintDirections {
 			// Set To: header field of the header.
 			message.addRecipient(Message.RecipientType.TO, toEmailAddress);
 
-			// Set Subject: header field
-			message.setSubject("Directions with Magnitude from: "+directions.get(0)+" to: "
-					+directions.get(directions.size()-1));
+			// Set Subject: header field with the first and last location.
+			message.setSubject("Directions with Magnitude From: "+points.get(0).getOrigin().getName()+" To: "
+					+points.get(points.size()-1).getDestination().getName());
 
 			// Send the actual HTML message, as big as you like
 
@@ -319,7 +349,12 @@ public class PrintDirections {
 		
 		
 		
-		new PrintDirections(testDirections);
+		try {
+			new PrintDirections(testDirections);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 

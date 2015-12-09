@@ -1,4 +1,3 @@
-
 package main_package;
 
 
@@ -628,6 +627,4 @@ public class InterMapEdgeGUI extends JFrame {
 			return false;
 		}
 	}
-
-
 }

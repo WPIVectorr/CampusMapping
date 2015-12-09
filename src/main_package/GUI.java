@@ -343,7 +343,7 @@ public class GUI{
 						for (int i = 0; i < maps.get(buildStartIndex-1).getPointList().size(); i++){
 							check = true;
 							if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
-									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Stairs") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().contains("Stair") &&
 									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path")){
 								if(i > 0){
 									System.out.println("i>0");

@@ -1058,7 +1058,8 @@ public class GUI{
 		btnEmailDirections.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					new PrintDirections(textDir,txtFieldEmail.getText());
+					new PrintDirections(textDir,finalDir,txtFieldEmail.getText());
+					txtFieldEmail.setText("");
 				} catch (AddressException e1) {
 					// TODO Auto-generated catch block
 					btnEmailDirections.setText("Invalid Address");

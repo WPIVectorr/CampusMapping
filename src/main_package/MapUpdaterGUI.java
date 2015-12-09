@@ -1198,6 +1198,7 @@ public class MapUpdaterGUI{
 		public void paintComponent(Graphics g) {
 
 			super.paintComponent(g);
+			Graphics2D g2D = (Graphics2D) g;
 
 
 			// -------------------------------
@@ -1657,16 +1658,16 @@ public class MapUpdaterGUI{
 			//draws all edges in the edge array
 			for (int j = 0; j < edgeArray.size(); j++) {
 
-				g.setColor(Color.ORANGE);
-
+				g2D.setColor(Color.ORANGE);
+				g2D.setStroke(new BasicStroke(4));
 				//if(!(drawnEdges.contains(edgeArray.get(j)))){
 				int point1x = (int)((edgeArray.get(j).getPoint1().getLocX()*newImageWidth)+drawnposx);
 				int point1y = (int)((edgeArray.get(j).getPoint1().getLocY()*newImageHeight)+drawnposy);
 				int point2x = (int)((edgeArray.get(j).getPoint2().getLocX()*newImageWidth)+drawnposx);
 				int point2y = (int)((edgeArray.get(j).getPoint2().getLocY()*newImageHeight)+drawnposy);
-				g.drawLine(point1x, point1y, point2x, point2y);
+				g2D.drawLine(point1x, point1y, point2x, point2y);
 				drawnEdges.add(edgeArray.get(j));
-				g.setColor(Color.BLACK);
+				g2D.setColor(Color.BLACK);
 				//}
 			}
 

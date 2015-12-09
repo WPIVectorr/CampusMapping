@@ -57,6 +57,8 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 	private static JRadioButton rdbtnAddPoints;
 	private static JRadioButton rdbtnEditPoints;
 	private static JRadioButton rdbtnRemovePoints;
+	private static JCheckBox isOutsideBox;
+	private static JCheckBox isStairsBox;
 
 	//---------------------------------
 
@@ -133,10 +135,13 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		buttonPanel.setLayout(new BorderLayout());
 		frame.getContentPane().add(buttonPanel, BorderLayout.NORTH);
 
+		isOutsideBox = new JCheckBox();
+		isStairsBox = new JCheckBox();
 		loadingIcon = new ImageIcon("src/VectorLogo/faster reverse.gif");
 
 		tabs.addTab("Maps", createMapsPanel());
 		tabs.addTab("Points", createPointsPanel());
+		
 
 		buttonPanel.add(tabs, BorderLayout.NORTH);
 
@@ -250,6 +255,9 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		gbc_label.gridx = 2;
 		gbc_label.gridy = 0;
 		mapsLoadingLabel.setVisible(false);
+		
+		
+		
 
 		// When the Updater opens the software the list will be populated with
 		// the files in
@@ -335,6 +343,8 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 				rdbtnAddPoints.setEnabled(true);
 				rdbtnEditPoints.setEnabled(true);
 				rdbtnRemovePoints.setEnabled(true);
+				isOutsideBox.setEnabled(true);
+				isStairsBox.setEnabled(true);
 
 				name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
 				if(DEBUG)
@@ -670,10 +680,12 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		chckbxPathMode = new JCheckBox("Path Mode");
 		chckbxPathMode.setEnabled(false);
 		GridBagConstraints gbc_chckbxPathMode= new GridBagConstraints();
+		gbc_chckbxPathMode.anchor = GridBagConstraints.WEST;
 		gbc_chckbxPathMode.insets = new Insets(0, 0, 5, 5);
 		gbc_chckbxPathMode.gridx = 3;
-		gbc_chckbxPathMode.gridy = 2;
+		gbc_chckbxPathMode.gridy = 1;
 		pointsPanel.add(chckbxPathMode, gbc_chckbxPathMode);
+		
 		chckbxPathMode.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -685,6 +697,86 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 				}
 			}
 		});
+		
+		isOutsideBox = new JCheckBox("Outside");
+		isOutsideBox.setEnabled(false);
+		GridBagConstraints gbc_isOutsideBox= new GridBagConstraints();
+		gbc_isOutsideBox.anchor = GridBagConstraints.WEST;
+		gbc_isOutsideBox.insets = new Insets(0, 0, 5, 5);
+		gbc_isOutsideBox.gridx = 3;
+		gbc_isOutsideBox.gridy = 3;
+		pointsPanel.add(isOutsideBox, gbc_isOutsideBox);
+		
+		isOutsideBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent g) {
+				if(isOutsideBox.isSelected()){
+					isOutsideBox.setSelected(true);
+					if(editPoint != null){
+						editPoint.setOutside(true);
+						if(!(updatedPoints.contains(editPoint))){
+							updatedPoints.add(editPoint);
+						}
+						
+					}
+						
+					if(DEBUG)
+						System.out.println("IsOutsideBox: true");
+				}
+				else{
+					isOutsideBox.setSelected(false);
+					if(editPoint != null){
+						editPoint.setOutside(false);
+						if(!(updatedPoints.contains(editPoint))){
+							updatedPoints.add(editPoint);
+						}
+					}
+					if(DEBUG)
+						System.out.println("IsOutsideBox: false");
+				}
+			}
+		});
+				
+		
+		isStairsBox = new JCheckBox("Stairs");
+		isStairsBox.setEnabled(false);
+		GridBagConstraints gbc_isStairsBox= new GridBagConstraints();
+		gbc_isStairsBox.anchor = GridBagConstraints.WEST;
+		gbc_isStairsBox.insets = new Insets(0, 0, 5, 5);
+		gbc_isStairsBox.gridx = 3;
+		gbc_isStairsBox.gridy = 2;
+		pointsPanel.add(isStairsBox, gbc_isStairsBox);
+		
+		isStairsBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent g) {
+				if(isStairsBox.isSelected()){
+					isStairsBox.setSelected(true);
+					if(editPoint != null){
+						editPoint.setStairs(true);
+						if(!(updatedPoints.contains(editPoint))){
+							updatedPoints.add(editPoint);
+						}
+						
+					}
+						
+					if(DEBUG)
+						System.out.println("IsOutsideBox: true");
+				}
+				else{
+					isStairsBox.setSelected(false);
+					if(editPoint != null){
+						editPoint.setStairs(false);
+						if(!(updatedPoints.contains(editPoint))){
+							updatedPoints.add(editPoint);
+						}
+					}
+					if(DEBUG)
+						System.out.println("IsStairsBox: false");
+				}
+			}
+		});
+		
+		
+		
 
 
 		// creates a centered text field that will write back the users info
@@ -746,6 +838,8 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 					} else {
 						updatedPoints.add(editPoint);
 					}
+					isOutsideBox.setSelected(false);
+					isStairsBox.setSelected(false);
 					editingPoint = false;
 				} else {
 
@@ -985,6 +1079,8 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		rdbtnAddPoints.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				chckbxPathMode.setEnabled(false);
+				isOutsideBox.setEnabled(true);
+				isStairsBox.setEnabled(true);
 				btnSavePoint.setEnabled(false);
 				roomNumber.setEnabled(true);
 				roomNumber.setText("Hallway");
@@ -997,6 +1093,8 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		rdbtnEditPoints.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				chckbxPathMode.setEnabled(true);
+				isOutsideBox.setEnabled(true);
+				isStairsBox.setEnabled(true);
 				btnSavePoint.setEnabled(true);
 				roomNumber.setEnabled(true);
 				roomNumber.setText("Select a Point to Edit");
@@ -1008,6 +1106,8 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		rdbtnRemovePoints.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				chckbxPathMode.setEnabled(false);
+				isOutsideBox.setEnabled(false);
+				isStairsBox.setEnabled(false);
 				btnSavePoint.setEnabled(false);
 				roomNumber.setEnabled(false);
 				btnConnectToOther.setEnabled(false);
@@ -1092,6 +1192,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		public void paintComponent(Graphics g) {
 			Graphics2D g2d= (Graphics2D) g;
 			super.paintComponent(g);
+			Graphics2D g2D = (Graphics2D) g;
 
 
 			// -------------------------------
@@ -1152,6 +1253,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
 
 				}
+			}
 
 
 			// add point to the point array (has to take place outside of below
@@ -1161,8 +1263,79 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 				
 				if (getRadButton() == 1) // if addpoint
 				{
-					editingPoint = false;
-					MapUpdaterControl.addPoint(lastMousex, lastMousey, currentMap, img, roomNumber.getText());
+
+					
+					Integer nameNumber = currentMap.getPointIDIndex()+1;
+					double ourRotation = currentMap.getRotationAngle();
+					ourRotation = 2 * Math.PI - ourRotation;
+
+					destinationFile = new File("src/VectorMaps/" + "Campus" + ".png");
+					destinationFile = new File(destinationFile.getAbsolutePath());
+					BufferedImage campusImage = null;
+					try {
+						if(DEBUG)
+							System.out.println("The absolute path is: " + destinationFile.getAbsolutePath());
+						//System.out.println("Map name " + currentMap.getMapName());
+
+						campusImage = ImageIO.read(destinationFile);
+					} catch (IOException e) {
+						System.out.println("Invalid Map Selection");
+						e.printStackTrace();
+					}
+					//double centerCurrentMapX = (Math.floor(((currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2) * img.getWidth())) / (campusImage.getWidth());
+					//double centerCurrentMapY = (Math.floor(((currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2) * img.getHeight())) / (campusImage.getHeight());
+					double tempPreRotateX = lastMousex;
+					double tempPreRotateY = lastMousey;
+					double LocalX = (lastMousex-drawnposx)/newImageWidth;
+					double LocalY = (lastMousey-drawnposy)/newImageHeight;
+					tempPreRotateX = tempPreRotateX - drawnposx;
+					tempPreRotateY = tempPreRotateY - drawnposy;
+					//System.out.println("At step 1 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+					tempPreRotateX = tempPreRotateX/(img.getWidth()*scaleSize);
+					tempPreRotateY = tempPreRotateY/(img.getHeight()*scaleSize);
+					//System.out.println("At step 2 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+					tempPreRotateX = tempPreRotateX - 0.5;
+					tempPreRotateY = tempPreRotateY - 0.5;
+					//System.out.println("At step 3 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+					tempPreRotateX = tempPreRotateX * currentMap.getWidth();
+					tempPreRotateY = tempPreRotateY * currentMap.getHeight();
+					//System.out.println("At step 4 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+					double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
+					double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+					//System.out.println("At step 5 x is: " + rotateX + " y is: " + rotateY);
+					rotateX = rotateX * campusImage.getWidth();
+					rotateY = rotateY * campusImage.getHeight();
+					//System.out.println("At step 6 x is: " + rotateX + " y is: " + rotateY);
+					int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
+					int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
+					//System.out.println("At step 7 x is: " + finalGlobX + " y is: " + finalGlobY);
+					//if(DEBUG)
+					//System.out.println("Global X is: " + finalGlobX + " and Y is: " + finalGlobY);
+					
+					if(DEBUG)
+						System.out.println("newest map id: "+currentMap.getNewPointID());
+					
+					System.out.println("Point(x, " + currentMap.getMapId() + ", " + roomNumber.getText() + ", y, " + LocalX + ", " + LocalY + ", " + finalGlobX + ", " + finalGlobY + ", " + numEdges + ");");
+					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
+							roomNumber.getText(), currentMap.getPointIDIndex(),
+							LocalX, LocalY, finalGlobX, finalGlobY, numEdges, isStairsBox.isSelected(), isOutsideBox.isSelected());
+
+					boolean shouldAdd = true;
+					for(int k = 0; k < pointArray.size(); k++){
+						//System.out.println(pointArray.get(k).getId());
+						if(point.getId().equals(pointArray.get(k).getId())){
+							//System.out.println(pointArray.get(k).getId());
+							//System.out.println("should add = false");
+							shouldAdd = false;
+						}
+					}
+					if(LocalX < 0 || LocalX > 1 || LocalY < 0 || LocalY > 1)
+						shouldAdd = false;
+					if(shouldAdd){
+						pointArray.add(point);
+						newPoints.add(point);
+					}
+
 					//System.out.println("add point to map: "+currentMap.getMapId()+" Point Array size: "+pointArray.size());
 					repaint();
 				}
@@ -1208,6 +1381,8 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 								if (newClick == true && editingPoint == false) {
 									//if we select a new point to edit
 									editPoint = currentPoint;
+									isOutsideBox.setSelected(editPoint.isOutside());
+									isStairsBox.setSelected(editPoint.isStairs());
 									editPointIndex = i;
 									editingPoint = true;
 									roomNumber.setText(editPoint.getName());
@@ -1215,12 +1390,81 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 									
 								} else if (newClick == true && editingPoint == true) {
 									if(editPoint.getId().contentEquals(currentPoint.getId())){
-										//if we select the currently editing point again
-										
-										
-									}else{
-										//if we select a point other than the currently editing point
-										roomNumber.setText(MapUpdaterControl.addEdgeToMap(roomNumber.getText(), i));
+
+
+									} else {
+										currentEdge = new Edge(editPoint, currentPoint);
+										pointArray.set(editPointIndex, editPoint);
+										pointArray.set(i, currentPoint);
+										if(!(updatedPoints.contains(editPoint))){
+											updatedPoints.add(editPoint);
+										} else {
+											for(int r = 0; r < updatedPoints.size(); r++){
+												if(editPoint.getId().contentEquals(updatedPoints.get(r).getId())){
+													updatedPoints.set(r, editPoint);
+													r = updatedPoints.size();
+												}
+											}
+										}
+										if(!(updatedPoints.contains(currentPoint))){
+											updatedPoints.add(currentPoint);
+										} else {
+											for(int r = 0; r < updatedPoints.size(); r++){
+												if(currentPoint.getId().contentEquals(updatedPoints.get(r).getId())){
+													updatedPoints.set(r, currentPoint);
+													r = updatedPoints.size();
+												}
+											}
+										}
+										if(DEBUG){
+											System.out.println("Edge sizes- editPoint:"+pointArray.get(editPointIndex).getEdges().size()+
+													" currentPoint:"+pointArray.get(i).getEdges().size());
+											System.out.println("Current Edge is: " + currentEdge.getId());
+										}
+										edgeArray.add(currentEdge);
+										if(newEdges.contains(currentEdge)){
+											for(int r = 0; r < newEdges.size(); r++){
+												if(currentEdge.getId().contentEquals(newEdges.get(r).getId())){
+													newEdges.set(r, currentEdge);
+													r = newEdges.size();
+												}
+											}
+										} else {
+											newEdges.add(currentEdge);
+										}
+
+										if (currentPoint.getNumEdges() > 0)//this has to be caught in an exception later
+										{
+											for (int j = 0; j < currentPoint.getNumEdges(); j++) {
+												if(DEBUG){
+													System.out.println("Adding clicked edge between: "
+															+ currentPoint.getEdges().get(j).getPoint1().getName() + ", "
+															+ currentPoint.getEdges().get(j).getPoint2().getName());
+												}
+											}
+										}
+									}
+
+									newClick = false;
+									if(pathMode){
+										Point tempEditPoint = pointArray.get(editPointIndex);
+										tempEditPoint.setName(roomNumber.getText());
+										pointArray.set(editPointIndex, tempEditPoint);
+										if(updatedPoints.contains(tempEditPoint)){
+											for(int r = 0; r < updatedPoints.size(); r++){
+												if(tempEditPoint.getId().contentEquals(updatedPoints.get(r).getId())){
+													updatedPoints.set(r, currentPoint);
+													r = updatedPoints.size();
+												}
+											}
+										} else {
+											updatedPoints.add(tempEditPoint);
+										}
+										editPoint = currentPoint;
+										isOutsideBox.setSelected(editPoint.isOutside());
+										isStairsBox.setSelected(editPoint.isStairs());
+										editPointIndex = i;
+
 										roomNumber.setText(editPoint.getName());
 										btnSavePoint.setText("Unselect Current Point");
 
@@ -1417,17 +1661,18 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 			//draws all edges in the edge array
 			for (int j = 0; j < edgeArray.size(); j++) {
 
-				g.setColor(Color.ORANGE);
-
+				g2D.setColor(Color.ORANGE);
+				g2D.setStroke(new BasicStroke(4));
 				//if(!(drawnEdges.contains(edgeArray.get(j)))){
 				int point1x = (int)((edgeArray.get(j).getPoint1().getLocX()*newImageWidth)+drawnposx);
 				int point1y = (int)((edgeArray.get(j).getPoint1().getLocY()*newImageHeight)+drawnposy);
 				int point2x = (int)((edgeArray.get(j).getPoint2().getLocX()*newImageWidth)+drawnposx);
 				int point2y = (int)((edgeArray.get(j).getPoint2().getLocY()*newImageHeight)+drawnposy);
-			
-				g.drawLine(point1x, point1y, point2x, point2y);
+
+				g2D.drawLine(point1x, point1y, point2x, point2y);
+
 				drawnEdges.add(edgeArray.get(j));
-				g.setColor(Color.BLACK);
+				g2D.setColor(Color.BLACK);
 				//}
 			}
 			if(editingPoint && editPoint != null)
@@ -1458,7 +1703,6 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		}
 
 	}
-}
 
 
 	/*

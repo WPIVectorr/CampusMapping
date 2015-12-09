@@ -36,7 +36,7 @@ import javax.swing.JComboBox;
 
 public class MapInserterGUIButtonPanel extends JFrame {
 
-	private InserterButtonPanel ButtonPanel = new InserterButtonPanel();
+	private InserterButtonPanel ButtonPanel ;
 	private JComboBox mapDropDown;
 	private JComboBox secondMap;
 	private static BufferedImage CampusMap = null;
@@ -47,6 +47,12 @@ public class MapInserterGUIButtonPanel extends JFrame {
 
 	public MapInserterGUIButtonPanel(java.awt.Point inserterLocation, Dimension windowSize) {
 		super("MapInserterGUIButtonPanel");
+		ButtonPanel = new InserterButtonPanel();
+		CampusMap = null;
+		addingMap = null;
+		windowSizeX = 0;
+		windowSizeY = 0;
+		windowScale = 0;
 		try {
 			   // Set to cross-platform Java Look and Feel (also called "Metal")
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -81,6 +87,7 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		mapDropDown.setBounds(168, 13, 211, 26);
 		getContentPane().add(mapDropDown);
 		mapDropDown.addItem("Select Map");
+		mapDropDown.setSelectedIndex(0);
 		
 		JLabel lblSelectCampusMap = new JLabel("Select Campus Map:");
 		lblSelectCampusMap.setBounds(10, 16, 178, 20);
@@ -89,6 +96,7 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		
 		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
+				MapInserterGUI.drawnfirst();
 				String name = mapDropDown.getSelectedItem().toString();//When you select an item, grab the name of the map selected
 				System.out.println("Selected item:"+name);
 
@@ -150,6 +158,7 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		secondMap.setBounds(168, 55, 211, 26);
 		getContentPane().add(secondMap);
 		secondMap.addItem("Select Map");
+		secondMap.setSelectedIndex(0);
 		
 		JLabel lblSelectSecondMap = new JLabel("Select Map to Add:");
 		lblSelectSecondMap.setBounds(10, 58, 178, 20);
@@ -164,6 +173,7 @@ public class MapInserterGUIButtonPanel extends JFrame {
 		
 		secondMap.addActionListener(new ActionListener() {//Open the dropdown menu
 			public void actionPerformed(ActionEvent a) {
+				MapInserterGUI.drawnfirst();
 				String name = secondMap.getSelectedItem().toString();//When you select an item, grab the name of the map selected
 				System.out.println("Selected item:"+name);
 

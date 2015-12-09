@@ -162,7 +162,7 @@ public class GUI{
 		GridBagLayout gbl_navMenu = new GridBagLayout();
 		gbl_navMenu.columnWidths = new int[]{0, 298, 298, 298, 0, 0};
 		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 0, 31, 30, 7, 0};
-		gbl_navMenu.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_navMenu.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
 		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
 
@@ -174,8 +174,9 @@ public class GUI{
 
 		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
 		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
+		gbc_btnSavePreferences.gridwidth = 7;
 		gbc_btnSavePreferences.insets = new Insets(0, 0, 5, 0);
-		gbc_btnSavePreferences.gridx = 3;
+		gbc_btnSavePreferences.gridx = 0;
 		gbc_btnSavePreferences.gridy = 5;
 		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
 		// Return to previous view
@@ -226,9 +227,9 @@ public class GUI{
             }
         });*/
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
-		gbl_mainMenu.columnWidths = new int[]{30, 134, 209, 146, 223, 0, 0};
+		gbl_mainMenu.columnWidths = new int[]{15, 24, 210, 132, 220, 15, 0};
 		gbl_mainMenu.rowHeights = new int[]{27, 27, 27, 0, 0, 0};
-		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
 		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		mainMenu.setLayout(gbl_mainMenu);
 		mapsDropdown.addItem("Select Map");
@@ -258,12 +259,20 @@ public class GUI{
 			mapsDropdown.addItem(temp.get(count));
 			DestMaps.addItem(temp.get(count));
 		}
+		
+		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
+		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 5);
+		gbc_horizontalStrut_1.gridx = 0;
+		gbc_horizontalStrut_1.gridy = 1;
+		mainMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
 
 
 		JLabel lblMaps = new JLabel("Starting Map:");
 		lblMaps.setHorizontalAlignment(SwingConstants.CENTER);
 		GridBagConstraints gbc_lblMaps = new GridBagConstraints();
-		gbc_lblMaps.fill = GridBagConstraints.BOTH;
+		gbc_lblMaps.anchor = GridBagConstraints.EAST;
+		gbc_lblMaps.fill = GridBagConstraints.VERTICAL;
 		gbc_lblMaps.insets = new Insets(0, 0, 5, 5);
 		gbc_lblMaps.gridx = 1;
 		gbc_lblMaps.gridy = 1;
@@ -533,16 +542,17 @@ public class GUI{
 		startBuilds.setEnabled(false);
 		mainMenu.add(startBuilds, gbc_startBuilds);
 		startBuilds.setBounds(122, 30, 148, 20);
-
-		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
-		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
-		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 0);
-		gbc_horizontalStrut_1.gridx = 5;
-		gbc_horizontalStrut_1.gridy = 1;
-		mainMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
+		
+		Component horizontalStrut = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
+		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 0);
+		gbc_horizontalStrut.gridx = 5;
+		gbc_horizontalStrut.gridy = 1;
+		mainMenu.add(horizontalStrut, gbc_horizontalStrut);
 
 		JLabel lblDestinationMap = new JLabel("Destination Map:");
 		GridBagConstraints gbc_lblDestinationMap = new GridBagConstraints();
+		gbc_lblDestinationMap.anchor = GridBagConstraints.EAST;
 		gbc_lblDestinationMap.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDestinationMap.gridx = 1;
 		gbc_lblDestinationMap.gridy = 2;
@@ -550,8 +560,8 @@ public class GUI{
 
 
 		GridBagConstraints gbc_destMaps = new GridBagConstraints();
-		gbc_destMaps.insets = new Insets(0, 0, 5, 5);
 		gbc_destMaps.fill = GridBagConstraints.HORIZONTAL;
+		gbc_destMaps.insets = new Insets(0, 0, 5, 5);
 		gbc_destMaps.gridx = 2;
 		gbc_destMaps.gridy = 2;
 		mainMenu.add(DestMaps, gbc_destMaps);
@@ -582,7 +592,6 @@ public class GUI{
 
 		GradientButton btnSetPreferencesMain = new GradientButton("Set Preferences", buttonColor);
 		GridBagConstraints gbc_btnSetPreferencesMain = new GridBagConstraints();
-		gbc_btnSetPreferencesMain.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnSetPreferencesMain.insets = new Insets(0, 0, 5, 5);
 		gbc_btnSetPreferencesMain.gridx = 2;
 		gbc_btnSetPreferencesMain.gridy = 3;
@@ -599,7 +608,6 @@ public class GUI{
 		btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
 		btnSwapStartAndDest.setEnabled(false);
 		GridBagConstraints gbc_btnSwapStartAndDest = new GridBagConstraints();
-		gbc_btnSwapStartAndDest.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnSwapStartAndDest.insets = new Insets(0, 0, 5, 5);
 		gbc_btnSwapStartAndDest.gridx = 4;
 		gbc_btnSwapStartAndDest.gridy = 3;
@@ -621,11 +629,12 @@ public class GUI{
 
 		// Button that generates a route and switches to nav display
 		directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
+		directionsButton.setText("          Directions          ");
 		directionsButton.setEnabled(false);
 		GridBagConstraints gbc_directionsButton = new GridBagConstraints();
-		gbc_directionsButton.fill = GridBagConstraints.BOTH;
-		gbc_directionsButton.insets = new Insets(0, 0, 0, 5);
-		gbc_directionsButton.gridx = 3;
+		gbc_directionsButton.gridwidth = 5;
+		gbc_directionsButton.fill = GridBagConstraints.VERTICAL;
+		gbc_directionsButton.gridx = 1;
 		gbc_directionsButton.gridy = 4;
 		mainMenu.add(directionsButton, gbc_directionsButton);
 		directionsButton.addActionListener(new ActionListener() {
@@ -1081,7 +1090,7 @@ public class GUI{
 		GridBagLayout gbl_prefMenu = new GridBagLayout();
 		gbl_prefMenu.columnWidths = new int[]{58, 0, 0, 56, 99, 147, 38, 0};
 		gbl_prefMenu.rowHeights = new int[]{0, 0, 0, 0, 32, 12, 11, 0};
-		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_prefMenu.columnWeights = new double[]{0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
 		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		prefMenu.setLayout(gbl_prefMenu);
 

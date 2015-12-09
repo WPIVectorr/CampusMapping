@@ -104,7 +104,26 @@ public class InterMapEdgeGUI extends JFrame {
 
 
 	public InterMapEdgeGUI(ArrayList<Map> mapList, Point passedPoint, int drawwidth, int drawheight) {
-
+		buttonPanel = new interButtonPanel();
+		mapFrame= new MapPanel();
+		img = null;
+		windowSizeX = 0;
+		windowSizeY = 0;
+		windowScale = 0;
+		pointSize = 7;
+		pointArray = new ArrayList<Point>();
+		maps = new ArrayList<Map>();
+		edgeArray = new ArrayList<Edge>();
+		name = "Select Map";
+		connectMap = null;
+		srcMap = null;
+		md = ServerDB.getInstance();
+		scaleSize = 1;
+		drawnfirst = false;
+		atMaxZoom = false;
+		atMinZoom = false;
+		Dragged = false;
+		scrolled = false;
 		imagewidth = drawwidth;
 		imageheight = drawheight;
 		maps = mapList;

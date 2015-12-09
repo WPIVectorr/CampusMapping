@@ -25,10 +25,10 @@ import javax.activation.*;
 
 
 public class PrintDirections {
-	public PrintDirections(ArrayList<ArrayList<String>> directions, String emailFilename) throws AddressException
+	public PrintDirections(ArrayList<ArrayList<String>> directions,ArrayList<Directions> points, String emailFilename) throws AddressException
 	{
 		try {
-			emailDirections(directions, new InternetAddress(emailFilename));
+			emailDirections(directions, points, new InternetAddress(emailFilename));
 		} catch (AddressException e) {
 			// TODO Auto-generated catch block
 			if(emailFilename.contains("save"))
@@ -155,7 +155,7 @@ public class PrintDirections {
 
 
 
-	private void emailDirections(ArrayList<ArrayList<String>> directions, InternetAddress to) throws AddressException
+	private void emailDirections(ArrayList<ArrayList<String>> directions,ArrayList<Directions> points, InternetAddress to) throws AddressException
 	{
 
 		boolean canSend =true;
@@ -195,9 +195,9 @@ public class PrintDirections {
 			// Set To: header field of the header.
 			message.addRecipient(Message.RecipientType.TO, toEmailAddress);
 
-			// Set Subject: header field
-			message.setSubject("Directions with Magnitude from: "+directions.get(0)+" to: "
-					+directions.get(directions.size()-1));
+			// Set Subject: header field with the first and last location.
+			message.setSubject("Directions with Magnitude From: "+points.get(0).getOrigin().getName()+" To: "
+					+points.get(points.size()-1).getDestination().getName());
 
 			// Send the actual HTML message, as big as you like
 

@@ -341,6 +341,7 @@ public class GUI{
 						boolean check = true;
 						System.out.println("number of points: " + maps.get(buildStartIndex-1).getPointList().size());
 						for (int i = 0; i < maps.get(buildStartIndex-1).getPointList().size(); i++){
+							check = true;
 							if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
 									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Stairs") &&
 									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path")){
@@ -450,25 +451,30 @@ public class GUI{
 							}
 						}
 						ArrayList<Point> tempDestRoom = new ArrayList<Point>();
+						System.out.println("pointArraysize: " + pointArray.size());
 						boolean check = true;
 						//System.out.println("building size: " + buildings.length);
-						for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-							if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
-									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Stairs") &&
-									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path")){
+						for (int i = 0; i < pointArray.size(); i++){
+							check = true;
+							if(!pointArray.get(i).getName().equalsIgnoreCase("Hallway") &&
+									!pointArray.get(i).getName().equalsIgnoreCase("Stairs") &&
+									!pointArray.get(i).getName().equalsIgnoreCase("Path")){
 
 								if(i > 0){
 									System.out.println("i>0");
 									for(int count = i-1;count >= 0 ; count--){
-										if(maps.get(buildDestIndex - 1).getPointList().get(i).getName().compareTo(maps.get(buildStartIndex-1).getPointList().get(count).getName()) == 0){
-											System.out.println("here");
+										if(pointArray.get(i).getName().compareTo(pointArray.get(count).getName()) == 0){
+											System.out.println("Found Duplicate");
 											check = false;
 											count = -1;
 										}
 									}
 								}
+								
 								if(check){
-									tempDestRoom.add(maps.get(buildDestIndex - 1).getPointList().get(i));
+								
+									tempDestRoom.add(pointArray.get(i));
+									System.out.println("testDestRoom last added: " + maps.get(buildDestIndex - 1).getPointList().get(i));
 									//mapsDropdown.addItem(maps.get(i).getMapName());
 									//DestMaps.addItem(maps.get(i).getMapName());
 								}

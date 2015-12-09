@@ -122,6 +122,8 @@ public class GUI{
 	private JTextField txtFieldEmail;
 	private JTextField txtTimeToDestination;
 	private boolean resetPath = false;
+	private GradientButton btnSwapStartAndDest;
+	private GradientButton directionsButton;
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
@@ -160,7 +162,7 @@ public class GUI{
 		GridBagLayout gbl_navMenu = new GridBagLayout();
 		gbl_navMenu.columnWidths = new int[]{0, 298, 298, 298, 0, 0};
 		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 0, 31, 30, 7, 0};
-		gbl_navMenu.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_navMenu.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
 		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
 
@@ -172,8 +174,9 @@ public class GUI{
 
 		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
 		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
+		gbc_btnSavePreferences.gridwidth = 7;
 		gbc_btnSavePreferences.insets = new Insets(0, 0, 5, 0);
-		gbc_btnSavePreferences.gridx = 3;
+		gbc_btnSavePreferences.gridx = 0;
 		gbc_btnSavePreferences.gridy = 5;
 		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
 		// Return to previous view
@@ -224,9 +227,9 @@ public class GUI{
             }
         });*/
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
-		gbl_mainMenu.columnWidths = new int[]{30, 134, 209, 146, 223, 0, 0};
+		gbl_mainMenu.columnWidths = new int[]{15, 24, 210, 132, 220, 15, 0};
 		gbl_mainMenu.rowHeights = new int[]{27, 27, 27, 0, 0, 0};
-		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
 		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		mainMenu.setLayout(gbl_mainMenu);
 		mapsDropdown.addItem("Select Map");
@@ -256,12 +259,20 @@ public class GUI{
 			mapsDropdown.addItem(temp.get(count));
 			DestMaps.addItem(temp.get(count));
 		}
+		
+		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
+		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 5);
+		gbc_horizontalStrut_1.gridx = 0;
+		gbc_horizontalStrut_1.gridy = 1;
+		mainMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
 
 
 		JLabel lblMaps = new JLabel("Starting Map:");
 		lblMaps.setHorizontalAlignment(SwingConstants.CENTER);
 		GridBagConstraints gbc_lblMaps = new GridBagConstraints();
-		gbc_lblMaps.fill = GridBagConstraints.BOTH;
+		gbc_lblMaps.anchor = GridBagConstraints.EAST;
+		gbc_lblMaps.fill = GridBagConstraints.VERTICAL;
 		gbc_lblMaps.insets = new Insets(0, 0, 5, 5);
 		gbc_lblMaps.gridx = 1;
 		gbc_lblMaps.gridy = 1;
@@ -280,78 +291,201 @@ public class GUI{
 		//adds the correct points for the building specified
 		mapsDropdown.addActionListener (new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
-				buildStartIndex = mapsDropdown.getSelectedIndex();
 
-
-				mapTitle = maps.get(buildStartIndex-1).getMapName();
-				//String mapTitle = "AtwaterKent1";
-
-				File start = new File("src/VectorMaps");
-				String startInput = start.getAbsolutePath();
-				//assuming all maps saved in vectorMaps are in jpg
-				startInput = startInput + "/" + mapTitle + ".png";
-
-				File destFile = new File(startInput);
-				try{
-					img = ImageIO.read(destFile);
-					frame.repaint();
+				if (mapsDropdown.getSelectedItem().equals("Select Map")){
+					startBuilds.removeAllItems();
+					startBuilds.setEnabled(false);
+					btnSwapStartAndDest.setEnabled(false);
+					directionsButton.setEnabled(false);
 				}
-				catch(IOException a){
-					System.out.println("Could not find file:"+startInput);
-					a.printStackTrace();
-				}
-
-				startBuilds.removeAllItems();
-				//destBuilds.removeAllItems();
-				if(buildStartIndex!=0){
-					edgeArray = new ArrayList<Edge>();
-
-					pointArray = maps.get(buildStartIndex - 1).getPointList();
-
-					for(int i = 0; i < pointArray.size(); i++){
-						for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
-							edgeArray.add(pointArray.get(i).getEdges().get(j));
-						}
+				else{
+					startBuilds.setEnabled(true);
+					if (destBuilds.isEnabled()){
+						btnSwapStartAndDest.setEnabled(true);
+						directionsButton.setEnabled(true);
 					}
-					ArrayList<Point> tempStartRoom = new ArrayList<Point>();
-					boolean check = true;
-					System.out.println("number of points: " + maps.get(buildStartIndex-1).getPointList().size());
-					for (int i = 0; i < maps.get(buildStartIndex-1).getPointList().size(); i++){
-						if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
-								!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Stairs") &&
-								!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path")){
-							if(i > 0){
-								System.out.println("i>0");
-								for(int count = i-1;count >= 0 ; count--){
-									if(maps.get(buildStartIndex - 1).getPointList().get(i).getName().compareTo(maps.get(buildStartIndex-1).getPointList().get(count).getName()) == 0){
-										System.out.println("here");
-										check = false;
-										count = -1;
+					buildStartIndex = mapsDropdown.getSelectedIndex();
+
+
+					mapTitle = maps.get(buildStartIndex-1).getMapName();
+					//String mapTitle = "AtwaterKent1";
+
+					File start = new File("src/VectorMaps");
+					String startInput = start.getAbsolutePath();
+					//assuming all maps saved in vectorMaps are in jpg
+					startInput = startInput + "/" + mapTitle + ".png";
+
+					File destFile = new File(startInput);
+					try{
+						img = ImageIO.read(destFile);
+						frame.repaint();
+					}
+					catch(IOException a){
+						System.out.println("Could not find file:"+startInput);
+						a.printStackTrace();
+					}
+
+					startBuilds.removeAllItems();
+					//destBuilds.removeAllItems();
+					if(buildStartIndex!=0){
+						edgeArray = new ArrayList<Edge>();
+
+						pointArray = maps.get(buildStartIndex - 1).getPointList();
+
+						for(int i = 0; i < pointArray.size(); i++){
+							for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
+								edgeArray.add(pointArray.get(i).getEdges().get(j));
+							}
+						}
+						ArrayList<Point> tempStartRoom = new ArrayList<Point>();
+						boolean check = true;
+						System.out.println("number of points: " + maps.get(buildStartIndex-1).getPointList().size());
+						for (int i = 0; i < maps.get(buildStartIndex-1).getPointList().size(); i++){
+							if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Stairs") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path")){
+								if(i > 0){
+									System.out.println("i>0");
+									for(int count = i-1;count >= 0 ; count--){
+										if(maps.get(buildStartIndex - 1).getPointList().get(i).getName().compareTo(maps.get(buildStartIndex-1).getPointList().get(count).getName()) == 0){
+											System.out.println("here");
+											check = false;
+											count = -1;
+										}
 									}
 								}
+								if(check){
+									tempStartRoom.add(maps.get(buildStartIndex - 1).getPointList().get(i));
+									//mapsDropdown.addItem(maps.get(i).getMapName());
+									//DestMaps.addItem(maps.get(i).getMapName());
+								}
+
 							}
-							if(check){
-								tempStartRoom.add(maps.get(buildStartIndex - 1).getPointList().get(i));
-								//mapsDropdown.addItem(maps.get(i).getMapName());
-								//DestMaps.addItem(maps.get(i).getMapName());
-							}
+
+							if(DEBUG)
+								System.out.println("startBuildsSize: " + maps.get(buildStartIndex-1).getPointList().size());
+						}
+						Collections.sort(tempStartRoom);
+						System.out.println("tempStartRoom size: " + tempStartRoom.size());
+						//tempStartRoom = sort(tempStartRoom);
+						for(int count = 0; count < tempStartRoom.size(); count++){
+							startBuilds.addItem(tempStartRoom.get(count));
 
 						}
+						//System.out.println("buildings[i] " + buildings[i]);
 
-						if(DEBUG)
-							System.out.println("startBuildsSize: " + maps.get(buildStartIndex-1).getPointList().size());
+						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+						//}
+
+						/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
+						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
+							destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
+						}*/
+						//System.out.println("buildings[i] " + buildings[i]);
+
+						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
 					}
-					Collections.sort(tempStartRoom);
-					System.out.println("tempStartRoom size: " + tempStartRoom.size());
-					//tempStartRoom = sort(tempStartRoom);
-					for(int count = 0; count < tempStartRoom.size(); count++){
-						startBuilds.addItem(tempStartRoom.get(count));
+				}
+				//startBuilds.removeAllItems();
+				//for (int i=0; i < buildings.length; i++){
+				//System.out.println("buildings[i] match: " + buildings[i]);
+				//startBuilds.addItem(buildings[i]);
+				//}
+				//destBuilds.removeAllItems();
+				//for (int i=0; i < buildings.length; i++){
+				///destBuilds.addItem(buildings[i]);
+				//}
+			}
+		}
+				);
+		//adds the correct points for the building specified
+		DestMaps.addActionListener (new ActionListener () {
+			public void actionPerformed(ActionEvent e) {
+				if (DestMaps.getSelectedItem().equals("Select Map")){
+					destBuilds.removeAllItems();
+					destBuilds.setEnabled(false);
+					btnSwapStartAndDest.setEnabled(false);
+					directionsButton.setEnabled(false);
+				}
+				else{
 
+					destBuilds.setEnabled(true);
+					if (startBuilds.isEnabled()){
+						btnSwapStartAndDest.setEnabled(true);
+						directionsButton.setEnabled(true);
 					}
-					//System.out.println("buildings[i] " + buildings[i]);
 
-					// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
-					//}
+					buildDestIndex = DestMaps.getSelectedIndex();
+
+
+
+					String mapTitle = maps.get(buildDestIndex-1).getMapName();
+					//String mapTitle = "AtwaterKent1";
+
+					File dest = new File("src/VectorMaps");
+					String destInput = dest.getAbsolutePath();
+					//assuming all maps saved in vectorMaps are in jpg
+					destInput = destInput + "/" + mapTitle + ".png";
+
+					File destFile = new File(destInput);
+					try{
+						img = ImageIO.read(destFile);
+						frame.repaint();
+					}
+					catch(IOException a){
+						System.out.println("Could not find file:"+destInput);
+						a.printStackTrace();
+					}
+
+					//startBuilds.removeAllItems();
+					destBuilds.removeAllItems();
+					if(buildDestIndex!=0){
+						edgeArray = new ArrayList<Edge>();
+
+						pointArray = maps.get(buildDestIndex - 1).getPointList();
+
+						for(int i = 0; i < pointArray.size(); i++){
+							for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
+								edgeArray.add(pointArray.get(i).getEdges().get(j));
+							}
+						}
+						ArrayList<Point> tempDestRoom = new ArrayList<Point>();
+						boolean check = true;
+						//System.out.println("building size: " + buildings.length);
+						for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
+							if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Stairs") &&
+									!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path")){
+
+								if(i > 0){
+									System.out.println("i>0");
+									for(int count = i-1;count >= 0 ; count--){
+										if(maps.get(buildDestIndex - 1).getPointList().get(i).getName().compareTo(maps.get(buildStartIndex-1).getPointList().get(count).getName()) == 0){
+											System.out.println("here");
+											check = false;
+											count = -1;
+										}
+									}
+								}
+								if(check){
+									tempDestRoom.add(maps.get(buildDestIndex - 1).getPointList().get(i));
+									//mapsDropdown.addItem(maps.get(i).getMapName());
+									//DestMaps.addItem(maps.get(i).getMapName());
+								}
+
+							}
+
+							if(DEBUG)
+								System.out.println("startBuildsSize: " + maps.get(buildStartIndex-1).getPointList().size());
+						}
+						Collections.sort(tempDestRoom);
+						System.out.println("tempDestRoom size: " + tempDestRoom.size());
+						//tempStartRoom = sort(tempStartRoom);
+						for(int count = 0; count < tempDestRoom.size(); count++){
+							destBuilds.addItem(tempDestRoom.get(count));
+
+						}
+					}
 
 					/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
 						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
@@ -361,99 +495,6 @@ public class GUI{
 
 					// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
 				}
-			}
-			//startBuilds.removeAllItems();
-			//for (int i=0; i < buildings.length; i++){
-			//System.out.println("buildings[i] match: " + buildings[i]);
-			//startBuilds.addItem(buildings[i]);
-			//}
-			//destBuilds.removeAllItems();
-			//for (int i=0; i < buildings.length; i++){
-			///destBuilds.addItem(buildings[i]);
-			//}
-		}
-				);
-		//adds the correct points for the building specified
-		DestMaps.addActionListener (new ActionListener () {
-			public void actionPerformed(ActionEvent e) {
-				buildDestIndex = DestMaps.getSelectedIndex();
-
-
-				String mapTitle = maps.get(buildDestIndex-1).getMapName();
-				//String mapTitle = "AtwaterKent1";
-
-				File dest = new File("src/VectorMaps");
-				String destInput = dest.getAbsolutePath();
-				//assuming all maps saved in vectorMaps are in jpg
-				destInput = destInput + "/" + mapTitle + ".png";
-
-				File destFile = new File(destInput);
-				try{
-					img = ImageIO.read(destFile);
-					frame.repaint();
-				}
-				catch(IOException a){
-					System.out.println("Could not find file:"+destInput);
-					a.printStackTrace();
-				}
-
-				//startBuilds.removeAllItems();
-				destBuilds.removeAllItems();
-				if(buildDestIndex!=0){
-					edgeArray = new ArrayList<Edge>();
-
-					pointArray = maps.get(buildDestIndex - 1).getPointList();
-
-					for(int i = 0; i < pointArray.size(); i++){
-						for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
-							edgeArray.add(pointArray.get(i).getEdges().get(j));
-						}
-					}
-					ArrayList<Point> tempDestRoom = new ArrayList<Point>();
-					boolean check = true;
-					//System.out.println("building size: " + buildings.length);
-					for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-						if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
-								!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Stairs") &&
-								!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Path")){
-
-							if(i > 0){
-								System.out.println("i>0");
-								for(int count = i-1;count >= 0 ; count--){
-									if(maps.get(buildDestIndex - 1).getPointList().get(i).getName().compareTo(maps.get(buildStartIndex-1).getPointList().get(count).getName()) == 0){
-										System.out.println("here");
-										check = false;
-										count = -1;
-									}
-								}
-							}
-							if(check){
-								tempDestRoom.add(maps.get(buildDestIndex - 1).getPointList().get(i));
-								//mapsDropdown.addItem(maps.get(i).getMapName());
-								//DestMaps.addItem(maps.get(i).getMapName());
-							}
-
-						}
-
-						if(DEBUG)
-							System.out.println("startBuildsSize: " + maps.get(buildStartIndex-1).getPointList().size());
-					}
-					Collections.sort(tempDestRoom);
-					System.out.println("tempDestRoom size: " + tempDestRoom.size());
-					//tempStartRoom = sort(tempStartRoom);
-					for(int count = 0; count < tempDestRoom.size(); count++){
-						destBuilds.addItem(tempDestRoom.get(count));
-
-					}
-				}
-
-				/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
-							destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
-						}*/
-				//System.out.println("buildings[i] " + buildings[i]);
-
-				// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
 			}
 
 			//startBuilds.removeAllItems();
@@ -498,18 +539,20 @@ public class GUI{
 		gbc_startBuilds.insets = new Insets(0, 0, 5, 5);
 		gbc_startBuilds.gridx = 4;
 		gbc_startBuilds.gridy = 1;
+		startBuilds.setEnabled(false);
 		mainMenu.add(startBuilds, gbc_startBuilds);
 		startBuilds.setBounds(122, 30, 148, 20);
-
-		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
-		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
-		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 0);
-		gbc_horizontalStrut_1.gridx = 5;
-		gbc_horizontalStrut_1.gridy = 1;
-		mainMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
+		
+		Component horizontalStrut = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
+		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 0);
+		gbc_horizontalStrut.gridx = 5;
+		gbc_horizontalStrut.gridy = 1;
+		mainMenu.add(horizontalStrut, gbc_horizontalStrut);
 
 		JLabel lblDestinationMap = new JLabel("Destination Map:");
 		GridBagConstraints gbc_lblDestinationMap = new GridBagConstraints();
+		gbc_lblDestinationMap.anchor = GridBagConstraints.EAST;
 		gbc_lblDestinationMap.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDestinationMap.gridx = 1;
 		gbc_lblDestinationMap.gridy = 2;
@@ -517,8 +560,8 @@ public class GUI{
 
 
 		GridBagConstraints gbc_destMaps = new GridBagConstraints();
-		gbc_destMaps.insets = new Insets(0, 0, 5, 5);
 		gbc_destMaps.fill = GridBagConstraints.HORIZONTAL;
+		gbc_destMaps.insets = new Insets(0, 0, 5, 5);
 		gbc_destMaps.gridx = 2;
 		gbc_destMaps.gridy = 2;
 		mainMenu.add(DestMaps, gbc_destMaps);
@@ -539,6 +582,7 @@ public class GUI{
 		gbc_destBuilds.insets = new Insets(0, 0, 5, 5);
 		gbc_destBuilds.gridx = 4;
 		gbc_destBuilds.gridy = 2;
+		destBuilds.setEnabled(false);
 		mainMenu.add(destBuilds, gbc_destBuilds);
 		destBuilds.setBounds(122, 30, 148, 20);
 
@@ -548,7 +592,6 @@ public class GUI{
 
 		GradientButton btnSetPreferencesMain = new GradientButton("Set Preferences", buttonColor);
 		GridBagConstraints gbc_btnSetPreferencesMain = new GridBagConstraints();
-		gbc_btnSetPreferencesMain.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnSetPreferencesMain.insets = new Insets(0, 0, 5, 5);
 		gbc_btnSetPreferencesMain.gridx = 2;
 		gbc_btnSetPreferencesMain.gridy = 3;
@@ -562,9 +605,9 @@ public class GUI{
 			}
 		});
 
-		GradientButton btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
+		btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
+		btnSwapStartAndDest.setEnabled(false);
 		GridBagConstraints gbc_btnSwapStartAndDest = new GridBagConstraints();
-		gbc_btnSwapStartAndDest.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnSwapStartAndDest.insets = new Insets(0, 0, 5, 5);
 		gbc_btnSwapStartAndDest.gridx = 4;
 		gbc_btnSwapStartAndDest.gridy = 3;
@@ -585,11 +628,13 @@ public class GUI{
 		});
 
 		// Button that generates a route and switches to nav display
-		GradientButton directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
+		directionsButton = new GradientButton("Directions", new Color(0, 255, 127));
+		directionsButton.setText("          Directions          ");
+		directionsButton.setEnabled(false);
 		GridBagConstraints gbc_directionsButton = new GridBagConstraints();
-		gbc_directionsButton.fill = GridBagConstraints.BOTH;
-		gbc_directionsButton.insets = new Insets(0, 0, 0, 5);
-		gbc_directionsButton.gridx = 3;
+		gbc_directionsButton.gridwidth = 5;
+		gbc_directionsButton.fill = GridBagConstraints.VERTICAL;
+		gbc_directionsButton.gridx = 1;
 		gbc_directionsButton.gridy = 4;
 		mainMenu.add(directionsButton, gbc_directionsButton);
 		directionsButton.addActionListener(new ActionListener() {
@@ -837,6 +882,7 @@ public class GUI{
 
 		//creates a centered text field that will write back the users info they typed in
 		directionsText = new JTextField();
+		directionsText.setEditable(false);
 		directionsText.setHorizontalAlignment(JTextField.CENTER);
 		directionsText.setToolTipText("");
 		directionsText.setBounds(6, 174, 438, 30);
@@ -853,6 +899,7 @@ public class GUI{
 		// Button to get previous step in directions
 		//sets the previous button color to green
 		btnPrevious = new GradientButton("Previous", previousColor);
+		btnPrevious.setEnabled(false);
 		btnPrevious.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if((textPos == 0 && mapPos == 0) || textDir == null){
@@ -886,6 +933,12 @@ public class GUI{
 					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
 					textPos--;
 					directionsText.setText(textDir.get(mapPos).get(textPos));
+					if (!btnNext.isEnabled()){
+						btnNext.setEnabled(true);
+					}
+					if (textPos == 0 && mapPos == 0){
+						btnPrevious.setEnabled(false);
+					}
 				}
 				frame.repaint();
 			}
@@ -918,6 +971,9 @@ public class GUI{
 						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
 
 						textPos++;
+						if (!btnPrevious.isEnabled()){
+							btnPrevious.setEnabled(true);
+						}
 
 						if (textPos != multiMapFinalDir.get(mapPos).size()){
 							directionsText.setText(textDir.get(mapPos).get(textPos));
@@ -930,6 +986,7 @@ public class GUI{
 							//mapPos = multiMapFinalDir.size() - 1;
 							txtTimeToDestination.setText("");
 							directionsText.setText("You have arrived at your destination");
+							btnNext.setEnabled(false);
 						}
 					}	
 
@@ -956,6 +1013,7 @@ public class GUI{
 			}});
 
 		txtTimeToDestination = new JTextField();
+		txtTimeToDestination.setEditable(false);
 		txtTimeToDestination.setText("Estimated Time to Destination: ");
 		GridBagConstraints gbc_txtTimeToDestination = new GridBagConstraints();
 		gbc_txtTimeToDestination.insets = new Insets(0, 0, 5, 5);
@@ -1009,7 +1067,8 @@ public class GUI{
 		btnEmailDirections.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					new PrintDirections(textDir,txtFieldEmail.getText());
+					new PrintDirections(textDir,finalDir,txtFieldEmail.getText());
+					txtFieldEmail.setText("");
 				} catch (AddressException e1) {
 					// TODO Auto-generated catch block
 					btnEmailDirections.setText("Invalid Address");
@@ -1030,8 +1089,8 @@ public class GUI{
 		prefMenu.setBackground(backgroundColor);
 		GridBagLayout gbl_prefMenu = new GridBagLayout();
 		gbl_prefMenu.columnWidths = new int[]{58, 0, 0, 56, 99, 147, 38, 0};
-		gbl_prefMenu.rowHeights = new int[]{0, 0, 0, 0, 0, 12, 11, 0};
-		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_prefMenu.rowHeights = new int[]{0, 0, 0, 0, 32, 12, 11, 0};
+		gbl_prefMenu.columnWeights = new double[]{0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, Double.MIN_VALUE};
 		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		prefMenu.setLayout(gbl_prefMenu);
 

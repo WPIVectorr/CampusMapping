@@ -60,9 +60,9 @@ public class GenTextDir {
 				//System.out.println("PrevPointY = " + prevPointY);
 				if(prevPointY == 0){//if the previous points Y is at 0, we rotate either PI/2, or -PI/2
 					if(prevPointX < 0){//If it's X is less than 0, we are rotating PI/2
-						angleRotate = -Math.PI/2;
-					} else {
 						angleRotate = Math.PI/2;
+					} else {
+						angleRotate = 3*Math.PI/2;
 					}
 				} else if (prevPointY < 0){
 					if(prevPointX > 0){

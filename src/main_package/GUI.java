@@ -970,6 +970,7 @@ public class GUI{
 		directionsText.setToolTipText("");
 		directionsText.setBounds(6, 174, 438, 30);
 		directionsText.setColumns(1);
+		directionsText.setFont(new Font("SansSerif", Font.BOLD, 20));
 		GridBagConstraints gbc_directionsText = new GridBagConstraints();
 		gbc_directionsText.gridwidth = 3;
 		gbc_directionsText.fill = GridBagConstraints.HORIZONTAL;

@@ -233,12 +233,16 @@ public class GenTextDir {
 		Directions currDir = null;
 		int i = 0;
 		boolean shouldAdd = true;
+		boolean isInterEdgeMap = false;
 		while(i < directions.size()){
 			System.out.println("Found getTurn of: " + directions.get(i).getTurn());
 			if(shouldAdd && directions.get(i).getTurn().equals("slight left")){
 				currDir = directions.get(i);
 				i++;
-				while(i < directions.size() && directions.get(i).isStraight() && directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
+				if(currDir.getOrigin().getMapId() != currDir.getDestination().getMapId()){
+					isInterEdgeMap = true;
+				}
+				while((i < directions.size() && directions.get(i).isStraight() && directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()) && !isInterEdgeMap){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
@@ -249,7 +253,10 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
-				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
+				if(currDir.getOrigin().getMapId() != currDir.getDestination().getMapId()){
+					isInterEdgeMap = true;
+				}
+				while((i < directions.size() && directions.get(i).isStraight() && directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()) && !isInterEdgeMap){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
@@ -260,7 +267,10 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
-				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
+				if(currDir.getOrigin().getMapId() != currDir.getDestination().getMapId()){
+					isInterEdgeMap = true;
+				}
+				while((i < directions.size() && directions.get(i).isStraight() && directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()) && !isInterEdgeMap){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
@@ -271,7 +281,10 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
-				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
+				if(currDir.getOrigin().getMapId() != currDir.getDestination().getMapId()){
+					isInterEdgeMap = true;
+				}
+				while((i < directions.size() && directions.get(i).isStraight() && directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()) && !isInterEdgeMap){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
@@ -282,7 +295,10 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
-				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
+				if(currDir.getOrigin().getMapId() != currDir.getDestination().getMapId()){
+					isInterEdgeMap = true;
+				}
+				while((i < directions.size() && directions.get(i).isStraight() && directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()) && !isInterEdgeMap){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
@@ -293,7 +309,10 @@ public class GenTextDir {
 				currDir = directions.get(i);
 				i++;
 				shouldAdd = false;
-				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
+				if(currDir.getOrigin().getMapId() != currDir.getDestination().getMapId()){
+					isInterEdgeMap = true;
+				}
+				while((i < directions.size() && directions.get(i).isStraight() && directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()) && !isInterEdgeMap){
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());
@@ -307,8 +326,11 @@ public class GenTextDir {
 				i++;
 				shouldAdd = false;
 
-				while(i < directions.size() && directions.get(i).isStraight() && directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
-
+				if(currDir.getOrigin().getMapId() != currDir.getDestination().getMapId()){
+					isInterEdgeMap = true;
+				}
+				while((i < directions.size() && directions.get(i).isStraight() && directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()) && !isInterEdgeMap){
+				
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
 					currDir.setDestination(directions.get(i).getDestination());

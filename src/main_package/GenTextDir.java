@@ -307,7 +307,7 @@ public class GenTextDir {
 				i++;
 				shouldAdd = false;
 
-				while(i < directions.size() && directions.get(i).isStraight()&& directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
+				while(i < directions.size() && directions.get(i).isStraight() && directions.get(i).getOrigin().getMapId() == directions.get(i).getDestination().getMapId()){
 
 					currDir.setDistance(currDir.getDistance() + directions.get(i).getDistance());
 					currDir.setTime(currDir.getTime() + directions.get(i).getTime());
@@ -333,22 +333,42 @@ public class GenTextDir {
 			ArrayList<String> tempStringList = new ArrayList<String>();
 			for(int i = 0; i < directions.get(j).size(); i++){
 				currDir = directions.get(j).get(i);
-				if(currDir.getTurn().equals("slight left")){
-					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
-				} else if (currDir.getTurn().equals("left")) {
-					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
-				} else if (currDir.getTurn().equals("sharp left")) {
-					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
-				} else if (currDir.getTurn().equals("slight right")) {
-					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
-				} else if (currDir.getTurn().equals("right")) {
-					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
-				} else if (currDir.getTurn().equals("sharp right")) {
-					tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
-				} else if (currDir.getTurn().equals("straight")) {
-					tempStringList.add("From " + currDir.getOrigin().getName() + " go " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+				if(currDir.getOrigin().getName().equals(currDir.getDestination().getName())){
+					if(currDir.getTurn().equals("slight left")){
+						tempStringList.add("Take a "  + currDir.getTurn() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("left")) {
+						tempStringList.add("Take a "  + currDir.getTurn() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("sharp left")) {
+						tempStringList.add("Take a "  + currDir.getTurn() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("slight right")) {
+						tempStringList.add("Take a "  + currDir.getTurn() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("right")) {
+						tempStringList.add("Take a "  + currDir.getTurn() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("sharp right")) {
+						tempStringList.add("Take a "  + currDir.getTurn() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("straight")) {
+						tempStringList.add("Take a "  + currDir.getTurn() + " and walk for " + currDir.getDistance() + " feet.");
+					} else {
+						throw new MalformedDirectionException("This direction has the wrong turn information" + directions.get(j).get(i).getTurn());
+					}
 				} else {
-					throw new MalformedDirectionException("This direction has the wrong turn information" + directions.get(j).get(i).getTurn());
+					if(currDir.getTurn().equals("slight left")){
+						tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("left")) {
+						tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("sharp left")) {
+						tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("slight right")) {
+						tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("right")) {
+						tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("sharp right")) {
+						tempStringList.add("From " + currDir.getOrigin().getName() + " take a " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+					} else if (currDir.getTurn().equals("straight")) {
+						tempStringList.add("From " + currDir.getOrigin().getName() + " go " + currDir.getTurn() + " towards " + currDir.getDestination().getName() + " and walk for " + currDir.getDistance() + " feet.");
+					} else {
+						throw new MalformedDirectionException("This direction has the wrong turn information" + directions.get(j).get(i).getTurn());
+					}
 				}
 
 			}

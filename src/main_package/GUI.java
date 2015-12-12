@@ -36,6 +36,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import database.AlreadyExistsException;
+import database.DoesNotExistException;
+import database.PopulateErrorException;
 import database.ServerDB;
 
 public class GUI{
@@ -124,6 +126,7 @@ public class GUI{
 	private boolean resetPath = false;
 	private GradientButton btnSwapStartAndDest;
 	private GradientButton directionsButton;
+	private ArrayList<Point> roomPointsToDraw;
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
@@ -308,6 +311,7 @@ public class GUI{
 
 
 					mapTitle = maps.get(buildStartIndex-1).getMapName();
+														
 					//String mapTitle = "AtwaterKent1";
 
 					File start = new File("src/VectorMaps");
@@ -326,6 +330,8 @@ public class GUI{
 					}
 
 					startBuilds.removeAllItems();
+//-----------------------------------------------------------------------------------------------------------------------------
+					roomPointsToDraw.clear();
 					//destBuilds.removeAllItems();
 					if(buildStartIndex!=0){
 						edgeArray = new ArrayList<Edge>();
@@ -474,6 +480,7 @@ public class GUI{
 								if(check){
 								
 									tempDestRoom.add(pointArray.get(i));
+									roomPointsToDraw.add(pointArray.get(i));
 									System.out.println("testDestRoom last added: " + maps.get(buildDestIndex - 1).getPointList().get(i));
 									//mapsDropdown.addItem(maps.get(i).getMapName());
 									//DestMaps.addItem(maps.get(i).getMapName());
@@ -901,6 +908,8 @@ public class GUI{
 		gbc_directionsText.gridy = 3;
 		navMenu.add(directionsText, gbc_directionsText);
 
+		
+		
 
 		// Button to get previous step in directions
 		//sets the previous button color to green
@@ -1347,6 +1356,39 @@ public class GUI{
 	}
 
 
+	public double getMaxXPoint(ArrayList<Point> pointList){
+		int length = pointList.size();
+		double maxX = pointList.get(0).getGlobX();
+		for(int i = 0; i < length-1; i++){
+			if(pointList.get(i).getGlobX() < pointList.get(i+1).getGlobX())
+				maxX = pointList.get(i+1).getGlobX();
+		}
+		return maxX;
+	}
+	
+	public double getMaxYPoint(ArrayList<Point> pointList){
+		int length = pointList.size();
+		double maxY = pointList.get(0).getGlobX();
+		for(int i = 0; i < length-1; i++){
+			if(pointList.get(i).getGlobY() < pointList.get(i+1).getGlobY())
+				maxY = pointList.get(i+1).getGlobY();
+		}
+		return maxY;
+	}
+	
+	public ArrayList<Point> getRoomPoints(ArrayList<Point> pointList){
+		int length = pointList.size();
+		ArrayList<Point> roomPoints = new ArrayList<Point>();
+		String name = "";
+		for(int i = 0; i < length; i++){
+			name = pointList.get(i).getName();
+			name = name.trim();
+			name = name.toLowerCase();
+			if(!(name.equals("stairs top")) && !(name.equals("stairs bottom")) && !(name.equals("room")) && !(name.equals("hallway")) && !(name.equals("elevator")))
+				roomPoints.add(pointList.get(i));
+		}
+		return roomPoints;
+	}
 
 	class DrawRoute extends JPanel {
 
@@ -1369,6 +1411,9 @@ public class GUI{
 
 		@Override
 		public void paintComponent(Graphics g) {
+			
+			
+			
 			Graphics2D g2 = (Graphics2D) g;
 			if (!(img == null)) {
 
@@ -1420,6 +1465,18 @@ public class GUI{
 					drawnposy += deltay;
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
 				}
+
+				if(roomPointsToDraw != null && roomPointsToDraw.size() != 0){
+					for (int i = 0; i < roomPointsToDraw.size(); i++){
+						int point1x = (int)((roomPointsToDraw.get(i).getLocX()*newImageWidth)+drawnposx);
+						int point1y = (int)((roomPointsToDraw.get(i).getLocY()*newImageHeight)+drawnposy);			
+						g.setColor(pointColor);
+						g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+						g.setColor(Color.BLACK);
+						g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+					}
+				}
+				
 
 				if (showRoute && route != null){
 
@@ -1504,6 +1561,8 @@ public class GUI{
 			}
 
 		}
+		
+		
 	}
 }
 

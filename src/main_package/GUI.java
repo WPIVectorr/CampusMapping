@@ -1635,7 +1635,7 @@ public class GUI{
 		scrollPane.setPreferredSize(new Dimension(220, 300));
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.gridwidth = 4;
-		gbc_scrollPane.gridheight = 10;
+		gbc_scrollPane.gridheight = 9;
 		gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 0;
@@ -1649,32 +1649,51 @@ public class GUI{
 		// Text box for full list of directions, initially invisible, appears when directions button pressed
 		txtpnFullTextDir.setText(" Full List of Directions:");
 		txtpnFullTextDir.setEditable(false);
-
-		txtFieldEmail = new JTextField();
-		txtFieldEmail.setText("Enter E-Mail Here");
-		GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
-		gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
-		gbc_txtFieldEmail.gridwidth = 2;
-		gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtFieldEmail.gridx = 1;
-		gbc_txtFieldEmail.gridy = 11;
-		panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
-		txtFieldEmail.setColumns(10);
-
-		txtSearchStart.addFocusListener(new FocusListener() {
-			public void focusGained(FocusEvent e){
-				// Empty textbox for input upon click if placeholder text
-				if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
-					txtFieldEmail.setText("");
-
-			}
-
-			public void focusLost(FocusEvent e) {
-				// If textboxes are empty and somewhere else is clicked, bring back placeholder text
-				if (txtFieldEmail.getText().equals(""))
-					txtFieldEmail.setText("Enter E-Mail Here");
-			}
-		});
+		
+				txtFieldEmail = new JTextField();
+				txtFieldEmail.setText("Enter E-Mail Here");
+				GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
+				gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
+				gbc_txtFieldEmail.gridwidth = 2;
+				gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
+				gbc_txtFieldEmail.gridx = 1;
+				gbc_txtFieldEmail.gridy = 10;
+				panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
+				txtFieldEmail.setColumns(10);
+				
+						txtFieldEmail.addFocusListener(new FocusListener() {
+							public void focusGained(FocusEvent e){
+								// Empty textbox for input upon click if placeholder text
+								if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
+									txtFieldEmail.setText("");
+							}
+				
+							public void focusLost(FocusEvent e) {
+								// If textboxes are empty and somewhere else is clicked, bring back placeholder text
+								if (txtFieldEmail.getText().equals(""))
+									txtFieldEmail.setText("Enter E-Mail Here");
+							}
+						});
+		
+				GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
+				GridBagConstraints gbc_btnEmailDirections = new GridBagConstraints();
+				gbc_btnEmailDirections.insets = new Insets(0, 0, 5, 5);
+				gbc_btnEmailDirections.gridwidth = 2;
+				gbc_btnEmailDirections.anchor = GridBagConstraints.NORTH;
+				gbc_btnEmailDirections.gridx = 1;
+				gbc_btnEmailDirections.gridy = 11;
+				panelDirections.add(btnEmailDirections, gbc_btnEmailDirections);
+				btnEmailDirections.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						try {
+							new PrintDirections(textDir,finalDir,txtFieldEmail.getText());
+							txtFieldEmail.setText("");
+						} catch (AddressException e1) {
+							// TODO Auto-generated catch block
+							btnEmailDirections.setText("Invalid Address");
+						}
+					}
+				});
 
 		Component horizontalStrut_4 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_4 = new GridBagConstraints();
@@ -1690,32 +1709,12 @@ public class GUI{
 		gbc_horizontalStrut_5.gridy = 12;
 		panelDirections.add(horizontalStrut_5, gbc_horizontalStrut_5);
 
-		GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
-		GridBagConstraints gbc_btnEmailDirections = new GridBagConstraints();
-		gbc_btnEmailDirections.insets = new Insets(0, 0, 5, 5);
-		gbc_btnEmailDirections.gridwidth = 2;
-		gbc_btnEmailDirections.anchor = GridBagConstraints.NORTH;
-		gbc_btnEmailDirections.gridx = 1;
-		gbc_btnEmailDirections.gridy = 13;
-		panelDirections.add(btnEmailDirections, gbc_btnEmailDirections);
-
 		Component verticalStrut = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
 		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
 		gbc_verticalStrut.gridx = 1;
 		gbc_verticalStrut.gridy = 14;
 		panelDirections.add(verticalStrut, gbc_verticalStrut);
-		btnEmailDirections.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					new PrintDirections(textDir,finalDir,txtFieldEmail.getText());
-					txtFieldEmail.setText("");
-				} catch (AddressException e1) {
-					// TODO Auto-generated catch block
-					btnEmailDirections.setText("Invalid Address");
-				}
-			}
-		});
 
 		// Make frame visible after initializing everything
 		frame.setVisible(true);
@@ -2085,19 +2084,9 @@ public class GUI{
 						g.setColor(Color.BLACK);
 						g.drawOval((int) (point1x - (pointSize / 2)), (int) (point1y - (pointSize / 2)), pointSize,
 								pointSize);
-					} else {
-						int point1x1 = (int) ((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX()
-								* newImageWidth) + drawnposx);
-						int point1y1 = (int) ((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY()
-								* newImageHeight) + drawnposy);
-						// Prints a star indicating where the user currently is
-						Shape star = createStar(5, point1x1, point1y1, 7, 12);
-						g.setColor(starColor);
-						g2.fill(star);
-						g.setColor(Color.BLACK);
-						g2.draw(star);
-					}
+					} 
 				}
+
 
 				// Draws final oval or star in path
 				int pointx = (int) ((multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size() - 1)
@@ -2115,7 +2104,21 @@ public class GUI{
 					int point1y1 = (int) ((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocY()
 							* newImageHeight) + drawnposy);
 					Shape star = createStar(5, point1x1, point1y1, 7, 12);
-					g.setColor(pointColor);
+					g.setColor(starColor);
+					g2.fill(star);
+					g.setColor(Color.BLACK);
+					g2.draw(star);
+				}
+
+				// Draw star after so its drawn over points
+				if (textPos != multiMapFinalDir.get(mapPos).size()){
+					int point1x1 = (int) ((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX()
+							* newImageWidth) + drawnposx);
+					int point1y1 = (int) ((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY()
+							* newImageHeight) + drawnposy);
+					// Prints a star indicating where the user currently is
+					Shape star = createStar(5, point1x1, point1y1, 7, 12);
+					g.setColor(starColor);
 					g2.fill(star);
 					g.setColor(Color.BLACK);
 					g2.draw(star);

@@ -260,9 +260,11 @@ public class GUI{
 				}
 			}
 			if(check){
-				temp.add(maps.get(i).getMapName());
-				//mapsDropdown.addItem(maps.get(i).getMapName());
-				//DestMaps.addItem(maps.get(i).getMapName());
+				for(int j = 0; j < maps.get(i).getMapName().length(); j++){
+					temp.add(maps.get(i).getMapName());
+					//mapsDropdown.addItem(maps.get(i).getMapName());
+					//DestMaps.addItem(maps.get(i).getMapName());
+				}
 			}
 
 		}
@@ -1241,7 +1243,7 @@ public class GUI{
 		gbc_txtTimeToDestination.gridx = 2;
 		gbc_txtTimeToDestination.gridy = 6;
 		navMenu.add(txtTimeToDestination, gbc_txtTimeToDestination);
-		
+
 		//txtTimeToDestination.setColumns(10);
 		txtTimeToDestination.setFont(new Font("Serif", Font.PLAIN, 18));
 
@@ -1288,24 +1290,24 @@ public class GUI{
 		// Text box for full list of directions, initially invisible, appears when directions button pressed
 		txtpnFullTextDir.setText(" Full List of Directions:");
 		txtpnFullTextDir.setEditable(false);
-		
-				txtFieldEmail = new JTextField();
-				txtFieldEmail.setText("Enter E-Mail Here");
-				GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
-				gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
-				gbc_txtFieldEmail.gridwidth = 2;
-				gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
-				gbc_txtFieldEmail.gridx = 1;
-				gbc_txtFieldEmail.gridy = 11;
-				panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
-				txtFieldEmail.setColumns(10);
-				txtFieldEmail.addMouseListener(new MouseAdapter() {
-					public void mouseClicked(MouseEvent e) {
-						// Empty textbox for input upon click if placeholder text
-						if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
-							txtFieldEmail.setText("");
-					}
-				});
+
+		txtFieldEmail = new JTextField();
+		txtFieldEmail.setText("Enter E-Mail Here");
+		GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
+		gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
+		gbc_txtFieldEmail.gridwidth = 2;
+		gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtFieldEmail.gridx = 1;
+		gbc_txtFieldEmail.gridy = 11;
+		panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
+		txtFieldEmail.setColumns(10);
+		txtFieldEmail.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				// Empty textbox for input upon click if placeholder text
+				if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
+					txtFieldEmail.setText("");
+			}
+		});
 
 		Component horizontalStrut_4 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_4 = new GridBagConstraints();

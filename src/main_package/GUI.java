@@ -1060,7 +1060,9 @@ public class GUI{
 		directionsText.setHorizontalAlignment(JTextField.CENTER);
 		directionsText.setToolTipText("");
 		directionsText.setBounds(6, 174, 438, 30);
-		directionsText.setFont(new Font("SansSerif", Font.BOLD, 20));
+
+		//directionsText.setColumns(1);
+		directionsText.setFont(new Font("Serif", Font.BOLD, 20));
 		GridBagConstraints gbc_directionsText = new GridBagConstraints();
 		gbc_directionsText.gridwidth = 5;
 		gbc_directionsText.insets = new Insets(0, 0, 5, 0);

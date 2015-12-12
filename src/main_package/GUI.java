@@ -195,7 +195,7 @@ public class GUI{
 		labels.put(1, new JLabel("Priority"));
 		
 		destMapsDropDown.addItem("Select Map");
-		destMapsDropDown.addItem("Select Map");
+		startMapsDropDown.addItem("Select Map");
 
 		JSlider sliderOutside = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
 		sliderOutside.setPaintLabels(true);

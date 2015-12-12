@@ -88,6 +88,7 @@ public class GUI{
 	private Color pointColor = Color.ORANGE;
 	private Color backgroundColor = new Color(255, 235, 205);
 	private Color buttonColor = new Color(153, 204, 255);
+	private Color starColor = new Color(255, 51, 255);
 	private ArrayList<Point> pointArray;
 	private ArrayList<Edge> edgeArray;
 	private JFrame frame = new JFrame("Directions with Magnitude");
@@ -1812,6 +1813,7 @@ public class GUI{
 				previousColor = new Color(255, 75, 75);
 				nextColor = new Color(51, 255, 51);
 				pointColor = Color.ORANGE;
+				starColor = new Color(255, 51, 255);
 			}
 		});
 
@@ -1828,7 +1830,8 @@ public class GUI{
 				// Switch to color blind friendly colors
 				previousColor = new Color(182, 109, 255);
 				nextColor = new Color(0, 146, 146);
-				pointColor = new Color(146, 0, 0);
+				pointColor = new Color(255, 255, 255);
+				starColor = new Color(146, 0, 0);
 			}
 		});
 
@@ -1995,14 +1998,14 @@ public class GUI{
 
 			if (showStartPoint){
 				Shape startStar = createStar(5, (int)((startStarX * newImageWidth) + drawnposx) , (int)((startStarY * newImageHeight) + drawnposy), 7, 12);
-				g.setColor(pointColor);
+				g.setColor(starColor);
 				g2.fill(startStar);
 				g.setColor(Color.BLACK);
 				g2.draw(startStar);
 			}
 			if (showDestPoint){
 				Shape destStar = createStar(5, (int)((destStarX * newImageWidth) + drawnposx), (int)((destStarY * newImageHeight) + drawnposy), 7, 12);
-				g.setColor(pointColor);
+				g.setColor(starColor);
 				g2.fill(destStar);
 				g.setColor(Color.BLACK);
 				g2.draw(destStar);
@@ -2015,7 +2018,7 @@ public class GUI{
 				// Draw lines for all points up to current point, use
 				// previousColor (same color as "Previous" button)
 				g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 150));
-				g2.setStroke(new BasicStroke(6));
+				g2.setStroke(new BasicStroke(8));
 				for (int i = 0; i < textPos; i++) {
 					int point1x = (int) ((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() * newImageWidth)
 							+ drawnposx);
@@ -2039,7 +2042,7 @@ public class GUI{
 					// multiMapFinalDir.get(mapPos).size()-1
 					// ==
 					// textPos)){
-					g2.setStroke(new BasicStroke(12));
+					g2.setStroke(new BasicStroke(13));
 					g.setColor(currentColor);
 					int point1x = (int) ((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX()
 							* newImageWidth) + drawnposx);
@@ -2052,7 +2055,7 @@ public class GUI{
 					g2.drawLine(point1x, point1y, point2x, point2y);
 				}
 
-				g2.setStroke(new BasicStroke(6));
+				g2.setStroke(new BasicStroke(8));
 				g.setColor(nextColor);
 				for (int i = textPos + 1; i < multiMapFinalDir.get(mapPos).size(); i++) {
 					int point1x1 = (int) ((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() * newImageWidth)
@@ -2089,7 +2092,7 @@ public class GUI{
 								* newImageHeight) + drawnposy);
 						// Prints a star indicating where the user currently is
 						Shape star = createStar(5, point1x1, point1y1, 7, 12);
-						g.setColor(pointColor);
+						g.setColor(starColor);
 						g2.fill(star);
 						g.setColor(Color.BLACK);
 						g2.draw(star);

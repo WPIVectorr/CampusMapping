@@ -544,7 +544,7 @@ public class GUI{
 
 
 		// Initalize this button first so it can be used in return button
-		GradientButton btnFullTextDirections = new GradientButton("Show Full Text Directions", buttonColor);
+		GradientButton btnFullTextDirections = new GradientButton("Send email", buttonColor);
 
 
 
@@ -929,7 +929,7 @@ public class GUI{
 				menuLayout.show(menus, "Main Menu");
 				showRoute = false;
 				panelDirections.setVisible(false);
-				btnFullTextDirections.setText("Show Full Text Directions");
+				btnFullTextDirections.setText("Send Email");
 				frame.repaint();
 			}
 		});
@@ -952,7 +952,7 @@ public class GUI{
 				// Change view to preferences menu, don't show route anymore
 				menuLayout.show(menus, "Pref Menu");
 				txtpnFullTextDir.setVisible(false);
-				btnFullTextDirections.setText("Show Full Text Directions");
+				btnFullTextDirections.setText("Send Email");
 				frame.repaint();
 			}
 		});
@@ -1135,11 +1135,11 @@ public class GUI{
 			public void actionPerformed(ActionEvent e) {
 				if(panelDirections.isVisible()){
 					panelDirections.setVisible(false);
-					btnFullTextDirections.setText("Show Full Text Directions");
+					btnFullTextDirections.setText("Show Email");
 				}
 				else{
 					panelDirections.setVisible(true);
-					btnFullTextDirections.setText("Hide Full Text Directions");
+					btnFullTextDirections.setText("Hide Email");
 				}
 			}
 		});

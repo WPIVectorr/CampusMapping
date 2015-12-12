@@ -717,12 +717,17 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 			public void actionPerformed(ActionEvent g) {
 				if(isOutsideBox.isSelected()){
 					isOutsideBox.setSelected(true);
-					if(editPoint != null){
+					if(editingPoint){
 						editPoint.setOutside(true);
 						if(!(updatedPoints.contains(editPoint))){
 							updatedPoints.add(editPoint);
+						} else {
+							for(int p = 0; p < updatedPoints.size(); p++){
+								if(updatedPoints.get(p).getId() == editPoint.getId()){
+									updatedPoints.set(p, editPoint);
+								}
+							}
 						}
-						
 					}
 						
 					if(DEBUG)
@@ -730,10 +735,16 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 				}
 				else{
 					isOutsideBox.setSelected(false);
-					if(editPoint != null){
+					if(editingPoint){
 						editPoint.setOutside(false);
 						if(!(updatedPoints.contains(editPoint))){
 							updatedPoints.add(editPoint);
+						} else {
+							for(int p = 0; p < updatedPoints.size(); p++){
+								if(updatedPoints.get(p).getId() == editPoint.getId()){
+									updatedPoints.set(p, editPoint);
+								}
+							}
 						}
 					}
 					if(DEBUG)
@@ -756,11 +767,18 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 			public void actionPerformed(ActionEvent g) {
 				if(isStairsBox.isSelected()){
 					isStairsBox.setSelected(true);
-					if(editPoint != null){
+					if(editingPoint){
 						editPoint.setStairs(true);
 						if(!(updatedPoints.contains(editPoint))){
 							updatedPoints.add(editPoint);
+						} else {
+							for(int p = 0; p < updatedPoints.size(); p++){
+								if(updatedPoints.get(p).getId() == editPoint.getId()){
+									updatedPoints.set(p, editPoint);
+								}
+							}
 						}
+						
 						
 					}
 						
@@ -769,10 +787,17 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 				}
 				else{
 					isStairsBox.setSelected(false);
-					if(editPoint != null){
+					if(editingPoint){
 						editPoint.setStairs(false);
 						if(!(updatedPoints.contains(editPoint))){
 							updatedPoints.add(editPoint);
+						} else {
+							System.out.println("Updated Points does contain editPoint");
+							for(int p = 0; p < updatedPoints.size(); p++){
+								if(updatedPoints.get(p).getId() == editPoint.getId()){
+									updatedPoints.set(p, editPoint);
+								}
+							}
 						}
 					}
 					if(DEBUG)
@@ -834,10 +859,12 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 					if(DEBUG)
 						System.out.println("Updating changed points");
 					editPoint.setName(roomNumber.getText());
+					editPoint.setOutside(isOutsideBox.isSelected());
+					editPoint.setStairs(isStairsBox.isSelected());
 					if(updatedPoints.contains(editPoint)){
 						for(int r = 0; r < updatedPoints.size(); r++){
 							if(editPoint.getId().contentEquals(updatedPoints.get(r).getId())){
-								updatedPoints.set(r, currentPoint);
+								updatedPoints.set(r, editPoint);
 								r = updatedPoints.size();
 							}
 						}
@@ -1044,6 +1071,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 				for (int j = 0; j < updatedPoints.size(); j++){
 					try {
 						if(!newPoints.contains(updatedPoints.get(j))){
+							System.out.println("Update point try isStairs: " + updatedPoints.get(j).isStairs());
 							ServerDB.updatePoint(updatedPoints.get(j));
 						}
 					} catch (SQLException e1) {
@@ -1473,6 +1501,8 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 									if(pathMode){
 										Point tempEditPoint = pointArray.get(editPointIndex);
 										tempEditPoint.setName(roomNumber.getText());
+										tempEditPoint.setOutside(isOutsideBox.isSelected());
+										tempEditPoint.setStairs(isStairsBox.isSelected());
 										pointArray.set(editPointIndex, tempEditPoint);
 										if(updatedPoints.contains(tempEditPoint)){
 											for(int r = 0; r < updatedPoints.size(); r++){

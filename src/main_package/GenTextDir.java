@@ -145,7 +145,7 @@ public class GenTextDir {
 				//System.out.println("At " + currPoint.getName() + " the angle value is: " + angle);
 				//System.out.println("At " + currPoint.getName() + " the y value is: " + prevPointY);
 				//System.out.println("At " + currPoint.getName() + " the x value is: " + nextPointX);
-				if((angle >= -10) && (angle <= 10)){//if the angle is within some degree of error of 0, we are going straight
+				if((angle >= -20) && (angle <= 20)){//if the angle is within some degree of error of 0, we are going straight
 					
 					dist = 0;//Now find out the last direction
 					dist = PythagTheorem(nextPoint.getGlobX() - currPoint.getGlobX(), nextPoint.getGlobY() - currPoint.getGlobY());//CONVERT TO FEET
@@ -340,7 +340,7 @@ public class GenTextDir {
 			} else if(shouldAdd) {
 				throw new MalformedDirectionException("This direction has the wrong turn information " + directions.get(i).getTurn());
 			}
-			
+			isInterEdgeMap = false;
 			retDirections.add(currDir);
 			shouldAdd = true;
 		}
@@ -369,7 +369,7 @@ public class GenTextDir {
 					} else if (currDir.getTurn().equals("sharp right")) {
 						tempStringList.add("Take a "  + currDir.getTurn() + " and walk for " + currDir.getDistance() + " feet.");
 					} else if (currDir.getTurn().equals("straight")) {
-						tempStringList.add("Take a "  + currDir.getTurn() + " and walk for " + currDir.getDistance() + " feet.");
+						tempStringList.add("Continue "  + currDir.getTurn() + " and walk for " + currDir.getDistance() + " feet.");
 					} else {
 						throw new MalformedDirectionException("This direction has the wrong turn information" + directions.get(j).get(i).getTurn());
 					}

@@ -366,9 +366,32 @@ public class GUI{
 				}
 			}
 			if(check){
-				temp.add(maps.get(i).getMapName());
-				//mapsDropdown.addItem(maps.get(i).getMapName());
-				//DestMaps.addItem(maps.get(i).getMapName());
+				String toAdd = "";
+				boolean prevIsUnderscore = true;
+				for(int j = 0; j < maps.get(i).getMapName().length(); j++){
+					char tempChar;
+					if(prevIsUnderscore){
+						tempChar = maps.get(i).getMapName().charAt(j);
+						//converts to upper case
+						tempChar = Character.toUpperCase(tempChar);
+						prevIsUnderscore = false;
+					}
+					else if (maps.get(i).getMapName().charAt(j) == ('_')){
+						prevIsUnderscore = true;
+						tempChar = ' ';
+					}
+					else{
+						tempChar = maps.get(i).getMapName().charAt(j);
+						prevIsUnderscore = false;
+					}
+					toAdd += tempChar;
+					//mapsDropdown.addItem(maps.get(i).getMapName());
+					//DestMaps.addItem(maps.get(i).getMapName());
+				}
+				System.out.println("toAdd: " + toAdd);
+				temp.add(toAdd);
+				//temp.add(maps.get(i).getMapName());
+				
 			}
 
 		}
@@ -1082,7 +1105,7 @@ public class GUI{
 				menuLayout.show(menus, "Main Menu");
 				showRoute = false;
 				panelDirections.setVisible(false);
-				btnFullTextDirections.setText("Show Full Text Directions");
+				btnFullTextDirections.setText("Send Email");
 				frame.repaint();
 			}
 		});
@@ -1133,8 +1156,10 @@ public class GUI{
 				returnMenu = "Nav Menu";
 				// Change view to preferences menu, don't show route anymore
 				menuLayout.show(menus, "Pref Menu");
+
 				panelDirections.setVisible(false);
 				btnFullTextDirections.setText("Show Full Text Directions");
+
 				frame.repaint();
 			}
 		});
@@ -1342,6 +1367,7 @@ public class GUI{
 		gbc_btnNext.gridx = 3;
 		gbc_btnNext.gridy = 5;
 		navMenu.add(btnNext, gbc_btnNext);
+
 
 		// Add panel for drawing
 		frame.getContentPane().add(drawPanel);

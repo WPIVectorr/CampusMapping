@@ -61,6 +61,8 @@ public class GUI{
 	private Point start;
 	private Point end;
 	private boolean showRoute;
+	private boolean showStartPoint = false;
+	private boolean showDestPoint = false;
 	private JLabel directionsText;
 	private JPanel mainMenu;
 	private JPanel navMenu;
@@ -86,6 +88,7 @@ public class GUI{
 	private Color pointColor = Color.ORANGE;
 	private Color backgroundColor = new Color(255, 235, 205);
 	private Color buttonColor = new Color(153, 204, 255);
+	private Color starColor = new Color(255, 51, 255);
 	private ArrayList<Point> pointArray;
 	private ArrayList<Edge> edgeArray;
 	private JFrame frame = new JFrame("Directions with Magnitude");
@@ -96,8 +99,8 @@ public class GUI{
 	private int pointSize = 16;
 	private int originalpointSize = 25;
 	private double scaleSize = 1;
-	private int drawnposx;
-	private int drawnposy;
+	private double drawnposx;
+	private double drawnposy;
 	private boolean drawnfirst = false;
 	private int screenHeight;
 	private int screenWidth;
@@ -131,10 +134,18 @@ public class GUI{
 	private GradientButton btnSwapStartAndDest;
 	private GradientButton directionsButton;
 	private JPanel panelDirections;
+	private double mousezoomx;
+	private double mousezoomy;
+	private double minZoomSize;
 	private JTextArea txtpnFullTextDir;
 	private JTextField txtSearchStart;
 	private JTextField txtSearchDest;
 	private GradientButton btnFullTextDirections;
+	private double startStarX;
+	private double startStarY;
+	private double destStarX;
+	private double destStarY;
+
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
@@ -571,77 +582,95 @@ public class GUI{
 		});
 
 		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
-
-			@Override
-			public void ancestorMoved(HierarchyEvent e) {
-
-			}
-			@Override
-			public void ancestorResized(HierarchyEvent e) {
-				frame.repaint();
-			}           
-		});
-
+			 
+            @Override
+            public void ancestorMoved(HierarchyEvent e) {
+                           
+            }
+            @Override
+            public void ancestorResized(HierarchyEvent e) {
+            	drawnfirst = false;
+                frame.repaint();
+            }           
+        });
+		
 		drawPanel.addMouseMotionListener(new MouseMotionListener(){
 			public void mouseDragged(MouseEvent g){
 				//System.out.println("dragged");
-				drawnfirst = true;
 				Dragged = true;
 				mousex = g.getX();
 				mousey = g.getY();
 				frame.repaint();
 			}
 
-			public void mouseMoved(MouseEvent arg0) {
-
+			public void mouseMoved(MouseEvent j) {
+				//System.out.println((j.getX()-(drawnposx+newImageWidth/2))+", "+(j.getY()-(drawnposy+newImageHeight/2)));
+				mousezoomx = j.getX();
+				mousezoomy = j.getY();
 			}
 		});
 
 		frame.addMouseWheelListener(new MouseWheelListener(){
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				scrolled = true;
-				String message;
-				int notches = e.getWheelRotation();
-				if (notches < 0) {
-					message = "Mouse wheel moved UP " + -notches + " notch(es)\n";
-				} else {
-					message = "Mouse wheel moved DOWN " + notches + " notch(es)\n";
-				}
-				double oldWidth = img.getWidth() * scaleSize;
-				double oldHeight = img.getHeight() * scaleSize;
-				if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(mapTitle.equals("Select Map")))) {
-					drawnfirst = true;
-					scroldirection = e.getWheelRotation();
-					if (e.getWheelRotation() > 0) {
-						if (scaleSize <= 2) {
-							// System.out.println("scale before plus: " +
-							// scaleSize);
-							scaleSize += (e.getWheelRotation() * .01);
-							// System.out.println("scale plus: " + scaleSize);
-							atMinZoom = false;
-						} else {
-							atMaxZoom = true;
-						}
-					} else {
-						if (scaleSize >= 0.1) {
-							// System.out.println("scale before minus: " +
-							// scaleSize);
-							scaleSize += (e.getWheelRotation() * .01);
-							// System.out.println("scale minus: " + scaleSize);
-							atMaxZoom = false;
-						} else {
-							atMinZoom = true;
+				if(!mapTitle.equals("Select Map")){
+					scrolled = true;
+					if(!(img == null)){
+						minZoomSize = 1 / ((double) img.getWidth() / (double) drawPanel.getWidth());
+						int WidthSize = (int) ((double) img.getHeight() * minZoomSize);
+						if (WidthSize > (double) drawPanel.getHeight()) {
+							minZoomSize = 1 / ((double) img.getHeight() / (double) drawPanel.getHeight());
 						}
 					}
-					double newWidth = img.getWidth() * scaleSize;
-					double newHeight = img.getHeight() * scaleSize;
-					difWidth = (oldWidth - newWidth);
-					difHeight = (oldHeight - newHeight);
-				} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
-
+					System.out.println(minZoomSize);
+					double oldWidth = (img.getWidth() * scaleSize);
+					double oldHeight = (img.getHeight() * scaleSize);
+					if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(mapTitle.equals("Select Map")))) {
+						drawnfirst = true;
+						if (e.getWheelRotation() > 0) {
+							if (scaleSize <= 2) {
+								scroldirection = 1;
+								scaleSize += (scroldirection * .02);
+								atMinZoom = false;
+							} else {
+								atMaxZoom = true;
+							}
+						} else {
+							if (scaleSize >= (minZoomSize)) {
+								scroldirection = -1;
+								// System.out.println("scale before minus: " +
+								// scaleSize);
+								scaleSize += (scroldirection * .02);
+								// System.out.println("scale minus: " + scaleSize);
+								atMaxZoom = false;
+							} else {
+								atMinZoom = true;
+							}
+						}
+						if(atMaxZoom == false && atMinZoom == false){
+							double ogx = ((mousezoomx-drawnposx)/oldWidth);
+							double ogy = ((mousezoomy-drawnposy)/oldHeight);
+							//System.out.println("old map size: "+oldWidth+", "+oldHeight);
+							//System.out.println("drawn pos x and y: "+drawnposx+", "+drawnposy);
+							//System.out.println("percentage x and y: "+ogx+", "+ogy);
+							double newWidth = (img.getWidth() * scaleSize);
+							double newHeight = (img.getHeight() * scaleSize);
+							difWidth = ((ogx*(oldWidth-newWidth)));//((ogx*((oldWidth-newWidth)*2)));
+							difHeight = ((ogy*(oldHeight-newHeight)));//((ogy*((oldHeight-newHeight)*2)));
+							//System.out.println("difference pos: "+movex+", "+movey);
+							//System.out.println("move pos: "+difWidth+", "+difHeight);
+							//System.out.println("new map size: "+newWidth+", "+newHeight);
+							//System.out.println("imagesize in scroll: "+newWidth+", "+newHeight);
+							//System.out.println("size diff: "+(oldHeight-newHeight));
+							drawnposx += difWidth;
+							drawnposy += difHeight;
+						}else{
+							difHeight = 0;
+						}
+						drawPanel.repaint();
+					} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+	
+					}
 				}
-				frame.repaint();
-				// System.out.println(message);
 			}
 		});
 
@@ -793,6 +822,16 @@ public class GUI{
 					startBuilds.setEnabled(false);
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
+					showStartPoint = false;
+					try{
+						tempImg = img;
+						img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+					}
+					catch(IOException g){
+						System.out.println("Invalid logo1");
+						g.printStackTrace();
+					}
+					frame.repaint();
 				}
 				else{
 					startBuilds.setEnabled(true);
@@ -908,6 +947,16 @@ public class GUI{
 					destBuilds.setEnabled(false);
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
+					showDestPoint = false;
+					try{
+						tempImg = img;
+						img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+					}
+					catch(IOException g){
+						System.out.println("Invalid logo1");
+						g.printStackTrace();
+					}
+					frame.repaint();
 				}
 				else{
 
@@ -1083,6 +1132,17 @@ public class GUI{
 		startBuilds.setEnabled(false);
 		mainMenu.add(startBuilds, gbc_startBuilds);
 		startBuilds.setBounds(122, 30, 148, 20);
+		startBuilds.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (startBuilds.getItemCount() != 0){
+					showStartPoint = true;
+					showDestPoint = false;
+					startStarX = ((Point)(startBuilds.getSelectedItem())).getLocX();
+					startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
+					frame.repaint();
+				}
+			}
+		});
 
 		//adds the destination label to the line with destination location options
 		JLabel lblDestination = new JLabel("Destination Room:");
@@ -1094,6 +1154,7 @@ public class GUI{
 		mainMenu.add(lblDestination, gbc_lblDestination);
 		lblDestination.setBounds(6, 68, 85, 44);
 		lblDestination.setLabelFor(destBuilds);
+
 		//adds destBuilds to the dropdown for destination
 		GridBagConstraints gbc_destBuilds = new GridBagConstraints();
 		gbc_destBuilds.gridwidth = 2;
@@ -1104,6 +1165,17 @@ public class GUI{
 		destBuilds.setEnabled(false);
 		mainMenu.add(destBuilds, gbc_destBuilds);
 		destBuilds.setBounds(122, 30, 148, 20);
+		destBuilds.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (destBuilds.getItemCount() != 0){
+					showDestPoint = true;
+					showStartPoint = false;
+					destStarX = ((Point)(destBuilds.getSelectedItem())).getLocX();
+					destStarY = ((Point)(destBuilds.getSelectedItem())).getLocY();
+					frame.repaint();
+				}
+			}
+		});
 
 		//buttonPanel.add(destBuilds);
 		destBuilds.setBounds(122, 80, 148, 20);
@@ -1124,6 +1196,8 @@ public class GUI{
 				// reset text position and map position indexes
 				textPos = 0;
 				mapPos = 0;
+				showStartPoint = false;
+				showDestPoint = false;
 
 
 				//gets the start and end building and room numbers the user chose
@@ -1271,6 +1345,99 @@ public class GUI{
 					directionsText.setText("Pick two different points");
 					frame.repaint();
 				}
+			}
+		});
+
+		drawPanel.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				originx = e.getX();
+				originy = e.getY();
+			}
+		});
+
+		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
+
+			@Override
+			public void ancestorMoved(HierarchyEvent e) {
+
+			}
+			@Override
+			public void ancestorResized(HierarchyEvent e) {
+				drawnfirst = false;
+                frame.repaint();
+			}           
+		});
+
+		drawPanel.addMouseMotionListener(new MouseMotionListener(){
+			public void mouseDragged(MouseEvent g){
+				if(!mapTitle.equals("Select Map")){
+					//System.out.println("dragged");
+					drawnfirst = true;
+					Dragged = true;
+					mousex = g.getX();
+					mousey = g.getY();
+					frame.repaint();
+				}
+			}
+
+			public void mouseMoved(MouseEvent j) {
+				mousezoomx = j.getX();
+				mousezoomy = j.getY();
+			}
+		});
+
+		frame.addMouseWheelListener(new MouseWheelListener(){
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				if(!mapTitle.equals("Select Map")){
+					minZoomSize = 1 / ((double) img.getWidth() / (double) drawPanel.getWidth());
+					int WidthSize = (int) ((double) img.getHeight() * minZoomSize);
+					if (WidthSize > (double) drawPanel.getHeight()) {
+						minZoomSize = 1 / ((double) img.getHeight() / (double) drawPanel.getHeight());
+					}
+					System.out.println(minZoomSize);
+					double oldWidth = (img.getWidth() * scaleSize);
+					double oldHeight = (img.getHeight() * scaleSize);
+					if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && !mapTitle.equals("SelectMap")){
+						drawnfirst = true;
+						if (e.getWheelRotation() > 0) {
+							if (scaleSize <= 2) {
+								scroldirection = 1;
+								scaleSize += (scroldirection * .02);
+								atMinZoom = false;
+							} else {
+								atMaxZoom = true;
+							}
+						} else {
+							if (scaleSize >= (minZoomSize)) {
+								scroldirection = -1;
+								// System.out.println("scale before minus: " +
+								// scaleSize);
+								scaleSize += (scroldirection * .02);
+								// System.out.println("scale minus: " + scaleSize);
+								atMaxZoom = false;
+							} else {
+								atMinZoom = true;
+							}
+						}
+						if(atMaxZoom == false && atMinZoom == false){
+							double ogx = ((mousezoomx-drawnposx)/oldWidth);
+							double ogy = ((mousezoomy-drawnposy)/oldHeight);
+							double newWidth = (img.getWidth() * scaleSize);
+							double newHeight = (img.getHeight() * scaleSize);
+							difWidth = ((ogx*(oldWidth-newWidth)));
+							difHeight = ((ogy*(oldHeight-newHeight)));
+							drawnposx += difWidth;
+							drawnposy += difHeight;
+						}else{
+							difHeight = 0;
+						}
+						frame.repaint();
+					} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+	
+					}
+				}
+				
+				// System.out.println(message);
 			}
 		});
 
@@ -1586,7 +1753,7 @@ public class GUI{
 		scrollPane.setPreferredSize(new Dimension(220, 300));
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.gridwidth = 4;
-		gbc_scrollPane.gridheight = 10;
+		gbc_scrollPane.gridheight = 9;
 		gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 0;
@@ -1600,32 +1767,51 @@ public class GUI{
 		// Text box for full list of directions, initially invisible, appears when directions button pressed
 		txtpnFullTextDir.setText(" Full List of Directions:");
 		txtpnFullTextDir.setEditable(false);
-
-		txtFieldEmail = new JTextField();
-		txtFieldEmail.setText("Enter E-Mail Here");
-		GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
-		gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
-		gbc_txtFieldEmail.gridwidth = 2;
-		gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtFieldEmail.gridx = 1;
-		gbc_txtFieldEmail.gridy = 11;
-		panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
-		txtFieldEmail.setColumns(10);
-
-		txtSearchStart.addFocusListener(new FocusListener() {
-			public void focusGained(FocusEvent e){
-				// Empty textbox for input upon click if placeholder text
-				if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
-					txtFieldEmail.setText("");
-
-			}
-
-			public void focusLost(FocusEvent e) {
-				// If textboxes are empty and somewhere else is clicked, bring back placeholder text
-				if (txtFieldEmail.getText().equals(""))
-					txtFieldEmail.setText("Enter E-Mail Here");
-			}
-		});
+		
+				txtFieldEmail = new JTextField();
+				txtFieldEmail.setText("Enter E-Mail Here");
+				GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
+				gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
+				gbc_txtFieldEmail.gridwidth = 2;
+				gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
+				gbc_txtFieldEmail.gridx = 1;
+				gbc_txtFieldEmail.gridy = 10;
+				panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
+				txtFieldEmail.setColumns(10);
+				
+						txtFieldEmail.addFocusListener(new FocusListener() {
+							public void focusGained(FocusEvent e){
+								// Empty textbox for input upon click if placeholder text
+								if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
+									txtFieldEmail.setText("");
+							}
+				
+							public void focusLost(FocusEvent e) {
+								// If textboxes are empty and somewhere else is clicked, bring back placeholder text
+								if (txtFieldEmail.getText().equals(""))
+									txtFieldEmail.setText("Enter E-Mail Here");
+							}
+						});
+		
+				GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
+				GridBagConstraints gbc_btnEmailDirections = new GridBagConstraints();
+				gbc_btnEmailDirections.insets = new Insets(0, 0, 5, 5);
+				gbc_btnEmailDirections.gridwidth = 2;
+				gbc_btnEmailDirections.anchor = GridBagConstraints.NORTH;
+				gbc_btnEmailDirections.gridx = 1;
+				gbc_btnEmailDirections.gridy = 11;
+				panelDirections.add(btnEmailDirections, gbc_btnEmailDirections);
+				btnEmailDirections.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						try {
+							new PrintDirections(textDir,finalDir,txtFieldEmail.getText());
+							txtFieldEmail.setText("");
+						} catch (AddressException e1) {
+							// TODO Auto-generated catch block
+							btnEmailDirections.setText("Invalid Address");
+						}
+					}
+				});
 
 		Component horizontalStrut_4 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_4 = new GridBagConstraints();
@@ -1641,32 +1827,12 @@ public class GUI{
 		gbc_horizontalStrut_5.gridy = 12;
 		panelDirections.add(horizontalStrut_5, gbc_horizontalStrut_5);
 
-		GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
-		GridBagConstraints gbc_btnEmailDirections = new GridBagConstraints();
-		gbc_btnEmailDirections.insets = new Insets(0, 0, 5, 5);
-		gbc_btnEmailDirections.gridwidth = 2;
-		gbc_btnEmailDirections.anchor = GridBagConstraints.NORTH;
-		gbc_btnEmailDirections.gridx = 1;
-		gbc_btnEmailDirections.gridy = 13;
-		panelDirections.add(btnEmailDirections, gbc_btnEmailDirections);
-
 		Component verticalStrut = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
 		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
 		gbc_verticalStrut.gridx = 1;
 		gbc_verticalStrut.gridy = 14;
 		panelDirections.add(verticalStrut, gbc_verticalStrut);
-		btnEmailDirections.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					new PrintDirections(textDir,finalDir,txtFieldEmail.getText());
-					txtFieldEmail.setText("");
-				} catch (AddressException e1) {
-					// TODO Auto-generated catch block
-					btnEmailDirections.setText("Invalid Address");
-				}
-			}
-		});
 
 		// Make frame visible after initializing everything
 		frame.setVisible(true);
@@ -1764,6 +1930,7 @@ public class GUI{
 				previousColor = new Color(255, 75, 75);
 				nextColor = new Color(51, 255, 51);
 				pointColor = Color.ORANGE;
+				starColor = new Color(255, 51, 255);
 			}
 		});
 
@@ -1780,7 +1947,8 @@ public class GUI{
 				// Switch to color blind friendly colors
 				previousColor = new Color(182, 109, 255);
 				nextColor = new Color(0, 146, 146);
-				pointColor = new Color(146, 0, 0);
+				pointColor = new Color(255, 255, 255);
+				starColor = new Color(146, 0, 0);
 			}
 		});
 
@@ -1897,9 +2065,6 @@ public class GUI{
 				if (drawnfirst == false) {
 					windowScale = ((double) img.getWidth() / (double) drawPanel.getWidth());
 					scaleSize = 1 / ((double) img.getWidth() / (double) drawPanel.getWidth());
-					// System.out.println("setting: "+scaleSize);
-					// System.out.println("Image Original Width " +
-					// img.getWidth());
 					int WidthSize = (int) ((double) img.getHeight() / windowScale);
 					if (WidthSize > (double) drawPanel.getHeight()) {
 						windowScale = (double) img.getHeight() / (double) drawPanel.getHeight();
@@ -1912,17 +2077,15 @@ public class GUI{
 					int centery = (drawPanel.getHeight() / 2);
 					drawnposx = centerx - (int) (newImageWidth / 2);
 					drawnposy = centery - (int) (newImageHeight / 2);
-					g.drawImage(img, drawnposx, drawnposy, (int) newImageWidth, (int) newImageHeight, null);
+					g.drawImage(img, (int)drawnposx, (int)drawnposy, (int) newImageWidth, (int) newImageHeight, null);
 					// System.out.println(newImageWidth+", "+newImageHeight);
 				} else {
 					double deltax = 0;
 					double deltay = 0;
-					newImageHeight = (int) img.getHeight() * scaleSize;
-					newImageWidth = (int) img.getWidth() * scaleSize;
-					if (!(mapTitle.equals("Select Map"))) {
+					newImageHeight = (int) (img.getHeight() * scaleSize);
+					newImageWidth = (int) (img.getWidth() * scaleSize);
+					if (!mapTitle.equals("Select Map")){
 						if (Dragged) {
-							if (DEBUG)
-								System.out.println("dragged");
 							deltax = -(originx - mousex);
 							deltay = -(originy - mousey);
 							originx = mousex;
@@ -1930,19 +2093,30 @@ public class GUI{
 							difWidth = 0;
 							difHeight = 0;
 						} else if (scrolled) {
-							if (DEBUG)
-								System.out.println("I did it");
-							deltax = difWidth;
-							deltay = difWidth;
+							deltax = 0;
+							deltay = 0;
 							scrolled = false;
 						}
-
 						drawnposx += deltax;
 						drawnposy += deltay;
-						g.drawImage(img, drawnposx, drawnposy, (int) newImageWidth, (int) newImageHeight, null);
-
+						g.drawImage(img, (int)drawnposx, (int)drawnposy, (int) newImageWidth, (int) newImageHeight, null);
 					}
 				}
+			}
+
+			if (showStartPoint){
+				Shape startStar = createStar(5, (int)((startStarX * newImageWidth) + drawnposx) , (int)((startStarY * newImageHeight) + drawnposy), 7, 12);
+				g.setColor(starColor);
+				g2.fill(startStar);
+				g.setColor(Color.BLACK);
+				g2.draw(startStar);
+			}
+			if (showDestPoint){
+				Shape destStar = createStar(5, (int)((destStarX * newImageWidth) + drawnposx), (int)((destStarY * newImageHeight) + drawnposy), 7, 12);
+				g.setColor(starColor);
+				g2.fill(destStar);
+				g.setColor(Color.BLACK);
+				g2.draw(destStar);
 			}
 
 			if (showRoute && route != null) {
@@ -1952,7 +2126,7 @@ public class GUI{
 				// Draw lines for all points up to current point, use
 				// previousColor (same color as "Previous" button)
 				g.setColor(new Color(previousColor.getRed(), previousColor.getGreen(), previousColor.getBlue(), 150));
-				g2.setStroke(new BasicStroke(6));
+				g2.setStroke(new BasicStroke(8));
 				for (int i = 0; i < textPos; i++) {
 					int point1x = (int) ((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() * newImageWidth)
 							+ drawnposx);
@@ -1976,7 +2150,7 @@ public class GUI{
 					// multiMapFinalDir.get(mapPos).size()-1
 					// ==
 					// textPos)){
-					g2.setStroke(new BasicStroke(12));
+					g2.setStroke(new BasicStroke(13));
 					g.setColor(currentColor);
 					int point1x = (int) ((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX()
 							* newImageWidth) + drawnposx);
@@ -1989,7 +2163,7 @@ public class GUI{
 					g2.drawLine(point1x, point1y, point2x, point2y);
 				}
 
-				g2.setStroke(new BasicStroke(6));
+				g2.setStroke(new BasicStroke(8));
 				g.setColor(nextColor);
 				for (int i = textPos + 1; i < multiMapFinalDir.get(mapPos).size(); i++) {
 					int point1x1 = (int) ((multiMapFinalDir.get(mapPos).get(i).getOrigin().getLocX() * newImageWidth)
@@ -2019,19 +2193,9 @@ public class GUI{
 						g.setColor(Color.BLACK);
 						g.drawOval((int) (point1x - (pointSize / 2)), (int) (point1y - (pointSize / 2)), pointSize,
 								pointSize);
-					} else {
-						int point1x1 = (int) ((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX()
-								* newImageWidth) + drawnposx);
-						int point1y1 = (int) ((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY()
-								* newImageHeight) + drawnposy);
-						// Prints a star indicating where the user currently is
-						Shape star = createStar(5, point1x1, point1y1, 7, 12);
-						g.setColor(pointColor);
-						g2.fill(star);
-						g.setColor(Color.BLACK);
-						g2.draw(star);
-					}
+					} 
 				}
+
 
 				// Draws final oval or star in path
 				int pointx = (int) ((multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size() - 1)
@@ -2049,7 +2213,21 @@ public class GUI{
 					int point1y1 = (int) ((multiMapFinalDir.get(mapPos).get(textPos - 1).getDestination().getLocY()
 							* newImageHeight) + drawnposy);
 					Shape star = createStar(5, point1x1, point1y1, 7, 12);
-					g.setColor(pointColor);
+					g.setColor(starColor);
+					g2.fill(star);
+					g.setColor(Color.BLACK);
+					g2.draw(star);
+				}
+
+				// Draw star after so its drawn over points
+				if (textPos != multiMapFinalDir.get(mapPos).size()){
+					int point1x1 = (int) ((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX()
+							* newImageWidth) + drawnposx);
+					int point1y1 = (int) ((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocY()
+							* newImageHeight) + drawnposy);
+					// Prints a star indicating where the user currently is
+					Shape star = createStar(5, point1x1, point1y1, 7, 12);
+					g.setColor(starColor);
 					g2.fill(star);
 					g.setColor(Color.BLACK);
 					g2.draw(star);

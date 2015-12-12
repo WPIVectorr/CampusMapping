@@ -1,37 +1,89 @@
 package main_package;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Locale;
 
-import javax.mail.search.SearchTerm;
-
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.StringUtils.*;
-
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.CaseInsensitiveMap;
 
 public class SearchLocation {
 
-	private static ArrayList<String> longNames = new ArrayList<String>();
+	private static HashMap<String, ArrayList<String>> allNames = new HashMap<String, ArrayList<String>>();
+	private static HashMap<String, ArrayList<String>> longNameHash = new HashMap<String, ArrayList<String>>();
+
 	private static ArrayList<String> shortNames = new ArrayList<String>();
 	private static ArrayList<String> roomNums = new ArrayList<String>();
+	private static HashMap<String, Point> pointNames = new HashMap<String,Point>();
+	
+	
+	private static ArrayList<String> AKNames = new ArrayList<String>();
+
 	
 	public SearchLocation() {
 		// TODO Auto-generated constructor stub
-		longNames.add("Atwater Kent");
-		longNames.add("Stratton Hall");
-		longNames.add("Boynton Hall");
-		longNames.add("Salisbury Labs");
-		longNames.add("Gordon Library");
-		longNames.add("Campus Center");
-		longNames.add("Higgins Labs");
-		longNames.add("Fuller Labs");
-		longNames.add("Kaven Hall");
-		longNames.add("Higgins House");
-		longNames.add("Washburn Shops");
-		longNames.add("Alden Hall");
-		longNames.add("Olin Hall");
 		
+
+		allNames.put("AK", AKNames);
+		
+		
+		ArrayList<String> StrattonHall 		= 	new ArrayList<String>();
+		ArrayList<String> BoyntonHall 		= 	new ArrayList<String>();
+		ArrayList<String> SalisburyLabs 	= 	new ArrayList<String>();
+		ArrayList<String> GordonLibrary 	= 	new ArrayList<String>();
+		ArrayList<String> CampusCenter 		= 	new ArrayList<String>();
+		ArrayList<String> HigginsLabs 		= 	new ArrayList<String>();
+		ArrayList<String> FullerLabs 		= 	new ArrayList<String>();
+		ArrayList<String> KavenHall 		= 	new ArrayList<String>();
+		ArrayList<String> HigginsHouse 		= 	new ArrayList<String>();
+		ArrayList<String> WashburnShops 	= 	new ArrayList<String>();
+		ArrayList<String> AldenHall 		= 	new ArrayList<String>();
+		ArrayList<String> OlinHall 			= 	new ArrayList<String>();
+		ArrayList<String> AtwaterKent 		= 	new ArrayList<String>();
+		ArrayList<String> West157 			= 	new ArrayList<String>();
+		ArrayList<String> Campus 			= 	new ArrayList<String>();
+		ArrayList<String> AlumniGym 		= 	new ArrayList<String>();
+		ArrayList<String> ProjectCenter		= 	new ArrayList<String>();
+
+
+		StrattonHall.add("SH");		StrattonHall.add("Stratton Hall");		StrattonHall.add("Stratton");
+		BoyntonHall.add("BH");		BoyntonHall.add("Boynton Hall");		BoyntonHall.add("Boynton");
+		SalisburyLabs.add("SL");	SalisburyLabs.add("Salisbury Labs");	SalisburyLabs.add("Salisbury");
+		GordonLibrary.add("GL");	GordonLibrary.add("Gordon Library");	GordonLibrary.add("Library");
+		CampusCenter.add("CC");		CampusCenter.add("Campus Center");		CampusCenter.add("Rubin Campus Center");
+		HigginsLabs.add("HL");		HigginsLabs.add("Higgins Labs");		HigginsLabs.add("Higgins");
+		FullerLabs.add("FL");		FullerLabs.add("Fuller Labs");		 	FullerLabs.add("Fuller");
+		KavenHall.add("KH");		KavenHall.add("Kaven Hall");		 	KavenHall.add("Kaven");
+		HigginsHouse.add("HH");		HigginsHouse.add("Higgins House");		HigginsHouse.add("Grandma's House");
+		WashburnShops.add("WB");	WashburnShops.add("Washburn Shops");	WashburnShops.add("Washburn");
+		AldenHall.add("AH");		AldenHall.add("Alden Hall");		 	AldenHall.add("Alden");
+		OlinHall.add("OH");		 	OlinHall.add("Olin Hall");		 		OlinHall.add("Olin");
+		West157.add("SDCC");		West157.add("157 West");		 		West157.add("157");
+		Campus.add("Fountain");	 	Campus.add("Campus");		 			Campus.add("Seal");
+		AlumniGym.add("AG");		AlumniGym.add("Alumni Gym");		 	AlumniGym.add("Alumni");
+		ProjectCenter.add("PC");	ProjectCenter.add("Project Center");	ProjectCenter.add("CDC");
+		AtwaterKent.add("AK");		AtwaterKent.add("Atwater Kent");
+	
+		
+		allNames.put("SH",		StrattonHall);
+		allNames.put("BH",		BoyntonHall);
+		allNames.put("SL",		SalisburyLabs);
+		allNames.put("GL",		GordonLibrary);
+		allNames.put("CC",		CampusCenter);
+		allNames.put("HL",		HigginsLabs);
+		allNames.put("FL",		FullerLabs);
+		allNames.put("KH",		KavenHall);
+		allNames.put("HH",		HigginsHouse);
+		allNames.put("WS",		WashburnShops);
+		allNames.put("AH",		AldenHall);
+		allNames.put("OH",		OlinHall);
+		allNames.put("AK",		AtwaterKent);
+		allNames.put("PC",		ProjectCenter);
+		allNames.put("AG",		AlumniGym);
+		allNames.put("Fountain",Campus);
+		allNames.put("SDCC",	West157);
+
+
+
 		shortNames.add("AK");
 		shortNames.add("SH");
 		shortNames.add("BH");
@@ -72,11 +124,34 @@ public class SearchLocation {
 		{	
 			String pointName = point.getName();
 			String lowerPointName = pointName.toLowerCase();
-			if(pointName.equalsIgnoreCase("room") || lowerPointName.contains("stair") || lowerPointName.contains("hallway") 
-					|| lowerPointName.contains("path") || lowerPointName.contains("elevator") )
-				shortNames.add(pointName);
-		}		
+			if(!(pointName.equalsIgnoreCase("room") || lowerPointName.contains("stair") || lowerPointName.contains("hallway") 
+					|| lowerPointName.contains("path") || lowerPointName.contains("elevator")) )
+			{
+				
 
+
+				for(String LN:getLongName(pointName))
+				{
+					pointNames.put(LN, point);
+
+				}
+			}
+		}		
+	}
+	
+	public static ArrayList<String> getLongName(String pointName)
+	{
+		ArrayList<String> longNameReturn = new ArrayList<String>();
+		int spaceIndex = pointName.indexOf(" ");
+		String shortName = pointName.substring(0,spaceIndex);
+		System.out.println("ShortName: "+shortName);
+		
+		longNameReturn = longNameHash.get(shortName);
+		//longNames.add(e);
+		
+		
+		
+		return longNameReturn;
 	}
 
 	public static void main(String[] args) {
@@ -130,7 +205,7 @@ public class SearchLocation {
 		ArrayList<ArrayList<String>> orderList = new ArrayList<ArrayList<String>>();
 		
 		
-		
+/*		
 		for(String shortName:shortNames)
 		{ 
 			ArrayList<String> addArray = new ArrayList<String>();
@@ -142,7 +217,7 @@ public class SearchLocation {
 			ArrayList<String> addArray = new ArrayList<String>();
 			addArray.add(longName);
 			orderList.add(addArray);			
-		}		
+		}		*/
 		for(ArrayList<String> nameArray:orderList)
 		{
 			Integer levenshtein = compareStrings(nameArray.get(0),searchTerm);
@@ -156,7 +231,13 @@ public class SearchLocation {
 		{
 			if(Integer.parseInt(sortedName.get(1))!=0)
 			{
-				results.add(sortedName.get(0));
+				String buildingLetter = sortedName.get(0).substring(0, 1);
+				String searchLetter = searchTerm.substring(0,1);
+				System.out.println("build Letter: "+buildingLetter+" Search letter: "+searchLetter);
+				if(buildingLetter.equalsIgnoreCase(searchLetter))
+				{
+					results.add(sortedName.get(0));
+				}
 			}
 			//System.out.println("Build: "+sortedName.get(0)+" lev: "+ sortedName.get(1));
 		}

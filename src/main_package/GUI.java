@@ -366,12 +366,32 @@ public class GUI{
 				}
 			}
 			if(check){
+				String toAdd = "";
+				boolean prevIsUnderscore = true;
 				for(int j = 0; j < maps.get(i).getMapName().length(); j++){
-					
-					temp.add(maps.get(i).getMapName());
+					char tempChar;
+					if(prevIsUnderscore){
+						tempChar = maps.get(i).getMapName().charAt(j);
+						//converts to upper case
+						tempChar = Character.toUpperCase(tempChar);
+						prevIsUnderscore = false;
+					}
+					else if (maps.get(i).getMapName().charAt(j) == ('_')){
+						prevIsUnderscore = true;
+						tempChar = ' ';
+					}
+					else{
+						tempChar = maps.get(i).getMapName().charAt(j);
+						prevIsUnderscore = false;
+					}
+					toAdd += tempChar;
 					//mapsDropdown.addItem(maps.get(i).getMapName());
 					//DestMaps.addItem(maps.get(i).getMapName());
 				}
+				System.out.println("toAdd: " + toAdd);
+				temp.add(toAdd);
+				//temp.add(maps.get(i).getMapName());
+				
 			}
 
 		}

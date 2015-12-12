@@ -367,6 +367,7 @@ public class GUI{
 			}
 			if(check){
 				for(int j = 0; j < maps.get(i).getMapName().length(); j++){
+					
 					temp.add(maps.get(i).getMapName());
 					//mapsDropdown.addItem(maps.get(i).getMapName());
 					//DestMaps.addItem(maps.get(i).getMapName());

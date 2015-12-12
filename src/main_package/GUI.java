@@ -155,9 +155,11 @@ public class GUI{
 
 		maps = md.getMapsFromLocal();
 		allPoints = new ArrayList<Point>();
+		System.out.println("All Points: " );
 		for(int i = 0; i < maps.size(); i++){
 			for(int j = 0; j < maps.get(i).getPointList().size(); j++){
 				allPoints.add(maps.get(i).getPointList().get(j));
+				
 			}
 		}
 		//System.out.println("------------------edges check-------------------");

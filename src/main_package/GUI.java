@@ -166,15 +166,22 @@ public class GUI{
 		mainMenu = new JPanel();
 		mainMenu.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		mainMenu.setBackground(backgroundColor);
+		
+		GridBagLayout gbl_mainMenu = new GridBagLayout();
+		gbl_mainMenu.columnWidths = new int[]{80, 90, 131, 44, 150, 90, 131, 44, 80};
+		gbl_mainMenu.rowHeights = new int[]{10, 18, 27, 0, 0, 0, 0, 0, 0};
+		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		mainMenu.setLayout(gbl_mainMenu);
 
 		navMenu = new JPanel();
 		navMenu.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		navMenu.setBackground(backgroundColor);
 
 		GridBagLayout gbl_navMenu = new GridBagLayout();
-		gbl_navMenu.columnWidths = new int[]{30, 320, 298, 320, 30, 0};
+		gbl_navMenu.columnWidths = new int[]{30, 215, 290, 215, 30, 0};
 		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 0, 31, 30, 7, 0};
-		gbl_navMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_navMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
 
@@ -348,12 +355,7 @@ public class GUI{
                 startRoomArray[0] = "Select a room";
             }
         });*/
-		GridBagLayout gbl_mainMenu = new GridBagLayout();
-		gbl_mainMenu.columnWidths = new int[]{80, 90, 175, 150, 90, 175, 80};
-		gbl_mainMenu.rowHeights = new int[]{10, 18, 27, 0, 0, 0, 0, 0, 0};
-		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		mainMenu.setLayout(gbl_mainMenu);
+
 		boolean check = true;
 		ArrayList<String> temp = new ArrayList<String> ();
 		for(int i = 0; i < maps.size(); i++){	
@@ -407,7 +409,7 @@ public class GUI{
 				GridBagConstraints gbc_btnOptionsMain = new GridBagConstraints();
 				gbc_btnOptionsMain.anchor = GridBagConstraints.SOUTH;
 				gbc_btnOptionsMain.insets = new Insets(0, 0, 5, 5);
-				gbc_btnOptionsMain.gridx = 5;
+				gbc_btnOptionsMain.gridx = 6;
 				gbc_btnOptionsMain.gridy = 1;
 				mainMenu.add(btnOptionsMain, gbc_btnOptionsMain);
 				btnOptionsMain.addActionListener(new ActionListener() {
@@ -422,7 +424,7 @@ public class GUI{
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
 		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 0);
-		gbc_horizontalStrut.gridx = 6;
+		gbc_horizontalStrut.gridx = 8;
 		gbc_horizontalStrut.gridy = 1;
 		mainMenu.add(horizontalStrut, gbc_horizontalStrut);
 
@@ -522,49 +524,90 @@ public class GUI{
 		gbc_lblStart.gridx = 1;
 		gbc_lblStart.gridy = 2;
 		mainMenu.add(lblStart, gbc_lblStart);
+		
+		GradientButton btnClearStart = new GradientButton("X", Color.RED);
+		btnClearStart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				txtSearchStart.setText("");
+				startMapsDropDown.setSelectedIndex(0);
+			}
+		});
+		GridBagConstraints gbc_btnClearStart = new GridBagConstraints();
+		gbc_btnClearStart.insets = new Insets(0, 0, 5, 5);
+		gbc_btnClearStart.gridx = 3;
+		gbc_btnClearStart.gridy = 2;
+		mainMenu.add(btnClearStart, gbc_btnClearStart);
 
 		JLabel lblDestination_1 = new JLabel("Destination");
 		GridBagConstraints gbc_lblDestination_1 = new GridBagConstraints();
 		gbc_lblDestination_1.gridwidth = 2;
 		gbc_lblDestination_1.insets = new Insets(0, 0, 5, 5);
-		gbc_lblDestination_1.gridx = 4;
+		gbc_lblDestination_1.gridx = 5;
 		gbc_lblDestination_1.gridy = 2;
 		mainMenu.add(lblDestination_1, gbc_lblDestination_1);
+		
+		GradientButton btnClearDest = new GradientButton("X", Color.RED);
+		GridBagConstraints gbc_btnClearDest = new GridBagConstraints();
+		gbc_btnClearDest.insets = new Insets(0, 0, 5, 5);
+		gbc_btnClearDest.gridx = 7;
+		gbc_btnClearDest.gridy = 2;
+		mainMenu.add(btnClearDest, gbc_btnClearDest);
+		btnClearDest.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				txtSearchDest.setText("");
+				destMapsDropDown.setSelectedIndex(0);
+			}
+		});
 
 
 		txtSearchStart = new JTextField();
 		txtSearchStart.setText("Search");
 		GridBagConstraints gbc_txtSearchStart = new GridBagConstraints();
-		gbc_txtSearchStart.gridwidth = 2;
+		gbc_txtSearchStart.gridwidth = 3;
 		gbc_txtSearchStart.insets = new Insets(0, 0, 5, 5);
 		gbc_txtSearchStart.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtSearchStart.gridx = 1;
 		gbc_txtSearchStart.gridy = 3;
 		mainMenu.add(txtSearchStart, gbc_txtSearchStart);
 		txtSearchStart.setColumns(10);
-		txtSearchStart.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
+		
+		txtSearchStart.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e){
 				// Empty textbox for input upon click if placeholder text
 				if (txtSearchStart.getText().equals("Search"))
 					txtSearchStart.setText("");
+					
+				}
+			
+			public void focusLost(FocusEvent e) {
+				// If textboxes are empty and somewhere else is clicked, bring back placeholder text
+				if (txtSearchStart.getText().equals(""))
+					txtSearchStart.setText("Search");
 			}
 		});
 
 		txtSearchDest = new JTextField();
 		txtSearchDest.setText("Search");
 		GridBagConstraints gbc_txtSearchDest = new GridBagConstraints();
-		gbc_txtSearchDest.gridwidth = 2;
+		gbc_txtSearchDest.gridwidth = 3;
 		gbc_txtSearchDest.insets = new Insets(0, 0, 5, 5);
 		gbc_txtSearchDest.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtSearchDest.gridx = 4;
+		gbc_txtSearchDest.gridx = 5;
 		gbc_txtSearchDest.gridy = 3;
 		mainMenu.add(txtSearchDest, gbc_txtSearchDest);
 		txtSearchDest.setColumns(10);
-		txtSearchDest.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
+
+		txtSearchDest.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e){				
 				// Empty textbox for input upon click if placeholder text
 				if (txtSearchDest.getText().equals("Search"))
 					txtSearchDest.setText("");
+				}
+			
+			public void focusLost(FocusEvent e) {
+				// If textboxes are empty and somewhere else is clicked, bring back placeholder text
+				if (txtSearchDest.getText().equals(""))
+					txtSearchDest.setText("Search");
 			}
 		});
 
@@ -579,12 +622,9 @@ public class GUI{
 		gbc_lblMaps.gridy = 4;
 		mainMenu.add(lblMaps, gbc_lblMaps);
 
-		startMapsDropDown.addItem("Select Map");
-
-
-
 		//creates a dropdown menu with map names
 		GridBagConstraints gbc_mapsDropdown = new GridBagConstraints();
+		gbc_mapsDropdown.gridwidth = 2;
 		gbc_mapsDropdown.fill = GridBagConstraints.BOTH;
 		gbc_mapsDropdown.insets = new Insets(0, 0, 5, 5);
 		gbc_mapsDropdown.gridx = 2;
@@ -832,7 +872,7 @@ public class GUI{
 				btnSwapStartAndDest.setEnabled(false);
 				GridBagConstraints gbc_btnSwapStartAndDest = new GridBagConstraints();
 				gbc_btnSwapStartAndDest.insets = new Insets(0, 0, 5, 5);
-				gbc_btnSwapStartAndDest.gridx = 3;
+				gbc_btnSwapStartAndDest.gridx = 4;
 				gbc_btnSwapStartAndDest.gridy = 4;
 				mainMenu.add(btnSwapStartAndDest, gbc_btnSwapStartAndDest);
 				btnSwapStartAndDest.addActionListener(new ActionListener() {
@@ -854,15 +894,16 @@ public class GUI{
 		GridBagConstraints gbc_lblDestinationMap = new GridBagConstraints();
 		gbc_lblDestinationMap.fill = GridBagConstraints.HORIZONTAL;
 		gbc_lblDestinationMap.insets = new Insets(0, 0, 5, 5);
-		gbc_lblDestinationMap.gridx = 4;
+		gbc_lblDestinationMap.gridx = 5;
 		gbc_lblDestinationMap.gridy = 4;
 		mainMenu.add(lblDestinationMap, gbc_lblDestinationMap);
 
 
 		GridBagConstraints gbc_destMaps = new GridBagConstraints();
+		gbc_destMaps.gridwidth = 2;
 		gbc_destMaps.fill = GridBagConstraints.HORIZONTAL;
 		gbc_destMaps.insets = new Insets(0, 0, 5, 5);
-		gbc_destMaps.gridx = 5;
+		gbc_destMaps.gridx = 6;
 		gbc_destMaps.gridy = 4;
 		mainMenu.add(destMapsDropDown, gbc_destMaps);
 
@@ -881,6 +922,7 @@ public class GUI{
 
 		//creates drop down box with building names
 		GridBagConstraints gbc_startBuilds = new GridBagConstraints();
+		gbc_startBuilds.gridwidth = 2;
 		gbc_startBuilds.fill = GridBagConstraints.BOTH;
 		gbc_startBuilds.insets = new Insets(0, 0, 5, 5);
 		gbc_startBuilds.gridx = 2;
@@ -894,16 +936,17 @@ public class GUI{
 		GridBagConstraints gbc_lblDestination = new GridBagConstraints();
 		gbc_lblDestination.fill = GridBagConstraints.BOTH;
 		gbc_lblDestination.insets = new Insets(0, 0, 5, 5);
-		gbc_lblDestination.gridx = 4;
+		gbc_lblDestination.gridx = 5;
 		gbc_lblDestination.gridy = 5;
 		mainMenu.add(lblDestination, gbc_lblDestination);
 		lblDestination.setBounds(6, 68, 85, 44);
 		lblDestination.setLabelFor(destBuilds);
 		//adds destBuilds to the dropdown for destination
 		GridBagConstraints gbc_destBuilds = new GridBagConstraints();
+		gbc_destBuilds.gridwidth = 2;
 		gbc_destBuilds.fill = GridBagConstraints.BOTH;
 		gbc_destBuilds.insets = new Insets(0, 0, 5, 5);
-		gbc_destBuilds.gridx = 5;
+		gbc_destBuilds.gridx = 6;
 		gbc_destBuilds.gridy = 5;
 		destBuilds.setEnabled(false);
 		mainMenu.add(destBuilds, gbc_destBuilds);
@@ -919,7 +962,7 @@ public class GUI{
 		GridBagConstraints gbc_directionsButton = new GridBagConstraints();
 		gbc_directionsButton.insets = new Insets(0, 0, 5, 5);
 		gbc_directionsButton.fill = GridBagConstraints.VERTICAL;
-		gbc_directionsButton.gridx = 3;
+		gbc_directionsButton.gridx = 4;
 		gbc_directionsButton.gridy = 6;
 		mainMenu.add(directionsButton, gbc_directionsButton);
 		directionsButton.addActionListener(new ActionListener() {
@@ -1415,11 +1458,19 @@ public class GUI{
 		gbc_txtFieldEmail.gridy = 11;
 		panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
 		txtFieldEmail.setColumns(10);
-		txtFieldEmail.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
+		
+		txtSearchStart.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e){
 				// Empty textbox for input upon click if placeholder text
 				if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
 					txtFieldEmail.setText("");
+				
+				}
+			
+			public void focusLost(FocusEvent e) {
+				// If textboxes are empty and somewhere else is clicked, bring back placeholder text
+				if (txtFieldEmail.getText().equals(""))
+					txtFieldEmail.setText("Enter E-Mail Here");
 			}
 		});
 
@@ -1476,7 +1527,7 @@ public class GUI{
 		GridBagLayout gbl_prefMenu = new GridBagLayout();
 		gbl_prefMenu.columnWidths = new int[]{40, 100, 100, 200, 200, 0, 136, 40, 0};
 		gbl_prefMenu.rowHeights = new int[]{0, 0, 10, 0, 32, 12, 11, 0};
-		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		prefMenu.setLayout(gbl_prefMenu);
 

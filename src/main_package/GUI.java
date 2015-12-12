@@ -61,6 +61,8 @@ public class GUI{
 	private Point start;
 	private Point end;
 	private boolean showRoute;
+	private boolean showStartPoint = false;
+	private boolean showDestPoint = false;
 	private JLabel directionsText;
 	private JPanel mainMenu;
 	private JPanel navMenu;
@@ -135,6 +137,10 @@ public class GUI{
 	private JTextField txtSearchStart;
 	private JTextField txtSearchDest;
 	private GradientButton btnFullTextDirections;
+	private double startStarX;
+	private double startStarY;
+	private double destStarX;
+	private double destStarY;
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
@@ -790,6 +796,16 @@ public class GUI{
 					startBuilds.setEnabled(false);
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
+					showStartPoint = false;
+					try{
+						tempImg = img;
+						img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+					}
+					catch(IOException g){
+						System.out.println("Invalid logo1");
+						g.printStackTrace();
+					}
+					frame.repaint();
 				}
 				else{
 					startBuilds.setEnabled(true);
@@ -905,6 +921,16 @@ public class GUI{
 					destBuilds.setEnabled(false);
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
+					showDestPoint = false;
+					try{
+						tempImg = img;
+						img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+					}
+					catch(IOException g){
+						System.out.println("Invalid logo1");
+						g.printStackTrace();
+					}
+					frame.repaint();
 				}
 				else{
 
@@ -1080,6 +1106,17 @@ public class GUI{
 		startBuilds.setEnabled(false);
 		mainMenu.add(startBuilds, gbc_startBuilds);
 		startBuilds.setBounds(122, 30, 148, 20);
+		startBuilds.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (startBuilds.getItemCount() != 0){
+					showStartPoint = true;
+					showDestPoint = false;
+					startStarX = ((Point)(startBuilds.getSelectedItem())).getLocX();
+					startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
+					frame.repaint();
+				}
+			}
+		});
 
 		//adds the destination label to the line with destination location options
 		JLabel lblDestination = new JLabel("Destination Room:");
@@ -1091,6 +1128,7 @@ public class GUI{
 		mainMenu.add(lblDestination, gbc_lblDestination);
 		lblDestination.setBounds(6, 68, 85, 44);
 		lblDestination.setLabelFor(destBuilds);
+
 		//adds destBuilds to the dropdown for destination
 		GridBagConstraints gbc_destBuilds = new GridBagConstraints();
 		gbc_destBuilds.gridwidth = 2;
@@ -1101,6 +1139,17 @@ public class GUI{
 		destBuilds.setEnabled(false);
 		mainMenu.add(destBuilds, gbc_destBuilds);
 		destBuilds.setBounds(122, 30, 148, 20);
+		destBuilds.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (destBuilds.getItemCount() != 0){
+					showDestPoint = true;
+					showStartPoint = false;
+					destStarX = ((Point)(destBuilds.getSelectedItem())).getLocX();
+					destStarY = ((Point)(destBuilds.getSelectedItem())).getLocY();
+					frame.repaint();
+				}
+			}
+		});
 
 		//buttonPanel.add(destBuilds);
 		destBuilds.setBounds(122, 80, 148, 20);
@@ -1121,6 +1170,8 @@ public class GUI{
 				// reset text position and map position indexes
 				textPos = 0;
 				mapPos = 0;
+				showStartPoint = false;
+				showDestPoint = false;
 
 
 				//gets the start and end building and room numbers the user chose
@@ -1940,6 +1991,21 @@ public class GUI{
 
 					}
 				}
+			}
+
+			if (showStartPoint){
+				Shape startStar = createStar(5, (int)((startStarX * newImageWidth) + drawnposx) , (int)((startStarY * newImageHeight) + drawnposy), 7, 12);
+				g.setColor(pointColor);
+				g2.fill(startStar);
+				g.setColor(Color.BLACK);
+				g2.draw(startStar);
+			}
+			if (showDestPoint){
+				Shape destStar = createStar(5, (int)((destStarX * newImageWidth) + drawnposx), (int)((destStarY * newImageHeight) + drawnposy), 7, 12);
+				g.setColor(pointColor);
+				g2.fill(destStar);
+				g.setColor(Color.BLACK);
+				g2.draw(destStar);
 			}
 
 			if (showRoute && route != null) {

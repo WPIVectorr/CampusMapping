@@ -28,35 +28,21 @@ import database.ServerDB;
 import database.NoMapException;
 import database.PopulateErrorException;
 
-public class MapUpdaterGUI{
+public class MapUpdaterGUI extends MapUpdaterControl{
 
 	private int lastMousex, lastMousey;
 	private int pointSize = 10;
 	private boolean newClick = false;
-	private boolean editingPoint = false;
-	private static boolean addingMap = false;
-	private ArrayList<Point> pointArray = new ArrayList<Point>();
-	private ArrayList<Point> oldPoints = new ArrayList<Point>();
-	private ArrayList<Point> newPoints = new ArrayList<Point>();
-	private ArrayList<Point> updatedPoints = new ArrayList<Point>();
-	private ArrayList<Point> markForDelete = new ArrayList<Point>();
+	
 
-
-	private Point currentPoint;
-	private Point editPoint;
-	private int editPointIndex;
+	
 	String name = "Select Map";
-	File destinationFile;
 	File logo;
 	int prevRadButtonVal = 0;
 
-	private Map currentMap = null;
 	//private static ServerDB md = ServerDB.getInstance();
 
-	private ArrayList<Edge> edgeArray = new ArrayList<Edge>();
-	private ArrayList<Edge> newEdges = new ArrayList<Edge>();
-	private ArrayList<Edge> drawnEdges = new ArrayList<Edge>();
-	private Edge currentEdge;
+	
 
 	// ---------------------------------
 	private double windowScale = 2;
@@ -75,12 +61,8 @@ public class MapUpdaterGUI{
 	private static JCheckBox isStairsBox;
 
 	//---------------------------------
-	private final static boolean DEBUG = false;
 
-	String point1;
-	String point2;
-	String point3;
-	String point4;
+
 	private JTextField roomNumber;
 	private DrawPanel drawPanel = new DrawPanel();
 	private JTextField mapName;
@@ -88,10 +70,7 @@ public class MapUpdaterGUI{
 	private static JComboBox<String> mapDropDown;
 	private File mapToAdd;
 	private JCheckBox chckbxPathMode;
-	private Boolean pathMode = false;
-	private static String maptitle = "";
-	private static String srcInput = "";
-	private static File srcFile = null;
+	
 
 	private Color buttonColor = new Color(153, 204, 255);
 
@@ -106,11 +85,9 @@ public class MapUpdaterGUI{
 	//private ArrayList<Map> maps = new ArrayList<Map>();
 	private static ArrayList<Map> emptyMaps = new ArrayList<Map>();
 	private JButton btnConnectToOther;
-	private InterMapEdgeGUI connectMapGUI;
+	
 	private static SplashPage loadingAnimation = new SplashPage();
-	private double scaleSize = 1;
-	private int drawnposx;
-	private int drawnposy;
+	
 	private boolean drawnfirst = false;
 	private int screenHeight;
 	private int screenWidth;
@@ -124,8 +101,7 @@ public class MapUpdaterGUI{
 	private int originy;
 	private double difWidth;
 	private double difHeight;
-	private double newImageHeight;
-	private double newImageWidth;
+
 	private boolean scrolled = false;
 
 
@@ -735,12 +711,17 @@ public class MapUpdaterGUI{
 			public void actionPerformed(ActionEvent g) {
 				if(isOutsideBox.isSelected()){
 					isOutsideBox.setSelected(true);
-					if(editPoint != null){
+					if(editingPoint){
 						editPoint.setOutside(true);
 						if(!(updatedPoints.contains(editPoint))){
 							updatedPoints.add(editPoint);
+						} else {
+							for(int p = 0; p < updatedPoints.size(); p++){
+								if(updatedPoints.get(p).getId() == editPoint.getId()){
+									updatedPoints.set(p, editPoint);
+								}
+							}
 						}
-						
 					}
 						
 					if(DEBUG)
@@ -748,10 +729,16 @@ public class MapUpdaterGUI{
 				}
 				else{
 					isOutsideBox.setSelected(false);
-					if(editPoint != null){
+					if(editingPoint){
 						editPoint.setOutside(false);
 						if(!(updatedPoints.contains(editPoint))){
 							updatedPoints.add(editPoint);
+						} else {
+							for(int p = 0; p < updatedPoints.size(); p++){
+								if(updatedPoints.get(p).getId() == editPoint.getId()){
+									updatedPoints.set(p, editPoint);
+								}
+							}
 						}
 					}
 					if(DEBUG)
@@ -774,11 +761,18 @@ public class MapUpdaterGUI{
 			public void actionPerformed(ActionEvent g) {
 				if(isStairsBox.isSelected()){
 					isStairsBox.setSelected(true);
-					if(editPoint != null){
+					if(editingPoint){
 						editPoint.setStairs(true);
 						if(!(updatedPoints.contains(editPoint))){
 							updatedPoints.add(editPoint);
+						} else {
+							for(int p = 0; p < updatedPoints.size(); p++){
+								if(updatedPoints.get(p).getId() == editPoint.getId()){
+									updatedPoints.set(p, editPoint);
+								}
+							}
 						}
+						
 						
 					}
 						
@@ -787,10 +781,17 @@ public class MapUpdaterGUI{
 				}
 				else{
 					isStairsBox.setSelected(false);
-					if(editPoint != null){
+					if(editingPoint){
 						editPoint.setStairs(false);
 						if(!(updatedPoints.contains(editPoint))){
 							updatedPoints.add(editPoint);
+						} else {
+							System.out.println("Updated Points does contain editPoint");
+							for(int p = 0; p < updatedPoints.size(); p++){
+								if(updatedPoints.get(p).getId() == editPoint.getId()){
+									updatedPoints.set(p, editPoint);
+								}
+							}
 						}
 					}
 					if(DEBUG)
@@ -852,10 +853,12 @@ public class MapUpdaterGUI{
 					if(DEBUG)
 						System.out.println("Updating changed points");
 					editPoint.setName(roomNumber.getText());
+					editPoint.setOutside(isOutsideBox.isSelected());
+					editPoint.setStairs(isStairsBox.isSelected());
 					if(updatedPoints.contains(editPoint)){
 						for(int r = 0; r < updatedPoints.size(); r++){
 							if(editPoint.getId().contentEquals(updatedPoints.get(r).getId())){
-								updatedPoints.set(r, currentPoint);
+								updatedPoints.set(r, editPoint);
 								r = updatedPoints.size();
 							}
 						}
@@ -1041,6 +1044,7 @@ public class MapUpdaterGUI{
 				for (int j = 0; j < updatedPoints.size(); j++){
 					try {
 						if(!newPoints.contains(updatedPoints.get(j))){
+							System.out.println("Update point try isStairs: " + updatedPoints.get(j).isStairs());
 							ServerDB.updatePoint(updatedPoints.get(j));
 						}
 					} catch (SQLException e1) {
@@ -1214,7 +1218,7 @@ public class MapUpdaterGUI{
 
 		@Override
 		public void paintComponent(Graphics g) {
-
+			Graphics2D g2d= (Graphics2D) g;
 			super.paintComponent(g);
 			Graphics2D g2D = (Graphics2D) g;
 
@@ -1242,8 +1246,8 @@ public class MapUpdaterGUI{
 					newImageHeight = (int)((double)img.getHeight() / windowScale);
 					int centerx = (drawPanel.getWidth()/2);
 					int centery = (drawPanel.getHeight()/2);
-					drawnposx = centerx -(int)(newImageWidth/2);
 					drawnposy = centery -(int)(newImageHeight/2);
+					MapUpdaterControl.setImageConstraints(drawPanel, img );
 					g.drawImage(img, drawnposx, drawnposy, (int)newImageWidth, (int)newImageHeight, null);
 					//System.out.println(newImageWidth+", "+newImageHeight);
 				} else{
@@ -1284,8 +1288,10 @@ public class MapUpdaterGUI{
 			// loop)
 			if (newClick == true) {
 				//System.out.println(newClick);
+				
 				if (getRadButton() == 1) // if addpoint
 				{
+
 					
 					Integer nameNumber = currentMap.getPointIDIndex()+1;
 					double ourRotation = currentMap.getRotationAngle();
@@ -1357,6 +1363,7 @@ public class MapUpdaterGUI{
 						pointArray.add(point);
 						newPoints.add(point);
 					}
+
 					//System.out.println("add point to map: "+currentMap.getMapId()+" Point Array size: "+pointArray.size());
 					repaint();
 				}
@@ -1400,18 +1407,18 @@ public class MapUpdaterGUI{
 									&& (lastMousey > posy - (pointSize + (1*scaleSize))
 											&& lastMousey < posy + (pointSize + (1*scaleSize)))) {
 								if (newClick == true && editingPoint == false) {
+									//if we select a new point to edit
 									editPoint = currentPoint;
 									isOutsideBox.setSelected(editPoint.isOutside());
 									isStairsBox.setSelected(editPoint.isStairs());
 									editPointIndex = i;
+									editingPoint = true;
 									roomNumber.setText(editPoint.getName());
 									btnSavePoint.setText("Unselect Current Point");
-									editingPoint = true;
-									newClick = false;/*
-								g.setColor(Color.ORANGE);
-								g.fillOval(currentPoint.getLocX() - 4, currentPoint.getLocY() - 4, 8, 8);*/
+									
 								} else if (newClick == true && editingPoint == true) {
 									if(editPoint.getId().contentEquals(currentPoint.getId())){
+
 
 									} else {
 										currentEdge = new Edge(editPoint, currentPoint);
@@ -1470,6 +1477,8 @@ public class MapUpdaterGUI{
 									if(pathMode){
 										Point tempEditPoint = pointArray.get(editPointIndex);
 										tempEditPoint.setName(roomNumber.getText());
+										tempEditPoint.setOutside(isOutsideBox.isSelected());
+										tempEditPoint.setStairs(isStairsBox.isSelected());
 										pointArray.set(editPointIndex, tempEditPoint);
 										if(updatedPoints.contains(tempEditPoint)){
 											for(int r = 0; r < updatedPoints.size(); r++){
@@ -1485,14 +1494,20 @@ public class MapUpdaterGUI{
 										isOutsideBox.setSelected(editPoint.isOutside());
 										isStairsBox.setSelected(editPoint.isStairs());
 										editPointIndex = i;
-										roomNumber.setText(editPoint.getName());
-									}
 
+										roomNumber.setText(editPoint.getName());
+										btnSavePoint.setText("Unselect Current Point");
+
+
+									}
 								}
+								
 								repaint();
 							}
 							break;
 						case 3:// remove points
+							editingPoint = false;
+							
 							if(DEBUG){
 								System.out.println("Remove point called.");
 								System.out.println("Size of edgeArray:"+edgeArray.size());
@@ -1683,12 +1698,19 @@ public class MapUpdaterGUI{
 				int point1y = (int)((edgeArray.get(j).getPoint1().getLocY()*newImageHeight)+drawnposy);
 				int point2x = (int)((edgeArray.get(j).getPoint2().getLocX()*newImageWidth)+drawnposx);
 				int point2y = (int)((edgeArray.get(j).getPoint2().getLocY()*newImageHeight)+drawnposy);
+
 				g2D.drawLine(point1x, point1y, point2x, point2y);
+
 				drawnEdges.add(edgeArray.get(j));
 				g2D.setColor(Color.BLACK);
 				//}
 			}
-
+			if(editingPoint && editPoint != null)
+			{
+				g.setColor(Color.ORANGE);
+				g.fillOval((int)editPoint.getLocX() - 4, (int)editPoint.getLocY() - 4, 8, 8);
+			}
+			
 			for( int w = 0; w < pointArray.size(); w++){
 				int drawX = (int) (double)((pointArray.get(w).getLocX()*newImageWidth)+drawnposx);
 				int drawY = (int) (double)((pointArray.get(w).getLocY()*newImageHeight)+drawnposy);

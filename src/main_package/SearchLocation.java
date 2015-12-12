@@ -6,24 +6,23 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 
+import database.ServerDB;
+
 public class SearchLocation {
 
 	private static HashMap<String, ArrayList<String>> allNames = new HashMap<String, ArrayList<String>>();
-	private static HashMap<String, ArrayList<String>> longNameHash = new HashMap<String, ArrayList<String>>();
 
 	private static ArrayList<String> shortNames = new ArrayList<String>();
 	private static ArrayList<String> roomNums = new ArrayList<String>();
-	private static HashMap<String, Point> pointNames = new HashMap<String,Point>();
+	private static FuzzyHashMap pointNames = new FuzzyHashMap(FuzzyHashMap.PRE_HASHING_METHOD.SOUNDEX);
 	
 	
-	private static ArrayList<String> AKNames = new ArrayList<String>();
 
 	
-	public SearchLocation() {
+	private static void prepData() {
 		// TODO Auto-generated constructor stub
 		
 
-		allNames.put("AK", AKNames);
 		
 		
 		ArrayList<String> StrattonHall 		= 	new ArrayList<String>();
@@ -73,94 +72,101 @@ public class SearchLocation {
 		allNames.put("FL",		FullerLabs);
 		allNames.put("KH",		KavenHall);
 		allNames.put("HH",		HigginsHouse);
-		allNames.put("WS",		WashburnShops);
+		allNames.put("WB",		WashburnShops);
 		allNames.put("AH",		AldenHall);
 		allNames.put("OH",		OlinHall);
 		allNames.put("AK",		AtwaterKent);
 		allNames.put("PC",		ProjectCenter);
 		allNames.put("AG",		AlumniGym);
 		allNames.put("Fountain",Campus);
+		allNames.put("Seal", 	Campus);
 		allNames.put("SDCC",	West157);
-
-
-
-		shortNames.add("AK");
-		shortNames.add("SH");
-		shortNames.add("BH");
-		shortNames.add("SL");
-		shortNames.add("GL");
-		shortNames.add("CC");
-		shortNames.add("HL");
-		shortNames.add("FL");
-		shortNames.add("KH");
-		shortNames.add("HH");
-		shortNames.add("WS");
-		shortNames.add("AH");
-		shortNames.add("OH");
-		
-		roomNums.add("001");
-		roomNums.add("201");
-		roomNums.add("202");
-		roomNums.add("203");
-		roomNums.add("303");
-		roomNums.add("508");
-		roomNums.add("002");
-		roomNums.add("004");
-		roomNums.add("004");
-		roomNums.add("332");
-		roomNums.add("116");
-		roomNums.add("113");
-		roomNums.add("Chairman's Room");
-		roomNums.add("Lower");
-		roomNums.add("Upper");
-		roomNums.add("334");
-		roomNums.add("204");
-		
 	}
 	
 	public SearchLocation(ArrayList<Point> pointArray)	
 	{
+		prepData();
+		
+		
 		for(Point point:pointArray)
 		{	
 			String pointName = point.getName();
 			String lowerPointName = pointName.toLowerCase();
 			if(!(pointName.equalsIgnoreCase("room") || lowerPointName.contains("stair") || lowerPointName.contains("hallway") 
-					|| lowerPointName.contains("path") || lowerPointName.contains("elevator")) )
+					|| lowerPointName.contains("path") || lowerPointName.contains("elevator")) || lowerPointName.contains("entrance"))
 			{
-				
-
-
 				for(String LN:getLongName(pointName))
 				{
-					pointNames.put(LN, point);
-
+					//System.out.println("long point name: " + LN);
+					pointNames.putFuzzy(LN, point);
 				}
 			}
 		}		
 	}
 	
+	//get's the list of aliases for a point on the map
+	//these points are added to the hashmap on return
+	//@param pointName name of the point, including number
+	//@return returns arrayList of aliases generated from tables
 	public static ArrayList<String> getLongName(String pointName)
 	{
+		ArrayList<String> aliasList = new ArrayList<String>();
 		ArrayList<String> longNameReturn = new ArrayList<String>();
-		int spaceIndex = pointName.indexOf(" ");
-		String shortName = pointName.substring(0,spaceIndex);
+
+	String shortName;
+	String roomNum;
+		if(pointName.contains(" ")){
+		String[] arr = pointName.split(" ",2);
+		 shortName = arr[0];
+		 roomNum = arr[1];
+		}
+		else{
+			shortName = pointName;
+			roomNum = "";
+		}
 		System.out.println("ShortName: "+shortName);
 		
-		longNameReturn = longNameHash.get(shortName);
+/*		int spaceIndex = pointName.indexOf(" ");
+		String shortName = pointName.substring(0,spaceIndex);
+		System.out.println("ShortName: "+shortName);*/
+		
+		//all of the aliases without roomnumattached
+		aliasList = allNames.get(shortName);
 		//longNames.add(e);
-		
-		
-		
-		return longNameReturn;
+		//for every aliase obtained from the tables, add the room number to store in the
+		//pointnames fuzzyhash
+		if(aliasList != null)
+		{
+			for(int count = 0; count < aliasList.size(); count++)
+			{
+				longNameReturn.add(aliasList.get(count).concat(" ").concat(roomNum));
+				System.out.println("full alias: "+longNameReturn.get(count));
+			}
+			return longNameReturn;
+
+		}else{
+			System.out.println("no mapping for: "+pointName);
+			return new ArrayList<String>();
+
+		}
 	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		new SearchLocation();
+		//new SearchLocation();
+		ArrayList<Map> maps = ServerDB.getMapsFromLocal();
+		ArrayList<Point> allPoints = new ArrayList<Point>();
+		for(int i = 0; i < maps.size(); i++){
+			for(int j = 0; j < maps.get(i).getPointList().size(); j++){
+				allPoints.add(maps.get(i).getPointList().get(j));
+			}
+		}
+		
+		new SearchLocation(allPoints);
 		ArrayList<String> searchTerms = new ArrayList<String>();
 		searchTerms.add(StringUtils.lowerCase("Atwater Kent"));
-		searchTerms.add(StringUtils.lowerCase("AK"));
-		searchTerms.add(StringUtils.lowerCase("AH"));
+		//searchTerms.add(StringUtils.lowerCase("AK"));
+		//searchTerms.add(StringUtils.lowerCase("AH"));
 
 		searchTerms.add(StringUtils.lowerCase("a"));
 		searchTerms.add(StringUtils.lowerCase("at"));
@@ -178,19 +184,18 @@ public class SearchLocation {
 		searchTerms.add(StringUtils.lowerCase("atwter Kent"));
 		searchTerms.add(StringUtils.lowerCase("atwater Kent"));
 		searchTerms.add(StringUtils.lowerCase("atwaterkent"));
-		
+		searchTerms.add(StringUtils.lowerCase("atwater 302"));
+
 		
 		
 		for(String search:searchTerms)
 		{
 			//search for one of the items in the test array
-			ArrayList<String> results = searchFor(search);
-			System.out.println("Searched for: "+ search+" Result: " );
-			for(int i = 0; i<results.size();i++)
+			Point result = searchFor(search);
+			if(result != null)
 			{
-				System.out.println(i+" " +results.get(i));
+				System.out.println("Searched for: "+ search+" Result: " +result.getName());
 			}
-			System.out.println(" ");
 	
 		}
 
@@ -199,29 +204,17 @@ public class SearchLocation {
 	
 	
 	//return a sorted arraylist of 
-	public static ArrayList<String> searchFor(String searchTerm)
+	public static Point searchFor(String searchTerm)
 	{
-		ArrayList<String> results = new ArrayList<String>();
+/*		ArrayList<String> results = new ArrayList<String>();
 		ArrayList<ArrayList<String>> orderList = new ArrayList<ArrayList<String>>();
 		
 		
-/*		
-		for(String shortName:shortNames)
-		{ 
-			ArrayList<String> addArray = new ArrayList<String>();
-			addArray.add(shortName);
-			orderList.add(addArray);		
-		}		
-		for(String longName:longNames)
-		{ 
-			ArrayList<String> addArray = new ArrayList<String>();
-			addArray.add(longName);
-			orderList.add(addArray);			
-		}		*/
+
 		for(ArrayList<String> nameArray:orderList)
 		{
-			Integer levenshtein = compareStrings(nameArray.get(0),searchTerm);
-			nameArray.add(levenshtein.toString());		
+			//Integer levenshtein = compareStrings(,searchTerm);
+			//nameArray.add(levenshtein.toString());		
 			//System.out.println("Lev: "+nameArray.get(1)+" Searchterm: "+searchTerm+" compare: "+nameArray.get(0));
 		}
 		
@@ -240,8 +233,15 @@ public class SearchLocation {
 				}
 			}
 			//System.out.println("Build: "+sortedName.get(0)+" lev: "+ sortedName.get(1));
+		}*/
+		Point result = (Point) pointNames.getFuzzy(searchTerm,10);
+		if(result == null){
+			System.out.println("Result = null");
 		}
-		return results;
+		else{
+			//System.out.println("In searched for: "+ result.getName());
+		}
+		return result;
 	}
 
 	

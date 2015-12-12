@@ -210,7 +210,13 @@ public class GUI{
 					timeEst = (int) (estimatedDirDist / walkSpeed);
 					int minEst = (int) Math.floor(timeEst / 60);
 					int secEst = timeEst % 60;
-					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
+					String secEstString = Integer.toString(secEst);
+					if(secEstString.length() == 1){
+						secEstString = "0" + secEstString;
+					} else if (secEstString.length() == 0){
+						secEstString = "00";
+					}
+					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
 				}
 				// Set button colors based on preferences selected
 				btnPrevious.setColor(previousColor);
@@ -897,7 +903,13 @@ public class GUI{
 						timeEst = (int) (estimatedDirDist / walkSpeed);
 						int minEst = (int) Math.floor(timeEst / 60);
 						int secEst = timeEst % 60;
-						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
+						String secEstString = Integer.toString(secEst);
+						if(secEstString.length() == 1){
+							secEstString = "0" + secEstString;
+						} else if (secEstString.length() == 0){
+							secEstString = "00";
+						}
+						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
 
 						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
 
@@ -1102,7 +1114,13 @@ public class GUI{
 					}
 					int minEst = (int) Math.floor(timeEst / 60);
 					int secEst = timeEst % 60;
-					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
+					String secEstString = Integer.toString(secEst);
+					if(secEstString.length() == 1){
+						secEstString = "0" + secEstString;
+					} else if (secEstString.length() == 0){
+						secEstString = "00";
+					}
+					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
 					textPos--;
 					directionsText.setText(textDir.get(mapPos).get(textPos));
 					if (!btnNext.isEnabled()){
@@ -1139,7 +1157,13 @@ public class GUI{
 						timeEst -= Math.floor((multiMapFinalDir.get(mapPos).get(textPos).getDistance()/walkSpeed));
 						int minEst = (int) Math.floor(timeEst / 60);
 						int secEst = timeEst % 60;
-						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
+						String secEstString = Integer.toString(secEst);
+						if(secEstString.length() == 1){
+							secEstString = "0" + secEstString;
+						} else if (secEstString.length() == 0){
+							secEstString = "00";
+						}
+						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
 
 						textPos++;
 						if (!btnPrevious.isEnabled()){
@@ -1213,6 +1237,9 @@ public class GUI{
 		gbc_txtTimeToDestination.gridx = 2;
 		gbc_txtTimeToDestination.gridy = 6;
 		navMenu.add(txtTimeToDestination, gbc_txtTimeToDestination);
+		
+		//txtTimeToDestination.setColumns(10);
+		txtTimeToDestination.setFont(new Font("Serif", Font.PLAIN, 18));
 
 		GridBagConstraints gbc_btnNext = new GridBagConstraints();
 		gbc_btnNext.fill = GridBagConstraints.HORIZONTAL;
@@ -1777,7 +1804,6 @@ public class GUI{
 				}
 			}
 		}
-
 	}
 }
 

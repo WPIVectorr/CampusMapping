@@ -407,12 +407,13 @@ public class GUI{
 		sliderWalkingSpeed.setLabelTable(speeds);
 		sliderWalkingSpeed.setPaintTicks(true);
 
-		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
+		GradientButton btnSavePreferences = new GradientButton("Back", buttonColor);
 		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
 		gbc_btnSavePreferences.gridwidth = 8;
 		gbc_btnSavePreferences.insets = new Insets(0, 0, 5, 0);
 		gbc_btnSavePreferences.gridx = 0;
 		gbc_btnSavePreferences.gridy = 5;
+		btnSavePreferences.setFont(new Font("Serif", Font.BOLD, 15));
 		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
 		// Return to previous view
 		btnSavePreferences.addActionListener(new ActionListener() {

@@ -37,8 +37,8 @@ public class MapUpdaterControl {
 	protected static double newImageHeight = 0;
 	protected static double newImageWidth = 0;
 	protected static double scaleSize = 1;
-	protected static int drawnposx = 0;
-	protected static int drawnposy = 0;
+	protected static double drawnposx = 0;
+	protected static double drawnposy = 0;
 
 	protected static Boolean pathMode = false;
 

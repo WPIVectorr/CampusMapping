@@ -16,7 +16,7 @@ import main_package.Point;
 
 public class ServerDB {
 	//------------------------------------------------------------Constants--------------------------------------------------------------------
-	private static String DATABASE_URL = "jdbc:mysql://campusmapping.c5bohpl1biax.us-west-2.rds.amazonaws.com:3306/";	
+	private static String DATABASE_URL = "jdbc:mysql://campusmapping.cxx9stnbmosg.us-east-1.rds.amazonaws.com:3306/";	
 	private static String DATABASE_NAME = "campusMapping_db";
 	private static String userName = "Vectorr";
 	private static String password = "mag";

@@ -200,7 +200,13 @@ public class GUI{
 					timeEst = (int) (estimatedDirDist / walkSpeed);
 					int minEst = (int) Math.floor(timeEst / 60);
 					int secEst = timeEst % 60;
-					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
+					String secEstString = Integer.toString(secEst);
+					if(secEstString.length() == 1){
+						secEstString = "0" + secEstString;
+					} else if (secEstString.length() == 0){
+						secEstString = "00";
+					}
+					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
 				}
 				// Set button colors based on preferences selected
 				btnPrevious.setColor(previousColor);
@@ -479,9 +485,9 @@ public class GUI{
 										}
 									}
 								}
-								
+
 								if(check){
-								
+
 									tempDestRoom.add(pointArray.get(i));
 									System.out.println("testDestRoom last added: " + maps.get(buildDestIndex - 1).getPointList().get(i));
 									//mapsDropdown.addItem(maps.get(i).getMapName());
@@ -724,18 +730,8 @@ public class GUI{
 											dirMaps.add(maps.get(s));
 										}
 									}
-								} else if (r != 0 && multiMapFinalDir.get(r - 1).size() != 0){
-									for(int s = 0; s < maps.size(); s++){
-										if(multiMapFinalDir.get(r-1).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
-											dirMaps.add(maps.get(s));
-										}
-									}
-								} else if(r == 0){
-									for(int s = 0; s < maps.size(); s++){
-										if(multiMapFinalDir.get(r+1).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
-											dirMaps.add(maps.get(s));
-										}
-									}
+								} else {
+									dirMaps.add(new Map());
 								}
 
 							}
@@ -765,7 +761,13 @@ public class GUI{
 						timeEst = (int) (estimatedDirDist / walkSpeed);
 						int minEst = (int) Math.floor(timeEst / 60);
 						int secEst = timeEst % 60;
-						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
+						String secEstString = Integer.toString(secEst);
+						if(secEstString.length() == 1){
+							secEstString = "0" + secEstString;
+						} else if (secEstString.length() == 0){
+							secEstString = "00";
+						}
+						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
 
 						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
 
@@ -812,7 +814,7 @@ public class GUI{
 				}
 			}
 		});
-		
+
 		drawPanel.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				originx = e.getX();
@@ -821,17 +823,17 @@ public class GUI{
 		});
 
 		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
-			 
-            @Override
-            public void ancestorMoved(HierarchyEvent e) {
-                           
-            }
-            @Override
-            public void ancestorResized(HierarchyEvent e) {
-                frame.repaint();
-            }           
-        });
-		
+
+			@Override
+			public void ancestorMoved(HierarchyEvent e) {
+
+			}
+			@Override
+			public void ancestorResized(HierarchyEvent e) {
+				frame.repaint();
+			}           
+		});
+
 		drawPanel.addMouseMotionListener(new MouseMotionListener(){
 			public void mouseDragged(MouseEvent g){
 				//System.out.println("dragged");
@@ -980,6 +982,7 @@ public class GUI{
 		directionsText.setToolTipText("");
 		directionsText.setBounds(6, 174, 438, 30);
 		directionsText.setColumns(1);
+		directionsText.setFont(new Font("SansSerif", Font.BOLD, 20));
 		GridBagConstraints gbc_directionsText = new GridBagConstraints();
 		gbc_directionsText.gridwidth = 3;
 		gbc_directionsText.fill = GridBagConstraints.HORIZONTAL;
@@ -1001,11 +1004,21 @@ public class GUI{
 				else if (textPos == 0){
 					mapPos--;
 					if(multiMapFinalDir.get(mapPos).size() == 0){
-						mapPos++;
+						while(multiMapFinalDir.get(mapPos).size() == 0){
+							mapPos--;
+						}
+						textPos = multiMapFinalDir.get(mapPos).size();
+						int m = mapPos + 1;
+						while(multiMapFinalDir.get(m).size() == 0){
+							m++;
+						}
+						//directionsText.setText(textDir.get(mapPos).get(textPos));
+						directionsText.setText("Enter " + dirMaps.get(m).getMapName());
 					} else {
 
 						textPos = multiMapFinalDir.get(mapPos).size();
 						//directionsText.setText(textDir.get(mapPos).get(textPos));
+						
 						directionsText.setText("Enter " + dirMaps.get(mapPos + 1).getMapName());
 					}
 					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
@@ -1024,7 +1037,13 @@ public class GUI{
 					}
 					int minEst = (int) Math.floor(timeEst / 60);
 					int secEst = timeEst % 60;
-					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
+					String secEstString = Integer.toString(secEst);
+					if(secEstString.length() == 1){
+						secEstString = "0" + secEstString;
+					} else if (secEstString.length() == 0){
+						secEstString = "00";
+					}
+					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
 					textPos--;
 					directionsText.setText(textDir.get(mapPos).get(textPos));
 					if (!btnNext.isEnabled()){
@@ -1062,7 +1081,13 @@ public class GUI{
 						timeEst -= Math.floor((multiMapFinalDir.get(mapPos).get(textPos).getDistance()/walkSpeed));
 						int minEst = (int) Math.floor(timeEst / 60);
 						int secEst = timeEst % 60;
-						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEst);
+						String secEstString = Integer.toString(secEst);
+						if(secEstString.length() == 1){
+							secEstString = "0" + secEstString;
+						} else if (secEstString.length() == 0){
+							secEstString = "00";
+						}
+						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
 
 						textPos++;
 						if (!btnPrevious.isEnabled()){
@@ -1073,7 +1098,11 @@ public class GUI{
 							directionsText.setText(textDir.get(mapPos).get(textPos));
 						}
 						else if (mapPos != multiMapFinalDir.size() - 1){
-							directionsText.setText("Enter " + dirMaps.get(mapPos + 1).getMapName());
+							int m = mapPos+1;
+							while(dirMaps.get(m).getMapName() == null){
+								m++;
+							}
+							directionsText.setText("Enter " + dirMaps.get(m).getMapName());
 						}
 						else {
 							textPos = multiMapFinalDir.get(mapPos).size();
@@ -1088,19 +1117,37 @@ public class GUI{
 					else if (textPos == multiMapFinalDir.get(mapPos).size() && mapPos != multiMapFinalDir.size() - 1) {
 						textPos = 0; // For route coloring 
 						mapPos++;
-						//change map
-						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
-						directionsText.setText(textDir.get(mapPos).get(textPos));
-						drawnfirst = false;
-
-
-						destinationFile = new File(destinationFile.getAbsolutePath());
-						try {
-							img = ImageIO.read(destinationFile);
-						} catch (IOException g) {
-							System.out.println("Invalid Map Selection");
-							g.printStackTrace();
+						boolean mapChange = true;
+						while(mapPos < multiMapFinalDir.size() && multiMapFinalDir.get(mapPos).size() == 0 ){
+							System.out.println("Incrementing value.");
+							mapPos++;
 						}
+						System.out.println("mapPos to: " + mapPos);
+						System.out.println("Size of arrayList super is: " + multiMapFinalDir.size());
+						if(mapPos >= multiMapFinalDir.size()){
+							
+							mapPos = multiMapFinalDir.size() - 1;
+							System.out.println("Reducing mapPos to: " + mapPos);
+							if(multiMapFinalDir.get(mapPos).size() == 0){
+								mapChange = false;
+							}
+						}
+						//change map
+						if(mapChange){
+							File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
+							directionsText.setText(textDir.get(mapPos).get(textPos));
+							drawnfirst = false;
+
+
+							destinationFile = new File(destinationFile.getAbsolutePath());
+							try {
+								img = ImageIO.read(destinationFile);
+							} catch (IOException g) {
+								System.out.println("Invalid Map Selection");
+								g.printStackTrace();
+							}
+						}
+						mapChange = true;
 						frame.repaint();
 					}
 					frame.repaint();
@@ -1117,6 +1164,7 @@ public class GUI{
 		gbc_txtTimeToDestination.gridy = 4;
 		navMenu.add(txtTimeToDestination, gbc_txtTimeToDestination);
 		txtTimeToDestination.setColumns(10);
+		txtTimeToDestination.setFont(new Font("Serif", Font.PLAIN, 18));
 
 		GridBagConstraints gbc_btnNext = new GridBagConstraints();
 		gbc_btnNext.insets = new Insets(0, 0, 5, 5);
@@ -1326,11 +1374,11 @@ public class GUI{
 		gbc_slider_1.gridx = 3;
 		gbc_slider_1.gridy = 2;
 		prefMenu.add(sliderStairs, gbc_slider_1);
-		
-		
+
+
 		sliderStairs.addChangeListener(new ChangeListener(){
 			public void stateChanged(ChangeEvent event) {
-				
+
 				int value = sliderStairs.getValue();
 				if (value == 0) {
 					stairs = 0;
@@ -1572,13 +1620,13 @@ public class GUI{
 				if (DEBUG)
 					System.out.println("mapPos: " + mapPos);
 				if (textPos != multiMapFinalDir.get(mapPos).size()) { // ||
-																		// (mapPos
-																		// ==
-																		// multiMapFinalDir.size()-1
-																		// &&
-																		// multiMapFinalDir.get(mapPos).size()-1
-																		// ==
-																		// textPos)){
+					// (mapPos
+					// ==
+					// multiMapFinalDir.size()-1
+					// &&
+					// multiMapFinalDir.get(mapPos).size()-1
+					// ==
+					// textPos)){
 					g2.setStroke(new BasicStroke(6));
 					g.setColor(currentColor);
 					int point1x = (int) ((multiMapFinalDir.get(mapPos).get(textPos).getOrigin().getLocX()
@@ -1658,7 +1706,6 @@ public class GUI{
 				}
 			}
 		}
-
 	}
 }
 

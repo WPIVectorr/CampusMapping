@@ -48,6 +48,7 @@ public class GUI{
 	private ServerDB md = ServerDB.getInstance();
 
 	private BufferedImage img = null;
+	private BufferedImage tempImg = null;
 
 	// Array of strings to initally populate dropdown menus with
 	private String rooms[] = {"Select room #", "Please choose building first"};
@@ -166,7 +167,7 @@ public class GUI{
 		mainMenu = new JPanel();
 		mainMenu.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		mainMenu.setBackground(backgroundColor);
-		
+
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
 		gbl_mainMenu.columnWidths = new int[]{80, 90, 131, 44, 150, 90, 131, 44, 80};
 		gbl_mainMenu.rowHeights = new int[]{10, 18, 27, 0, 0, 0, 0, 0, 0};
@@ -185,12 +186,119 @@ public class GUI{
 		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
 
+		JPanel aboutMenu = new JPanel();
+		aboutMenu.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		aboutMenu.setBackground(backgroundColor);
+
+		GridBagLayout gbl_aboutMenu = new GridBagLayout();
+		gbl_aboutMenu.columnWidths = new int[]{30, 280, 50, 280, 0};
+		gbl_aboutMenu.rowHeights = new int[]{13, 19, 0, 20, 20, 20, 20, 30, 0};
+		gbl_aboutMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
+		gbl_aboutMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		aboutMenu.setLayout(gbl_aboutMenu);
+
 		menus = new JPanel(new CardLayout());
 		menuLayout = (CardLayout) menus.getLayout();
 		menus.add(mainMenu, "Main Menu");
 		menus.add(navMenu, "Nav Menu");
 		menus.add(createPrefMenu(), "Pref Menu");
-		
+		menus.add(aboutMenu, "About Menu");
+
+		JLabel lblTitle = new JLabel("Vectorr Solutions            ");
+		lblTitle.setFont(new Font("Sitka Text", Font.PLAIN, 22));
+		GridBagConstraints gbc_lblTitle = new GridBagConstraints();
+		gbc_lblTitle.gridwidth = 3;
+		gbc_lblTitle.insets = new Insets(0, 0, 5, 5);
+		gbc_lblTitle.gridx = 1;
+		gbc_lblTitle.gridy = 0;
+		aboutMenu.add(lblTitle, gbc_lblTitle);
+
+		JLabel lblNewLabel = new JLabel("Worcester Polytechnic Institute   -   CS3733 B15   -   Prof. Wilson Wong   -   Team Coach: Nick McMahon                        ");
+		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+		gbc_lblNewLabel.gridwidth = 3;
+		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel.gridx = 1;
+		gbc_lblNewLabel.gridy = 1;
+		aboutMenu.add(lblNewLabel, gbc_lblNewLabel);
+
+		JLabel lblTeamMembers = new JLabel("Team Members");
+		GridBagConstraints gbc_lblTeamMembers = new GridBagConstraints();
+		gbc_lblTeamMembers.insets = new Insets(0, 0, 5, 5);
+		gbc_lblTeamMembers.gridx = 2;
+		gbc_lblTeamMembers.gridy = 2;
+		aboutMenu.add(lblTeamMembers, gbc_lblTeamMembers);
+
+		JLabel lblIan = new JLabel("Ian Banatoski - Lead Graphics Engineer");
+		GridBagConstraints gbc_lblIan = new GridBagConstraints();
+		gbc_lblIan.insets = new Insets(0, 0, 5, 5);
+		gbc_lblIan.gridx = 1;
+		gbc_lblIan.gridy = 3;
+		aboutMenu.add(lblIan, gbc_lblIan);
+
+		JLabel lblCassidy = new JLabel("Cassidy Litch - Lead Test Eng. (It. 1 & 2), Proj. Manager (It. 3 & 4)");
+		GridBagConstraints gbc_lblCassidy = new GridBagConstraints();
+		gbc_lblCassidy.insets = new Insets(0, 0, 5, 5);
+		gbc_lblCassidy.gridx = 3;
+		gbc_lblCassidy.gridy = 3;
+		aboutMenu.add(lblCassidy, gbc_lblCassidy);
+
+		JLabel lblBrett = new JLabel("Brett Cohen - Lead UI Engineer");
+		GridBagConstraints gbc_lblBrett = new GridBagConstraints();
+		gbc_lblBrett.insets = new Insets(0, 0, 5, 5);
+		gbc_lblBrett.gridx = 1;
+		gbc_lblBrett.gridy = 4;
+		aboutMenu.add(lblBrett, gbc_lblBrett);
+
+		JLabel lblPaul = new JLabel("Paul Raynes - Lead Soft. Eng. (It. 1 & 2), Product Owner (It. 3 & 4)");
+		GridBagConstraints gbc_lblPaul = new GridBagConstraints();
+		gbc_lblPaul.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPaul.gridx = 3;
+		gbc_lblPaul.gridy = 4;
+		aboutMenu.add(lblPaul, gbc_lblPaul);
+
+		JLabel lblJosh = new JLabel("Josh Graff - Product Owner (Iterations 1 & 2)");
+		GridBagConstraints gbc_lblJosh = new GridBagConstraints();
+		gbc_lblJosh.insets = new Insets(0, 0, 5, 5);
+		gbc_lblJosh.gridx = 1;
+		gbc_lblJosh.gridy = 5;
+		aboutMenu.add(lblJosh, gbc_lblJosh);
+
+		JLabel lblBrian = new JLabel("Brian Rubenstein - Project Manager (Iterations 1 & 2)");
+		GridBagConstraints gbc_lblBrian = new GridBagConstraints();
+		gbc_lblBrian.insets = new Insets(0, 0, 5, 5);
+		gbc_lblBrian.gridx = 3;
+		gbc_lblBrian.gridy = 5;
+		aboutMenu.add(lblBrian, gbc_lblBrian);
+
+		JLabel lblAlexi = new JLabel("Alexi Kessler - Lead Software Engineer (Iterations 3 & 4)");
+		GridBagConstraints gbc_lblAlexi = new GridBagConstraints();
+		gbc_lblAlexi.insets = new Insets(0, 0, 5, 5);
+		gbc_lblAlexi.gridx = 1;
+		gbc_lblAlexi.gridy = 6;
+		aboutMenu.add(lblAlexi, gbc_lblAlexi);
+
+		JLabel lblSteven = new JLabel("Steven Ruotolo - Lead Test Engineer (Iterations 3 & 4)");
+		GridBagConstraints gbc_lblSteven = new GridBagConstraints();
+		gbc_lblSteven.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSteven.gridx = 3;
+		gbc_lblSteven.gridy = 6;
+		aboutMenu.add(lblSteven, gbc_lblSteven);
+
+		GradientButton btnReturnToOptions = new GradientButton("Return to Options", buttonColor);
+		btnReturnToOptions.setText("Close");
+		GridBagConstraints gbc_btnReturnToOptions = new GridBagConstraints();
+		gbc_btnReturnToOptions.insets = new Insets(0, 0, 0, 5);
+		gbc_btnReturnToOptions.gridx = 2;
+		gbc_btnReturnToOptions.gridy = 7;
+		aboutMenu.add(btnReturnToOptions, gbc_btnReturnToOptions);
+		btnReturnToOptions.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuLayout.show(menus, "Pref Menu");
+				img = tempImg;
+				frame.repaint();
+			}
+		});
+
 		Hashtable<Integer, JLabel> speeds = new Hashtable<Integer, JLabel>();
 		speeds.put(0, new JLabel("Medium"));
 		speeds.put(-1, new JLabel("Slow"));
@@ -200,7 +308,7 @@ public class GUI{
 		labels.put(0, new JLabel("Neutral"));
 		labels.put(-1, new JLabel("Avoid"));
 		labels.put(1, new JLabel("Priority"));
-		
+
 		destMapsDropDown.addItem("Select Map");
 		startMapsDropDown.addItem("Select Map");
 
@@ -307,11 +415,31 @@ public class GUI{
 		// Return to previous view
 		btnSavePreferences.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
 				// If the position in the route should be reset, does that
 				if (resetPath){
 					textPos = 0;
 					mapPos = 0;
 					resetPath = false;
+
+					mapTitle = maps.get(buildStartIndex-1).getMapName();
+					//String mapTitle = "AtwaterKent1";
+
+					File start = new File("src/VectorMaps");
+					String startInput = start.getAbsolutePath();
+					//assuming all maps saved in vectorMaps are in jpg
+					startInput = startInput + "/" + mapTitle + ".png";
+
+					File destFile = new File(startInput);
+					try{
+						img = ImageIO.read(destFile);
+						frame.repaint();
+					}
+					catch(IOException a){
+						System.out.println("Could not find file:"+startInput);
+						a.printStackTrace();
+					}
+
 
 					double estimatedDirDist = 0;
 					for(int g = 0; g < multiMapFinalDir.size(); g++){
@@ -334,6 +462,10 @@ public class GUI{
 				// Set button colors based on preferences selected
 				btnPrevious.setColor(previousColor);
 				btnNext.setColor(nextColor);
+				// Show the route again if returning to nav view
+				if (returnMenu.equals("Nav Menu")){
+					showRoute = true;
+				}
 				// Return to view that preferences menu was accessed from
 				menuLayout.show(menus, returnMenu);
 				frame.repaint();
@@ -393,7 +525,7 @@ public class GUI{
 				System.out.println("toAdd: " + toAdd);
 				temp.add(toAdd);
 				//temp.add(maps.get(i).getMapName());
-				
+
 			}
 
 		}
@@ -403,23 +535,23 @@ public class GUI{
 			startMapsDropDown.addItem(temp.get(count));
 			destMapsDropDown.addItem(temp.get(count));
 		}
-		
-				GradientButton btnOptionsMain = new GradientButton("Set Preferences", buttonColor);
-				btnOptionsMain.setText("Options\r\n");
-				GridBagConstraints gbc_btnOptionsMain = new GridBagConstraints();
-				gbc_btnOptionsMain.anchor = GridBagConstraints.SOUTH;
-				gbc_btnOptionsMain.insets = new Insets(0, 0, 5, 5);
-				gbc_btnOptionsMain.gridx = 6;
-				gbc_btnOptionsMain.gridy = 1;
-				mainMenu.add(btnOptionsMain, gbc_btnOptionsMain);
-				btnOptionsMain.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						// Note which menu to return to
-						returnMenu = "Main Menu";
-						// Show preferences menu
-						menuLayout.show(menus, "Pref Menu");
-					}
-				});
+
+		GradientButton btnOptionsMain = new GradientButton("Set Preferences", buttonColor);
+		btnOptionsMain.setText("Options\r\n");
+		GridBagConstraints gbc_btnOptionsMain = new GridBagConstraints();
+		gbc_btnOptionsMain.anchor = GridBagConstraints.SOUTH;
+		gbc_btnOptionsMain.insets = new Insets(0, 0, 5, 5);
+		gbc_btnOptionsMain.gridx = 6;
+		gbc_btnOptionsMain.gridy = 1;
+		mainMenu.add(btnOptionsMain, gbc_btnOptionsMain);
+		btnOptionsMain.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Note which menu to return to
+				returnMenu = "Main Menu";
+				// Show preferences menu
+				menuLayout.show(menus, "Pref Menu");
+			}
+		});
 
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
@@ -524,12 +656,21 @@ public class GUI{
 		gbc_lblStart.gridx = 1;
 		gbc_lblStart.gridy = 2;
 		mainMenu.add(lblStart, gbc_lblStart);
-		
+
 		GradientButton btnClearStart = new GradientButton("X", Color.RED);
 		btnClearStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				txtSearchStart.setText("");
 				startMapsDropDown.setSelectedIndex(0);
+				try{
+					tempImg = img;
+					img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+				}
+				catch(IOException g){
+					System.out.println("Invalid logo1");
+					g.printStackTrace();
+				}
+				frame.repaint();
 			}
 		});
 		GridBagConstraints gbc_btnClearStart = new GridBagConstraints();
@@ -545,7 +686,7 @@ public class GUI{
 		gbc_lblDestination_1.gridx = 5;
 		gbc_lblDestination_1.gridy = 2;
 		mainMenu.add(lblDestination_1, gbc_lblDestination_1);
-		
+
 		GradientButton btnClearDest = new GradientButton("X", Color.RED);
 		GridBagConstraints gbc_btnClearDest = new GridBagConstraints();
 		gbc_btnClearDest.insets = new Insets(0, 0, 5, 5);
@@ -556,6 +697,15 @@ public class GUI{
 			public void actionPerformed(ActionEvent arg0) {
 				txtSearchDest.setText("");
 				destMapsDropDown.setSelectedIndex(0);
+				try{
+					tempImg = img;
+					img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+				}
+				catch(IOException g){
+					System.out.println("Invalid logo1");
+					g.printStackTrace();
+				}
+				frame.repaint();
 			}
 		});
 
@@ -570,15 +720,15 @@ public class GUI{
 		gbc_txtSearchStart.gridy = 3;
 		mainMenu.add(txtSearchStart, gbc_txtSearchStart);
 		txtSearchStart.setColumns(10);
-		
+
 		txtSearchStart.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e){
 				// Empty textbox for input upon click if placeholder text
 				if (txtSearchStart.getText().equals("Search"))
 					txtSearchStart.setText("");
-					
-				}
-			
+
+			}
+
 			public void focusLost(FocusEvent e) {
 				// If textboxes are empty and somewhere else is clicked, bring back placeholder text
 				if (txtSearchStart.getText().equals(""))
@@ -602,8 +752,8 @@ public class GUI{
 				// Empty textbox for input upon click if placeholder text
 				if (txtSearchDest.getText().equals("Search"))
 					txtSearchDest.setText("");
-				}
-			
+			}
+
 			public void focusLost(FocusEvent e) {
 				// If textboxes are empty and somewhere else is clicked, bring back placeholder text
 				if (txtSearchDest.getText().equals(""))
@@ -866,29 +1016,29 @@ public class GUI{
 			//}
 
 		});
-		
-				btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
-				btnSwapStartAndDest.setText("Swap");
-				btnSwapStartAndDest.setEnabled(false);
-				GridBagConstraints gbc_btnSwapStartAndDest = new GridBagConstraints();
-				gbc_btnSwapStartAndDest.insets = new Insets(0, 0, 5, 5);
-				gbc_btnSwapStartAndDest.gridx = 4;
-				gbc_btnSwapStartAndDest.gridy = 4;
-				mainMenu.add(btnSwapStartAndDest, gbc_btnSwapStartAndDest);
-				btnSwapStartAndDest.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						if (startBuilds.getItemCount() != 0 && destBuilds.getItemCount() != 0){
-							int startMapIndex = startMapsDropDown.getSelectedIndex();
-							int startPointIndex = startBuilds.getSelectedIndex();
 
-							startMapsDropDown.setSelectedIndex(destMapsDropDown.getSelectedIndex());
-							startBuilds.setSelectedIndex(destBuilds.getSelectedIndex());
+		btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
+		btnSwapStartAndDest.setText("Swap");
+		btnSwapStartAndDest.setEnabled(false);
+		GridBagConstraints gbc_btnSwapStartAndDest = new GridBagConstraints();
+		gbc_btnSwapStartAndDest.insets = new Insets(0, 0, 5, 5);
+		gbc_btnSwapStartAndDest.gridx = 4;
+		gbc_btnSwapStartAndDest.gridy = 4;
+		mainMenu.add(btnSwapStartAndDest, gbc_btnSwapStartAndDest);
+		btnSwapStartAndDest.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (startBuilds.getItemCount() != 0 && destBuilds.getItemCount() != 0){
+					int startMapIndex = startMapsDropDown.getSelectedIndex();
+					int startPointIndex = startBuilds.getSelectedIndex();
 
-							destMapsDropDown.setSelectedIndex(startMapIndex);
-							destBuilds.setSelectedIndex(startPointIndex);
-						}
-					}
-				});
+					startMapsDropDown.setSelectedIndex(destMapsDropDown.getSelectedIndex());
+					startBuilds.setSelectedIndex(destBuilds.getSelectedIndex());
+
+					destMapsDropDown.setSelectedIndex(startMapIndex);
+					destBuilds.setSelectedIndex(startPointIndex);
+				}
+			}
+		});
 
 		JLabel lblDestinationMap = new JLabel("Destination Map:");
 		GridBagConstraints gbc_lblDestinationMap = new GridBagConstraints();
@@ -1199,7 +1349,7 @@ public class GUI{
 				returnMenu = "Nav Menu";
 				// Change view to preferences menu, don't show route anymore
 				menuLayout.show(menus, "Pref Menu");
-
+				showRoute = false;
 				panelDirections.setVisible(false);
 				btnFullTextDirections.setText("Show Full Text Directions");
 
@@ -1458,15 +1608,15 @@ public class GUI{
 		gbc_txtFieldEmail.gridy = 11;
 		panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
 		txtFieldEmail.setColumns(10);
-		
+
 		txtSearchStart.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e){
 				// Empty textbox for input upon click if placeholder text
 				if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
 					txtFieldEmail.setText("");
-				
-				}
-			
+
+			}
+
 			public void focusLost(FocusEvent e) {
 				// If textboxes are empty and somewhere else is clicked, bring back placeholder text
 				if (txtFieldEmail.getText().equals(""))
@@ -1544,20 +1694,34 @@ public class GUI{
 		gbc_horizontalStrut.gridx = 0;
 		gbc_horizontalStrut.gridy = 1;
 		prefMenu.add(horizontalStrut, gbc_horizontalStrut);
-		
-				GradientButton btnHelp = new GradientButton("Help", buttonColor);
-				GridBagConstraints gbc_btnHelp = new GridBagConstraints();
-				gbc_btnHelp.insets = new Insets(0, 0, 5, 5);
-				gbc_btnHelp.gridx = 1;
-				gbc_btnHelp.gridy = 1;
-				prefMenu.add(btnHelp, gbc_btnHelp);
-		
-				GradientButton btnAbout = new GradientButton("About", buttonColor);
-				GridBagConstraints gbc_btnAbout = new GridBagConstraints();
-				gbc_btnAbout.insets = new Insets(0, 0, 5, 5);
-				gbc_btnAbout.gridx = 2;
-				gbc_btnAbout.gridy = 1;
-				prefMenu.add(btnAbout, gbc_btnAbout);
+
+		GradientButton btnHelp = new GradientButton("Help", buttonColor);
+		GridBagConstraints gbc_btnHelp = new GridBagConstraints();
+		gbc_btnHelp.insets = new Insets(0, 0, 5, 5);
+		gbc_btnHelp.gridx = 1;
+		gbc_btnHelp.gridy = 1;
+		prefMenu.add(btnHelp, gbc_btnHelp);
+
+		GradientButton btnAbout = new GradientButton("About", buttonColor);
+		GridBagConstraints gbc_btnAbout = new GridBagConstraints();
+		gbc_btnAbout.insets = new Insets(0, 0, 5, 5);
+		gbc_btnAbout.gridx = 2;
+		gbc_btnAbout.gridy = 1;
+		prefMenu.add(btnAbout, gbc_btnAbout);
+		btnAbout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuLayout.show(menus, "About Menu");
+				try{
+					tempImg = img;
+					img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+				}
+				catch(IOException g){
+					System.out.println("Invalid logo1");
+					g.printStackTrace();
+				}
+				frame.repaint();
+			}
+		});
 
 		JLabel lblVisualPreferences = new JLabel("Theme\r\n");
 		GridBagConstraints gbc_lblVisualPreferences = new GridBagConstraints();

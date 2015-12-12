@@ -63,6 +63,8 @@ public class GUI{
 	private Point start;
 	private Point end;
 	private boolean showRoute;
+	private boolean showStartPoint = false;
+	private boolean showDestPoint = false;
 	private JLabel directionsText;
 	private JPanel mainMenu;
 	private JPanel navMenu;
@@ -98,8 +100,8 @@ public class GUI{
 	private int pointSize = 10;
 	private int originalpointSize = 25;
 	private double scaleSize = 1;
-	private int drawnposx;
-	private int drawnposy;
+	private double drawnposx;
+	private double drawnposy;
 	private boolean drawnfirst = false;
 	private int screenHeight;
 	private int screenWidth;
@@ -134,10 +136,18 @@ public class GUI{
 	private GradientButton directionsButton;
 	private ArrayList<Point> roomPointsToDraw = new ArrayList<Point>();
 	private JPanel panelDirections;
+	private double mousezoomx;
+	private double mousezoomy;
+	private double minZoomSize;
 	private JTextArea txtpnFullTextDir;
 	private JTextField txtSearchStart;
 	private JTextField txtSearchDest;
 	private GradientButton btnFullTextDirections;
+
+	private double startStarX;
+	private double startStarY;
+	private double destStarX;
+	private double destStarY;
 
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
@@ -796,6 +806,16 @@ public class GUI{
 					startBuilds.setEnabled(false);
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
+					showStartPoint = false;
+					try{
+						tempImg = img;
+						img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+					}
+					catch(IOException g){
+						System.out.println("Invalid logo1");
+						g.printStackTrace();
+					}
+					frame.repaint();
 				}
 				else{
 					startBuilds.setEnabled(true);
@@ -927,6 +947,16 @@ public class GUI{
 					destBuilds.setEnabled(false);
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
+					showDestPoint = false;
+					try{
+						tempImg = img;
+						img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+					}
+					catch(IOException g){
+						System.out.println("Invalid logo1");
+						g.printStackTrace();
+					}
+					frame.repaint();
 				}
 				else{
 
@@ -1103,6 +1133,17 @@ public class GUI{
 		startBuilds.setEnabled(false);
 		mainMenu.add(startBuilds, gbc_startBuilds);
 		startBuilds.setBounds(122, 30, 148, 20);
+		startBuilds.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (startBuilds.getItemCount() != 0){
+					showStartPoint = true;
+					showDestPoint = false;
+					startStarX = ((Point)(startBuilds.getSelectedItem())).getLocX();
+					startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
+					frame.repaint();
+				}
+			}
+		});
 
 		//adds the destination label to the line with destination location options
 		JLabel lblDestination = new JLabel("Destination Room:");
@@ -1114,6 +1155,7 @@ public class GUI{
 		mainMenu.add(lblDestination, gbc_lblDestination);
 		lblDestination.setBounds(6, 68, 85, 44);
 		lblDestination.setLabelFor(destBuilds);
+
 		//adds destBuilds to the dropdown for destination
 		GridBagConstraints gbc_destBuilds = new GridBagConstraints();
 		gbc_destBuilds.gridwidth = 2;
@@ -1124,6 +1166,17 @@ public class GUI{
 		destBuilds.setEnabled(false);
 		mainMenu.add(destBuilds, gbc_destBuilds);
 		destBuilds.setBounds(122, 30, 148, 20);
+		destBuilds.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (destBuilds.getItemCount() != 0){
+					showDestPoint = true;
+					showStartPoint = false;
+					destStarX = ((Point)(destBuilds.getSelectedItem())).getLocX();
+					destStarY = ((Point)(destBuilds.getSelectedItem())).getLocY();
+					frame.repaint();
+				}
+			}
+		});
 
 		//buttonPanel.add(destBuilds);
 		destBuilds.setBounds(122, 80, 148, 20);
@@ -1144,6 +1197,8 @@ public class GUI{
 				// reset text position and map position indexes
 				textPos = 0;
 				mapPos = 0;
+				showStartPoint = false;
+				showDestPoint = false;
 
 
 				//gets the start and end building and room numbers the user chose
@@ -1291,6 +1346,99 @@ public class GUI{
 					directionsText.setText("Pick two different points");
 					frame.repaint();
 				}
+			}
+		});
+
+		drawPanel.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				originx = e.getX();
+				originy = e.getY();
+			}
+		});
+
+		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
+
+			@Override
+			public void ancestorMoved(HierarchyEvent e) {
+
+			}
+			@Override
+			public void ancestorResized(HierarchyEvent e) {
+				drawnfirst = false;
+                frame.repaint();
+			}           
+		});
+
+		drawPanel.addMouseMotionListener(new MouseMotionListener(){
+			public void mouseDragged(MouseEvent g){
+				if(!mapTitle.equals("Select Map")){
+					//System.out.println("dragged");
+					drawnfirst = true;
+					Dragged = true;
+					mousex = g.getX();
+					mousey = g.getY();
+					frame.repaint();
+				}
+			}
+
+			public void mouseMoved(MouseEvent j) {
+				mousezoomx = j.getX();
+				mousezoomy = j.getY();
+			}
+		});
+
+		frame.addMouseWheelListener(new MouseWheelListener(){
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				if(!mapTitle.equals("Select Map")){
+					minZoomSize = 1 / ((double) img.getWidth() / (double) drawPanel.getWidth());
+					int WidthSize = (int) ((double) img.getHeight() * minZoomSize);
+					if (WidthSize > (double) drawPanel.getHeight()) {
+						minZoomSize = 1 / ((double) img.getHeight() / (double) drawPanel.getHeight());
+					}
+					System.out.println(minZoomSize);
+					double oldWidth = (img.getWidth() * scaleSize);
+					double oldHeight = (img.getHeight() * scaleSize);
+					if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && !mapTitle.equals("SelectMap")){
+						drawnfirst = true;
+						if (e.getWheelRotation() > 0) {
+							if (scaleSize <= 2) {
+								scroldirection = 1;
+								scaleSize += (scroldirection * .02);
+								atMinZoom = false;
+							} else {
+								atMaxZoom = true;
+							}
+						} else {
+							if (scaleSize >= (minZoomSize)) {
+								scroldirection = -1;
+								// System.out.println("scale before minus: " +
+								// scaleSize);
+								scaleSize += (scroldirection * .02);
+								// System.out.println("scale minus: " + scaleSize);
+								atMaxZoom = false;
+							} else {
+								atMinZoom = true;
+							}
+						}
+						if(atMaxZoom == false && atMinZoom == false){
+							double ogx = ((mousezoomx-drawnposx)/oldWidth);
+							double ogy = ((mousezoomy-drawnposy)/oldHeight);
+							double newWidth = (img.getWidth() * scaleSize);
+							double newHeight = (img.getHeight() * scaleSize);
+							difWidth = ((ogx*(oldWidth-newWidth)));
+							difHeight = ((ogy*(oldHeight-newHeight)));
+							drawnposx += difWidth;
+							drawnposy += difHeight;
+						}else{
+							difHeight = 0;
+						}
+						frame.repaint();
+					} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+	
+					}
+				}
+				
+				// System.out.println(message);
 			}
 		});
 
@@ -1956,9 +2104,6 @@ public class GUI{
 				if (drawnfirst == false) {
 					windowScale = ((double) img.getWidth() / (double) drawPanel.getWidth());
 					scaleSize = 1 / ((double) img.getWidth() / (double) drawPanel.getWidth());
-					// System.out.println("setting: "+scaleSize);
-					// System.out.println("Image Original Width " +
-					// img.getWidth());
 					int WidthSize = (int) ((double) img.getHeight() / windowScale);
 					if (WidthSize > (double) drawPanel.getHeight()) {
 						windowScale = (double) img.getHeight() / (double) drawPanel.getHeight();
@@ -1971,17 +2116,15 @@ public class GUI{
 					int centery = (drawPanel.getHeight() / 2);
 					drawnposx = centerx - (int) (newImageWidth / 2);
 					drawnposy = centery - (int) (newImageHeight / 2);
-					g.drawImage(img, drawnposx, drawnposy, (int) newImageWidth, (int) newImageHeight, null);
+					g.drawImage(img, (int)drawnposx, (int)drawnposy, (int) newImageWidth, (int) newImageHeight, null);
 					// System.out.println(newImageWidth+", "+newImageHeight);
 				} else {
 					double deltax = 0;
 					double deltay = 0;
-					newImageHeight = (int) img.getHeight() * scaleSize;
-					newImageWidth = (int) img.getWidth() * scaleSize;
-					if (!(mapTitle.equals("Select Map"))) {
+					newImageHeight = (int) (img.getHeight() * scaleSize);
+					newImageWidth = (int) (img.getWidth() * scaleSize);
+					if (!mapTitle.equals("Select Map")){
 						if (Dragged) {
-							if (DEBUG)
-								System.out.println("dragged");
 							deltax = -(originx - mousex);
 							deltay = -(originy - mousey);
 							originx = mousex;
@@ -1989,17 +2132,13 @@ public class GUI{
 							difWidth = 0;
 							difHeight = 0;
 						} else if (scrolled) {
-							if (DEBUG)
-								System.out.println("I did it");
-							deltax = difWidth;
-							deltay = difWidth;
+							deltax = 0;
+							deltay = 0;
 							scrolled = false;
 						}
-
 						drawnposx += deltax;
 						drawnposy += deltay;
-						g.drawImage(img, drawnposx, drawnposy, (int) newImageWidth, (int) newImageHeight, null);
-
+						g.drawImage(img, (int)drawnposx, (int)drawnposy, (int) newImageWidth, (int) newImageHeight, null);
 					}
 				}
 			}
@@ -2024,6 +2163,21 @@ public class GUI{
 			
 			
 			
+
+			if (showStartPoint){
+				Shape startStar = createStar(5, (int)((startStarX * newImageWidth) + drawnposx) , (int)((startStarY * newImageHeight) + drawnposy), 7, 12);
+				g.setColor(pointColor);
+				g2.fill(startStar);
+				g.setColor(Color.BLACK);
+				g2.draw(startStar);
+			}
+			if (showDestPoint){
+				Shape destStar = createStar(5, (int)((destStarX * newImageWidth) + drawnposx), (int)((destStarY * newImageHeight) + drawnposy), 7, 12);
+				g.setColor(pointColor);
+				g2.fill(destStar);
+				g.setColor(Color.BLACK);
+				g2.draw(destStar);
+			}
 
 			if (showRoute && route != null) {
 

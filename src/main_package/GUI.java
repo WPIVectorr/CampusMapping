@@ -1229,21 +1229,21 @@ public class GUI{
 		frame.getContentPane().add(panelDirections, BorderLayout.WEST);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{0, 110, 110, 0, 0};
-		gbl_panel.rowHeights = new int[]{23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel.rowHeights = new int[]{23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0};
 		gbl_panel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panelDirections.setLayout(gbl_panel);
 		panelDirections.setVisible(false);
 
 		txtpnFullTextDir = new JTextArea();
 
 		JScrollPane scrollPane = new JScrollPane(txtpnFullTextDir);
-		scrollPane.setMinimumSize(new Dimension(300, 500));
-		scrollPane.setPreferredSize(new Dimension(300, 500));
+		scrollPane.setMinimumSize(new Dimension(220, 300));
+		scrollPane.setPreferredSize(new Dimension(220, 300));
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.gridwidth = 4;
-		gbc_scrollPane.gridheight = 17;
-		gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
+		gbc_scrollPane.gridheight = 10;
+		gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 0;
 		gbc_scrollPane.gridy = 1;
@@ -1256,37 +1256,37 @@ public class GUI{
 		// Text box for full list of directions, initially invisible, appears when directions button pressed
 		txtpnFullTextDir.setText(" Full List of Directions:");
 		txtpnFullTextDir.setEditable(false);
+		
+				txtFieldEmail = new JTextField();
+				txtFieldEmail.setText("Enter E-Mail Here");
+				GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
+				gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
+				gbc_txtFieldEmail.gridwidth = 2;
+				gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
+				gbc_txtFieldEmail.gridx = 1;
+				gbc_txtFieldEmail.gridy = 11;
+				panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
+				txtFieldEmail.setColumns(10);
+				txtFieldEmail.addMouseListener(new MouseAdapter() {
+					public void mouseClicked(MouseEvent e) {
+						// Empty textbox for input upon click if placeholder text
+						if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
+							txtFieldEmail.setText("");
+					}
+				});
 
 		Component horizontalStrut_4 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_4 = new GridBagConstraints();
 		gbc_horizontalStrut_4.insets = new Insets(0, 0, 5, 5);
 		gbc_horizontalStrut_4.gridx = 0;
-		gbc_horizontalStrut_4.gridy = 18;
+		gbc_horizontalStrut_4.gridy = 12;
 		panelDirections.add(horizontalStrut_4, gbc_horizontalStrut_4);
-
-		txtFieldEmail = new JTextField();
-		txtFieldEmail.setText("Enter E-Mail Here");
-		GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
-		gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
-		gbc_txtFieldEmail.gridwidth = 2;
-		gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtFieldEmail.gridx = 1;
-		gbc_txtFieldEmail.gridy = 18;
-		panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
-		txtFieldEmail.setColumns(10);
-		txtFieldEmail.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				// Empty textbox for input upon click if placeholder text
-				if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
-					txtFieldEmail.setText("");
-			}
-		});
 
 		Component horizontalStrut_5 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_5 = new GridBagConstraints();
 		gbc_horizontalStrut_5.insets = new Insets(0, 0, 5, 0);
 		gbc_horizontalStrut_5.gridx = 3;
-		gbc_horizontalStrut_5.gridy = 18;
+		gbc_horizontalStrut_5.gridy = 12;
 		panelDirections.add(horizontalStrut_5, gbc_horizontalStrut_5);
 
 		GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
@@ -1295,14 +1295,14 @@ public class GUI{
 		gbc_btnEmailDirections.gridwidth = 2;
 		gbc_btnEmailDirections.anchor = GridBagConstraints.NORTH;
 		gbc_btnEmailDirections.gridx = 1;
-		gbc_btnEmailDirections.gridy = 19;
+		gbc_btnEmailDirections.gridy = 13;
 		panelDirections.add(btnEmailDirections, gbc_btnEmailDirections);
 
 		Component verticalStrut = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
-		gbc_verticalStrut.insets = new Insets(0, 0, 0, 5);
+		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
 		gbc_verticalStrut.gridx = 1;
-		gbc_verticalStrut.gridy = 20;
+		gbc_verticalStrut.gridy = 14;
 		panelDirections.add(verticalStrut, gbc_verticalStrut);
 		btnEmailDirections.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

@@ -1983,9 +1983,10 @@ public class GUI{
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 
 		//added by JPG starts and plays the animation
-		loadingAnimation = new SplashPage();
+		loadingAnimation = new SplashPage("Splash Thread");
+		loadingAnimation.showSplash();
 		try {
-			Thread.sleep(4000);
+			Thread.sleep(50);
 		} catch (InterruptedException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();

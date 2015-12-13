@@ -43,7 +43,7 @@ import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 
-public class GUI{
+public class GUI implements Runnable{
 	private boolean DEBUG = false;
 	private ServerDB md = ServerDB.getInstance();
 
@@ -145,9 +145,10 @@ public class GUI{
 	private double startStarY;
 	private double destStarX;
 	private double destStarY;
+	protected static Thread GUIThread;
 
 
-	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
+	public void run(){
 
 		//frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -2010,25 +2011,16 @@ public class GUI{
 				e1.printStackTrace();
 			}
 		}
-		SwingUtilities.invokeLater(new Runnable()
+		GUI gui = new GUI();
+		GUIThread = new Thread(gui, "GUI thread");
+		GUIThread.start();
+/*		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				GUI gui = new GUI();
-				try {
-					gui.createAndShowGUI();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (AlreadyExistsException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+
 			}
-		});
+		});*/
 	}
 
 

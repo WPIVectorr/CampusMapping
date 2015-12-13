@@ -13,6 +13,12 @@ public class Edge {
 		this.point1 = point1;
 		this.point2 = point2;
 		this.weight = (int)Math.sqrt((double)(Math.pow((point1.getGlobX()-point2.getGlobX()),2)+Math.pow((point1.getGlobY()-point2.getGlobY()),2)));
+		if(point1.isStairs() && point2.isStairs()){
+			this.isStairs = true;
+		}
+		if(point1.isOutside() || point2.isOutside()){
+			this.isOutside = true;
+		}
 		point1.addEdge(this);								//TODO this may be duplicating edges
 		point2.addEdge(this);
 	}
@@ -21,6 +27,12 @@ public class Edge {
 		this.point1 = point1;
 		this.point2 = point2;
 		this.weight = weight;
+		if(point1.isStairs() && point2.isStairs()){
+			this.isStairs = true;
+		}
+		if(point1.isOutside() || point2.isOutside()){
+			this.isOutside = true;
+		}
 		point1.addEdge(this);								//TODO this may be duplicating edges
 		point2.addEdge(this);								//TODO this may be duplicating edges
 	}
@@ -31,7 +43,12 @@ public class Edge {
 		this.weight = weight;
 		this.isOutside = isOutside;
 		this.isStairs = isStairs;
-		
+		if(point1.isStairs() && point2.isStairs()){
+			this.isStairs = true;
+		}
+		if(point1.isOutside() || point2.isOutside()){
+			this.isOutside = true;
+		}
 		point1.addEdge(this);								//TODO this may be duplicating edges
 		point2.addEdge(this);								//TODO this may be duplicating edges
 	}

@@ -14,7 +14,7 @@ public class SearchLocation {
 
 	private static ArrayList<String> shortNames = new ArrayList<String>();
 	private static ArrayList<String> roomNums = new ArrayList<String>();
-	private static FuzzyHashMap pointNames = new FuzzyHashMap(FuzzyHashMap.PRE_HASHING_METHOD.SOUNDEX);
+	private static HashMap pointNames = new HashMap;
 	
 	
 
@@ -98,7 +98,7 @@ public class SearchLocation {
 				for(String LN:getLongName(pointName))
 				{
 					//System.out.println("long point name: " + LN);
-					pointNames.putFuzzy(LN, point);
+					pointNames.put(LN, point);
 				}
 			}
 		}		
@@ -234,7 +234,7 @@ public class SearchLocation {
 			}
 			//System.out.println("Build: "+sortedName.get(0)+" lev: "+ sortedName.get(1));
 		}*/
-		Point result = (Point) pointNames.getFuzzy(searchTerm,10);
+		Point result = (Point) pointNames.get(searchTerm,10);
 		if(result == null){
 			System.out.println("Result = null");
 		}

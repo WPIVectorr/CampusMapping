@@ -14,7 +14,8 @@ public class SearchLocation {
 
 	private static ArrayList<String> shortNames = new ArrayList<String>();
 	private static ArrayList<String> roomNums = new ArrayList<String>();
-	private static HashMap pointNames = new HashMap;
+	private static HashMap<String, Point> pointNames;
+	private static ArrayList<String> keyList;
 	
 	
 
@@ -22,8 +23,8 @@ public class SearchLocation {
 	private static void prepData() {
 		// TODO Auto-generated constructor stub
 		
-
-		
+		keyList = new ArrayList<String>();
+		pointNames = new HashMap<String,Point>();
 		
 		ArrayList<String> StrattonHall 		= 	new ArrayList<String>();
 		ArrayList<String> BoyntonHall 		= 	new ArrayList<String>();
@@ -99,6 +100,7 @@ public class SearchLocation {
 				{
 					//System.out.println("long point name: " + LN);
 					pointNames.put(LN, point);
+					keyList.add(LN);
 				}
 			}
 		}		
@@ -124,7 +126,7 @@ public class SearchLocation {
 			shortName = pointName;
 			roomNum = "";
 		}
-		System.out.println("ShortName: "+shortName);
+		//System.out.println("ShortName: "+shortName);
 		
 /*		int spaceIndex = pointName.indexOf(" ");
 		String shortName = pointName.substring(0,spaceIndex);
@@ -140,7 +142,7 @@ public class SearchLocation {
 			for(int count = 0; count < aliasList.size(); count++)
 			{
 				longNameReturn.add(aliasList.get(count).concat(" ").concat(roomNum));
-				System.out.println("full alias: "+longNameReturn.get(count));
+				//System.out.println("full alias: "+longNameReturn.get(count));
 			}
 			return longNameReturn;
 
@@ -164,7 +166,7 @@ public class SearchLocation {
 		
 		new SearchLocation(allPoints);
 		ArrayList<String> searchTerms = new ArrayList<String>();
-		searchTerms.add(StringUtils.lowerCase("Atwater Kent"));
+		//searchTerms.add(StringUtils.lowerCase("Atwater Kent"));
 		//searchTerms.add(StringUtils.lowerCase("AK"));
 		//searchTerms.add(StringUtils.lowerCase("AH"));
 
@@ -185,16 +187,35 @@ public class SearchLocation {
 		searchTerms.add(StringUtils.lowerCase("atwater Kent"));
 		searchTerms.add(StringUtils.lowerCase("atwaterkent"));
 		searchTerms.add(StringUtils.lowerCase("atwater 302"));
+		searchTerms.add(StringUtils.lowerCase("atwater kent 302"));
+		searchTerms.add(StringUtils.lowerCase("AK 302"));
+		searchTerms.add(StringUtils.lowerCase("Campus Center 301"));
+		searchTerms.add(StringUtils.lowerCase("AG ST"));
+		searchTerms.add(StringUtils.lowerCase("Grandma's House"));
+		searchTerms.add(StringUtils.lowerCase("fountain"));
+		searchTerms.add(StringUtils.lowerCase("HL 001"));
+		searchTerms.add(StringUtils.lowerCase("SL501"));
+		searchTerms.add(StringUtils.lowerCase("SL 501"));
+		searchTerms.add(StringUtils.lowerCase("Library"));
+		searchTerms.add(StringUtils.lowerCase("KH204"));
+		searchTerms.add(StringUtils.lowerCase("KH 204"));
+		searchTerms.add(StringUtils.lowerCase("Project Center Entrance"));
+		searchTerms.add(StringUtils.lowerCase("PC Entrance"));
+		searchTerms.add(StringUtils.lowerCase("AK Entrance"));
+		searchTerms.add(StringUtils.lowerCase("AG Exit"));
+		
+		
 
 		
 		
 		for(String search:searchTerms)
 		{
 			//search for one of the items in the test array
-			Point result = searchFor(search);
+			ArrayList<Point> result = searchFor(search);
 			if(result != null)
 			{
-				System.out.println("Searched for: "+ search+" Result: " +result.getName());
+				for(Point returnedPoint:result)
+				System.out.println("Searched for: "+ search+" Result: " +returnedPoint.getName());
 			}
 	
 		}
@@ -204,44 +225,59 @@ public class SearchLocation {
 	
 	
 	//return a sorted arraylist of 
-	public static Point searchFor(String searchTerm)
+	public static ArrayList<Point> searchFor(String searchTerm)
 	{
-/*		ArrayList<String> results = new ArrayList<String>();
+		ArrayList<Point> results = new ArrayList<Point>();
 		ArrayList<ArrayList<String>> orderList = new ArrayList<ArrayList<String>>();
 		
+		//goes through the list of keys(of the hashmap) and adds them to
+			//two dimensional array.
+		for(String key:keyList)
+		{ 
+			ArrayList<String> addArray = new ArrayList<String>();
+			addArray.add(key);
+			orderList.add(addArray);		
+		}	
 		
-
-		for(ArrayList<String> nameArray:orderList)
+		//goes through the two dimensional list and searches against every key
+			//adds the fuzzy score as the second dimension.
+		for(int i = 0;i < orderList.size();i++)
 		{
-			//Integer levenshtein = compareStrings(,searchTerm);
-			//nameArray.add(levenshtein.toString());		
-			//System.out.println("Lev: "+nameArray.get(1)+" Searchterm: "+searchTerm+" compare: "+nameArray.get(0));
+			ArrayList<String> key = orderList.get(i);
+			Integer levenshtein = compareStrings(key.get(0),searchTerm);
+			key.add(levenshtein.toString());		
+
+			if(levenshtein!=0)
+			{
+				//adds the levenshtein as the second index
+				//System.out.println("Lev: "+key.get(1)+" Searchterm: "+searchTerm+" compare: "+key.get(0));
+			}
 		}
 		
 		orderList.sort(new orderListComparator());
 		//System.out.println("sortedList: ");
 		for(ArrayList<String> sortedName:orderList)
 		{
-			if(Integer.parseInt(sortedName.get(1))!=0)
-			{
 				String buildingLetter = sortedName.get(0).substring(0, 1);
 				String searchLetter = searchTerm.substring(0,1);
-				System.out.println("build Letter: "+buildingLetter+" Search letter: "+searchLetter);
+				//System.out.println("build Letter: "+buildingLetter+" Search letter: "+searchLetter);
 				if(buildingLetter.equalsIgnoreCase(searchLetter))
 				{
-					results.add(sortedName.get(0));
+					if(results.size()<6)
+						results.add(pointNames.get(sortedName.get(0)));
 				}
-			}
 			//System.out.println("Build: "+sortedName.get(0)+" lev: "+ sortedName.get(1));
-		}*/
-		Point result = (Point) pointNames.get(searchTerm,10);
-		if(result == null){
+		}
+		
+		
+		
+		if(results.isEmpty()){
 			System.out.println("Result = null");
 		}
 		else{
 			//System.out.println("In searched for: "+ result.getName());
 		}
-		return result;
+		return results;
 	}
 
 	
@@ -251,17 +287,23 @@ public class SearchLocation {
 	//@return int
 	public static Integer compareStrings(String s, String c)
 	{
-		String compare = null;
-		String search = null;
+		String compare = c;
+		String search = s;
 		if(s.length()<=c.length())
 		{
 			compare = c.substring(0,s.length());
 			search = s;
-		}else {
-			search = s.substring(0,c.length());			
+		}else {		
 			compare = c;
+			search = s.substring(0,c.length());	
 		}
-		return StringUtils.getFuzzyDistance(compare.substring(0,search.length()),search.substring(0,compare.length()), Locale.ENGLISH);
+		compare =compare.substring(0,search.length());
+		search = search.substring(0,compare.length());
+		compare = compare.replaceAll("\\s","");
+		search = search.replaceAll("\\s","");
+		
+		
+		return StringUtils.getFuzzyDistance(compare,search, Locale.ENGLISH);
 		
 	}
 

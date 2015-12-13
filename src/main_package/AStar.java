@@ -75,6 +75,7 @@ public class AStar {
 					}
 					//checks if name contains stairs
 					
+					
 					if(isStairs){
 						if(stairs == -1){
 							prefStairsScale = 1000.0;

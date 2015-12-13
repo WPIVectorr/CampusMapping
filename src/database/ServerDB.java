@@ -1127,7 +1127,7 @@ public class ServerDB {
 							newPtGlobX = rs2.getInt("globX");
 							newPtGlobY = rs2.getInt("globY");
 							newPtNumberEdges = 0;						//This should be automatically rectified when adding in edges
-							newPtIsStairs = rs2.getBoolean("isOutside");
+							newPtIsStairs = rs2.getBoolean("isStairs");
 							newPtIsOutside = rs2.getBoolean("isOutside");
 							Point newPt = new Point(newPtId, newPtMapId, newPtName, newPtIndex, newPtLocX, newPtLocY, newPtGlobX,
 									newPtGlobY, newPtNumberEdges, newPtIsStairs, newPtIsOutside);

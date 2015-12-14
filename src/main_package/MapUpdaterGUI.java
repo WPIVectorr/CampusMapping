@@ -86,7 +86,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 	private static ArrayList<Map> emptyMaps = new ArrayList<Map>();
 	private JButton btnConnectToOther;
 	
-	private static SplashPage loadingAnimation = new SplashPage();
+	private static SplashPage loadingAnimation = new SplashPage("updater Splash");
 	
 	private boolean drawnfirst = false;
 	private int screenHeight;

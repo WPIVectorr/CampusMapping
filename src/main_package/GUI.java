@@ -43,7 +43,7 @@ import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 
-public class GUI implements Runnable{
+public class GUI{
 	private boolean DEBUG = false;
 	private ServerDB md = ServerDB.getInstance();
 
@@ -145,10 +145,9 @@ public class GUI implements Runnable{
 	private double startStarY;
 	private double destStarX;
 	private double destStarY;
-	protected static Thread GUIThread;
 
 
-	public void run(){
+	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
 		//frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -2033,8 +2032,8 @@ public class GUI implements Runnable{
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 
 		//added by JPG starts and plays the animation
-		loadingAnimation = new SplashPage("Splash Thread");
-		loadingAnimation.showSplash();
+		loadingAnimation = new SplashPage("GuiSplashThread");
+		loadingAnimation.run();
 		try {
 			Thread.sleep(50);
 		} catch (InterruptedException e2) {
@@ -2060,10 +2059,7 @@ public class GUI implements Runnable{
 				e1.printStackTrace();
 			}
 		}
-		GUI gui = new GUI();
-		GUIThread = new Thread(gui, "GUI thread");
-		GUIThread.start();
-/*				SwingUtilities.invokeLater(new Runnable()
+		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -2081,7 +2077,7 @@ public class GUI implements Runnable{
 					e.printStackTrace();
 				}
 			}
-		});*/
+		});
 	}
 
 
@@ -2287,4 +2283,3 @@ public class GUI implements Runnable{
 		}
 	}
 }
-

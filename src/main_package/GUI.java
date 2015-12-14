@@ -2063,11 +2063,23 @@ public class GUI implements Runnable{
 		GUI gui = new GUI();
 		GUIThread = new Thread(gui, "GUI thread");
 		GUIThread.start();
-/*		SwingUtilities.invokeLater(new Runnable()
+/*				SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-
+				GUI gui = new GUI();
+				try {
+					gui.createAndShowGUI();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (AlreadyExistsException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});*/
 	}

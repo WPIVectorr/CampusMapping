@@ -10,6 +10,8 @@ import database.ServerDB;
 
 public class SearchLocation {
 
+	
+	//a list of each of the building's list of aliases
 	private static HashMap<String, ArrayList<String>> allNames = new HashMap<String, ArrayList<String>>();
 
 	private static ArrayList<String> shortNames = new ArrayList<String>();
@@ -63,7 +65,7 @@ public class SearchLocation {
 		ProjectCenter.add("PC");	ProjectCenter.add("Project Center");	ProjectCenter.add("CDC");
 		AtwaterKent.add("AK");		AtwaterKent.add("Atwater Kent");
 	
-		
+		//shortname,aliases
 		allNames.put("SH",		StrattonHall);
 		allNames.put("BH",		BoyntonHall);
 		allNames.put("SL",		SalisburyLabs);
@@ -134,6 +136,8 @@ public class SearchLocation {
 		
 		//all of the aliases without roomnumattached
 		aliasList = allNames.get(shortName);
+		
+		
 		//longNames.add(e);
 		//for every aliase obtained from the tables, add the room number to store in the
 		//pointnames fuzzyhash
@@ -148,8 +152,9 @@ public class SearchLocation {
 
 		}else{
 			System.out.println("no mapping for: "+pointName);
-			return new ArrayList<String>();
-
+			ArrayList<String> pointNameList = new ArrayList<String>();
+			pointNameList.add(pointName);
+			return pointNameList;
 		}
 	}
 
@@ -203,6 +208,7 @@ public class SearchLocation {
 		searchTerms.add(StringUtils.lowerCase("PC Entrance"));
 		searchTerms.add(StringUtils.lowerCase("AK Entrance"));
 		searchTerms.add(StringUtils.lowerCase("AG Exit"));
+		searchTerms.add(StringUtils.lowerCase("Fuller Upper"));
 		
 		
 

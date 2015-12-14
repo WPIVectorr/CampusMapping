@@ -187,7 +187,7 @@ public class GUI{
 		mainMenu.setBackground(backgroundColor);
 
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
-		gbl_mainMenu.columnWidths = new int[]{80, 90, 131, 44, 150, 90, 131, 44, 80};
+		gbl_mainMenu.columnWidths = new int[]{80, 90, 75, 110, 150, 90, 75, 110, 80};
 		gbl_mainMenu.rowHeights = new int[]{10, 18, 27, 0, 0, 0, 0, 0, 0};
 		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
@@ -568,26 +568,26 @@ public class GUI{
 			startMapsDropDown.addItem(temp.get(count));
 			destMapsDropDown.addItem(temp.get(count));
 		}
-
-		GradientButton btnOptionsMain = new GradientButton("Set Preferences", buttonColor);
-		btnOptionsMain.setText("Options\r\n");
-		GridBagConstraints gbc_btnOptionsMain = new GridBagConstraints();
-		gbc_btnOptionsMain.anchor = GridBagConstraints.SOUTH;
-		gbc_btnOptionsMain.insets = new Insets(0, 0, 5, 5);
-		gbc_btnOptionsMain.gridx = 6;
-		gbc_btnOptionsMain.gridy = 1;
-		mainMenu.add(btnOptionsMain, gbc_btnOptionsMain);
-		btnOptionsMain.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showStartPoint = false;
-				showDestPoint = false;
-				// Note which menu to return to
-				returnMenu = "Main Menu";
-				// Show preferences menu
-				menuLayout.show(menus, "Pref Menu");
-				frame.repaint();
-			}
-		});
+		
+				GradientButton btnOptionsMain = new GradientButton("Set Preferences", buttonColor);
+				btnOptionsMain.setText("Options\r\n");
+				GridBagConstraints gbc_btnOptionsMain = new GridBagConstraints();
+				gbc_btnOptionsMain.anchor = GridBagConstraints.SOUTHEAST;
+				gbc_btnOptionsMain.insets = new Insets(0, 0, 5, 5);
+				gbc_btnOptionsMain.gridx = 7;
+				gbc_btnOptionsMain.gridy = 1;
+				mainMenu.add(btnOptionsMain, gbc_btnOptionsMain);
+				btnOptionsMain.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						showStartPoint = false;
+						showDestPoint = false;
+						// Note which menu to return to
+						returnMenu = "Main Menu";
+						// Show preferences menu
+						menuLayout.show(menus, "Pref Menu");
+						frame.repaint();
+					}
+				});
 
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
@@ -711,28 +711,6 @@ public class GUI{
 		gbc_lblStart.gridy = 2;
 		mainMenu.add(lblStart, gbc_lblStart);
 
-		GradientButton btnClearStart = new GradientButton("X", Color.RED);
-		btnClearStart.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				txtSearchStart.setText("");
-				startMapsDropDown.setSelectedIndex(0);
-				try{
-					tempImg = img;
-					img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
-				}
-				catch(IOException g){
-					System.out.println("Invalid logo1");
-					g.printStackTrace();
-				}
-				frame.repaint();
-			}
-		});
-		GridBagConstraints gbc_btnClearStart = new GridBagConstraints();
-		gbc_btnClearStart.insets = new Insets(0, 0, 5, 5);
-		gbc_btnClearStart.gridx = 3;
-		gbc_btnClearStart.gridy = 2;
-		mainMenu.add(btnClearStart, gbc_btnClearStart);
-
 		JLabel lblDestination_1 = new JLabel("Destination");
 		GridBagConstraints gbc_lblDestination_1 = new GridBagConstraints();
 		gbc_lblDestination_1.gridwidth = 2;
@@ -741,33 +719,11 @@ public class GUI{
 		gbc_lblDestination_1.gridy = 2;
 		mainMenu.add(lblDestination_1, gbc_lblDestination_1);
 
-		GradientButton btnClearDest = new GradientButton("X", Color.RED);
-		GridBagConstraints gbc_btnClearDest = new GridBagConstraints();
-		gbc_btnClearDest.insets = new Insets(0, 0, 5, 5);
-		gbc_btnClearDest.gridx = 7;
-		gbc_btnClearDest.gridy = 2;
-		mainMenu.add(btnClearDest, gbc_btnClearDest);
-		btnClearDest.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				txtSearchDest.setText("");
-				destMapsDropDown.setSelectedIndex(0);
-				try{
-					tempImg = img;
-					img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
-				}
-				catch(IOException g){
-					System.out.println("Invalid logo1");
-					g.printStackTrace();
-				}
-				frame.repaint();
-			}
-		});
-
 
 		txtSearchStart = new JTextField();
 		txtSearchStart.setText("Search");
 		GridBagConstraints gbc_txtSearchStart = new GridBagConstraints();
-		gbc_txtSearchStart.gridwidth = 3;
+		gbc_txtSearchStart.gridwidth = 2;
 		gbc_txtSearchStart.insets = new Insets(0, 0, 5, 5);
 		gbc_txtSearchStart.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtSearchStart.gridx = 1;
@@ -789,11 +745,34 @@ public class GUI{
 					txtSearchStart.setText("Search");
 			}
 		});
+		
+				GradientButton btnClearStart = new GradientButton("X", new Color(240,128,128));
+				btnClearStart.setText("Clear Selection");
+				btnClearStart.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						txtSearchStart.setText("");
+						startMapsDropDown.setSelectedIndex(0);
+						try{
+							tempImg = img;
+							img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+						}
+						catch(IOException g){
+							System.out.println("Invalid logo1");
+							g.printStackTrace();
+						}
+						frame.repaint();
+					}
+				});
+				GridBagConstraints gbc_btnClearStart = new GridBagConstraints();
+				gbc_btnClearStart.insets = new Insets(0, 0, 5, 5);
+				gbc_btnClearStart.gridx = 3;
+				gbc_btnClearStart.gridy = 3;
+				mainMenu.add(btnClearStart, gbc_btnClearStart);
 
 		txtSearchDest = new JTextField();
 		txtSearchDest.setText("Search");
 		GridBagConstraints gbc_txtSearchDest = new GridBagConstraints();
-		gbc_txtSearchDest.gridwidth = 3;
+		gbc_txtSearchDest.gridwidth = 2;
 		gbc_txtSearchDest.insets = new Insets(0, 0, 5, 5);
 		gbc_txtSearchDest.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtSearchDest.gridx = 5;
@@ -814,6 +793,30 @@ public class GUI{
 					txtSearchDest.setText("Search");
 			}
 		});
+		
+				GradientButton btnClearDest = new GradientButton("X", new Color(240,128,128));
+				btnClearDest.setText("Clear Selection");
+				GridBagConstraints gbc_btnClearDest = new GridBagConstraints();
+				gbc_btnClearDest.anchor = GridBagConstraints.EAST;
+				gbc_btnClearDest.insets = new Insets(0, 0, 5, 5);
+				gbc_btnClearDest.gridx = 7;
+				gbc_btnClearDest.gridy = 3;
+				mainMenu.add(btnClearDest, gbc_btnClearDest);
+				btnClearDest.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						txtSearchDest.setText("");
+						destMapsDropDown.setSelectedIndex(0);
+						try{
+							tempImg = img;
+							img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+						}
+						catch(IOException g){
+							System.out.println("Invalid logo1");
+							g.printStackTrace();
+						}
+						frame.repaint();
+					}
+				});
 
 
 		JLabel lblMaps = new JLabel("Starting Map:");

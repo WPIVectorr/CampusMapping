@@ -153,7 +153,15 @@ public class GUI{
 	private double destStarX;
 	private double destStarY;
 
-
+	
+	private ArrayList<Point> searchStartPoint;
+	private Map searchStartMap;
+	private Point searchDestPoint;
+	private Map searchDestMap;
+	private static SearchLocation google = new SearchLocation();
+	
+	
+	
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
 		//frame.setSize(932, 778);
@@ -182,6 +190,7 @@ public class GUI{
 			}
 		}
 		//System.out.println("------------------edges check-------------------");
+		google.prepData(allPoints);
 
 
 		mainMenu = new JPanel();
@@ -558,7 +567,7 @@ public class GUI{
 					//mapsDropdown.addItem(maps.get(i).getMapName());
 					//DestMaps.addItem(maps.get(i).getMapName());
 				}
-				System.out.println("toAdd: " + toAdd);
+				//System.out.println("toAdd: " + toAdd);
 				temp.add(toAdd);
 				//temp.add(maps.get(i).getMapName());
 
@@ -768,6 +777,7 @@ public class GUI{
 
 
 		txtSearchStart = new JTextField();
+
 		txtSearchStart.setText("Search");
 		GridBagConstraints gbc_txtSearchStart = new GridBagConstraints();
 		gbc_txtSearchStart.gridwidth = 3;
@@ -778,6 +788,50 @@ public class GUI{
 		mainMenu.add(txtSearchStart, gbc_txtSearchStart);
 		txtSearchStart.setColumns(10);
 
+				
+		
+		txtSearchStart.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if(txtSearchStart.getCaretPosition()>0)
+				{
+					String searchString;
+					
+					searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
+					System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
+					searchStartPoint = google.searchFor(searchString);
+					if(searchStartPoint.size() != 0 )
+					{
+						String searchStartPointName = searchStartPoint.get(0).getName();
+						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+						
+						txtSearchStart.setText(searchStartPointName);
+						txtSearchStart.setCaretPosition(searchString.length());
+						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+					}else{
+						System.out.println("no autocomplete found");
+					}
+				}else{
+					txtSearchStart.setText("");
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		
 		txtSearchStart.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e){
 				// Empty textbox for input upon click if placeholder text
@@ -804,6 +858,48 @@ public class GUI{
 		mainMenu.add(txtSearchDest, gbc_txtSearchDest);
 		txtSearchDest.setColumns(10);
 
+		txtSearchDest.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if(txtSearchDest.getCaretPosition()>0)
+				{
+					String searchString;
+					
+					searchString = txtSearchDest.getText().substring(0, txtSearchDest.getCaretPosition());
+					System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
+					searchStartPoint = google.searchFor(searchString);
+					if(searchStartPoint.size() != 0 )
+					{
+						String searchStartPointName = searchStartPoint.get(0).getName();
+						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+						
+						txtSearchDest.setText(searchStartPointName);
+						txtSearchDest.setCaretPosition(searchString.length());
+						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+					}else{
+						System.out.println("no autocomplete found");
+					}
+				}else{
+					txtSearchDest.setText("");
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		
 		txtSearchDest.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e){				
 				// Empty textbox for input upon click if placeholder text

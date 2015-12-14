@@ -1851,8 +1851,16 @@ public class GUI{
 		gbc_verticalStrut.gridx = 1;
 		gbc_verticalStrut.gridy = 14;
 		panelDirections.add(verticalStrut, gbc_verticalStrut);
+		
+		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();
+		gbc_horizontalStrut_2.insets = new Insets(0, 0, 5, 5);
+		gbc_horizontalStrut_2.gridx = 0;
+		gbc_horizontalStrut_2.gridy = 0;
+		panelHelp.add(horizontalStrut_2, gbc_horizontalStrut_2);
 				
 		JScrollPane scrollPaneHelp = new JScrollPane();
+		scrollPaneHelp.setViewportBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		GridBagConstraints gbc_scrollPaneHelp = new GridBagConstraints();
 		gbc_scrollPaneHelp.insets = new Insets(0, 0, 5, 5);
 		gbc_scrollPaneHelp.fill = GridBagConstraints.BOTH;
@@ -1864,12 +1872,26 @@ public class GUI{
 		textAreaHelp.setEditable(false);
 		scrollPaneHelp.setViewportView(textAreaHelp);
 		
+		Component horizontalStrut_6 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_6 = new GridBagConstraints();
+		gbc_horizontalStrut_6.insets = new Insets(0, 0, 5, 0);
+		gbc_horizontalStrut_6.gridx = 2;
+		gbc_horizontalStrut_6.gridy = 0;
+		panelHelp.add(horizontalStrut_6, gbc_horizontalStrut_6);
+		
 		GradientButton btnCloseHelp = new GradientButton("Close Help", buttonColor);
 		GridBagConstraints gbc_btnCloseHelp = new GridBagConstraints();
 		gbc_btnCloseHelp.insets = new Insets(0, 0, 5, 5);
 		gbc_btnCloseHelp.gridx = 1;
 		gbc_btnCloseHelp.gridy = 1;
 		panelHelp.add(btnCloseHelp, gbc_btnCloseHelp);
+		
+		Component verticalStrut_1 = Box.createVerticalStrut(20);
+		GridBagConstraints gbc_verticalStrut_1 = new GridBagConstraints();
+		gbc_verticalStrut_1.insets = new Insets(0, 0, 0, 5);
+		gbc_verticalStrut_1.gridx = 1;
+		gbc_verticalStrut_1.gridy = 2;
+		panelHelp.add(verticalStrut_1, gbc_verticalStrut_1);
 		btnCloseHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{

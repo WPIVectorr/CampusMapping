@@ -2,13 +2,13 @@ package main_package;
 
 public class Directions {
 	private String turn;
-	private double distance;
+	private int distance;
 	private boolean isStraight;
 	private double time;
 	private Point origin;
 	private Point destination;
 	
-	public Directions(String turn, double distance, boolean isStraight, double time, Point origin, Point destination){
+	public Directions(String turn, int distance, boolean isStraight, double time, Point origin, Point destination){
 		this.turn = turn;
 		this.distance = distance;
 		this.isStraight = isStraight;
@@ -25,11 +25,11 @@ public class Directions {
 		this.turn = turn;
 	}
 
-	public double getDistance() {
+	public int getDistance() {
 		return distance;
 	}
 
-	public void setDistance(double distance) {
+	public void setDistance(int distance) {
 		this.distance = distance;
 	}
 

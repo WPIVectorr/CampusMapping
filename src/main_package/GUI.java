@@ -168,9 +168,11 @@ public class GUI implements Runnable{
 
 		maps = md.getMapsFromLocal();
 		allPoints = new ArrayList<Point>();
+		System.out.println("All Points: " );
 		for(int i = 0; i < maps.size(); i++){
 			for(int j = 0; j < maps.get(i).getPointList().size(); j++){
 				allPoints.add(maps.get(i).getPointList().get(j));
+				
 			}
 		}
 		//System.out.println("------------------edges check-------------------");
@@ -417,12 +419,13 @@ public class GUI implements Runnable{
 		sliderWalkingSpeed.setLabelTable(speeds);
 		sliderWalkingSpeed.setPaintTicks(true);
 
-		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
+		GradientButton btnSavePreferences = new GradientButton("Back", buttonColor);
 		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
 		gbc_btnSavePreferences.gridwidth = 8;
 		gbc_btnSavePreferences.insets = new Insets(0, 0, 5, 0);
 		gbc_btnSavePreferences.gridx = 0;
 		gbc_btnSavePreferences.gridy = 5;
+		btnSavePreferences.setFont(new Font("Serif", Font.BOLD, 15));
 		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
 		// Return to previous view
 		btnSavePreferences.addActionListener(new ActionListener() {
@@ -1218,10 +1221,10 @@ public class GUI implements Runnable{
 					//System.out.println("--------------------astar--------------------------------");
 					//start.print();
 					//end.print();
-					AStar astar = new AStar();
-					astar.reset();
-
-					route = astar.PathFind(start, end, outside, stairs);
+					
+					AStar.reset();
+					
+					route = AStar.PathFind(start, end, outside, stairs, allPoints);
 					//System.out.println("route variable: " + (route == null));
 
 					if(route != null){
@@ -1257,6 +1260,7 @@ public class GUI implements Runnable{
 
 							for(int r = 0; r < multiMapFinalDir.size(); r++){
 								if(multiMapFinalDir.get(r).size() != 0){
+									System.out.println("Found a valid map!");
 									for(int s = 0; s < maps.size(); s++){
 										if(multiMapFinalDir.get(r).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
 											dirMaps.add(maps.get(s));
@@ -1268,6 +1272,7 @@ public class GUI implements Runnable{
 
 							}
 
+							
 							try {
 								textDir = gentextdir.genDirStrings(multiMapFinalDir);
 							} catch (MalformedDirectionException e) {
@@ -1300,8 +1305,11 @@ public class GUI implements Runnable{
 							secEstString = "00";
 						}
 						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
-
-						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
+						int m = mapPos;
+						while(multiMapFinalDir.get(m).size() == 0){
+							m++;
+						}
+						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(m).getMapName() + ".png");
 
 						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
@@ -1560,18 +1568,35 @@ public class GUI implements Runnable{
 
 				}
 				else if (textPos == 0){
+					int marker = mapPos;
 					mapPos--;
 					if(multiMapFinalDir.get(mapPos).size() == 0){
-						while(multiMapFinalDir.get(mapPos).size() == 0){
+						while((multiMapFinalDir.get(mapPos).size() != 0) && (multiMapFinalDir.get(mapPos).size() == 0)){
 							mapPos--;
 						}
-						textPos = multiMapFinalDir.get(mapPos).size();
-						int m = mapPos + 1;
-						while(multiMapFinalDir.get(m).size() == 0){
-							m++;
+						if(mapPos == 0){
+							while(multiMapFinalDir.get(mapPos).size() == 0){
+								mapPos++;
+							}
+						}
+						if(mapPos != marker){
+							textPos = multiMapFinalDir.get(mapPos).size();
+						} else { 
+							textPos = 0;
+						}
+						int m = mapPos - 1;
+						while((m != 0) && multiMapFinalDir.get(m).size() == 0){
+							m--;
+						}
+						if(m == 0){
+							while(multiMapFinalDir.get(m).size() == 0){
+								m++;
+							}
 						}
 						//directionsText.setText(textDir.get(mapPos).get(textPos));
-						directionsText.setText("Enter " + dirMaps.get(m).getMapName());
+						if(mapPos != marker){
+							directionsText.setText("Enter " + dirMaps.get(m).getMapName());
+						}
 					} else {
 
 						textPos = multiMapFinalDir.get(mapPos).size();
@@ -1659,7 +1684,31 @@ public class GUI implements Runnable{
 							while(dirMaps.get(m).getMapName() == null){
 								m++;
 							}
-							directionsText.setText("Enter " + dirMaps.get(m).getMapName());
+							
+							String toAdd = "";
+							boolean prevIsUnderscore = true;
+							for(int j = 0; j < dirMaps.get(m).getMapName().length(); j++){
+								char tempChar;
+								if(prevIsUnderscore){
+									tempChar = dirMaps.get(m).getMapName().charAt(j);
+									//converts to upper case
+									tempChar = Character.toUpperCase(tempChar);
+									prevIsUnderscore = false;
+								}
+								else if (dirMaps.get(m).getMapName().charAt(j) == ('_')){
+									prevIsUnderscore = true;
+									tempChar = ' ';
+								}
+								else{
+									tempChar = dirMaps.get(m).getMapName().charAt(j);
+									prevIsUnderscore = false;
+								}
+								toAdd += tempChar;
+								//mapsDropdown.addItem(maps.get(i).getMapName());
+								//DestMaps.addItem(maps.get(i).getMapName());
+							}
+							
+							directionsText.setText("Enter " + toAdd);
 						}
 						else {
 							textPos = multiMapFinalDir.get(mapPos).size();

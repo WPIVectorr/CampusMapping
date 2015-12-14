@@ -1,3 +1,4 @@
+
 package main_package;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -22,11 +23,15 @@ public class SearchLocation {
 	
 
 	
-	private static void prepData() {
+	public void prepData(ArrayList<Point> pointArray) {
 		// TODO Auto-generated constructor stub
 		
 		keyList = new ArrayList<String>();
 		pointNames = new HashMap<String,Point>();
+		
+		
+
+		
 		
 		ArrayList<String> StrattonHall 		= 	new ArrayList<String>();
 		ArrayList<String> BoyntonHall 		= 	new ArrayList<String>();
@@ -84,11 +89,7 @@ public class SearchLocation {
 		allNames.put("Fountain",Campus);
 		allNames.put("Seal", 	Campus);
 		allNames.put("SDCC",	West157);
-	}
-	
-	public SearchLocation(ArrayList<Point> pointArray)	
-	{
-		prepData();
+		
 		
 		
 		for(Point point:pointArray)
@@ -103,9 +104,16 @@ public class SearchLocation {
 					//System.out.println("long point name: " + LN);
 					pointNames.put(LN, point);
 					keyList.add(LN);
+					System.out.println("KeyPrep: "+LN);
 				}
 			}
-		}		
+		}
+	}
+	
+	public SearchLocation()	
+	{
+		
+		
 	}
 	
 	//get's the list of aliases for a point on the map
@@ -168,8 +176,8 @@ public class SearchLocation {
 				allPoints.add(maps.get(i).getPointList().get(j));
 			}
 		}
-		
-		new SearchLocation(allPoints);
+		SearchLocation google = new SearchLocation();
+		google.prepData(allPoints);
 		ArrayList<String> searchTerms = new ArrayList<String>();
 		//searchTerms.add(StringUtils.lowerCase("Atwater Kent"));
 		//searchTerms.add(StringUtils.lowerCase("AK"));
@@ -233,57 +241,66 @@ public class SearchLocation {
 	//return a sorted arraylist of 
 	public static ArrayList<Point> searchFor(String searchTerm)
 	{
-		ArrayList<Point> results = new ArrayList<Point>();
-		ArrayList<ArrayList<String>> orderList = new ArrayList<ArrayList<String>>();
-		
-		//goes through the list of keys(of the hashmap) and adds them to
-			//two dimensional array.
-		for(String key:keyList)
-		{ 
-			ArrayList<String> addArray = new ArrayList<String>();
-			addArray.add(key);
-			orderList.add(addArray);		
-		}	
-		
-		//goes through the two dimensional list and searches against every key
-			//adds the fuzzy score as the second dimension.
-		for(int i = 0;i < orderList.size();i++)
+		if(searchTerm.length() != 0)
 		{
-			ArrayList<String> key = orderList.get(i);
-			Integer levenshtein = compareStrings(key.get(0),searchTerm);
-			key.add(levenshtein.toString());		
-
-			if(levenshtein!=0)
+			searchTerm = StringUtils.lowerCase(searchTerm);
+			ArrayList<Point> results = new ArrayList<Point>();
+			ArrayList<ArrayList<String>> orderList = new ArrayList<ArrayList<String>>();
+			System.out.println("Search Term: "+searchTerm);
+			//goes through the list of keys(of the hashmap) and adds them to
+				//two dimensional array.
+			for(String key:keyList)
+			{ 
+				ArrayList<String> addArray = new ArrayList<String>();
+				//System.out.println("key: "+key);
+				addArray.add(key);
+				orderList.add(addArray);		
+			}	
+			
+			//goes through the two dimensional list and searches against every key
+				//adds the fuzzy score as the second dimension.
+			for(int i = 0;i < orderList.size();i++)
 			{
-				//adds the levenshtein as the second index
-				//System.out.println("Lev: "+key.get(1)+" Searchterm: "+searchTerm+" compare: "+key.get(0));
-			}
-		}
-		
-		orderList.sort(new orderListComparator());
-		//System.out.println("sortedList: ");
-		for(ArrayList<String> sortedName:orderList)
-		{
-				String buildingLetter = sortedName.get(0).substring(0, 1);
-				String searchLetter = searchTerm.substring(0,1);
-				//System.out.println("build Letter: "+buildingLetter+" Search letter: "+searchLetter);
-				if(buildingLetter.equalsIgnoreCase(searchLetter))
+				ArrayList<String> key = orderList.get(i);
+				Integer levenshtein = compareStrings(key.get(0),searchTerm);
+				key.add(levenshtein.toString());		
+	
+				if(levenshtein!=0)
 				{
-					if(results.size()<6)
-						results.add(pointNames.get(sortedName.get(0)));
+					//adds the levenshtein as the second index
+					//System.out.println("Lev: "+key.get(1)+" Searchterm: "+searchTerm+" compare: "+key.get(0));
 				}
-			//System.out.println("Build: "+sortedName.get(0)+" lev: "+ sortedName.get(1));
+			}
+			
+			orderList.sort(new orderListComparator());
+			//System.out.println("sortedList: ");
+			for(ArrayList<String> sortedName:orderList)
+			{
+					String buildingLetter = sortedName.get(0).substring(0, 1);
+					String searchLetter = searchTerm.substring(0,1);
+					//System.out.println("build Letter: "+buildingLetter+" Search letter: "+searchLetter);
+					if(buildingLetter.equalsIgnoreCase(searchLetter))
+					{
+						if(results.size()<6)
+							results.add(pointNames.get(sortedName.get(0)));
+					}
+				//System.out.println("Build: "+sortedName.get(0)+" lev: "+ sortedName.get(1));
+			}
+			
+			
+			
+			if(results.isEmpty()){
+				System.out.println("Result = null");
+			}
+			else{
+				//System.out.println("In searched for: "+ result.getName());
+			}
+			return results;
+		}else{
+			ArrayList<Point> emptyArrayList = new ArrayList<Point>();
+			return emptyArrayList;
 		}
 		
-		
-		
-		if(results.isEmpty()){
-			System.out.println("Result = null");
-		}
-		else{
-			//System.out.println("In searched for: "+ result.getName());
-		}
-		return results;
 	}
 
 	

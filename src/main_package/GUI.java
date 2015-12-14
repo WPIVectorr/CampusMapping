@@ -116,6 +116,8 @@ public class GUI{
 	private int mousey;
 	private int originx;
 	private int originy;
+	private int lastMouseX;
+	private int lastMouseY;
 	private double difWidth;
 	private double difHeight;
 	private double newImageHeight;
@@ -128,7 +130,10 @@ public class GUI{
 	private int stairs;
 	private double walkSpeed = 4.5;
 	private Map startMap;
+	private Map destMap;
 	private String mapTitle = "Select Map";
+	//private String startPointName = "Select Start Location";
+	//private String destPointName = "Select Destination Location";
 	private static SplashPage loadingAnimation;
 	private JTextField txtFieldEmail;
 	private JLabel txtTimeToDestination;
@@ -144,6 +149,22 @@ public class GUI{
 	private JTextField txtSearchStart;
 	private JTextField txtSearchDest;
 	private GradientButton btnFullTextDirections;
+	private boolean newClick = false;
+	private Point startPoint = new Point();
+	private Point destPoint = new Point();
+	private int startPointIndex;
+	private int destPointIndex;
+	private Map currentMap;
+	private ArrayList<Point> tempStartRoom = new ArrayList<Point>();
+	private ArrayList<Point> tempDestRoom = new ArrayList<Point>();
+	private Point startPointName = new Point();
+	private Point destPointName = new Point();
+	private String selectedPointID;
+	private Point selectedPoint;
+	private boolean startIsSelected = false;
+	private boolean destIsSelected = false;
+	
+	
 
 	private double startStarX;
 	private double startStarY;
@@ -182,6 +203,13 @@ public class GUI{
 		mainMenu = new JPanel();
 		mainMenu.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		mainMenu.setBackground(backgroundColor);
+		
+		//create a dummy point for the titles of the dropdowns for selecting points
+		startPointName.setName("Select Start Location");
+		destPointName.setName("Select Destination Location");
+		
+		startPoint = startPointName;
+		destPoint = destPointName;
 
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
 		gbl_mainMenu.columnWidths = new int[]{80, 90, 131, 44, 150, 90, 131, 44, 80};
@@ -438,6 +466,7 @@ public class GUI{
 					resetPath = false;
 
 					mapTitle = maps.get(buildStartIndex-1).getMapName();
+					currentMap = maps.get(buildStartIndex-1);
 					//String mapTitle = "AtwaterKent1";
 
 					File start = new File("src/VectorMaps");
@@ -580,8 +609,39 @@ public class GUI{
 				originx = e.getX();
 				originy = e.getY();
 			}
-			
-			
+				
+			public void mouseReleased(MouseEvent a) {
+				System.out.println("New Mouse Release");
+				System.out.println("Map Title: " + mapTitle);
+				if(!(mapTitle.equals("Select Map"))){
+					System.out.println("Dragged: " + Dragged);
+					if (!Dragged) {
+						// System.out.println("not dragged");
+						newClick = false;
+						lastMouseX = a.getX();
+						lastMouseY = a.getY();
+						System.out.println("lastMouseX: " + lastMouseX);
+						System.out.println("lastMouseY: " + lastMouseY);
+						System.out.println("startMapsDropDown selectedItem: " + startMapsDropDown.getSelectedItem().toString());
+						if (!(startMapsDropDown.getSelectedItem().equals("Select Map")) || !(destMapsDropDown.getSelectedItem().equals("Select Map")))
+							newClick = true;
+
+						//frame.repaint();
+					} else {
+						// System.out.println("dragged = true");
+						Dragged = false;
+						drawnfirst = true;
+					}
+				}
+				else{
+					if(!(roomPointsToDraw == null)){
+						roomPointsToDraw.clear();
+					}
+				}
+				frame.repaint();
+
+			}
+
 		});
 		
 		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
@@ -599,15 +659,17 @@ public class GUI{
 		
 		drawPanel.addMouseMotionListener(new MouseMotionListener(){
 			public void mouseDragged(MouseEvent g){
-				//System.out.println("dragged");
-				Dragged = true;
-				mousex = g.getX();
-				mousey = g.getY();
-				frame.repaint();
+				if(!mapTitle.equals("Select Map")){
+					//System.out.println("dragged");
+					drawnfirst = true;
+					Dragged = true;
+					mousex = g.getX();
+					mousey = g.getY();
+					frame.repaint();
+				}
 			}
 
 			public void mouseMoved(MouseEvent j) {
-				//System.out.println((j.getX()-(drawnposx+newImageWidth/2))+", "+(j.getY()-(drawnposy+newImageHeight/2)));
 				mousezoomx = j.getX();
 				mousezoomy = j.getY();
 			}
@@ -823,6 +885,7 @@ public class GUI{
 				if (startMapsDropDown.getSelectedItem().equals("Select Map")){
 					startBuilds.removeAllItems();
 					startBuilds.setEnabled(false);
+					roomPointsToDraw.clear();
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
 					showStartPoint = false;
@@ -834,9 +897,19 @@ public class GUI{
 						System.out.println("Invalid logo1");
 						g.printStackTrace();
 					}
+					if(currentMap != null){
+						currentMap = null;
+					}
+					if(startMap != null){
+						startMap = null;
+					}
+					startPoint = startPointName;
+					startIsSelected = false;
+					
 					frame.repaint();
 				}
 				else{
+					startIsSelected = false;
 					startBuilds.setEnabled(true);
 					if (destBuilds.isEnabled()){
 						btnSwapStartAndDest.setEnabled(true);
@@ -846,7 +919,15 @@ public class GUI{
 
 
 					mapTitle = maps.get(buildStartIndex-1).getMapName();
-														
+					System.out.println("MapTitle: " + mapTitle);
+					currentMap = maps.get(buildStartIndex-1); //old
+					startMap = maps.get(buildStartIndex-1); //new	
+					
+					if(!(startMap.getMapId() == startPoint.getMapId())){
+						startPoint = startPointName;
+						startIsSelected = false;
+					}
+					
 					//String mapTitle = "AtwaterKent1";
 
 					File start = new File("src/VectorMaps");
@@ -870,7 +951,7 @@ public class GUI{
 					if(!(roomPointsToDraw == null)){
 						roomPointsToDraw.clear();
 					}
-					//destBuilds.removeAllItems();
+					
 					if(buildStartIndex!=0){
 						edgeArray = new ArrayList<Edge>();
 
@@ -891,9 +972,9 @@ public class GUI{
 								}
 							}
 						}
-						ArrayList<Point> tempStartRoom = new ArrayList<Point>();
 						boolean check = true;
 						System.out.println("number of points: " + maps.get(buildStartIndex-1).getPointList().size());
+						tempStartRoom.clear();
 						for (int i = 0; i < maps.get(buildStartIndex-1).getPointList().size(); i++){
 							check = true;
 							if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
@@ -915,6 +996,9 @@ public class GUI{
 								}
 								if(check){
 									tempStartRoom.add(maps.get(buildStartIndex - 1).getPointList().get(i));
+									if(!(roomPointsToDraw.contains(pointArray.get(i)))){
+										roomPointsToDraw.add(pointArray.get(i));
+									}
 									//mapsDropdown.addItem(maps.get(i).getMapName());
 									//DestMaps.addItem(maps.get(i).getMapName());
 								}
@@ -927,42 +1011,28 @@ public class GUI{
 						Collections.sort(tempStartRoom);
 						System.out.println("tempStartRoom size: " + tempStartRoom.size());
 						//tempStartRoom = sort(tempStartRoom);
+						startBuilds.addItem(startPointName);
 						for(int count = 0; count < tempStartRoom.size(); count++){
 							startBuilds.addItem(tempStartRoom.get(count));
-
-						}
-						//System.out.println("buildings[i] " + buildings[i]);
-
-						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
-						//}
-
-						/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-																						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
-																							destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
-																						}*/
-						//System.out.println("buildings[i] " + buildings[i]);
-
-						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+						}		
+					}
+					
+					
+					if(startIsSelected){
+						startBuilds.setSelectedItem(startPoint);
 					}
 				}
-				//startBuilds.removeAllItems();
-				//for (int i=0; i < buildings.length; i++){
-				//System.out.println("buildings[i] match: " + buildings[i]);
-				//startBuilds.addItem(buildings[i]);
-				//}
-				//destBuilds.removeAllItems();
-				//for (int i=0; i < buildings.length; i++){
-				///destBuilds.addItem(buildings[i]);
-				//}
 			}
-		}
-				);
+		});
+		
+		
 		//adds the correct points for the building specified
 		destMapsDropDown.addActionListener (new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
 				drawnfirst = false;
 				if (destMapsDropDown.getSelectedItem().equals("Select Map")){
 					destBuilds.removeAllItems();
+					roomPointsToDraw.clear();
 					destBuilds.setEnabled(false);
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
@@ -975,10 +1045,19 @@ public class GUI{
 						System.out.println("Invalid logo1");
 						g.printStackTrace();
 					}
+					if(currentMap != null){
+						currentMap = null;
+					}
+					if(destMap != null){
+						destMap = null;
+					}
+					destPoint = destPointName;
+					destIsSelected = false;
+					
 					frame.repaint();
 				}
 				else{
-
+					destIsSelected = false;
 					destBuilds.setEnabled(true);
 					if (startBuilds.isEnabled()){
 						btnSwapStartAndDest.setEnabled(true);
@@ -987,11 +1066,15 @@ public class GUI{
 
 					buildDestIndex = destMapsDropDown.getSelectedIndex();
 
-
-
 					String mapTitle = maps.get(buildDestIndex-1).getMapName();
-					//String mapTitle = "AtwaterKent1";
-
+					currentMap = maps.get(buildDestIndex-1);
+					destMap = maps.get(buildDestIndex-1); //new
+					
+					if(!(destMap.getMapId() == destPoint.getMapId())){
+						destPoint = destPointName;
+						destIsSelected = false;
+					}
+					
 					File dest = new File("src/VectorMaps");
 					String destInput = dest.getAbsolutePath();
 					//assuming all maps saved in vectorMaps are in jpg
@@ -1009,20 +1092,36 @@ public class GUI{
 
 					//startBuilds.removeAllItems();
 					destBuilds.removeAllItems();
+					
+					if(!(roomPointsToDraw == null)){
+						roomPointsToDraw.clear();
+					}
+					
 					if(buildDestIndex!=0){
 						edgeArray = new ArrayList<Edge>();
 
 						pointArray = maps.get(buildDestIndex - 1).getPointList();
-
+						String pointName = "";
+						
 						for(int i = 0; i < pointArray.size(); i++){
 							for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
 								edgeArray.add(pointArray.get(i).getEdges().get(j));
 							}
+							pointName = pointArray.get(i).getName();
+							pointName = pointName.trim();
+							pointName = pointName.toLowerCase();
+							if(!(pointArray == null)){
+								if(!((pointName.equals("hallway")) || (pointName.equals("stairs bottom")) || (pointName.equals("stairs top")) || (pointName.equals("stairs")) || (pointName.equals("elevator") || (pointName.equals("room")) || (pointName.equals("path"))))){
+									roomPointsToDraw.add(pointArray.get(i));
+								}
+							}
 						}
-						ArrayList<Point> tempDestRoom = new ArrayList<Point>();
+						
 						System.out.println("pointArraysize: " + pointArray.size());
 						boolean check = true;
 						//System.out.println("building size: " + buildings.length);
+						
+						tempDestRoom.clear();
 						for (int i = 0; i < pointArray.size(); i++){
 							check = true;
 							if(!pointArray.get(i).getName().equalsIgnoreCase("Hallway") &&
@@ -1047,7 +1146,9 @@ public class GUI{
 								if(check){
 
 									tempDestRoom.add(pointArray.get(i));
-									roomPointsToDraw.add(pointArray.get(i));
+									if(!(roomPointsToDraw.contains(pointArray.get(i)))){
+										roomPointsToDraw.add(pointArray.get(i));
+									}
 									System.out.println("testDestRoom last added: " + maps.get(buildDestIndex - 1).getPointList().get(i));
 									//mapsDropdown.addItem(maps.get(i).getMapName());
 									//DestMaps.addItem(maps.get(i).getMapName());
@@ -1061,32 +1162,17 @@ public class GUI{
 						Collections.sort(tempDestRoom);
 						System.out.println("tempDestRoom size: " + tempDestRoom.size());
 						//tempStartRoom = sort(tempStartRoom);
+						destBuilds.addItem(destPointName);
 						for(int count = 0; count < tempDestRoom.size(); count++){
 							destBuilds.addItem(tempDestRoom.get(count));
-
 						}
 					}
 
-					/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-																								if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
-																									destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
-																								}*/
-					//System.out.println("buildings[i] " + buildings[i]);
-
-					// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+					if(destIsSelected){
+						destBuilds.setSelectedItem(destPoint);
+					}
 				}
 			}
-
-			//startBuilds.removeAllItems();
-			//for (int i=0; i < buildings.length; i++){
-			//System.out.println("buildings[i] match: " + buildings[i]);
-			//startBuilds.addItem(buildings[i]);
-			//}
-			//destBuilds.removeAllItems();
-			//for (int i=0; i < buildings.length; i++){
-			///destBuilds.addItem(buildings[i]);
-			//}
-
 		});
 
 		btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
@@ -1154,12 +1240,15 @@ public class GUI{
 		startBuilds.setBounds(122, 30, 148, 20);
 		startBuilds.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (startBuilds.getItemCount() != 0){
-					showStartPoint = true;
-					showDestPoint = false;
-					startStarX = ((Point)(startBuilds.getSelectedItem())).getLocX();
-					startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
-					frame.repaint();
+				if (!(startBuilds.getSelectedIndex() == 0)){
+					if (startBuilds.getItemCount() > 1){
+						showStartPoint = false;
+						showDestPoint = false;
+						startStarX = ((Point)(startBuilds.getSelectedItem())).getLocX();
+						startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
+						startMap = currentMap;
+						frame.repaint();
+					}
 				}
 			}
 		});
@@ -1187,12 +1276,15 @@ public class GUI{
 		destBuilds.setBounds(122, 30, 148, 20);
 		destBuilds.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (destBuilds.getItemCount() != 0){
-					showDestPoint = true;
-					showStartPoint = false;
-					destStarX = ((Point)(destBuilds.getSelectedItem())).getLocX();
-					destStarY = ((Point)(destBuilds.getSelectedItem())).getLocY();
-					frame.repaint();
+				if (!(destBuilds.getSelectedIndex() == 0)){
+					if (destBuilds.getItemCount() > 1){
+						showDestPoint = false;
+						showStartPoint = false;
+						destStarX = ((Point)(destBuilds.getSelectedItem())).getLocX();
+						destStarY = ((Point)(destBuilds.getSelectedItem())).getLocY();
+						startMap = currentMap;
+						frame.repaint();
+					}
 				}
 			}
 		});
@@ -1368,13 +1460,6 @@ public class GUI{
 			}
 		});
 
-		drawPanel.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				originx = e.getX();
-				originy = e.getY();
-			}
-		});
-
 		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
 
 			@Override
@@ -1388,24 +1473,8 @@ public class GUI{
 			}           
 		});
 
-		drawPanel.addMouseMotionListener(new MouseMotionListener(){
-			public void mouseDragged(MouseEvent g){
-				if(!mapTitle.equals("Select Map")){
-					//System.out.println("dragged");
-					drawnfirst = true;
-					Dragged = true;
-					mousex = g.getX();
-					mousey = g.getY();
-					frame.repaint();
-				}
-			}
-
-			public void mouseMoved(MouseEvent j) {
-				mousezoomx = j.getX();
-				mousezoomy = j.getY();
-			}
-		});
-
+		
+		
 		frame.addMouseWheelListener(new MouseWheelListener(){
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				if(!mapTitle.equals("Select Map")){
@@ -2165,33 +2234,154 @@ public class GUI{
 			
 			
 			
-			
-			
-			if(roomPointsToDraw != null && roomPointsToDraw.size() != 0){
-				System.out.print("roomPointsToDraw size: " + roomPointsToDraw.size());
-				
-				for (int i = 0; i < roomPointsToDraw.size(); i++){
-					int point1x = (int)((roomPointsToDraw.get(i).getLocX()*newImageWidth)+drawnposx);
-					int point1y = (int)((roomPointsToDraw.get(i).getLocY()*newImageHeight)+drawnposy);			
-					g.setColor(pointColor);
-					g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
-					g.setColor(Color.BLACK);
-					g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+			if (!showRoute && route == null) {
+				//Draws the points in each room so that the user can select each point as a source or destination
+				if(roomPointsToDraw != null && roomPointsToDraw.size() != 0){
+					System.out.println("roomPointsToDraw size: " + roomPointsToDraw.size());
+
+					for (int i = 0; i < roomPointsToDraw.size(); i++){
+						int point1x = (int)((roomPointsToDraw.get(i).getLocX()*newImageWidth)+drawnposx);
+						int point1y = (int)((roomPointsToDraw.get(i).getLocY()*newImageHeight)+drawnposy);			
+						g.setColor(pointColor);
+						g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+						g.setColor(Color.BLACK);
+						g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+					}
+				}
+				for(int i = 0; i < roomPointsToDraw.size(); i++){
+					double posx = ((roomPointsToDraw.get(i).getLocX()*newImageWidth)+drawnposx);
+					double posy = ((roomPointsToDraw.get(i).getLocY()*newImageHeight)+drawnposy);
+
+					DEBUG = false;
+					if(DEBUG){
+						System.out.println(i + " - Point Name: " + roomPointsToDraw.get(i).getName());
+						System.out.println("posx: " + posx);
+						System.out.println("posy: " + posy);
+						System.out.println("lastMouseX: " + lastMouseX);
+						System.out.println("lastMouseY: " + lastMouseY);
+						System.out.println("startIsSelected: " + startIsSelected);
+						System.out.println("startPoint ID: " + startPoint.getName());
+						if(startMap != null)
+							System.out.println("Current Start Map Name: " + startMap.getMapId());
+						System.out.println("------------------------------------");
+						System.out.println("destPoint ID: " + destPoint.getName());
+						if(selectedPointID != null)
+							System.out.println("Selected Point ID: " + selectedPointID);
+						System.out.println("destIsSelected: " + destIsSelected);
+						if(destMap != null)
+							System.out.println("Current Dest Map Name: " + destMap.getMapId());
+						System.out.println("------------------------------------");
+					}
+					DEBUG = false;
+					if ((lastMouseX > posx - (pointSize + (1*scaleSize))
+							&& lastMouseX < posx + (pointSize + (1*scaleSize)))
+							&& (lastMouseY > posy - (pointSize + (1*scaleSize))
+									&& lastMouseY < posy + (pointSize + (1*scaleSize)))) {
+						//If there is a new click action and a start point has not been selected then the start point is set
+						if(DEBUG){
+							System.out.println("Point Name: " + roomPointsToDraw.get(i).getName());
+						}
+						selectedPoint = roomPointsToDraw.get(i);
+						selectedPointID = selectedPoint.getId();
+
+
+						System.out.println("newClick: " + newClick);
+						System.out.println("selectedPointID is null: " + (selectedPointID == null));
+
+						//select the starting point
+						if(!(startIsSelected)){
+							if (newClick == true && startPoint.getName().equals("Select Start Location")) {
+								//if we select a new point to edit
+								startPoint = selectedPoint;
+								startPointIndex = i;
+								System.out.println("Set the startPoint to first point clicked");
+
+								//set the drop down for points
+								//startBuilds.setSelectedIndex(tempStartRoom.indexOf(roomPointsToDraw.get(i)));
+								startBuilds.setSelectedItem(startPoint);
+
+
+								System.out.println("starBuilds selectedIndex: " + startBuilds.getSelectedIndex());
+
+								newClick = false;
+								startIsSelected = true;
+							}
+						}
+
+						//unselect the starting point
+						if(startIsSelected){
+							if(newClick == true && selectedPointID.equals(startPoint.getId()) && startIsSelected){
+								startPoint = startPointName;
+								startPointIndex = 0;
+								startBuilds.setSelectedItem(startPointName);
+								System.out.println("Unselected the startPoint");
+								newClick = false;
+								startIsSelected = false;
+							}
+						}
+
+						//select destination point
+						if(!(destIsSelected)){
+							if(newClick == true && destPoint.getName().equals("Select Destination Location") ){
+								System.out.println("Set the Selected Destination Point");
+								destPoint = selectedPoint;
+								destPointIndex = i;
+								destBuilds.setSelectedItem(destPoint);
+								System.out.println("Unselected the destPoint");
+								newClick = false;
+								destIsSelected = true;
+							}
+						}
+
+						//unselect the destination point
+						if(destIsSelected){
+							if(newClick == true && destPoint.getId().equals(destPointName.getId()) && destIsSelected){
+								destPoint = destPointName;
+								destPointIndex = 0;
+								destBuilds.setSelectedItem(destPointName);
+								System.out.println("Unselected the destPoint");
+								newClick = false;
+								destIsSelected = false;
+							}
+						}
+					}
+					mainMenu.repaint();
+				}
+
+
+
+				if(startMap != null && currentMap != null && currentMap.getMapId() == startMap.getMapId()){
+					if(startPoint.getId() != null && !(startPoint.getName().equals(startPointName.getName())) && currentMap.getMapId() == startPoint.getMapId()){
+						int point1x = (int)((startPoint.getLocX()*newImageWidth)+drawnposx);
+						int point1y = (int)((startPoint.getLocY()*newImageHeight)+drawnposy);			
+						g.setColor(Color.GREEN);
+						g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+						g.setColor(Color.BLACK);
+						g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+					}
+				}
+
+
+				if(destMap != null && currentMap != null && currentMap.getMapId() == destMap.getMapId()){
+					if(destPoint.getId() != null && !(destPoint.getName().equals(destPointName.getName())) && currentMap.getMapId() == destPoint.getMapId()){
+						int point1x = (int)((destPoint.getLocX()*newImageWidth)+drawnposx);
+						int point1y = (int)((destPoint.getLocY()*newImageHeight)+drawnposy);			
+						g.setColor(Color.RED);
+						g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+						g.setColor(Color.BLACK);
+						g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+					}
 				}
 			}
 			
-			
-			
-			
-
-			if (showStartPoint){
+			if (showStartPoint && !(startPoint.getName().equals("Select Start Location"))){
 				Shape startStar = createStar(5, (int)((startStarX * newImageWidth) + drawnposx) , (int)((startStarY * newImageHeight) + drawnposy), 7, 12);
 				g.setColor(starColor);
 				g2.fill(startStar);
 				g.setColor(Color.BLACK);
 				g2.draw(startStar);
 			}
-			if (showDestPoint){
+			if (showDestPoint && !(destPoint.getName().equals("Select Destination Location"))){
 				Shape destStar = createStar(5, (int)((destStarX * newImageWidth) + drawnposx), (int)((destStarY * newImageHeight) + drawnposy), 7, 12);
 				g.setColor(starColor);
 				g2.fill(destStar);
@@ -2200,7 +2390,6 @@ public class GUI{
 			}
 
 			if (showRoute && route != null) {
-
 				// Draw multi colored lines depending on current step in
 				// directions and color settings (color blind mode or not)
 				// Draw lines for all points up to current point, use

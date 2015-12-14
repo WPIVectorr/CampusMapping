@@ -7,10 +7,12 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +40,7 @@ import javax.swing.text.JTextComponent;
 
 import database.AlreadyExistsException;
 import database.ServerDB;
+
 import javax.swing.border.TitledBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
@@ -68,7 +71,10 @@ public class GUI{
 	private JPanel navMenu;
 	private JPanel prefMenu;
 	private JPanel menus;
+	private JPanel panelHelp;
 	private CardLayout menuLayout;
+	JPanel panels;
+	CardLayout panelLayout;
 	private String returnMenu;
 	private GradientButton btnNext;
 	private GradientButton btnPrevious;
@@ -138,6 +144,7 @@ public class GUI{
 	private double mousezoomy;
 	private double minZoomSize;
 	private JTextArea txtpnFullTextDir;
+	private JTextArea textAreaHelp;
 	private JTextField txtSearchStart;
 	private JTextField txtSearchDest;
 	private GradientButton btnFullTextDirections;
@@ -216,6 +223,21 @@ public class GUI{
 		menus.add(navMenu, "Nav Menu");
 		menus.add(createPrefMenu(), "Pref Menu");
 		menus.add(aboutMenu, "About Menu");
+		
+		panelHelp = new JPanel();
+		GridBagLayout gbl_panelHelp = new GridBagLayout();
+		gbl_panelHelp.columnWidths = new int[]{0, 0, 0, 0};
+		gbl_panelHelp.rowHeights = new int[]{0, 0, 0, 0};
+		gbl_panelHelp.columnWeights = new double[]{0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_panelHelp.rowWeights = new double[]{1.0, 0.0, 0.0, Double.MIN_VALUE};
+		panelHelp.setLayout(gbl_panelHelp);
+		panelHelp.setVisible(false);
+		panelHelp.setBackground(backgroundColor);
+		
+		panels = new JPanel(new CardLayout());
+		panelLayout = (CardLayout) panels.getLayout();
+		panels.add((JPanel) drawPanel, "Draw Panel");
+		panels.add(panelHelp, "Help Panel");
 
 		JLabel lblTitle = new JLabel("Vectorr Solutions - Team Five         ");
 		lblTitle.setFont(new Font("Sitka Text", Font.PLAIN, 22));
@@ -488,7 +510,7 @@ public class GUI{
 
 
 		frame.getContentPane().add(menus, BorderLayout.NORTH);
-
+		frame.getContentPane().add(panels, BorderLayout.CENTER);
 
 		/*adds the room numbers based off of building name
         startBuilds.addActionListener (new ActionListener () {
@@ -560,10 +582,13 @@ public class GUI{
 		mainMenu.add(btnOptionsMain, gbc_btnOptionsMain);
 		btnOptionsMain.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				showStartPoint = false;
+				showDestPoint = false;
 				// Note which menu to return to
 				returnMenu = "Main Menu";
 				// Show preferences menu
 				menuLayout.show(menus, "Pref Menu");
+				frame.repaint();
 			}
 		});
 
@@ -582,18 +607,18 @@ public class GUI{
 		});
 
 		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
-			 
-            @Override
-            public void ancestorMoved(HierarchyEvent e) {
-                           
-            }
-            @Override
-            public void ancestorResized(HierarchyEvent e) {
-            	drawnfirst = false;
-                frame.repaint();
-            }           
-        });
-		
+
+			@Override
+			public void ancestorMoved(HierarchyEvent e) {
+
+			}
+			@Override
+			public void ancestorResized(HierarchyEvent e) {
+				drawnfirst = false;
+				frame.repaint();
+			}           
+		});
+
 		drawPanel.addMouseMotionListener(new MouseMotionListener(){
 			public void mouseDragged(MouseEvent g){
 				//System.out.println("dragged");
@@ -668,7 +693,7 @@ public class GUI{
 						}
 						drawPanel.repaint();
 					} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
-	
+
 					}
 				}
 			}
@@ -1369,7 +1394,7 @@ public class GUI{
 			@Override
 			public void ancestorResized(HierarchyEvent e) {
 				drawnfirst = false;
-                frame.repaint();
+				frame.repaint();
 			}           
 		});
 
@@ -1438,10 +1463,10 @@ public class GUI{
 						}
 						frame.repaint();
 					} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
-	
+
 					}
 				}
-				
+
 				// System.out.println(message);
 			}
 		});
@@ -1777,10 +1802,6 @@ public class GUI{
 		gbc_btnNext.gridy = 5;
 		navMenu.add(btnNext, gbc_btnNext);
 
-
-		// Add panel for drawing
-		frame.getContentPane().add(drawPanel);
-
 		panelDirections = new JPanel();
 		panelDirections.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		frame.getContentPane().add(panelDirections, BorderLayout.WEST);
@@ -1813,51 +1834,51 @@ public class GUI{
 		// Text box for full list of directions, initially invisible, appears when directions button pressed
 		txtpnFullTextDir.setText(" Full List of Directions:");
 		txtpnFullTextDir.setEditable(false);
-		
-				txtFieldEmail = new JTextField();
-				txtFieldEmail.setText("Enter E-Mail Here");
-				GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
-				gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
-				gbc_txtFieldEmail.gridwidth = 2;
-				gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
-				gbc_txtFieldEmail.gridx = 1;
-				gbc_txtFieldEmail.gridy = 10;
-				panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
-				txtFieldEmail.setColumns(10);
-				
-						txtFieldEmail.addFocusListener(new FocusListener() {
-							public void focusGained(FocusEvent e){
-								// Empty textbox for input upon click if placeholder text
-								if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
-									txtFieldEmail.setText("");
-							}
-				
-							public void focusLost(FocusEvent e) {
-								// If textboxes are empty and somewhere else is clicked, bring back placeholder text
-								if (txtFieldEmail.getText().equals(""))
-									txtFieldEmail.setText("Enter E-Mail Here");
-							}
-						});
-		
-				GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
-				GridBagConstraints gbc_btnEmailDirections = new GridBagConstraints();
-				gbc_btnEmailDirections.insets = new Insets(0, 0, 5, 5);
-				gbc_btnEmailDirections.gridwidth = 2;
-				gbc_btnEmailDirections.anchor = GridBagConstraints.NORTH;
-				gbc_btnEmailDirections.gridx = 1;
-				gbc_btnEmailDirections.gridy = 11;
-				panelDirections.add(btnEmailDirections, gbc_btnEmailDirections);
-				btnEmailDirections.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						try {
-							new PrintDirections(textDir,finalDir,txtFieldEmail.getText());
-							txtFieldEmail.setText("");
-						} catch (AddressException e1) {
-							// TODO Auto-generated catch block
-							btnEmailDirections.setText("Invalid Address");
-						}
-					}
-				});
+
+		txtFieldEmail = new JTextField();
+		txtFieldEmail.setText("Enter E-Mail Here");
+		GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
+		gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
+		gbc_txtFieldEmail.gridwidth = 2;
+		gbc_txtFieldEmail.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtFieldEmail.gridx = 1;
+		gbc_txtFieldEmail.gridy = 10;
+		panelDirections.add(txtFieldEmail, gbc_txtFieldEmail);
+		txtFieldEmail.setColumns(10);
+
+		txtFieldEmail.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e){
+				// Empty textbox for input upon click if placeholder text
+				if (txtFieldEmail.getText().equals("Enter E-Mail Here"))
+					txtFieldEmail.setText("");
+			}
+
+			public void focusLost(FocusEvent e) {
+				// If textboxes are empty and somewhere else is clicked, bring back placeholder text
+				if (txtFieldEmail.getText().equals(""))
+					txtFieldEmail.setText("Enter E-Mail Here");
+			}
+		});
+
+		GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
+		GridBagConstraints gbc_btnEmailDirections = new GridBagConstraints();
+		gbc_btnEmailDirections.insets = new Insets(0, 0, 5, 5);
+		gbc_btnEmailDirections.gridwidth = 2;
+		gbc_btnEmailDirections.anchor = GridBagConstraints.NORTH;
+		gbc_btnEmailDirections.gridx = 1;
+		gbc_btnEmailDirections.gridy = 11;
+		panelDirections.add(btnEmailDirections, gbc_btnEmailDirections);
+		btnEmailDirections.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					new PrintDirections(textDir,finalDir,txtFieldEmail.getText());
+					txtFieldEmail.setText("");
+				} catch (AddressException e1) {
+					// TODO Auto-generated catch block
+					btnEmailDirections.setText("Invalid Address");
+				}
+			}
+		});
 
 		Component horizontalStrut_4 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_4 = new GridBagConstraints();
@@ -1879,6 +1900,55 @@ public class GUI{
 		gbc_verticalStrut.gridx = 1;
 		gbc_verticalStrut.gridy = 14;
 		panelDirections.add(verticalStrut, gbc_verticalStrut);
+		
+		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();
+		gbc_horizontalStrut_2.insets = new Insets(0, 0, 5, 5);
+		gbc_horizontalStrut_2.gridx = 0;
+		gbc_horizontalStrut_2.gridy = 0;
+		panelHelp.add(horizontalStrut_2, gbc_horizontalStrut_2);
+				
+		JScrollPane scrollPaneHelp = new JScrollPane();
+		scrollPaneHelp.setViewportBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		GridBagConstraints gbc_scrollPaneHelp = new GridBagConstraints();
+		gbc_scrollPaneHelp.insets = new Insets(0, 0, 5, 5);
+		gbc_scrollPaneHelp.fill = GridBagConstraints.BOTH;
+		gbc_scrollPaneHelp.gridx = 1;
+		gbc_scrollPaneHelp.gridy = 0;
+		panelHelp.add(scrollPaneHelp, gbc_scrollPaneHelp);
+		
+		textAreaHelp = new JTextArea();
+		textAreaHelp.setEditable(false);
+		scrollPaneHelp.setViewportView(textAreaHelp);
+		
+		Component horizontalStrut_6 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_6 = new GridBagConstraints();
+		gbc_horizontalStrut_6.insets = new Insets(0, 0, 5, 0);
+		gbc_horizontalStrut_6.gridx = 2;
+		gbc_horizontalStrut_6.gridy = 0;
+		panelHelp.add(horizontalStrut_6, gbc_horizontalStrut_6);
+		
+		GradientButton btnCloseHelp = new GradientButton("Close Help", buttonColor);
+		GridBagConstraints gbc_btnCloseHelp = new GridBagConstraints();
+		gbc_btnCloseHelp.insets = new Insets(0, 0, 5, 5);
+		gbc_btnCloseHelp.gridx = 1;
+		gbc_btnCloseHelp.gridy = 1;
+		panelHelp.add(btnCloseHelp, gbc_btnCloseHelp);
+		
+		Component verticalStrut_1 = Box.createVerticalStrut(20);
+		GridBagConstraints gbc_verticalStrut_1 = new GridBagConstraints();
+		gbc_verticalStrut_1.insets = new Insets(0, 0, 0, 5);
+		gbc_verticalStrut_1.gridx = 1;
+		gbc_verticalStrut_1.gridy = 2;
+		panelHelp.add(verticalStrut_1, gbc_verticalStrut_1);
+		btnCloseHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
+				panelHelp.setVisible(false);
+				menus.setVisible(true);
+				panelLayout.show(panels, "Draw Panel");
+			}
+		});
 
 		// Make frame visible after initializing everything
 		frame.setVisible(true);
@@ -1916,6 +1986,24 @@ public class GUI{
 		gbc_btnHelp.gridx = 1;
 		gbc_btnHelp.gridy = 1;
 		prefMenu.add(btnHelp, gbc_btnHelp);
+		btnHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
+
+				panelLayout.show(panels, "Help Panel");
+				
+				menus.setVisible(false);
+				try
+				{
+					FileReader reader = new FileReader("src/VectorLogo/help.txt");
+					BufferedReader br = new BufferedReader(reader);
+					textAreaHelp.read( br, null );
+					br.close();
+					textAreaHelp.requestFocus();
+				}
+				catch(Exception e2) { System.out.println(e2); }
+			}
+		});
 
 		GradientButton btnAbout = new GradientButton("About", buttonColor);
 		GridBagConstraints gbc_btnAbout = new GridBagConstraints();

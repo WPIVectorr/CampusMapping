@@ -2437,7 +2437,7 @@ public class GUI implements Runnable{
 	}
 
 
-
+//runs the startup and the object for the GUI class in its' own thread.
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub

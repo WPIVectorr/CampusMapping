@@ -167,9 +167,11 @@ public class GUI{
 
 		maps = md.getMapsFromLocal();
 		allPoints = new ArrayList<Point>();
+		System.out.println("All Points: " );
 		for(int i = 0; i < maps.size(); i++){
 			for(int j = 0; j < maps.get(i).getPointList().size(); j++){
 				allPoints.add(maps.get(i).getPointList().get(j));
+				
 			}
 		}
 		//System.out.println("------------------edges check-------------------");
@@ -416,12 +418,13 @@ public class GUI{
 		sliderWalkingSpeed.setLabelTable(speeds);
 		sliderWalkingSpeed.setPaintTicks(true);
 
-		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
+		GradientButton btnSavePreferences = new GradientButton("Back", buttonColor);
 		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
 		gbc_btnSavePreferences.gridwidth = 8;
 		gbc_btnSavePreferences.insets = new Insets(0, 0, 5, 0);
 		gbc_btnSavePreferences.gridx = 0;
 		gbc_btnSavePreferences.gridy = 5;
+		btnSavePreferences.setFont(new Font("Serif", Font.BOLD, 15));
 		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
 		// Return to previous view
 		btnSavePreferences.addActionListener(new ActionListener() {
@@ -2029,9 +2032,10 @@ public class GUI{
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 
 		//added by JPG starts and plays the animation
-		loadingAnimation = new SplashPage();
+		loadingAnimation = new SplashPage("GuiSplashThread");
+		loadingAnimation.run();
 		try {
-			Thread.sleep(4000);
+			Thread.sleep(50);
 		} catch (InterruptedException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
@@ -2279,4 +2283,3 @@ public class GUI{
 		}
 	}
 }
-

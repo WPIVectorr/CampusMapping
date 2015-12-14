@@ -137,6 +137,7 @@ public class GUI{
 	private double mousezoomx;
 	private double mousezoomy;
 	private double minZoomSize;
+	private double maxZoomSize = 2;
 	private JTextArea txtpnFullTextDir;
 	private JTextField txtSearchStart;
 	private JTextField txtSearchDest;
@@ -621,7 +622,7 @@ public class GUI{
 							minZoomSize = 1 / ((double) img.getHeight() / (double) drawPanel.getHeight());
 						}
 					}
-					System.out.println(minZoomSize);
+					//System.out.println(minZoomSize);
 					double oldWidth = (img.getWidth() * scaleSize);
 					double oldHeight = (img.getHeight() * scaleSize);
 					if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(mapTitle.equals("Select Map")))) {
@@ -1135,6 +1136,25 @@ public class GUI{
 		startBuilds.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (startBuilds.getItemCount() != 0){
+					buildStartIndex = startMapsDropDown.getSelectedIndex();
+
+					String mapTitle = maps.get(buildStartIndex-1).getMapName();
+					//String mapTitle = "AtwaterKent1";
+
+					File dest = new File("src/VectorMaps");
+					String destInput = dest.getAbsolutePath();
+					//assuming all maps saved in vectorMaps are in jpg
+					destInput = destInput + "/" + mapTitle + ".png";
+
+					File destFile = new File(destInput);
+					try{
+						img = ImageIO.read(destFile);
+						frame.repaint();
+					}
+					catch(IOException a){
+						System.out.println("Could not find file:"+destInput);
+						a.printStackTrace();
+					}
 					showStartPoint = true;
 					showDestPoint = false;
 					startStarX = ((Point)(startBuilds.getSelectedItem())).getLocX();
@@ -1168,6 +1188,27 @@ public class GUI{
 		destBuilds.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (destBuilds.getItemCount() != 0){
+					buildDestIndex = destMapsDropDown.getSelectedIndex();
+
+
+
+					String mapTitle = maps.get(buildDestIndex-1).getMapName();
+					//String mapTitle = "AtwaterKent1";
+
+					File dest = new File("src/VectorMaps");
+					String destInput = dest.getAbsolutePath();
+					//assuming all maps saved in vectorMaps are in jpg
+					destInput = destInput + "/" + mapTitle + ".png";
+
+					File destFile = new File(destInput);
+					try{
+						img = ImageIO.read(destFile);
+						frame.repaint();
+					}
+					catch(IOException a){
+						System.out.println("Could not find file:"+destInput);
+						a.printStackTrace();
+					}
 					showDestPoint = true;
 					showStartPoint = false;
 					destStarX = ((Point)(destBuilds.getSelectedItem())).getLocX();
@@ -1192,13 +1233,12 @@ public class GUI{
 		mainMenu.add(directionsButton, gbc_directionsButton);
 		directionsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				drawnfirst = false;
 				// reset text position and map position indexes
 				textPos = 0;
 				mapPos = 0;
 				showStartPoint = false;
 				showDestPoint = false;
-
+				drawnfirst = true;
 
 				//gets the start and end building and room numbers the user chose
 
@@ -1341,7 +1381,86 @@ public class GUI{
 						// Reset text box to top
 						txtpnFullTextDir.setCaretPosition(0);
 					}
-
+					double maxx = 0;
+					double maxy = 0;
+					double minx = 1;
+					double miny = 1;
+					System.out.println(multiMapFinalDir.get(0).size());
+					for(int j = 0; j < multiMapFinalDir.get(0).size(); j++){
+						Point point1 = multiMapFinalDir.get(0).get(j).getOrigin();
+						System.out.println(multiMapFinalDir.get(0).get(j).getOrigin().getLocX()+", "+multiMapFinalDir.get(0).get(j).getOrigin().getLocY());
+						if(point1.getLocX() > maxx){
+							maxx = point1.getLocX();
+						} 
+						if(point1.getLocY() > maxy){
+							maxy = point1.getLocY();
+						} 
+						if(point1.getLocX() < minx){
+							minx = point1.getLocX();
+						} 
+						if(point1.getLocY() < miny){
+							miny = point1.getLocY();
+						}
+					}
+					Point point1 = multiMapFinalDir.get(0).get(multiMapFinalDir.get(0).size()-1).getDestination();
+					System.out.println(multiMapFinalDir.get(0).get(multiMapFinalDir.get(0).size()-1).getDestination().getLocX()+", "+multiMapFinalDir.get(0).get(multiMapFinalDir.get(0).size()-1).getDestination().getLocY());
+					if(point1.getLocX() > maxx){
+						maxx = point1.getLocX();
+					} 
+					if(point1.getLocY() > maxy){
+						maxy = point1.getLocY();
+					} 
+					if(point1.getLocX() < minx){
+						minx = point1.getLocX();
+					} 
+					if(point1.getLocY() < miny){
+						miny = point1.getLocY();
+					}
+					if(maxx >= 0.95){
+						maxx = 1;
+					} else{
+						maxx += 0.05;
+					}
+					if(maxy >= 0.95){
+						maxy = 1;
+					} else{
+						maxy += 0.05;
+					}
+					if(minx <= 0.05){
+						minx = 0;
+					} else{
+						minx -= 0.05;
+					}
+					if(miny <= 0.05){
+						miny = 0;
+					} else{
+						miny -= 0.05;
+					}
+					System.out.println(minx+", "+miny+", "+maxx+", "+maxy);
+					maxZoomSize = 2;
+					double screenx = Math.abs(maxx - minx);
+					double screeny = Math.abs(maxy - miny);
+					if(screeny > screenx){
+						scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
+						if((screenx*img.getWidth()*scaleSize) > drawPanel.getWidth())
+							scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
+					} else {
+						scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
+						if((screeny*img.getHeight()*scaleSize) > drawPanel.getHeight())
+							scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
+					}
+					System.out.println("screen sizex: "+(screenx*img.getWidth()*scaleSize));
+					System.out.println("screen sizey: "+(screeny*img.getHeight()*scaleSize));
+					System.out.println("screen size framex: "+drawPanel.getWidth());
+					System.out.println("screen size framey: "+drawPanel.getHeight());
+					if(scaleSize > maxZoomSize)
+						maxZoomSize = scaleSize;
+					Dragged = false;
+					scrolled = false;
+					drawnposx = (drawPanel.getWidth()/2)-(((maxx+minx)/2)*(img.getWidth()*scaleSize));
+					drawnposy = (drawPanel.getHeight()/2)-(((maxy+miny)/2)*(img.getHeight()*scaleSize));
+					System.out.println("drawnposx: "+drawnposx);
+					System.out.println("drawnposy: "+drawnposy);
 					frame.repaint();
 					menuLayout.show(menus, "Nav Menu");
 				}
@@ -1399,13 +1518,13 @@ public class GUI{
 					if (WidthSize > (double) drawPanel.getHeight()) {
 						minZoomSize = 1 / ((double) img.getHeight() / (double) drawPanel.getHeight());
 					}
-					System.out.println(minZoomSize);
+					//System.out.println(minZoomSize);
 					double oldWidth = (img.getWidth() * scaleSize);
 					double oldHeight = (img.getHeight() * scaleSize);
 					if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && !mapTitle.equals("SelectMap")){
 						drawnfirst = true;
 						if (e.getWheelRotation() > 0) {
-							if (scaleSize <= 2) {
+							if (scaleSize <= maxZoomSize) {
 								scroldirection = 1;
 								scaleSize += (scroldirection * .02);
 								atMinZoom = false;
@@ -1596,6 +1715,86 @@ public class GUI{
 						if(mapPos != marker){
 							directionsText.setText("Enter " + dirMaps.get(m).getMapName());
 						}
+						double maxx = 0;
+						double maxy = 0;
+						double minx = 1;
+						double miny = 1;
+						System.out.println(multiMapFinalDir.get(m).size());
+						for(int j = 0; j < multiMapFinalDir.get(m).size(); j++){
+							Point point1 = multiMapFinalDir.get(m).get(j).getOrigin();
+							System.out.println(multiMapFinalDir.get(m).get(j).getOrigin().getLocX());
+							if(point1.getLocX() > maxx){
+								maxx = point1.getLocX();
+							} 
+							if(point1.getLocY() > maxy){
+								maxy = point1.getLocY();
+							} 
+							if(point1.getLocX() < minx){
+								minx = point1.getLocX();
+							} 
+							if(point1.getLocY() < miny){
+								miny = point1.getLocY();
+							}
+						}
+						Point point1 = multiMapFinalDir.get(m).get(multiMapFinalDir.get(m).size()-1).getDestination();
+						System.out.println(multiMapFinalDir.get(m).get(multiMapFinalDir.get(m).size()-1).getDestination().getLocX());
+						if(point1.getLocX() > maxx){
+							maxx = point1.getLocX();
+						} 
+						if(point1.getLocY() > maxy){
+							maxy = point1.getLocY();
+						} 
+						if(point1.getLocX() < minx){
+							minx = point1.getLocX();
+						} 
+						if(point1.getLocY() < miny){
+							miny = point1.getLocY();
+						}
+						if(maxx >= 0.95){
+							maxx = 1;
+						} else{
+							maxx += 0.05;
+						}
+						if(maxy >= 0.95){
+							maxy = 1;
+						} else{
+							maxy += 0.05;
+						}
+						if(minx <= 0.05){
+							minx = 0;
+						} else{
+							minx -= 0.05;
+						}
+						if(miny <= 0.05){
+							miny = 0;
+						} else{
+							miny -= 0.05;
+						}
+						System.out.println(minx+", "+miny+", "+maxx+", "+maxy);
+						maxZoomSize = 2;
+						double screenx = Math.abs(maxx - minx);
+						double screeny = Math.abs(maxy - miny);
+						if(screeny > screenx){
+							scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
+							if((screenx*img.getWidth()*scaleSize) > drawPanel.getWidth())
+								scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
+						} else {
+							scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
+							if((screeny*img.getHeight()*scaleSize) > drawPanel.getHeight())
+								scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
+						}
+						System.out.println("screen sizex: "+(screenx*img.getWidth()*scaleSize));
+						System.out.println("screen sizey: "+(screeny*img.getHeight()*scaleSize));
+						System.out.println("screen size framex: "+drawPanel.getWidth());
+						System.out.println("screen size framey: "+drawPanel.getHeight());
+						if(scaleSize > maxZoomSize)
+							maxZoomSize = scaleSize;
+						Dragged = false;
+						scrolled = false;
+						drawnposx = (drawPanel.getWidth()/2)-(((maxx+minx)/2)*(img.getWidth()*scaleSize));
+						drawnposy = (drawPanel.getHeight()/2)-(((maxy+miny)/2)*(img.getHeight()*scaleSize));
+						System.out.println("drawnposx: "+drawnposx);
+						System.out.println("drawnposy: "+drawnposy);
 					} else {
 
 						textPos = multiMapFinalDir.get(mapPos).size();
@@ -1605,7 +1804,8 @@ public class GUI{
 					}
 					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
 					destinationFile = new File(destinationFile.getAbsolutePath());
-					drawnfirst = false;
+					
+					
 					try {
 						img = ImageIO.read(destinationFile);
 					} catch (IOException g) {
@@ -1741,8 +1941,89 @@ public class GUI{
 						if(mapChange){
 							File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
 							directionsText.setText(textDir.get(mapPos).get(textPos));
-							drawnfirst = false;
-
+							double maxx = 0;
+							double maxy = 0;
+							double minx = 1;
+							double miny = 1;
+							System.out.println(multiMapFinalDir.get(mapPos).size());
+							for(int j = 0; j < multiMapFinalDir.get(mapPos).size(); j++){
+								Point point1 = multiMapFinalDir.get(mapPos).get(j).getOrigin();
+								//System.out.println(multiMapFinalDir.get(mapPos).get(j).getOrigin().getLocX()+", "+multiMapFinalDir.get(mapPos).get(j).getOrigin().getLocY());
+								if(point1.getLocX() > maxx){
+									maxx = point1.getLocX();
+								} 
+								if(point1.getLocY() > maxy){
+									maxy = point1.getLocY();
+								} 
+								if(point1.getLocX() < minx){
+									minx = point1.getLocX();
+								} 
+								if(point1.getLocY() < miny){
+									miny = point1.getLocY();
+								}
+								point1 = multiMapFinalDir.get(mapPos).get(j).getDestination();
+								System.out.println(multiMapFinalDir.get(mapPos).get(j).getDestination().getLocX()+", "+multiMapFinalDir.get(mapPos).get(j).getDestination().getLocY());
+								if(point1.getLocX() > maxx){
+									maxx = point1.getLocX();
+								} 
+								if(point1.getLocY() > maxy){
+									maxy = point1.getLocY();
+								} 
+								if(point1.getLocX() < minx){
+									minx = point1.getLocX();
+								} 
+								if(point1.getLocY() < miny){
+									miny = point1.getLocY();
+								}
+							}
+							
+							if(maxx >= 0.95){
+								maxx = 1;
+							} else{
+								maxx += 0.05;
+							}
+							if(maxy >= 0.95){
+								maxy = 1;
+							} else{
+								maxy += 0.05;
+							}
+							if(minx <= 0.05){
+								minx = 0;
+							} else{
+								minx -= 0.05;
+							}
+							if(miny <= 0.05){
+								miny = 0;
+							} else{
+								miny -= 0.05;
+							}
+							System.out.println(minx+", "+miny+", "+maxx+", "+maxy);
+							maxZoomSize = 2;
+							double screenx = Math.abs(maxx - minx);
+							double screeny = Math.abs(maxy - miny);
+							if(screeny > screenx){
+								scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
+								if((screenx*img.getWidth()*scaleSize) > drawPanel.getWidth())
+									scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
+							} else {
+								scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
+								if((screeny*img.getHeight()*scaleSize) > drawPanel.getHeight())
+									scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
+							}
+							System.out.println("screen scale: "+(scaleSize));
+							System.out.println("screen sizex: "+(screenx*img.getWidth()*scaleSize));
+							System.out.println("screen sizey: "+(screeny*img.getHeight()*scaleSize));
+							System.out.println("screen size framex: "+drawPanel.getWidth());
+							System.out.println("screen size framey: "+drawPanel.getHeight());
+							if(scaleSize > maxZoomSize)
+								maxZoomSize = scaleSize;
+							drawnfirst = true;
+							Dragged = false;
+							scrolled = false;
+							drawnposx = (drawPanel.getWidth()/2)-(((maxx+minx)/2)*(img.getWidth()*scaleSize));
+							drawnposy = (drawPanel.getHeight()/2)-(((maxy+miny)/2)*(img.getHeight()*scaleSize));
+							System.out.println("drawnposx: "+drawnposx);
+							System.out.println("drawnposy: "+drawnposy);
 
 							destinationFile = new File(destinationFile.getAbsolutePath());
 							try {
@@ -1753,7 +2034,7 @@ public class GUI{
 							}
 						}
 						mapChange = true;
-						frame.repaint();
+						drawPanel.repaint();
 					}
 					frame.repaint();
 				}
@@ -2145,6 +2426,11 @@ public class GUI{
 						}
 						drawnposx += deltax;
 						drawnposy += deltay;
+						System.out.println("drawnposx2: "+drawnposx);
+						System.out.println("drawnposy2: "+drawnposy);
+						System.out.println("botrightx: "+(drawnposx+(img.getWidth()*scaleSize)));
+						System.out.println("botrighty2: "+(drawnposy+(img.getHeight()*scaleSize)));
+						System.out.println("scale size2: "+scaleSize);
 						g.drawImage(img, (int)drawnposx, (int)drawnposy, (int) newImageWidth, (int) newImageHeight, null);
 					}
 				}

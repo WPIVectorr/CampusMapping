@@ -46,7 +46,11 @@ import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 
-public class GUI{
+public class GUI implements Runnable{
+	
+	private static Thread guiThreadObject;
+	private String threadName;
+	
 	private boolean DEBUG = false;
 	private ServerDB md = ServerDB.getInstance();
 
@@ -164,6 +168,8 @@ public class GUI{
 	
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
+		
+		
 		//frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setMinimumSize(new Dimension(800, 600));
@@ -1932,6 +1938,7 @@ public class GUI{
 		txtpnFullTextDir.setEditable(false);
 
 		txtFieldEmail = new JTextField();
+		
 		txtFieldEmail.setText("Enter E-Mail Here");
 		GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
 		gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
@@ -2048,7 +2055,6 @@ public class GUI{
 
 		// Make frame visible after initializing everything
 		frame.setVisible(true);
-		loadingAnimation.hideSplash(0);
 	}
 
 	public JPanel createPrefMenu(){
@@ -2215,53 +2221,16 @@ public class GUI{
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 
-		//added by JPG starts and plays the animation
-		loadingAnimation = new SplashPage("GuiSplashThread");
-		loadingAnimation.run();
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
+		GUI gui = new GUI();
 
-
-		try {
-			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
-					UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		} catch (Exception e) {
-			// If Nimbus is not available, use lookAndFeel of current system
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (ClassNotFoundException | InstantiationException
-					| IllegalAccessException | UnsupportedLookAndFeelException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-		SwingUtilities.invokeLater(new Runnable()
+		if(guiThreadObject == null)
 		{
-			public void run()
-			{
-				GUI gui = new GUI();
-				try {
-					gui.createAndShowGUI();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (AlreadyExistsException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
+			guiThreadObject= new Thread (gui, "GUI Thread");
+			guiThreadObject.setPriority(8);
+			guiThreadObject.start();
+
+		}
+
 	}
 
 
@@ -2465,5 +2434,56 @@ public class GUI{
 				}
 			}
 		}
+	}
+
+
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		//added by JPG starts and plays the animation
+		loadingAnimation = new SplashPage("GuiSplashThread");
+		loadingAnimation.showSplash();
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+
+
+		try {
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception e) {
+			// If Nimbus is not available, use lookAndFeel of current system
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException | InstantiationException
+					| IllegalAccessException | UnsupportedLookAndFeelException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+				try {
+					this.createAndShowGUI();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (AlreadyExistsException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		
+
+		loadingAnimation.hideSplash(0);
 	}
 }

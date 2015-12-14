@@ -1334,7 +1334,6 @@ public class GUI{
 							m++;
 						}
 						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(m).getMapName() + ".png");
-
 						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
 							img = ImageIO.read(destinationFile);

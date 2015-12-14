@@ -217,7 +217,7 @@ public class GUI{
 		menus.add(createPrefMenu(), "Pref Menu");
 		menus.add(aboutMenu, "About Menu");
 
-		JLabel lblTitle = new JLabel("Vectorr Solutions            ");
+		JLabel lblTitle = new JLabel("Vectorr Solutions - Team Five         ");
 		lblTitle.setFont(new Font("Sitka Text", Font.PLAIN, 22));
 		GridBagConstraints gbc_lblTitle = new GridBagConstraints();
 		gbc_lblTitle.gridwidth = 3;
@@ -1235,7 +1235,7 @@ public class GUI{
 					}
 					showRoute = true;
 					if (route == null){
-						directionsText.setText(start.getName() + "->" + end.getName());
+						directionsText.setText("No Valid Route.");
 					}
 					else{
 						btnNext.setEnabled(true);

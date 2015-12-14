@@ -70,8 +70,8 @@ public class GUI{
 	private JPanel menus;
 	private JPanel panelHelp;
 	private CardLayout menuLayout;
-	JPanel panels;
-	CardLayout panelLayout;
+	private JPanel panels;
+	private CardLayout panelLayout;
 	private String returnMenu;
 	private GradientButton btnNext;
 	private GradientButton btnPrevious;
@@ -155,15 +155,15 @@ public class GUI{
 	private int walkSpeedIndex = 0;
 	private int themeIndex = 0;
 
-	
+
 	private ArrayList<Point> searchStartPoint;
 	private Map searchStartMap;
 	private Point searchDestPoint;
 	private Map searchDestMap;
 	private static SearchLocation google = new SearchLocation();
-	
-	
-	
+
+
+
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
 		//frame.setSize(932, 778);
@@ -188,7 +188,7 @@ public class GUI{
 		for(int i = 0; i < maps.size(); i++){
 			for(int j = 0; j < maps.get(i).getPointList().size(); j++){
 				allPoints.add(maps.get(i).getPointList().get(j));
-				
+
 			}
 		}
 		//System.out.println("------------------edges check-------------------");
@@ -574,23 +574,23 @@ public class GUI{
 		mainMenu.add(txtSearchStart, gbc_txtSearchStart);
 		txtSearchStart.setColumns(10);
 
-				
-		
+
+
 		txtSearchStart.addKeyListener(new KeyListener() {
-			
+
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
 
 			}
-			
+
 			@Override
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
 				if(txtSearchStart.getCaretPosition()>0)
 				{
 					String searchString;
-					
+
 					searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
 					System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
 					searchStartPoint = google.searchFor(searchString);
@@ -598,7 +598,7 @@ public class GUI{
 					{
 						String searchStartPointName = searchStartPoint.get(0).getName();
 						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
-						
+
 						txtSearchStart.setText(searchStartPointName);
 						txtSearchStart.setCaretPosition(searchString.length());
 						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
@@ -609,15 +609,15 @@ public class GUI{
 					txtSearchStart.setText("");
 				}
 			}
-			
+
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
-		
+
+
 		txtSearchStart.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e){
 				// Empty textbox for input upon click if placeholder text
@@ -669,20 +669,20 @@ public class GUI{
 		txtSearchDest.setColumns(10);
 
 		txtSearchDest.addKeyListener(new KeyListener() {
-			
+
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
 
 			}
-			
+
 			@Override
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
 				if(txtSearchDest.getCaretPosition()>0)
 				{
 					String searchString;
-					
+
 					searchString = txtSearchDest.getText().substring(0, txtSearchDest.getCaretPosition());
 					System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
 					searchStartPoint = google.searchFor(searchString);
@@ -690,7 +690,7 @@ public class GUI{
 					{
 						String searchStartPointName = searchStartPoint.get(0).getName();
 						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
-						
+
 						txtSearchDest.setText(searchStartPointName);
 						txtSearchDest.setCaretPosition(searchString.length());
 						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
@@ -701,15 +701,15 @@ public class GUI{
 					txtSearchDest.setText("");
 				}
 			}
-			
+
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
-		
+
+
 		txtSearchDest.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e){				
 				// Empty textbox for input upon click if placeholder text
@@ -1176,9 +1176,9 @@ public class GUI{
 					//System.out.println("--------------------astar--------------------------------");
 					//start.print();
 					//end.print();
-					
+
 					AStar.reset();
-					
+
 					route = AStar.PathFind(start, end, outside, stairs, allPoints);
 					//System.out.println("route variable: " + (route == null));
 
@@ -1227,7 +1227,7 @@ public class GUI{
 
 							}
 
-							
+
 							try {
 								textDir = gentextdir.genDirStrings(multiMapFinalDir);
 							} catch (MalformedDirectionException e) {
@@ -1639,7 +1639,7 @@ public class GUI{
 							while(dirMaps.get(m).getMapName() == null){
 								m++;
 							}
-							
+
 							String toAdd = "";
 							boolean prevIsUnderscore = true;
 							for(int j = 0; j < dirMaps.get(m).getMapName().length(); j++){
@@ -1662,7 +1662,7 @@ public class GUI{
 								//mapsDropdown.addItem(maps.get(i).getMapName());
 								//DestMaps.addItem(maps.get(i).getMapName());
 							}
-							
+
 							directionsText.setText("Enter " + toAdd);
 						}
 						else {
@@ -1907,52 +1907,52 @@ public class GUI{
 		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		prefMenu.setLayout(gbl_prefMenu);
-		
-				GradientButton btnHelp = new GradientButton("Help", buttonColor);
-				GridBagConstraints gbc_btnHelp = new GridBagConstraints();
-				gbc_btnHelp.insets = new Insets(0, 0, 5, 5);
-				gbc_btnHelp.gridx = 1;
-				gbc_btnHelp.gridy = 0;
-				prefMenu.add(btnHelp, gbc_btnHelp);
-				btnHelp.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e)
-					{
 
-						panelLayout.show(panels, "Help Panel");
+		GradientButton btnHelp = new GradientButton("Help", buttonColor);
+		GridBagConstraints gbc_btnHelp = new GridBagConstraints();
+		gbc_btnHelp.insets = new Insets(0, 0, 5, 5);
+		gbc_btnHelp.gridx = 1;
+		gbc_btnHelp.gridy = 0;
+		prefMenu.add(btnHelp, gbc_btnHelp);
+		btnHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+			{
 
-						menus.setVisible(false);
-						try
-						{
-							FileReader reader = new FileReader("src/VectorLogo/help.txt");
-							BufferedReader br = new BufferedReader(reader);
-							textAreaHelp.read( br, null );
-							br.close();
-							textAreaHelp.requestFocus();
-						}
-						catch(Exception e2) { System.out.println(e2); }
-					}
-				});
-		
-				GradientButton btnAbout = new GradientButton("About", buttonColor);
-				GridBagConstraints gbc_btnAbout = new GridBagConstraints();
-				gbc_btnAbout.insets = new Insets(0, 0, 5, 5);
-				gbc_btnAbout.gridx = 2;
-				gbc_btnAbout.gridy = 0;
-				prefMenu.add(btnAbout, gbc_btnAbout);
-				btnAbout.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						menuLayout.show(menus, "About Menu");
-						try{
-							tempImg = img;
-							img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
-						}
-						catch(IOException g){
-							System.out.println("Invalid logo1");
-							g.printStackTrace();
-						}
-						frame.repaint();
-					}
-				});
+				panelLayout.show(panels, "Help Panel");
+
+				menus.setVisible(false);
+				try{
+					FileReader reader = new FileReader("src/VectorLogo/helpMain.txt");
+					BufferedReader br = new BufferedReader(reader);
+					textAreaHelp.read( br, null );
+					br.close();
+					textAreaHelp.requestFocus();
+				}
+				catch(Exception e2) { System.out.println(e2); 
+				}
+			}
+		});
+
+		GradientButton btnAbout = new GradientButton("About", buttonColor);
+		GridBagConstraints gbc_btnAbout = new GridBagConstraints();
+		gbc_btnAbout.insets = new Insets(0, 0, 5, 5);
+		gbc_btnAbout.gridx = 2;
+		gbc_btnAbout.gridy = 0;
+		prefMenu.add(btnAbout, gbc_btnAbout);
+		btnAbout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuLayout.show(menus, "About Menu");
+				try{
+					tempImg = img;
+					img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+				}
+				catch(IOException g){
+					System.out.println("Invalid logo1");
+					g.printStackTrace();
+				}
+				frame.repaint();
+			}
+		});
 
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
@@ -2077,7 +2077,7 @@ public class GUI{
 		sliderWalkingSpeed.setMajorTickSpacing(1);
 		sliderWalkingSpeed.setLabelTable(speeds);
 		sliderWalkingSpeed.setPaintTicks(true);
-		
+
 		String[] themes = {"Standard", "Color Blind Mode"};
 
 		JLabel lblVisualPreferences = new JLabel("Visual Theme:\r\n");
@@ -2109,7 +2109,7 @@ public class GUI{
 				sliderOutside.setValue(outsideIndex);
 				sliderWalkingSpeed.setValue(walkSpeedIndex);
 				dropdownTheme.setSelectedIndex(themeIndex);
-				
+
 				resetPath = false;
 				// Show the route again if returning to nav view
 				if (returnMenu.equals("Nav Menu")){
@@ -2135,7 +2135,7 @@ public class GUI{
 				outsideIndex = sliderOutside.getValue();
 				walkSpeedIndex = sliderWalkingSpeed.getValue();
 				themeIndex = dropdownTheme.getSelectedIndex();
-				
+
 				// Set color according to selection
 				if (((String)dropdownTheme.getSelectedItem()).equals("Standard")){
 					// Switch to standard colors

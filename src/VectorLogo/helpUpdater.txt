@@ -1,0 +1,102 @@
+Campus Management Software Quick-Start Guide
+Vectorr Mapping uses proprietary software to load and manage maps 
+and locations for the use of generating directions. 
+
+Adding maps to the database and map program
+	The first step in using the Campus Management tool is to 
+	add a map to the database. The first map you add must be 
+	the campus overview map, relative to which, additional 
+	maps may be added.
+	1) Open the Campus Management software.
+	2) Select “Add Map From File.”
+	3) Navigate to the image you’d like to add to the database,
+	   ensuring that it is in the portable network graphic (.png) format.
+	4) Type the common name of the building the map describes 
+	   in the text box above the “Add Map” button.
+	5) Click the “Add Map” button to make the “Map Inserter” 
+	   appear.
+		a) This program allows you to add maps relative 
+		   to a full-campus map.
+		b) Using the button panel on the right side of 
+		   the screen, select the full-campus map in the 
+		   top drop down and the map to add to it in the 
+		   bottom drop down.
+		c) In the main frame, the campus map should appear, 
+		   while the secondary map should appear in the 
+		   side button panel.
+			i) The secondary map has two numbers 
+			   superimposed on it to act as guides 
+			   for inserting it into the campus map. 
+		d) Using the mouse to select two points (matching 
+		   the guide numbers) on the campus map, align the
+		   secondary map with its approximate location on the campus map.
+			i) To make corrections to the placement, 
+			   simply click the placed numbers a second
+			   time to remove them.
+			ii) To start the placement entirely fresh,
+			    click “Delete Points.”
+		e) When the second map is properly placed, select 
+		   “Save Map” to upload the changes to the database. 
+	6) The map should now appear in the “Select Map” dropdown 
+	   in the Campus Management program and the “Building” 
+	   dropdowns in the Vectorr Mapping program. The Vectorr 
+	   Campus Management software will also load in the point 
+	   right away to add points to.
+
+Adding points to an inserted map
+	1) Select the desired map from the “Select Map” dropdown 
+	   on the “Maps” tab of the program. 
+	2) Choose the “Points” tab of the program.
+	3) With the “Add Points” radio-button selected, click 
+	   anywhere on a map to add a point. 
+		a) An initial loading time may be required to 
+		   insert the point into the database.
+	4) Input as many points as desired to a map. 
+		a) Zooming on the map is accomplished with the 
+		   scroll wheel. 
+	5) When finished adding points, select “Save Map” to load 
+	   all of the points into the database. 
+
+
+Editing existing points in the database
+IMPORTANT: The routing tool in the main mapping program requires 
+every point to be connected to at least one other point by an 
+edge. The only way to connect points with edges is through the 
+Edit Point interface.
+	1) If there are already points in the database, you can 
+	   edit them on the “Points” tab by selecting the “Edit 
+	   Point” radio button.
+	2) Select a point you wish to edit, by clicking it on the map. 
+		a) An initial loading time may be required to 
+		   draw information from the database.
+		b) Zooming on the map is accomplished with the 
+		   scroll wheel.
+	3) Once selected, the designated point will be highlighted.
+		a) Options such as the point’s name, and connected 
+		   points can be changed from this state.
+			i) To make an edge to another point, simply 
+			   click the point to which you would like
+			   to connect. 
+				1) To make edges between multiple 
+				   points, creating a path through
+				   them, select the “Path Mode” 
+				   check box to move the selected 
+				   point with each selection.
+			ii) To change the name of a point, type 
+			    the desired name into the text box at 
+			    the top of the Campus Management window.
+			iii) To change points outside of “Path Mode” 
+			     press “Unselect Current Point” to 
+			     select another point.
+	4) After editing the desired points, click “Save Map” to 
+	   load the updated points to the database.
+
+
+Removing existing points from the database
+	1) If there are already points in the database, you can 
+	   remove them on the “Points” tab by selecting the 
+	   “Remove Point” radio button.
+	2) Select the points you would like to remove from the 
+	   database.
+		a) The points and all edges connected to them 
+		   will be removed from the database.

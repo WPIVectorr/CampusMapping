@@ -155,7 +155,15 @@ public class GUI{
 	private int walkSpeedIndex = 0;
 	private int themeIndex = 0;
 
-
+	
+	private ArrayList<Point> searchStartPoint;
+	private Map searchStartMap;
+	private Point searchDestPoint;
+	private Map searchDestMap;
+	private static SearchLocation google = new SearchLocation();
+	
+	
+	
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
 		//frame.setSize(932, 778);
@@ -176,12 +184,15 @@ public class GUI{
 
 		maps = md.getMapsFromLocal();
 		allPoints = new ArrayList<Point>();
+		System.out.println("All Points: " );
 		for(int i = 0; i < maps.size(); i++){
 			for(int j = 0; j < maps.get(i).getPointList().size(); j++){
 				allPoints.add(maps.get(i).getPointList().get(j));
+				
 			}
 		}
 		//System.out.println("------------------edges check-------------------");
+		google.prepData(allPoints);
 
 
 		mainMenu = new JPanel();
@@ -239,7 +250,7 @@ public class GUI{
 		panels.add((JPanel) drawPanel, "Draw Panel");
 		panels.add(panelHelp, "Help Panel");
 
-		JLabel lblTitle = new JLabel("Vectorr Solutions            ");
+		JLabel lblTitle = new JLabel("Vectorr Solutions - Team Five         ");
 		lblTitle.setFont(new Font("Sitka Text", Font.PLAIN, 22));
 		GridBagConstraints gbc_lblTitle = new GridBagConstraints();
 		gbc_lblTitle.gridwidth = 3;
@@ -337,9 +348,6 @@ public class GUI{
 		destMapsDropDown.addItem("Select Map");
 		startMapsDropDown.addItem("Select Map");
 
-		
-
-
 		frame.getContentPane().add(menus, BorderLayout.NORTH);
 		frame.getContentPane().add(panels, BorderLayout.CENTER);
 
@@ -389,7 +397,7 @@ public class GUI{
 					//mapsDropdown.addItem(maps.get(i).getMapName());
 					//DestMaps.addItem(maps.get(i).getMapName());
 				}
-				System.out.println("toAdd: " + toAdd);
+				//System.out.println("toAdd: " + toAdd);
 				temp.add(toAdd);
 				//temp.add(maps.get(i).getMapName());
 
@@ -555,6 +563,7 @@ public class GUI{
 
 
 		txtSearchStart = new JTextField();
+
 		txtSearchStart.setText("Search");
 		GridBagConstraints gbc_txtSearchStart = new GridBagConstraints();
 		gbc_txtSearchStart.gridwidth = 2;
@@ -565,6 +574,50 @@ public class GUI{
 		mainMenu.add(txtSearchStart, gbc_txtSearchStart);
 		txtSearchStart.setColumns(10);
 
+				
+		
+		txtSearchStart.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if(txtSearchStart.getCaretPosition()>0)
+				{
+					String searchString;
+					
+					searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
+					System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
+					searchStartPoint = google.searchFor(searchString);
+					if(searchStartPoint.size() != 0 )
+					{
+						String searchStartPointName = searchStartPoint.get(0).getName();
+						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+						
+						txtSearchStart.setText(searchStartPointName);
+						txtSearchStart.setCaretPosition(searchString.length());
+						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+					}else{
+						System.out.println("no autocomplete found");
+					}
+				}else{
+					txtSearchStart.setText("");
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		
 		txtSearchStart.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e){
 				// Empty textbox for input upon click if placeholder text
@@ -615,6 +668,48 @@ public class GUI{
 		mainMenu.add(txtSearchDest, gbc_txtSearchDest);
 		txtSearchDest.setColumns(10);
 
+		txtSearchDest.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if(txtSearchDest.getCaretPosition()>0)
+				{
+					String searchString;
+					
+					searchString = txtSearchDest.getText().substring(0, txtSearchDest.getCaretPosition());
+					System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
+					searchStartPoint = google.searchFor(searchString);
+					if(searchStartPoint.size() != 0 )
+					{
+						String searchStartPointName = searchStartPoint.get(0).getName();
+						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+						
+						txtSearchDest.setText(searchStartPointName);
+						txtSearchDest.setCaretPosition(searchString.length());
+						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+					}else{
+						System.out.println("no autocomplete found");
+					}
+				}else{
+					txtSearchDest.setText("");
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		
 		txtSearchDest.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e){				
 				// Empty textbox for input upon click if placeholder text
@@ -1081,10 +1176,10 @@ public class GUI{
 					//System.out.println("--------------------astar--------------------------------");
 					//start.print();
 					//end.print();
-					AStar astar = new AStar();
-					astar.reset();
-
-					route = astar.PathFind(start, end, outside, stairs);
+					
+					AStar.reset();
+					
+					route = AStar.PathFind(start, end, outside, stairs, allPoints);
 					//System.out.println("route variable: " + (route == null));
 
 					if(route != null){
@@ -1096,7 +1191,7 @@ public class GUI{
 					}
 					showRoute = true;
 					if (route == null){
-						directionsText.setText(start.getName() + "->" + end.getName());
+						directionsText.setText("No Valid Route.");
 					}
 					else{
 						btnNext.setEnabled(true);
@@ -1120,6 +1215,7 @@ public class GUI{
 
 							for(int r = 0; r < multiMapFinalDir.size(); r++){
 								if(multiMapFinalDir.get(r).size() != 0){
+									System.out.println("Found a valid map!");
 									for(int s = 0; s < maps.size(); s++){
 										if(multiMapFinalDir.get(r).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
 											dirMaps.add(maps.get(s));
@@ -1131,6 +1227,7 @@ public class GUI{
 
 							}
 
+							
 							try {
 								textDir = gentextdir.genDirStrings(multiMapFinalDir);
 							} catch (MalformedDirectionException e) {
@@ -1163,8 +1260,11 @@ public class GUI{
 							secEstString = "00";
 						}
 						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
-
-						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
+						int m = mapPos;
+						while(multiMapFinalDir.get(m).size() == 0){
+							m++;
+						}
+						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(m).getMapName() + ".png");
 
 						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
@@ -1423,18 +1523,35 @@ public class GUI{
 
 				}
 				else if (textPos == 0){
+					int marker = mapPos;
 					mapPos--;
 					if(multiMapFinalDir.get(mapPos).size() == 0){
-						while(multiMapFinalDir.get(mapPos).size() == 0){
+						while((multiMapFinalDir.get(mapPos).size() != 0) && (multiMapFinalDir.get(mapPos).size() == 0)){
 							mapPos--;
 						}
-						textPos = multiMapFinalDir.get(mapPos).size();
-						int m = mapPos + 1;
-						while(multiMapFinalDir.get(m).size() == 0){
-							m++;
+						if(mapPos == 0){
+							while(multiMapFinalDir.get(mapPos).size() == 0){
+								mapPos++;
+							}
+						}
+						if(mapPos != marker){
+							textPos = multiMapFinalDir.get(mapPos).size();
+						} else { 
+							textPos = 0;
+						}
+						int m = mapPos - 1;
+						while((m != 0) && multiMapFinalDir.get(m).size() == 0){
+							m--;
+						}
+						if(m == 0){
+							while(multiMapFinalDir.get(m).size() == 0){
+								m++;
+							}
 						}
 						//directionsText.setText(textDir.get(mapPos).get(textPos));
-						directionsText.setText("Enter " + dirMaps.get(m).getMapName());
+						if(mapPos != marker){
+							directionsText.setText("Enter " + dirMaps.get(m).getMapName());
+						}
 					} else {
 
 						textPos = multiMapFinalDir.get(mapPos).size();
@@ -1522,7 +1639,31 @@ public class GUI{
 							while(dirMaps.get(m).getMapName() == null){
 								m++;
 							}
-							directionsText.setText("Enter " + dirMaps.get(m).getMapName());
+							
+							String toAdd = "";
+							boolean prevIsUnderscore = true;
+							for(int j = 0; j < dirMaps.get(m).getMapName().length(); j++){
+								char tempChar;
+								if(prevIsUnderscore){
+									tempChar = dirMaps.get(m).getMapName().charAt(j);
+									//converts to upper case
+									tempChar = Character.toUpperCase(tempChar);
+									prevIsUnderscore = false;
+								}
+								else if (dirMaps.get(m).getMapName().charAt(j) == ('_')){
+									prevIsUnderscore = true;
+									tempChar = ' ';
+								}
+								else{
+									tempChar = dirMaps.get(m).getMapName().charAt(j);
+									prevIsUnderscore = false;
+								}
+								toAdd += tempChar;
+								//mapsDropdown.addItem(maps.get(i).getMapName());
+								//DestMaps.addItem(maps.get(i).getMapName());
+							}
+							
+							directionsText.setText("Enter " + toAdd);
 						}
 						else {
 							textPos = multiMapFinalDir.get(mapPos).size();
@@ -2073,9 +2214,10 @@ public class GUI{
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 
 		//added by JPG starts and plays the animation
-		loadingAnimation = new SplashPage();
+		loadingAnimation = new SplashPage("GuiSplashThread");
+		loadingAnimation.run();
 		try {
-			Thread.sleep(4000);
+			Thread.sleep(50);
 		} catch (InterruptedException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
@@ -2323,4 +2465,3 @@ public class GUI{
 		}
 	}
 }
-

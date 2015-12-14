@@ -1537,25 +1537,25 @@ public class GUI{
 					if(point1.getLocY() < miny){
 						miny = point1.getLocY();
 					}
-					if(maxx >= 0.95){
+					if(maxx >= 0.9){
 						maxx = 1;
 					} else{
-						maxx += 0.05;
+						maxx += 0.1;
 					}
-					if(maxy >= 0.95){
+					if(maxy >= 0.9){
 						maxy = 1;
 					} else{
-						maxy += 0.05;
+						maxy += 0.1;
 					}
-					if(minx <= 0.05){
+					if(minx <= 0.1){
 						minx = 0;
 					} else{
-						minx -= 0.05;
+						minx -= 0.1;
 					}
-					if(miny <= 0.05){
+					if(miny <= 0.1){
 						miny = 0;
 					} else{
-						miny -= 0.05;
+						miny -= 0.1;
 					}
 					System.out.println(minx+", "+miny+", "+maxx+", "+maxy);
 					maxZoomSize = 2;
@@ -1836,86 +1836,7 @@ public class GUI{
 						if(mapPos != marker){
 							directionsText.setText("Enter " + dirMaps.get(m).getMapName());
 						}
-						double maxx = 0;
-						double maxy = 0;
-						double minx = 1;
-						double miny = 1;
-						System.out.println(multiMapFinalDir.get(m).size());
-						for(int j = 0; j < multiMapFinalDir.get(m).size(); j++){
-							Point point1 = multiMapFinalDir.get(m).get(j).getOrigin();
-							System.out.println(multiMapFinalDir.get(m).get(j).getOrigin().getLocX());
-							if(point1.getLocX() > maxx){
-								maxx = point1.getLocX();
-							} 
-							if(point1.getLocY() > maxy){
-								maxy = point1.getLocY();
-							} 
-							if(point1.getLocX() < minx){
-								minx = point1.getLocX();
-							} 
-							if(point1.getLocY() < miny){
-								miny = point1.getLocY();
-							}
-						}
-						Point point1 = multiMapFinalDir.get(m).get(multiMapFinalDir.get(m).size()-1).getDestination();
-						System.out.println(multiMapFinalDir.get(m).get(multiMapFinalDir.get(m).size()-1).getDestination().getLocX());
-						if(point1.getLocX() > maxx){
-							maxx = point1.getLocX();
-						} 
-						if(point1.getLocY() > maxy){
-							maxy = point1.getLocY();
-						} 
-						if(point1.getLocX() < minx){
-							minx = point1.getLocX();
-						} 
-						if(point1.getLocY() < miny){
-							miny = point1.getLocY();
-						}
-						if(maxx >= 0.95){
-							maxx = 1;
-						} else{
-							maxx += 0.05;
-						}
-						if(maxy >= 0.95){
-							maxy = 1;
-						} else{
-							maxy += 0.05;
-						}
-						if(minx <= 0.05){
-							minx = 0;
-						} else{
-							minx -= 0.05;
-						}
-						if(miny <= 0.05){
-							miny = 0;
-						} else{
-							miny -= 0.05;
-						}
-						System.out.println(minx+", "+miny+", "+maxx+", "+maxy);
-						maxZoomSize = 2;
-						double screenx = Math.abs(maxx - minx);
-						double screeny = Math.abs(maxy - miny);
-						if(screeny > screenx){
-							scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
-							if((screenx*img.getWidth()*scaleSize) > drawPanel.getWidth())
-								scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
-						} else {
-							scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
-							if((screeny*img.getHeight()*scaleSize) > drawPanel.getHeight())
-								scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
-						}
-						System.out.println("screen sizex: "+(screenx*img.getWidth()*scaleSize));
-						System.out.println("screen sizey: "+(screeny*img.getHeight()*scaleSize));
-						System.out.println("screen size framex: "+drawPanel.getWidth());
-						System.out.println("screen size framey: "+drawPanel.getHeight());
-						if(scaleSize > maxZoomSize)
-							maxZoomSize = scaleSize;
-						Dragged = false;
-						scrolled = false;
-						drawnposx = (drawPanel.getWidth()/2)-(((maxx+minx)/2)*(img.getWidth()*scaleSize));
-						drawnposy = (drawPanel.getHeight()/2)-(((maxy+miny)/2)*(img.getHeight()*scaleSize));
-						System.out.println("drawnposx: "+drawnposx);
-						System.out.println("drawnposy: "+drawnposy);
+						
 					} else {
 
 						textPos = multiMapFinalDir.get(mapPos).size();
@@ -1933,6 +1854,86 @@ public class GUI{
 						System.out.println("Invalid Map Selection");
 						g.printStackTrace();
 					}
+					double maxx = 0;
+					double maxy = 0;
+					double minx = 1;
+					double miny = 1;
+					System.out.println(multiMapFinalDir.get(mapPos).size());
+					for(int j = 0; j < multiMapFinalDir.get(mapPos).size(); j++){
+						Point point1 = multiMapFinalDir.get(mapPos).get(j).getOrigin();
+						System.out.println(multiMapFinalDir.get(mapPos).get(j).getOrigin().getLocX());
+						if(point1.getLocX() > maxx){
+							maxx = point1.getLocX();
+						} 
+						if(point1.getLocY() > maxy){
+							maxy = point1.getLocY();
+						} 
+						if(point1.getLocX() < minx){
+							minx = point1.getLocX();
+						} 
+						if(point1.getLocY() < miny){
+							miny = point1.getLocY();
+						}
+					}
+					Point point1 = multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination();
+					System.out.println(multiMapFinalDir.get(mapPos).get(multiMapFinalDir.get(mapPos).size()-1).getDestination().getLocX());
+					if(point1.getLocX() > maxx){
+						maxx = point1.getLocX();
+					} 
+					if(point1.getLocY() > maxy){
+						maxy = point1.getLocY();
+					} 
+					if(point1.getLocX() < minx){
+						minx = point1.getLocX();
+					} 
+					if(point1.getLocY() < miny){
+						miny = point1.getLocY();
+					}
+					if(maxx >= 0.9){
+						maxx = 1;
+					} else{
+						maxx += 0.1;
+					}
+					if(maxy >= 0.9){
+						maxy = 1;
+					} else{
+						maxy += 0.1;
+					}
+					if(minx <= 0.1){
+						minx = 0;
+					} else{
+						minx -= 0.1;
+					}
+					if(miny <= 0.1){
+						miny = 0;
+					} else{
+						miny -= 0.1;
+					}
+					System.out.println(minx+", "+miny+", "+maxx+", "+maxy);
+					maxZoomSize = 2;
+					double screenx = Math.abs(maxx - minx);
+					double screeny = Math.abs(maxy - miny);
+					if(screeny > screenx){
+						scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
+						if((screenx*img.getWidth()*scaleSize) > drawPanel.getWidth())
+							scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
+					} else {
+						scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
+						if((screeny*img.getHeight()*scaleSize) > drawPanel.getHeight())
+							scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
+					}
+					System.out.println("screen sizex: "+(screenx*img.getWidth()*scaleSize));
+					System.out.println("screen sizey: "+(screeny*img.getHeight()*scaleSize));
+					System.out.println("screen size framex: "+drawPanel.getWidth());
+					System.out.println("screen size framey: "+drawPanel.getHeight());
+					if(scaleSize > maxZoomSize)
+						maxZoomSize = scaleSize;
+					Dragged = false;
+					scrolled = false;
+					drawnposx = (drawPanel.getWidth()/2)-(((maxx+minx)/2)*(img.getWidth()*scaleSize));
+					drawnposy = (drawPanel.getHeight()/2)-(((maxy+miny)/2)*(img.getHeight()*scaleSize));
+					System.out.println("drawnposx: "+drawnposx);
+					System.out.println("drawnposy: "+drawnposy);
 					frame.repaint();
 				} else {
 					if (textPos != 0){
@@ -2062,6 +2063,15 @@ public class GUI{
 						if(mapChange){
 							File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
 							directionsText.setText(textDir.get(mapPos).get(textPos));
+							
+
+							destinationFile = new File(destinationFile.getAbsolutePath());
+							try {
+								img = ImageIO.read(destinationFile);
+							} catch (IOException g) {
+								System.out.println("Invalid Map Selection");
+								g.printStackTrace();
+							}
 							double maxx = 0;
 							double maxy = 0;
 							double minx = 1;
@@ -2098,25 +2108,25 @@ public class GUI{
 								}
 							}
 							
-							if(maxx >= 0.95){
+							if(maxx >= 0.9){
 								maxx = 1;
 							} else{
-								maxx += 0.05;
+								maxx += 0.1;
 							}
-							if(maxy >= 0.95){
+							if(maxy >= 0.9){
 								maxy = 1;
 							} else{
-								maxy += 0.05;
+								maxy += 0.1;
 							}
-							if(minx <= 0.05){
+							if(minx <= 0.1){
 								minx = 0;
 							} else{
-								minx -= 0.05;
+								minx -= 0.1;
 							}
-							if(miny <= 0.05){
+							if(miny <= 0.1){
 								miny = 0;
 							} else{
-								miny -= 0.05;
+								miny -= 0.1;
 							}
 							System.out.println(minx+", "+miny+", "+maxx+", "+maxy);
 							maxZoomSize = 2;
@@ -2145,14 +2155,6 @@ public class GUI{
 							drawnposy = (drawPanel.getHeight()/2)-(((maxy+miny)/2)*(img.getHeight()*scaleSize));
 							System.out.println("drawnposx: "+drawnposx);
 							System.out.println("drawnposy: "+drawnposy);
-
-							destinationFile = new File(destinationFile.getAbsolutePath());
-							try {
-								img = ImageIO.read(destinationFile);
-							} catch (IOException g) {
-								System.out.println("Invalid Map Selection");
-								g.printStackTrace();
-							}
 						}
 						mapChange = true;
 						drawPanel.repaint();

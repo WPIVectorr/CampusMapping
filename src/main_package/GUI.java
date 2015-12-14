@@ -153,15 +153,15 @@ public class GUI{
 	private double destStarX;
 	private double destStarY;
 
-	
+
 	private ArrayList<Point> searchStartPoint;
 	private Map searchStartMap;
 	private Point searchDestPoint;
 	private Map searchDestMap;
 	private static SearchLocation google = new SearchLocation();
-	
-	
-	
+
+
+
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
 		//frame.setSize(932, 778);
@@ -186,7 +186,7 @@ public class GUI{
 		for(int i = 0; i < maps.size(); i++){
 			for(int j = 0; j < maps.get(i).getPointList().size(); j++){
 				allPoints.add(maps.get(i).getPointList().get(j));
-				
+
 			}
 		}
 		//System.out.println("------------------edges check-------------------");
@@ -232,7 +232,7 @@ public class GUI{
 		menus.add(navMenu, "Nav Menu");
 		menus.add(createPrefMenu(), "Pref Menu");
 		menus.add(aboutMenu, "About Menu");
-		
+
 		panelHelp = new JPanel();
 		GridBagLayout gbl_panelHelp = new GridBagLayout();
 		gbl_panelHelp.columnWidths = new int[]{0, 0, 0, 0};
@@ -242,7 +242,7 @@ public class GUI{
 		panelHelp.setLayout(gbl_panelHelp);
 		panelHelp.setVisible(false);
 		panelHelp.setBackground(backgroundColor);
-		
+
 		panels = new JPanel(new CardLayout());
 		panelLayout = (CardLayout) panels.getLayout();
 		panels.add((JPanel) drawPanel, "Draw Panel");
@@ -485,24 +485,25 @@ public class GUI{
 						a.printStackTrace();
 					}
 
-
-					double estimatedDirDist = 0;
-					for(int g = 0; g < multiMapFinalDir.size(); g++){
-						for(int p = 0; p < multiMapFinalDir.get(g).size(); p++){
-							estimatedDirDist+=multiMapFinalDir.get(g).get(p).getDistance();
+					if(multiMapFinalDir != null){
+						double estimatedDirDist = 0;
+						for(int g = 0; g < multiMapFinalDir.size(); g++){
+							for(int p = 0; p < multiMapFinalDir.get(g).size(); p++){
+								estimatedDirDist+=multiMapFinalDir.get(g).get(p).getDistance();
+							}
 						}
+						
+						timeEst = (int) (estimatedDirDist / walkSpeed);
+						int minEst = (int) Math.floor(timeEst / 60);
+						int secEst = timeEst % 60;
+						String secEstString = Integer.toString(secEst);
+						if(secEstString.length() == 1){
+							secEstString = "0" + secEstString;
+						} else if (secEstString.length() == 0){
+							secEstString = "00";
+						}
+						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
 					}
-
-					timeEst = (int) (estimatedDirDist / walkSpeed);
-					int minEst = (int) Math.floor(timeEst / 60);
-					int secEst = timeEst % 60;
-					String secEstString = Integer.toString(secEst);
-					if(secEstString.length() == 1){
-						secEstString = "0" + secEstString;
-					} else if (secEstString.length() == 0){
-						secEstString = "00";
-					}
-					txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
 				}
 				// Set button colors based on preferences selected
 				btnPrevious.setColor(previousColor);
@@ -788,23 +789,23 @@ public class GUI{
 		mainMenu.add(txtSearchStart, gbc_txtSearchStart);
 		txtSearchStart.setColumns(10);
 
-				
-		
+
+
 		txtSearchStart.addKeyListener(new KeyListener() {
-			
+
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
 
 			}
-			
+
 			@Override
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
 				if(txtSearchStart.getCaretPosition()>0)
 				{
 					String searchString;
-					
+
 					searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
 					System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
 					searchStartPoint = google.searchFor(searchString);
@@ -812,7 +813,7 @@ public class GUI{
 					{
 						String searchStartPointName = searchStartPoint.get(0).getName();
 						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
-						
+
 						txtSearchStart.setText(searchStartPointName);
 						txtSearchStart.setCaretPosition(searchString.length());
 						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
@@ -823,15 +824,15 @@ public class GUI{
 					txtSearchStart.setText("");
 				}
 			}
-			
+
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
-		
+
+
 		txtSearchStart.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e){
 				// Empty textbox for input upon click if placeholder text
@@ -859,20 +860,20 @@ public class GUI{
 		txtSearchDest.setColumns(10);
 
 		txtSearchDest.addKeyListener(new KeyListener() {
-			
+
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
 
 			}
-			
+
 			@Override
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
 				if(txtSearchDest.getCaretPosition()>0)
 				{
 					String searchString;
-					
+
 					searchString = txtSearchDest.getText().substring(0, txtSearchDest.getCaretPosition());
 					System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
 					searchStartPoint = google.searchFor(searchString);
@@ -880,7 +881,7 @@ public class GUI{
 					{
 						String searchStartPointName = searchStartPoint.get(0).getName();
 						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
-						
+
 						txtSearchDest.setText(searchStartPointName);
 						txtSearchDest.setCaretPosition(searchString.length());
 						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
@@ -891,15 +892,15 @@ public class GUI{
 					txtSearchDest.setText("");
 				}
 			}
-			
+
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
-		
+
+
 		txtSearchDest.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e){				
 				// Empty textbox for input upon click if placeholder text
@@ -1341,9 +1342,9 @@ public class GUI{
 					//System.out.println("--------------------astar--------------------------------");
 					//start.print();
 					//end.print();
-					
+
 					AStar.reset();
-					
+
 					route = AStar.PathFind(start, end, outside, stairs, allPoints);
 					//System.out.println("route variable: " + (route == null));
 
@@ -1392,7 +1393,7 @@ public class GUI{
 
 							}
 
-							
+
 							try {
 								textDir = gentextdir.genDirStrings(multiMapFinalDir);
 							} catch (MalformedDirectionException e) {
@@ -1803,7 +1804,7 @@ public class GUI{
 							while(dirMaps.get(m).getMapName() == null){
 								m++;
 							}
-							
+
 							String toAdd = "";
 							boolean prevIsUnderscore = true;
 							for(int j = 0; j < dirMaps.get(m).getMapName().length(); j++){
@@ -1826,7 +1827,7 @@ public class GUI{
 								//mapsDropdown.addItem(maps.get(i).getMapName());
 								//DestMaps.addItem(maps.get(i).getMapName());
 							}
-							
+
 							directionsText.setText("Enter " + toAdd);
 						}
 						else {
@@ -1995,14 +1996,14 @@ public class GUI{
 		gbc_verticalStrut.gridx = 1;
 		gbc_verticalStrut.gridy = 14;
 		panelDirections.add(verticalStrut, gbc_verticalStrut);
-		
+
 		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();
 		gbc_horizontalStrut_2.insets = new Insets(0, 0, 5, 5);
 		gbc_horizontalStrut_2.gridx = 0;
 		gbc_horizontalStrut_2.gridy = 0;
 		panelHelp.add(horizontalStrut_2, gbc_horizontalStrut_2);
-				
+
 		JScrollPane scrollPaneHelp = new JScrollPane();
 		scrollPaneHelp.setViewportBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		GridBagConstraints gbc_scrollPaneHelp = new GridBagConstraints();
@@ -2011,25 +2012,25 @@ public class GUI{
 		gbc_scrollPaneHelp.gridx = 1;
 		gbc_scrollPaneHelp.gridy = 0;
 		panelHelp.add(scrollPaneHelp, gbc_scrollPaneHelp);
-		
+
 		textAreaHelp = new JTextArea();
 		textAreaHelp.setEditable(false);
 		scrollPaneHelp.setViewportView(textAreaHelp);
-		
+
 		Component horizontalStrut_6 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_6 = new GridBagConstraints();
 		gbc_horizontalStrut_6.insets = new Insets(0, 0, 5, 0);
 		gbc_horizontalStrut_6.gridx = 2;
 		gbc_horizontalStrut_6.gridy = 0;
 		panelHelp.add(horizontalStrut_6, gbc_horizontalStrut_6);
-		
+
 		GradientButton btnCloseHelp = new GradientButton("Close Help", buttonColor);
 		GridBagConstraints gbc_btnCloseHelp = new GridBagConstraints();
 		gbc_btnCloseHelp.insets = new Insets(0, 0, 5, 5);
 		gbc_btnCloseHelp.gridx = 1;
 		gbc_btnCloseHelp.gridy = 1;
 		panelHelp.add(btnCloseHelp, gbc_btnCloseHelp);
-		
+
 		Component verticalStrut_1 = Box.createVerticalStrut(20);
 		GridBagConstraints gbc_verticalStrut_1 = new GridBagConstraints();
 		gbc_verticalStrut_1.insets = new Insets(0, 0, 0, 5);
@@ -2086,7 +2087,7 @@ public class GUI{
 			{
 
 				panelLayout.show(panels, "Help Panel");
-				
+
 				menus.setVisible(false);
 				try
 				{

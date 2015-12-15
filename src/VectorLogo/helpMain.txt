@@ -1,0 +1,59 @@
+Vectorr Mapping: Instructions for Use
+
+
+Mapping Software Quick-Start Guide
+	1) Launch the Vectorr Mapping program.
+	2) Select the starting building and room from the dropdown menus.
+		a) This represents the beginning location of all 
+		   directions generated.
+		b) If preferred, a search tool is also provided 
+		   which will find points with names related to 
+		   the one given.
+		c) If the wrong building or point is selected, 
+		   the red X related to the start set of dropdowns 
+		   can be clicked to clear the dropdown field.
+	3) Select the destination building and room from the 
+	   dropdown menus.
+		a) These destination attributes are the place to 
+		   which you would like directions.
+		b) The same search tool is provided for destinations.
+		c) Similarly, the same red X is provided to clear 
+		   the destination fields.
+	4) Press the button labelled “Directions” to generate a 
+	   route between the two locations.
+		a) Text directions, along with a traced route on 
+		   a map will appear if the program was able to 
+		   find a route between the two points. 
+			i) If Vectorr Mapping is unable to find a
+			   route, it will print out: “No Valid 
+			   Route.” 
+		b) Vectorr Mapping will also provide a time 
+		   estimate for the route.
+		c) Stepping through the route is as easy as 
+		   pressing the next button to advance to the 
+		   next step in the route. 
+		d) Remembering past directions is easy too, 
+		   just hit the previous button.
+		e) Pressing the “Full Text Directions” button 
+		   will allow viewing of all the text directions 
+		   in order.
+	5) To generate directions along the reverse of the route, 
+	   simply press the “Swap” button to return to the original
+	   location.
+
+
+Setting Preferences for Routing
+Vectorr Mapping includes options for preferences to be set to 
+change the route generated based on a user’s choices.
+
+	1) Before generating any directions, select the “Options” 
+	   button from the main page of the program.
+	2) From the page that appears, a user can choose:
+		The color scheme of the program (including a color-blind accessibility mode).
+		The likelihood of the program generating a route that uses stairs. 
+		The likelihood of the program generating a route that goes outside.
+		How long it will take to travel the route.
+	3) Simply press the button labelled “Back” to return to 
+	   the main mapping page.
+	4) To view information about Vectorr Solutions, simply 
+	   click the about page.

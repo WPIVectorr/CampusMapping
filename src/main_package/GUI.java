@@ -36,6 +36,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 import javax.swing.text.JTextComponent;
 
 import database.AlreadyExistsException;
@@ -45,6 +47,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class GUI{
 	private boolean DEBUG = false;
@@ -222,7 +226,7 @@ public class GUI{
 		aboutMenu.setBackground(backgroundColor);
 
 		GridBagLayout gbl_aboutMenu = new GridBagLayout();
-		gbl_aboutMenu.columnWidths = new int[]{30, 280, 50, 280, 0};
+		gbl_aboutMenu.columnWidths = new int[]{50, 280, 50, 280, 50};
 		gbl_aboutMenu.rowHeights = new int[]{13, 19, 0, 20, 20, 20, 20, 30, 0};
 		gbl_aboutMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_aboutMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
@@ -1738,7 +1742,7 @@ public class GUI{
 		frame.getContentPane().add(panelDirections, BorderLayout.WEST);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{0, 110, 110, 0, 0};
-		gbl_panel.rowHeights = new int[]{23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0};
+		gbl_panel.rowHeights = new int[]{23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, -11, 0, 0, 0};
 		gbl_panel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panelDirections.setLayout(gbl_panel);
@@ -1791,6 +1795,16 @@ public class GUI{
 			}
 		});
 
+
+		JLabel labelEmail = new JLabel("New label");
+		GridBagConstraints gbc_labelEmail = new GridBagConstraints();
+		gbc_labelEmail.gridwidth = 2;
+		gbc_labelEmail.insets = new Insets(0, 0, 5, 5);
+		gbc_labelEmail.gridx = 1;
+		gbc_labelEmail.gridy = 12;
+		panelDirections.add(labelEmail, gbc_labelEmail);
+		labelEmail.setVisible(false);
+
 		GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
 		GridBagConstraints gbc_btnEmailDirections = new GridBagConstraints();
 		gbc_btnEmailDirections.insets = new Insets(0, 0, 5, 5);
@@ -1799,14 +1813,76 @@ public class GUI{
 		gbc_btnEmailDirections.gridx = 1;
 		gbc_btnEmailDirections.gridy = 11;
 		panelDirections.add(btnEmailDirections, gbc_btnEmailDirections);
+		btnEmailDirections.setEnabled(false);
 		btnEmailDirections.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					new PrintDirections(textDir,finalDir,txtFieldEmail.getText());
 					txtFieldEmail.setText("");
+					labelEmail.setVisible(true);
+					labelEmail.setForeground(Color.BLACK);
+					labelEmail.setText("Email Successfully Sent!");
 				} catch (AddressException e1) {
 					// TODO Auto-generated catch block
-					btnEmailDirections.setText("Invalid Address");
+					labelEmail.setVisible(true);
+					labelEmail.setForeground(Color.RED);
+					labelEmail.setText("Invalid Address");
+				}
+			}
+		});
+
+		txtFieldEmail.getDocument().addDocumentListener(new DocumentListener()
+		{
+
+			public void changedUpdate(DocumentEvent arg0) 
+			{
+
+			}
+			public void insertUpdate(DocumentEvent arg0) 
+			{
+				String format = StringUtils.substringAfter(txtFieldEmail.getText(), "@");
+				if (format.contains(".") && format.charAt(0) != '.'
+						&& format.charAt(format.length()-1) != '.' && !format.contains("@")){
+					labelEmail.setVisible(false);
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+					btnEmailDirections.setEnabled(true);
+				}
+				else if(txtFieldEmail.getText().equals("") || txtFieldEmail.getText().equals("Enter E-Mail Here")){
+					labelEmail.setVisible(false);
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+					btnEmailDirections.setEnabled(false);
+				}
+				else{
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.RED));
+					labelEmail.setForeground(Color.RED);
+					labelEmail.setText("Invalid Format");
+					labelEmail.setVisible(true);
+					btnEmailDirections.setEnabled(false);
+				}
+
+
+			}
+
+			public void removeUpdate(DocumentEvent arg0) 
+			{
+				String format = StringUtils.substringAfter(txtFieldEmail.getText(), "@");
+				if (format.contains(".") && format.charAt(0) != '.'
+						&& format.charAt(format.length()-1) != '.' && !format.contains("@")){
+					labelEmail.setVisible(false);
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+					btnEmailDirections.setEnabled(true);
+				}
+				else if(txtFieldEmail.getText().equals("") || txtFieldEmail.getText().equals("Enter E-Mail Here")){
+					labelEmail.setVisible(false);
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+					btnEmailDirections.setEnabled(false);
+				}
+				else{
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.RED));
+					labelEmail.setForeground(Color.RED);
+					labelEmail.setText("Invalid Format");
+					labelEmail.setVisible(true);
+					btnEmailDirections.setEnabled(false);
 				}
 			}
 		});
@@ -1815,22 +1891,15 @@ public class GUI{
 		GridBagConstraints gbc_horizontalStrut_4 = new GridBagConstraints();
 		gbc_horizontalStrut_4.insets = new Insets(0, 0, 5, 5);
 		gbc_horizontalStrut_4.gridx = 0;
-		gbc_horizontalStrut_4.gridy = 12;
+		gbc_horizontalStrut_4.gridy = 13;
 		panelDirections.add(horizontalStrut_4, gbc_horizontalStrut_4);
 
 		Component horizontalStrut_5 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_5 = new GridBagConstraints();
 		gbc_horizontalStrut_5.insets = new Insets(0, 0, 5, 0);
 		gbc_horizontalStrut_5.gridx = 3;
-		gbc_horizontalStrut_5.gridy = 12;
+		gbc_horizontalStrut_5.gridy = 13;
 		panelDirections.add(horizontalStrut_5, gbc_horizontalStrut_5);
-
-		Component verticalStrut = Box.createVerticalStrut(20);
-		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
-		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
-		gbc_verticalStrut.gridx = 1;
-		gbc_verticalStrut.gridy = 14;
-		panelDirections.add(verticalStrut, gbc_verticalStrut);
 
 		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();

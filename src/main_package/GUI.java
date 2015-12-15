@@ -1550,14 +1550,58 @@ public class GUI{
 						}
 						//directionsText.setText(textDir.get(mapPos).get(textPos));
 						if(mapPos != marker){
-							directionsText.setText("Enter " + dirMaps.get(m).getMapName());
+							String toAdd = "";
+							boolean prevIsUnderscore = true;
+							for(int j = 0; j < dirMaps.get(m).getMapName().length(); j++){
+								char tempChar;
+								if(prevIsUnderscore){
+									tempChar = dirMaps.get(m).getMapName().charAt(j);
+									//converts to upper case
+									tempChar = Character.toUpperCase(tempChar);
+									prevIsUnderscore = false;
+								}
+								else if (dirMaps.get(m).getMapName().charAt(j) == ('_')){
+									prevIsUnderscore = true;
+									tempChar = ' ';
+								}
+								else{
+									tempChar = dirMaps.get(m).getMapName().charAt(j);
+									prevIsUnderscore = false;
+								}
+								toAdd += tempChar;
+								//mapsDropdown.addItem(maps.get(i).getMapName());
+								//DestMaps.addItem(maps.get(i).getMapName());
+							}
+
+							directionsText.setText("Enter " + toAdd);
 						}
 					} else {
 
 						textPos = multiMapFinalDir.get(mapPos).size();
 						//directionsText.setText(textDir.get(mapPos).get(textPos));
-
-						directionsText.setText("Enter " + dirMaps.get(mapPos + 1).getMapName());
+						String toAdd = "";
+						boolean prevIsUnderscore = true;
+						for(int j = 0; j < dirMaps.get(mapPos + 1).getMapName().length(); j++){
+							char tempChar;
+							if(prevIsUnderscore){
+								tempChar = dirMaps.get(mapPos + 1).getMapName().charAt(j);
+								//converts to upper case
+								tempChar = Character.toUpperCase(tempChar);
+								prevIsUnderscore = false;
+							}
+							else if (dirMaps.get(mapPos + 1).getMapName().charAt(j) == ('_')){
+								prevIsUnderscore = true;
+								tempChar = ' ';
+							}
+							else{
+								tempChar = dirMaps.get(mapPos + 1).getMapName().charAt(j);
+								prevIsUnderscore = false;
+							}
+							toAdd += tempChar;
+							//mapsDropdown.addItem(maps.get(i).getMapName());
+							//DestMaps.addItem(maps.get(i).getMapName());
+						}
+						directionsText.setText("Enter " + toAdd);
 					}
 					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
 					destinationFile = new File(destinationFile.getAbsolutePath());

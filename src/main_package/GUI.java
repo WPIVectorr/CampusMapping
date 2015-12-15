@@ -1206,6 +1206,7 @@ public class GUI{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						
 						dirMaps = new ArrayList<Map>();
 						if(multiMapFinalDir != null){
 							multiMapFinalDir.clear();

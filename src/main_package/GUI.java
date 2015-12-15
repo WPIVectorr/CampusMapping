@@ -1009,7 +1009,9 @@ public class GUI{
 				if (startMapsDropDown.getSelectedItem().equals("Select Map")){
 					startBuilds.removeAllItems();
 					startBuilds.setEnabled(false);
-					roomPointsToDraw.clear();
+					if(!(roomPointsToDraw.isEmpty())){
+						roomPointsToDraw.clear();
+					}
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
 					showStartPoint = false;
@@ -1053,20 +1055,21 @@ public class GUI{
 					}
 					
 					//String mapTitle = "AtwaterKent1";
+					if(startMap != destMap){
+						File start = new File("src/VectorMaps");
+						String startInput = start.getAbsolutePath();
+						//assuming all maps saved in vectorMaps are in jpg
+						startInput = startInput + "/" + mapTitle + ".png";
 
-					File start = new File("src/VectorMaps");
-					String startInput = start.getAbsolutePath();
-					//assuming all maps saved in vectorMaps are in jpg
-					startInput = startInput + "/" + mapTitle + ".png";
-
-					File destFile = new File(startInput);
-					try{
-						img = ImageIO.read(destFile);
-						frame.repaint();
-					}
-					catch(IOException a){
-						System.out.println("Could not find file:"+startInput);
-						a.printStackTrace();
+						File destFile = new File(startInput);
+						try{
+							img = ImageIO.read(destFile);
+							frame.repaint();
+						}
+						catch(IOException a){
+							System.out.println("Could not find file:"+startInput);
+							a.printStackTrace();
+						}
 					}
 
 					startBuilds.removeAllItems();
@@ -1156,7 +1159,9 @@ public class GUI{
 				drawnfirst = false;
 				if (destMapsDropDown.getSelectedItem().equals("Select Map")){
 					destBuilds.removeAllItems();
-					roomPointsToDraw.clear();
+					if(!(roomPointsToDraw.isEmpty())){
+						roomPointsToDraw.clear();
+					}
 					destBuilds.setEnabled(false);
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
@@ -1199,19 +1204,22 @@ public class GUI{
 						destIsSelected = false;
 					}
 					
-					File dest = new File("src/VectorMaps");
-					String destInput = dest.getAbsolutePath();
-					//assuming all maps saved in vectorMaps are in jpg
-					destInput = destInput + "/" + mapTitle + ".png";
+					
+					if(destMap != startMap){
+						File dest = new File("src/VectorMaps");
+						String destInput = dest.getAbsolutePath();
+						//assuming all maps saved in vectorMaps are in jpg
+						destInput = destInput + "/" + mapTitle + ".png";
 
-					File destFile = new File(destInput);
-					try{
-						img = ImageIO.read(destFile);
-						frame.repaint();
-					}
-					catch(IOException a){
-						System.out.println("Could not find file:"+destInput);
-						a.printStackTrace();
+						File destFile = new File(destInput);
+						try{
+							img = ImageIO.read(destFile);
+							frame.repaint();
+						}
+						catch(IOException a){
+							System.out.println("Could not find file:"+destInput);
+							a.printStackTrace();
+						}
 					}
 
 					//startBuilds.removeAllItems();
@@ -1371,6 +1379,14 @@ public class GUI{
 						startStarX = ((Point)(startBuilds.getSelectedItem())).getLocX();
 						startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
 						startMap = currentMap;
+						startPoint = (Point) startBuilds.getSelectedItem();
+						//If the startPoint and the destPoint are the same then force the startPoint to be
+						// "Select
+						if(destPoint != destPointName && startPoint != startPointName && !(destPoint == startPoint)){
+							startPoint = startPointName;
+							startBuilds.setSelectedItem(startPointName);
+						}
+						System.out.println("Selected Point Name From the DropDown: " + startPoint.getName());
 						frame.repaint();
 					}
 				}
@@ -1407,6 +1423,12 @@ public class GUI{
 						destStarX = ((Point)(destBuilds.getSelectedItem())).getLocX();
 						destStarY = ((Point)(destBuilds.getSelectedItem())).getLocY();
 						startMap = currentMap;
+						destPoint = (Point) destBuilds.getSelectedItem();
+						if(destPoint != destPointName && startPoint != startPointName && destPoint == startPoint){
+							destPoint = destPointName;
+							destBuilds.setSelectedItem(destPointName);
+						}
+						System.out.println("Selected Point ID From the DropDown: " + destPoint.getName());
 						frame.repaint();
 					}
 				}
@@ -2470,9 +2492,9 @@ public class GUI{
 			
 			if (!showRoute && route == null) {
 				//Draws the points in each room so that the user can select each point as a source or destination
-				if(roomPointsToDraw != null && roomPointsToDraw.size() != 0){
-					System.out.println("roomPointsToDraw size: " + roomPointsToDraw.size());
-
+				System.out.println("\t\t\t\t\t\troomPointsToDraw size: " + roomPointsToDraw.size());
+				if(roomPointsToDraw != null && !(roomPointsToDraw.isEmpty()) ){
+					System.out.println("\t\t\t12312312321roomPointsToDraw size: " + roomPointsToDraw.size());
 					for (int i = 0; i < roomPointsToDraw.size(); i++){
 						int point1x = (int)((roomPointsToDraw.get(i).getLocX()*newImageWidth)+drawnposx);
 						int point1y = (int)((roomPointsToDraw.get(i).getLocY()*newImageHeight)+drawnposy);			
@@ -2521,63 +2543,67 @@ public class GUI{
 
 						System.out.println("newClick: " + newClick);
 						System.out.println("selectedPointID is null: " + (selectedPointID == null));
+						
+						if(currentMap == startMap){
+							//select the starting point
+							if(!(startIsSelected)){
+								if (newClick == true && startPoint.getName().equals("Select Start Location")) {
+									//if we select a new point to edit
+									startPoint = selectedPoint;
+									startPointIndex = i;
+									System.out.println("Set the startPoint to first point clicked");
 
-						//select the starting point
-						if(!(startIsSelected)){
-							if (newClick == true && startPoint.getName().equals("Select Start Location")) {
-								//if we select a new point to edit
-								startPoint = selectedPoint;
-								startPointIndex = i;
-								System.out.println("Set the startPoint to first point clicked");
-
-								//set the drop down for points
-								//startBuilds.setSelectedIndex(tempStartRoom.indexOf(roomPointsToDraw.get(i)));
-								startBuilds.setSelectedItem(startPoint);
+									//set the drop down for points
+									//startBuilds.setSelectedIndex(tempStartRoom.indexOf(roomPointsToDraw.get(i)));
+									startBuilds.setSelectedItem(startPoint);
 
 
-								System.out.println("starBuilds selectedIndex: " + startBuilds.getSelectedIndex());
+									System.out.println("starBuilds selectedIndex: " + startBuilds.getSelectedIndex());
 
-								newClick = false;
-								startIsSelected = true;
+									newClick = false;
+									startIsSelected = true;
+								}
 							}
-						}
 
-						//unselect the starting point
-						if(startIsSelected){
-							if(newClick == true && selectedPointID.equals(startPoint.getId()) && startIsSelected){
-								startPoint = startPointName;
-								startPointIndex = 0;
-								startBuilds.setSelectedItem(startPointName);
-								System.out.println("Unselected the startPoint");
-								newClick = false;
-								startIsSelected = false;
+							//unselect the starting point
+							if(startIsSelected){
+								if(newClick == true && selectedPointID.equals(startPoint.getId()) && startIsSelected){
+									startPoint = startPointName;
+									startPointIndex = 0;
+									startBuilds.setSelectedItem(startPointName);
+									System.out.println("Unselected the startPoint");
+									newClick = false;
+									startIsSelected = false;
+								}
 							}
-						}
+						}//end of currentMap = startMap
 
-						//select destination point
-						if(!(destIsSelected)){
-							if(newClick == true && destPoint.getName().equals("Select Destination Location") ){
-								System.out.println("Set the Selected Destination Point");
-								destPoint = selectedPoint;
-								destPointIndex = i;
-								destBuilds.setSelectedItem(destPoint);
-								System.out.println("Unselected the destPoint");
-								newClick = false;
-								destIsSelected = true;
+						if(currentMap == destMap){
+							//select destination point
+							if(!(destIsSelected)){
+								if(newClick == true && destPoint.getName().equals("Select Destination Location") ){
+									System.out.println("Set the Selected Destination Point");
+									destPoint = selectedPoint;
+									destPointIndex = i;
+									destBuilds.setSelectedItem(destPoint);
+									System.out.println("Unselected the destPoint");
+									newClick = false;
+									destIsSelected = true;
+								}
 							}
-						}
 
-						//unselect the destination point
-						if(destIsSelected){
-							if(newClick == true && destPoint.getId().equals(destPointName.getId()) && destIsSelected){
-								destPoint = destPointName;
-								destPointIndex = 0;
-								destBuilds.setSelectedItem(destPointName);
-								System.out.println("Unselected the destPoint");
-								newClick = false;
-								destIsSelected = false;
+							//unselect the destination point
+							if(destIsSelected){
+								if(newClick == true && destPoint.getId().equals(destPointName.getId()) && destIsSelected){
+									destPoint = destPointName;
+									destPointIndex = 0;
+									destBuilds.setSelectedItem(destPointName);
+									System.out.println("Unselected the destPoint");
+									newClick = false;
+									destIsSelected = false;
+								}
 							}
-						}
+						}//end of currentMap == destMap
 					}
 					mainMenu.repaint();
 				}

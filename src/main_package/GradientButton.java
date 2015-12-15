@@ -1,11 +1,18 @@
 package main_package;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 public class GradientButton extends JButton{
 	private Color baseColor;
@@ -14,7 +21,9 @@ public class GradientButton extends JButton{
     {
     	super(text);
         this.baseColor = baseColor;
-
+        this.putClientProperty( "JButton.buttonType", "textured" );
+        Border emptyBorder = BorderFactory.createSoftBevelBorder(BevelBorder.LOWERED, baseColor, baseColor);
+        this.setBorder(emptyBorder);
         setContentAreaFilled(false);
     }
     
@@ -26,6 +35,8 @@ public class GradientButton extends JButton{
     @Override
     public void paintComponent(Graphics g)
     {
+
+
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         // Sets gradient paint

@@ -62,7 +62,7 @@ public class SplashPage extends JWindow implements Runnable {
 		if(t == null)
 		{
 			t= new Thread (this, threadName);
-			t.setPriority(8);
+			t.setPriority(4);
 			t.start();
 
 		}

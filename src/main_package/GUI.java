@@ -138,13 +138,14 @@ public class GUI{
 	private double mousezoomy;
 	private double minZoomSize;
 	private JTextArea txtpnFullTextDir;
-	private JTextField txtSearchStart;
-	private JTextField txtSearchDest;
+	protected JTextField txtSearchStart;
+	protected JTextField txtSearchDest;
 	private GradientButton btnFullTextDirections;
 	private double startStarX;
 	private double startStarY;
 	private double destStarX;
 	private double destStarY;
+	
 
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
@@ -2282,4 +2283,5 @@ public class GUI{
 			}
 		}
 	}
+	
 }

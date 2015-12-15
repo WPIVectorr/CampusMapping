@@ -10,7 +10,7 @@ import database.ServerDB;
 
 public class SearchLocation {
 
-	
+
 	//a list of each of the building's list of aliases
 	private static HashMap<String, ArrayList<String>> allNames = new HashMap<String, ArrayList<String>>();
 
@@ -18,16 +18,16 @@ public class SearchLocation {
 	private static ArrayList<String> roomNums = new ArrayList<String>();
 	private static HashMap<String, Point> pointNames;
 	private static ArrayList<String> keyList;
-	
-	
 
-	
+
+
+
 	private static void prepData() {
 		// TODO Auto-generated constructor stub
-		
+
 		keyList = new ArrayList<String>();
 		pointNames = new HashMap<String,Point>();
-		
+
 		ArrayList<String> StrattonHall 		= 	new ArrayList<String>();
 		ArrayList<String> BoyntonHall 		= 	new ArrayList<String>();
 		ArrayList<String> SalisburyLabs 	= 	new ArrayList<String>();
@@ -64,7 +64,7 @@ public class SearchLocation {
 		AlumniGym.add("AG");		AlumniGym.add("Alumni Gym");		 	AlumniGym.add("Alumni");
 		ProjectCenter.add("PC");	ProjectCenter.add("Project Center");	ProjectCenter.add("CDC");
 		AtwaterKent.add("AK");		AtwaterKent.add("Atwater Kent");
-	
+
 		//shortname,aliases
 		allNames.put("SH",		StrattonHall);
 		allNames.put("BH",		BoyntonHall);
@@ -85,12 +85,12 @@ public class SearchLocation {
 		allNames.put("Seal", 	Campus);
 		allNames.put("SDCC",	West157);
 	}
-	
+
 	public SearchLocation(ArrayList<Point> pointArray)	
 	{
 		prepData();
-		
-		
+
+
 		for(Point point:pointArray)
 		{	
 			String pointName = point.getName();
@@ -107,7 +107,7 @@ public class SearchLocation {
 			}
 		}		
 	}
-	
+
 	//get's the list of aliases for a point on the map
 	//these points are added to the hashmap on return
 	//@param pointName name of the point, including number
@@ -117,27 +117,27 @@ public class SearchLocation {
 		ArrayList<String> aliasList = new ArrayList<String>();
 		ArrayList<String> longNameReturn = new ArrayList<String>();
 
-	String shortName;
-	String roomNum;
+		String shortName;
+		String roomNum;
 		if(pointName.contains(" ")){
-		String[] arr = pointName.split(" ",2);
-		 shortName = arr[0];
-		 roomNum = arr[1];
+			String[] arr = pointName.split(" ",2);
+			shortName = arr[0];
+			roomNum = arr[1];
 		}
 		else{
 			shortName = pointName;
 			roomNum = "";
 		}
 		//System.out.println("ShortName: "+shortName);
-		
-/*		int spaceIndex = pointName.indexOf(" ");
+
+		/*		int spaceIndex = pointName.indexOf(" ");
 		String shortName = pointName.substring(0,spaceIndex);
 		System.out.println("ShortName: "+shortName);*/
-		
+
 		//all of the aliases without roomnumattached
 		aliasList = allNames.get(shortName);
-		
-		
+
+
 		//longNames.add(e);
 		//for every aliase obtained from the tables, add the room number to store in the
 		//pointnames fuzzyhash
@@ -168,7 +168,7 @@ public class SearchLocation {
 				allPoints.add(maps.get(i).getPointList().get(j));
 			}
 		}
-		
+
 		new SearchLocation(allPoints);
 		ArrayList<String> searchTerms = new ArrayList<String>();
 		//searchTerms.add(StringUtils.lowerCase("Atwater Kent"));
@@ -209,11 +209,11 @@ public class SearchLocation {
 		searchTerms.add(StringUtils.lowerCase("AK Entrance"));
 		searchTerms.add(StringUtils.lowerCase("AG Exit"));
 		searchTerms.add(StringUtils.lowerCase("Fuller Upper"));
-		
-		
 
-		
-		
+
+
+
+
 		for(String search:searchTerms)
 		{
 			//search for one of the items in the test array
@@ -221,32 +221,32 @@ public class SearchLocation {
 			if(result != null)
 			{
 				for(Point returnedPoint:result)
-				System.out.println("Searched for: "+ search+" Result: " +returnedPoint.getName());
+					System.out.println("Searched for: "+ search+" Result: " +returnedPoint.getName());
 			}
-	
+
 		}
 
 	}
-	
-	
-	
+
+
+
 	//return a sorted arraylist of 
 	public static ArrayList<Point> searchFor(String searchTerm)
 	{
 		ArrayList<Point> results = new ArrayList<Point>();
 		ArrayList<ArrayList<String>> orderList = new ArrayList<ArrayList<String>>();
-		
+
 		//goes through the list of keys(of the hashmap) and adds them to
-			//two dimensional array.
+		//two dimensional array.
 		for(String key:keyList)
 		{ 
 			ArrayList<String> addArray = new ArrayList<String>();
 			addArray.add(key);
 			orderList.add(addArray);		
 		}	
-		
+
 		//goes through the two dimensional list and searches against every key
-			//adds the fuzzy score as the second dimension.
+		//adds the fuzzy score as the second dimension.
 		for(int i = 0;i < orderList.size();i++)
 		{
 			ArrayList<String> key = orderList.get(i);
@@ -259,24 +259,24 @@ public class SearchLocation {
 				//System.out.println("Lev: "+key.get(1)+" Searchterm: "+searchTerm+" compare: "+key.get(0));
 			}
 		}
-		
+
 		orderList.sort(new orderListComparator());
 		//System.out.println("sortedList: ");
 		for(ArrayList<String> sortedName:orderList)
 		{
-				String buildingLetter = sortedName.get(0).substring(0, 1);
-				String searchLetter = searchTerm.substring(0,1);
-				//System.out.println("build Letter: "+buildingLetter+" Search letter: "+searchLetter);
-				if(buildingLetter.equalsIgnoreCase(searchLetter))
-				{
-					if(results.size()<6)
-						results.add(pointNames.get(sortedName.get(0)));
-				}
+			String buildingLetter = sortedName.get(0).substring(0, 1);
+			String searchLetter = searchTerm.substring(0,1);
+			//System.out.println("build Letter: "+buildingLetter+" Search letter: "+searchLetter);
+			if(buildingLetter.equalsIgnoreCase(searchLetter))
+			{
+				if(results.size()<6)
+					results.add(pointNames.get(sortedName.get(0)));
+			}
 			//System.out.println("Build: "+sortedName.get(0)+" lev: "+ sortedName.get(1));
 		}
-		
-		
-		
+
+
+
 		if(results.isEmpty()){
 			System.out.println("Result = null");
 		}
@@ -286,8 +286,8 @@ public class SearchLocation {
 		return results;
 	}
 
-	
-	
+
+
 	//returns the levenshtein value for two Strings
 	//@param String String 
 	//@return int
@@ -307,13 +307,13 @@ public class SearchLocation {
 		search = search.substring(0,compare.length());
 		compare = compare.replaceAll("\\s","");
 		search = search.replaceAll("\\s","");
-		
-		
+
+
 		return StringUtils.getFuzzyDistance(compare,search, Locale.ENGLISH);
-		
+
 	}
 
-    static class orderListComparator implements Comparator<ArrayList<String>> {
+	static class orderListComparator implements Comparator<ArrayList<String>> {
 
 		@Override
 		public int compare(ArrayList<String> o1, ArrayList<String> o2) {
@@ -326,9 +326,27 @@ public class SearchLocation {
 				return 0;
 			if(num1 < num2)
 				return 1;
-			
+
 			return (Integer) null;
 		}
-    }
+	}
 
+
+
+	private class CompletionTask extends GUI implements Runnable {
+		String completion;
+		int position;
+
+		CompletionTask(String completion, int position) {
+			this.completion = completion;
+			this.position = position;
+		}
+
+		public void run() {
+			(JTextArea) txtSearchStart.insert(completion, position);
+			textArea.setCaretPosition(position + completion.length());
+			textArea.moveCaretPosition(position);
+			mode = Mode.COMPLETION;
+		}
+	}
 }

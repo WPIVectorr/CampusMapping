@@ -105,6 +105,9 @@ public class PointEditerGUI extends JFrame {
 //=============================set grid size==============================================
 	
 	private double gridSize = 0.005;
+	protected int mousezoomx;
+	protected int mousezoomy;
+	protected double minZoomSize;
 
 //=============================set grid size==============================================
 
@@ -246,14 +249,6 @@ public class PointEditerGUI extends JFrame {
 		buttonPanel.add(changeypos, gbc_changeypos);
 		btnConfirmSelection.setEnabled(true);
 		
-		JButton saveandchange = new JButton("Save and Change Point");
-		GridBagConstraints gbc_saveandchange = new GridBagConstraints();
-		gbc_saveandchange.insets = new Insets(0, 0, 5, 5);
-		gbc_saveandchange.gridx = 5;
-		gbc_saveandchange.gridy = 1;
-		buttonPanel.add(saveandchange, gbc_saveandchange);
-		btnConfirmSelection.setEnabled(true);
-		
 		buttonPanel.setBackground(Color.WHITE);
 		
 		buttonPanel.repaint();
@@ -364,6 +359,7 @@ public class PointEditerGUI extends JFrame {
         });
 		
 		mapFrame.addMouseMotionListener(new MouseMotionListener(){
+
 			public void mouseDragged(MouseEvent g){
 				//System.out.println("dragged");
 				drawnfirst = true;
@@ -373,49 +369,78 @@ public class PointEditerGUI extends JFrame {
 				mapFrame.repaint();
 			}
 
-			public void mouseMoved(MouseEvent arg0) {
-
+			public void mouseMoved(MouseEvent j) {
+				mousezoomx = j.getX();
+				mousezoomy = j.getY();
 			}
 		});
 
 		mapFrame.addMouseWheelListener(new MouseWheelListener(){
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				scrolled = true;
-				double oldWidth = img.getWidth() * scaleSize;
-				double oldHeight = img.getHeight() * scaleSize;
-				if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(name.equals("Select Map")))) {
-					drawnfirst = true;
-					scroldirection = e.getWheelRotation();
-					if (e.getWheelRotation() > 0) {
-						if (scaleSize <= 2) {
-							// System.out.println("scale before plus: " +
-							// scaleSize);
-							scaleSize += (e.getWheelRotation() * .01);
-							// System.out.println("scale plus: " + scaleSize);
-							atMinZoom = false;
-						} else {
-							atMaxZoom = true;
-						}
-					} else {
-						if (scaleSize >= 0.1) {
-							// System.out.println("scale before minus: " +
-							// scaleSize);
-							scaleSize += (e.getWheelRotation() * .01);
-							// System.out.println("scale minus: " + scaleSize);
-							atMaxZoom = false;
-						} else {
-							atMinZoom = true;
+				if(!name.equals("Select Map")){
+					scrolled = true;
+					if(!(img == null)){
+						minZoomSize = 1 / ((double) img.getWidth() / (double) mapFrame.getWidth());
+						int WidthSize = (int) ((double) img.getHeight() * minZoomSize);
+						if (WidthSize > (double) mapFrame.getHeight()) {
+							minZoomSize = 1 / ((double) img.getHeight() / (double) mapFrame.getHeight());
 						}
 					}
-					double newWidth = img.getWidth() * scaleSize;
-					double newHeight = img.getHeight() * scaleSize;
-					difWidth = (oldWidth - newWidth);
-					difHeight = (oldHeight - newHeight);
-				} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
+					//System.out.println(minZoomSize);
+					double oldWidth = (img.getWidth() * scaleSize);
+					double oldHeight = (img.getHeight() * scaleSize);
+					double ogx = ((mousezoomx-drawnposx)/oldWidth);
+					double ogy = ((mousezoomy-drawnposy)/oldHeight);
+					if(ogx<1 && ogx>0 && ogy<1 && ogy>0){
+						if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(name.equals("Select Map")))) {
+							drawnfirst = true;
+							if (e.getWheelRotation() > 0) {
+								if (scaleSize <= 2) {
+									scroldirection = 1;
+									scaleSize += (scroldirection * .02);
+									atMinZoom = false;
+								} else {
+									atMaxZoom = true;
+								}
+							} else {
+								if (scaleSize >= (minZoomSize)) {
+									scroldirection = -1;
+									// System.out.println("scale before minus: " +
+									// scaleSize);
+									scaleSize += (scroldirection * .02);
+									// System.out.println("scale minus: " + scaleSize);
+									atMaxZoom = false;
+								} else {
+									atMinZoom = true;
+								}
+							}
+							if(atMaxZoom == false && atMinZoom == false){
+								
+								//System.out.println("old map size: "+oldWidth+", "+oldHeight);
+								//System.out.println("drawn pos x and y: "+drawnposx+", "+drawnposy);
+								//System.out.println("percentage x and y: "+ogx+", "+ogy);
+								double newWidth = (img.getWidth() * scaleSize);
+								double newHeight = (img.getHeight() * scaleSize);
+								difWidth = ((ogx*(oldWidth-newWidth)));//((ogx*((oldWidth-newWidth)*2)));
+								difHeight = ((ogy*(oldHeight-newHeight)));//((ogy*((oldHeight-newHeight)*2)));
+								//System.out.println("difference pos: "+movex+", "+movey);
+								//System.out.println("move pos: "+difWidth+", "+difHeight);
+								//System.out.println("new map size: "+newWidth+", "+newHeight);
+								//System.out.println("imagesize in scroll: "+newWidth+", "+newHeight);
+								//System.out.println("size diff: "+(oldHeight-newHeight));
+								drawnposx += difWidth;
+								drawnposy += difHeight;
+							}else{
+								difHeight = 0;
+							}
+							
+						}
+					} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
 
+					}
+					mapFrame.repaint();
+					frame.repaint();
 				}
-				mapFrame.repaint();
-				// System.out.println(message);
 			}
 		});
 

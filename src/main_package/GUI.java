@@ -1265,7 +1265,6 @@ public class GUI{
 							m++;
 						}
 						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(m).getMapName() + ".png");
-
 						destinationFile = new File(destinationFile.getAbsolutePath());
 						try {
 							img = ImageIO.read(destinationFile);
@@ -1526,7 +1525,7 @@ public class GUI{
 					int marker = mapPos;
 					mapPos--;
 					if(multiMapFinalDir.get(mapPos).size() == 0){
-						while((multiMapFinalDir.get(mapPos).size() != 0) && (multiMapFinalDir.get(mapPos).size() == 0)){
+						while((mapPos != 0) && (multiMapFinalDir.get(mapPos).size() == 0)){
 							mapPos--;
 						}
 						if(mapPos == 0){
@@ -1539,7 +1538,7 @@ public class GUI{
 						} else { 
 							textPos = 0;
 						}
-						int m = mapPos - 1;
+						int m = mapPos;
 						while((m != 0) && multiMapFinalDir.get(m).size() == 0){
 							m--;
 						}

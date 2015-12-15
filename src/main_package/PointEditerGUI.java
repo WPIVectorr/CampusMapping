@@ -281,7 +281,7 @@ public class PointEditerGUI extends JFrame {
 		btnConfirmSelection.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent a){
 				for(int i = 0; i < pointArray.size(); i++){
-					/*try {
+					try {
 							ServerDB.updatePoint(pointArray.get(i));
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
@@ -289,12 +289,10 @@ public class PointEditerGUI extends JFrame {
 					} catch (DoesNotExistException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					}*/
+					}
 				}
 			}
 		});
-		
-		
 		
 		changexneg.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent a){

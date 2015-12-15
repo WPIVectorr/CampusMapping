@@ -139,7 +139,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//maps = ServerDB.getMapsFromLocal();
-		emptyMaps = ServerDB.getEmptyMapsFromServer();
+		//emptyMaps = ServerDB.getEmptyMapsFromServer();
 
 		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
@@ -276,7 +276,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 
 	public JComponent createMapsPanel(){
 		JPanel mapsPanel = new JPanel();
-		mapsPanel.setBackground(new Color(255, 235, 205));
+		mapsPanel.setBackground(new Color(75, 98, 128));
 		GridBagLayout gbl_mapsPanel = new GridBagLayout();
 		gbl_mapsPanel.rowHeights = new int[] {0, 0, 30, 30};
 		gbl_mapsPanel.columnWidths = new int[] {280, 280, 280};

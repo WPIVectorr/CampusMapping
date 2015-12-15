@@ -200,9 +200,9 @@ public class GUI{
 		mainMenu.setBackground(backgroundColor);
 
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
-		gbl_mainMenu.columnWidths = new int[]{80, 90, 75, 110, 150, 90, 75, 110, 80};
+		gbl_mainMenu.columnWidths = new int[]{80, 90, 123, 62, 150, 90, 93, 30, 62, 80};
 		gbl_mainMenu.rowHeights = new int[]{10, 18, 27, 0, 0, 0, 0, 0, 0};
-		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		mainMenu.setLayout(gbl_mainMenu);
 
@@ -414,6 +414,7 @@ public class GUI{
 		GradientButton btnOptionsMain = new GradientButton("Set Preferences", buttonColor);
 		btnOptionsMain.setText("Options\r\n");
 		GridBagConstraints gbc_btnOptionsMain = new GridBagConstraints();
+		gbc_btnOptionsMain.gridwidth = 2;
 		gbc_btnOptionsMain.anchor = GridBagConstraints.SOUTHEAST;
 		gbc_btnOptionsMain.insets = new Insets(0, 0, 5, 5);
 		gbc_btnOptionsMain.gridx = 7;
@@ -434,7 +435,7 @@ public class GUI{
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
 		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 0);
-		gbc_horizontalStrut.gridx = 8;
+		gbc_horizontalStrut.gridx = 9;
 		gbc_horizontalStrut.gridy = 1;
 		mainMenu.add(horizontalStrut, gbc_horizontalStrut);
 
@@ -547,7 +548,7 @@ public class GUI{
 
 		JLabel lblStart = new JLabel("Start");
 		GridBagConstraints gbc_lblStart = new GridBagConstraints();
-		gbc_lblStart.gridwidth = 2;
+		gbc_lblStart.gridwidth = 3;
 		gbc_lblStart.insets = new Insets(0, 0, 5, 5);
 		gbc_lblStart.gridx = 1;
 		gbc_lblStart.gridy = 2;
@@ -555,7 +556,7 @@ public class GUI{
 
 		JLabel lblDestination_1 = new JLabel("Destination");
 		GridBagConstraints gbc_lblDestination_1 = new GridBagConstraints();
-		gbc_lblDestination_1.gridwidth = 2;
+		gbc_lblDestination_1.gridwidth = 4;
 		gbc_lblDestination_1.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDestination_1.gridx = 5;
 		gbc_lblDestination_1.gridy = 2;
@@ -634,7 +635,7 @@ public class GUI{
 		});
 
 		GradientButton btnClearStart = new GradientButton("X", new Color(240,128,128));
-		btnClearStart.setText("Clear Selection");
+		btnClearStart.setText("Clear");
 		btnClearStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				showStartPoint = false;
@@ -660,7 +661,7 @@ public class GUI{
 		txtSearchDest = new JTextField();
 		txtSearchDest.setText("Search");
 		GridBagConstraints gbc_txtSearchDest = new GridBagConstraints();
-		gbc_txtSearchDest.gridwidth = 2;
+		gbc_txtSearchDest.gridwidth = 3;
 		gbc_txtSearchDest.insets = new Insets(0, 0, 5, 5);
 		gbc_txtSearchDest.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtSearchDest.gridx = 5;
@@ -725,11 +726,11 @@ public class GUI{
 		});
 
 		GradientButton btnClearDest = new GradientButton("X", new Color(240,128,128));
-		btnClearDest.setText("Clear Selection");
+		btnClearDest.setText("Clear");
 		GridBagConstraints gbc_btnClearDest = new GridBagConstraints();
 		gbc_btnClearDest.anchor = GridBagConstraints.EAST;
 		gbc_btnClearDest.insets = new Insets(0, 0, 5, 5);
-		gbc_btnClearDest.gridx = 7;
+		gbc_btnClearDest.gridx = 8;
 		gbc_btnClearDest.gridy = 3;
 		mainMenu.add(btnClearDest, gbc_btnClearDest);
 		btnClearDest.addActionListener(new ActionListener() {
@@ -1058,7 +1059,7 @@ public class GUI{
 
 
 		GridBagConstraints gbc_destMaps = new GridBagConstraints();
-		gbc_destMaps.gridwidth = 2;
+		gbc_destMaps.gridwidth = 3;
 		gbc_destMaps.fill = GridBagConstraints.HORIZONTAL;
 		gbc_destMaps.insets = new Insets(0, 0, 5, 5);
 		gbc_destMaps.gridx = 6;
@@ -1113,7 +1114,7 @@ public class GUI{
 
 		//adds destBuilds to the dropdown for destination
 		GridBagConstraints gbc_destBuilds = new GridBagConstraints();
-		gbc_destBuilds.gridwidth = 2;
+		gbc_destBuilds.gridwidth = 3;
 		gbc_destBuilds.fill = GridBagConstraints.BOTH;
 		gbc_destBuilds.insets = new Insets(0, 0, 5, 5);
 		gbc_destBuilds.gridx = 6;
@@ -1428,7 +1429,7 @@ public class GUI{
 				menuLayout.show(menus, "Main Menu");
 				showRoute = false;
 				panelDirections.setVisible(false);
-				btnFullTextDirections.setText("Send Email");
+				btnFullTextDirections.setText("Show Full Text Directions");
 				frame.repaint();
 			}
 		});
@@ -1895,20 +1896,21 @@ public class GUI{
 		Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
 		labels.put(0, new JLabel("Neutral"));
 		labels.put(-1, new JLabel("Avoid"));
-		labels.put(1, new JLabel("Priority"));
+		labels.put(1, new JLabel("Prefer"));
 
 		prefMenu = new JPanel();
 		prefMenu.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		prefMenu.setBackground(backgroundColor);
 		GridBagLayout gbl_prefMenu = new GridBagLayout();
-		gbl_prefMenu.columnWidths = new int[]{25, 125, 125, 75, 175, 250, 25};
+		gbl_prefMenu.columnWidths = new int[]{25, 75, 30, 145, 110, 30, 110, 250, 25};
 		gbl_prefMenu.rowHeights = new int[]{0, 0, 10, 0, 32, 12, 11, 0};
-		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		prefMenu.setLayout(gbl_prefMenu);
 
 		GradientButton btnHelp = new GradientButton("Help", buttonColor);
 		GridBagConstraints gbc_btnHelp = new GridBagConstraints();
+		gbc_btnHelp.anchor = GridBagConstraints.EAST;
 		gbc_btnHelp.insets = new Insets(0, 0, 5, 5);
 		gbc_btnHelp.gridx = 1;
 		gbc_btnHelp.gridy = 0;
@@ -1934,8 +1936,9 @@ public class GUI{
 
 		GradientButton btnAbout = new GradientButton("About", buttonColor);
 		GridBagConstraints gbc_btnAbout = new GridBagConstraints();
+		gbc_btnAbout.anchor = GridBagConstraints.WEST;
 		gbc_btnAbout.insets = new Insets(0, 0, 5, 5);
-		gbc_btnAbout.gridx = 2;
+		gbc_btnAbout.gridx = 3;
 		gbc_btnAbout.gridy = 0;
 		prefMenu.add(btnAbout, gbc_btnAbout);
 		btnAbout.addActionListener(new ActionListener() {
@@ -1962,7 +1965,7 @@ public class GUI{
 
 		JLabel lblOutside = new JLabel("Outside");
 		GridBagConstraints gbc_lblOutside = new GridBagConstraints();
-		gbc_lblOutside.gridwidth = 2;
+		gbc_lblOutside.gridwidth = 3;
 		gbc_lblOutside.insets = new Insets(0, 0, 5, 5);
 		gbc_lblOutside.gridx = 1;
 		gbc_lblOutside.gridy = 2;
@@ -1970,23 +1973,23 @@ public class GUI{
 
 		JLabel lblStairs = new JLabel("Stairs");
 		GridBagConstraints gbc_lblStairs = new GridBagConstraints();
-		gbc_lblStairs.gridwidth = 2;
+		gbc_lblStairs.gridwidth = 3;
 		gbc_lblStairs.insets = new Insets(0, 0, 5, 5);
-		gbc_lblStairs.gridx = 3;
+		gbc_lblStairs.gridx = 4;
 		gbc_lblStairs.gridy = 2;
 		prefMenu.add(lblStairs, gbc_lblStairs);
 
 		JLabel lblWalkingSpeed = new JLabel("Walking Speed");
 		GridBagConstraints gbc_lblWalkingSpeed = new GridBagConstraints();
 		gbc_lblWalkingSpeed.insets = new Insets(0, 0, 5, 5);
-		gbc_lblWalkingSpeed.gridx = 5;
+		gbc_lblWalkingSpeed.gridx = 7;
 		gbc_lblWalkingSpeed.gridy = 2;
 		prefMenu.add(lblWalkingSpeed, gbc_lblWalkingSpeed);
 
 		JSlider sliderOutside = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
 		sliderOutside.setPaintLabels(true);
 		GridBagConstraints gbc_slider = new GridBagConstraints();
-		gbc_slider.gridwidth = 2;
+		gbc_slider.gridwidth = 3;
 		gbc_slider.fill = GridBagConstraints.HORIZONTAL;
 		gbc_slider.insets = new Insets(0, 0, 5, 5);
 		gbc_slider.gridx = 1;
@@ -2016,10 +2019,10 @@ public class GUI{
 		JSlider sliderStairs = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
 		sliderStairs.setPaintLabels(true);
 		GridBagConstraints gbc_slider_1 = new GridBagConstraints();
-		gbc_slider_1.gridwidth = 2;
+		gbc_slider_1.gridwidth = 3;
 		gbc_slider_1.fill = GridBagConstraints.HORIZONTAL;
 		gbc_slider_1.insets = new Insets(0, 0, 5, 5);
-		gbc_slider_1.gridx = 3;
+		gbc_slider_1.gridx = 4;
 		gbc_slider_1.gridy = 3;
 		prefMenu.add(sliderStairs, gbc_slider_1);
 
@@ -2051,7 +2054,7 @@ public class GUI{
 		GridBagConstraints gbc_walkingSpeed = new GridBagConstraints();
 		gbc_walkingSpeed.fill = GridBagConstraints.HORIZONTAL;
 		gbc_walkingSpeed.insets = new Insets(0, 0, 5, 5);
-		gbc_walkingSpeed.gridx = 5;
+		gbc_walkingSpeed.gridx = 7;
 		gbc_walkingSpeed.gridy = 3;
 		prefMenu.add(sliderWalkingSpeed, gbc_walkingSpeed);
 		sliderWalkingSpeed.addChangeListener(new ChangeListener(){
@@ -2083,23 +2086,24 @@ public class GUI{
 		GridBagConstraints gbc_lblVisualPreferences = new GridBagConstraints();
 		gbc_lblVisualPreferences.anchor = GridBagConstraints.EAST;
 		gbc_lblVisualPreferences.insets = new Insets(0, 0, 5, 5);
-		gbc_lblVisualPreferences.gridx = 3;
+		gbc_lblVisualPreferences.gridx = 4;
 		gbc_lblVisualPreferences.gridy = 4;
 		prefMenu.add(lblVisualPreferences, gbc_lblVisualPreferences);
 
 		JComboBox<String> dropdownTheme = new JComboBox(themes);
 		GridBagConstraints gbc_dropdownTheme = new GridBagConstraints();
+		gbc_dropdownTheme.gridwidth = 2;
 		gbc_dropdownTheme.insets = new Insets(0, 0, 5, 5);
 		gbc_dropdownTheme.fill = GridBagConstraints.HORIZONTAL;
-		gbc_dropdownTheme.gridx = 4;
+		gbc_dropdownTheme.gridx = 5;
 		gbc_dropdownTheme.gridy = 4;
 		prefMenu.add(dropdownTheme, gbc_dropdownTheme);
 
 		GradientButton btnCancel = new GradientButton("Cancel", buttonColor);
 		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
-		gbc_btnCancel.anchor = GridBagConstraints.WEST;
+		gbc_btnCancel.anchor = GridBagConstraints.EAST;
 		gbc_btnCancel.insets = new Insets(0, 0, 0, 5);
-		gbc_btnCancel.gridx = 3;
+		gbc_btnCancel.gridx = 4;
 		gbc_btnCancel.gridy = 6;
 		prefMenu.add(btnCancel, gbc_btnCancel);
 		btnCancel.addActionListener(new ActionListener() {
@@ -2121,9 +2125,11 @@ public class GUI{
 		});
 
 		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
+		btnSavePreferences.setText(" Save ");
 		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
+		gbc_btnSavePreferences.anchor = GridBagConstraints.WEST;
 		gbc_btnSavePreferences.insets = new Insets(0, 0, 0, 5);
-		gbc_btnSavePreferences.gridx = 4;
+		gbc_btnSavePreferences.gridx = 6;
 		gbc_btnSavePreferences.gridy = 6;
 		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
 		// Return to previous view

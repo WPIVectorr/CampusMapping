@@ -36,6 +36,10 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.ComboBoxUI;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
+import javax.swing.plaf.basic.BasicComboBoxUI;
+import javax.swing.plaf.metal.MetalComboBoxUI;
 import javax.swing.text.JTextComponent;
 
 import database.AlreadyExistsException;
@@ -387,6 +391,7 @@ public class GUI implements Runnable{
 				frame.repaint();
 			}
 		});
+		
 
 		destMapsDropDown.addItem("Select Map");
 		startMapsDropDown.addItem("Select Map");
@@ -699,7 +704,7 @@ public class GUI implements Runnable{
 						
 						if(txtSearchStart.getCaretPosition()>0)
 						{
-							
+						
 							searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
 							System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
 							searchStartPointName = googleStart.searchFor(searchString);
@@ -708,6 +713,9 @@ public class GUI implements Runnable{
 								//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
 								
 								txtSearchStart.setText(searchStartPointName);
+								//txtSearchStart.select(0, searchString.length());
+							//	txtSearchStart.selectAll();
+								//txtSearchStart.setSelectedTetColor(Color.RED);
 								txtSearchStart.setCaretPosition(searchString.length());
 								System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
 							}else{
@@ -1231,6 +1239,7 @@ public class GUI implements Runnable{
 
 					startMapsDropDown.setSelectedIndex(destMapsDropDown.getSelectedIndex());
 					startBuilds.setSelectedIndex(destBuilds.getSelectedIndex());
+					
 
 					destMapsDropDown.setSelectedIndex(startMapIndex);
 					destBuilds.setSelectedIndex(startPointIndex);
@@ -2450,7 +2459,6 @@ public class GUI implements Runnable{
 				frame.repaint();
 			}
 		});
-
 		return prefMenu;
 	}
 
@@ -2461,12 +2469,12 @@ public class GUI implements Runnable{
 		if(guiThreadObject == null)
 		{
 			guiThreadObject= new Thread (gui, "GUI Thread");
-			guiThreadObject.setPriority(8);
+			guiThreadObject.setPriority(4);
 			guiThreadObject.start();
 
 		}
 
-	}
+	}				
 
 
 	public double getMaxXPoint(ArrayList<Point> pointList){
@@ -2904,12 +2912,8 @@ public class GUI implements Runnable{
 
 
 		try {
-			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
-					UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
 		} catch (Exception e) {
 			// If Nimbus is not available, use lookAndFeel of current system
 			try {

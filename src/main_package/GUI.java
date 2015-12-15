@@ -183,12 +183,15 @@ public class GUI implements Runnable{
 	private double destStarY;
 
 	
-	private ArrayList<Point> searchStartPoint;
+	private static String searchStartPointName;
+	private static String searchDestPointName;
+	private static Point searchStartPoint;
+	private static Point searchDestPoint;
 	private Map searchStartMap;
-	private ArrayList<Point> searchDestPoint;
 	private Map searchDestMap;
 	private static SearchLocation googleStart = new SearchLocation();
 	private static SearchLocation googleDest = new SearchLocation();
+
 	
 	
 	
@@ -731,7 +734,7 @@ public class GUI implements Runnable{
 							minZoomSize = 1 / ((double) img.getHeight() / (double) drawPanel.getHeight());
 						}
 					}
-					System.out.println(minZoomSize);
+					//System.out.println(minZoomSize);
 					double oldWidth = (img.getWidth() * scaleSize);
 					double oldHeight = (img.getHeight() * scaleSize);
 					if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(mapTitle.equals("Select Map")))) {
@@ -879,17 +882,17 @@ public class GUI implements Runnable{
 				// TODO Auto-generated method stub
 				if(startSearchTypeEvent.getKeyCode() != KeyEvent.VK_ENTER )
 				{
+					String searchString;
 					try{
-						String searchString;
+						
 						if(txtSearchStart.getCaretPosition()>0)
 						{
 							
 							searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
 							System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
-							searchStartPoint = googleStart.searchFor(searchString);
-							if(searchStartPoint.size() != 0 )
+							searchStartPointName = googleStart.searchFor(searchString);
+							if(searchStartPointName != "" )
 							{
-								String searchStartPointName = searchStartPoint.get(0).getName();
 								//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
 								
 								txtSearchStart.setText(searchStartPointName);
@@ -905,13 +908,14 @@ public class GUI implements Runnable{
 					}catch(java.lang.IllegalArgumentException searchExcept1){
 						
 					}
-				}else if(searchStartPoint.get(0) != null)
+				}else if(searchStartPointName != "")
 				{
-				System.out.println("Enter Pressed, Point: "+searchStartPoint.get(0).getName());
+					searchStartPoint = googleStart.getPointFromName(searchStartPointName);
+				System.out.println("Enter Pressed, Point: "+searchStartPoint.getName());
 					
 					for(int i=0;i<maps.size();i++)
 					{
-						if(searchStartPoint.get(0).getMapId() == maps.get(i).getMapId())
+						if(searchStartPoint.getMapId() == maps.get(i).getMapId())
 						{
 							System.out.println("MapSearchedName: "+maps.get(i).getMapName());
 							startMapsDropDown.setSelectedIndex(i+1);
@@ -920,7 +924,7 @@ public class GUI implements Runnable{
 					
 					for(int i=0; i<startBuilds.getItemCount();i++)
 					{
-						if(searchStartPoint.get(0).equals(startBuilds.getItemAt(i)))
+						if(searchStartPoint.equals(startBuilds.getItemAt(i)))
 							startBuilds.setSelectedIndex(i);
 					}
 				}
@@ -983,10 +987,10 @@ public class GUI implements Runnable{
 						
 						searchString = txtSearchDest.getText().substring(0, txtSearchDest.getCaretPosition());
 						//System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
-						searchDestPoint = googleDest.searchFor(searchString);
-						if(searchDestPoint.size() != 0 )
+						searchDestPointName = googleDest.searchFor(searchString);
+						if(searchDestPointName != "")
 						{
-							String searchDestPointName = searchDestPoint.get(0).getName();
+							//String searchDestPointName = searchDestPoint.get(0).getName();
 							//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
 							
 							txtSearchDest.setText(searchDestPointName);
@@ -1003,13 +1007,14 @@ public class GUI implements Runnable{
 					
 				}
 				
-			}else if(searchDestPoint.get(0) != null)
+			}else if(searchDestPointName != "")
 				{
-				System.out.println("Enter Pressed, Point: "+searchDestPoint.get(0).getName());
+				searchDestPoint = googleDest.getPointFromName(searchDestPointName);
+				System.out.println("Enter Pressed, Point: "+searchDestPoint.getName());
 					
 					for(int i=0;i<maps.size();i++)
 					{
-						if(searchDestPoint.get(0).getMapId() == maps.get(i).getMapId())
+						if(searchDestPoint.getMapId() == maps.get(i).getMapId())
 						{
 							System.out.println("MapSearchedName: "+maps.get(i).getMapName());
 							destMapsDropDown.setSelectedIndex(i+1);
@@ -1018,7 +1023,7 @@ public class GUI implements Runnable{
 					
 					for(int i=0; i<destBuilds.getItemCount();i++)
 					{
-						if(searchDestPoint.get(0).equals(destBuilds.getItemAt(i)))
+						if(searchDestPoint.equals(destBuilds.getItemAt(i)))
 							destBuilds.setSelectedIndex(i);
 					}
 				}
@@ -1677,7 +1682,7 @@ public class GUI implements Runnable{
 					if (WidthSize > (double) drawPanel.getHeight()) {
 						minZoomSize = 1 / ((double) img.getHeight() / (double) drawPanel.getHeight());
 					}
-					System.out.println(minZoomSize);
+					//System.out.println(minZoomSize);
 					double oldWidth = (img.getWidth() * scaleSize);
 					double oldHeight = (img.getHeight() * scaleSize);
 					if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && !mapTitle.equals("SelectMap")){

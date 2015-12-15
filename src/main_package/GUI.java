@@ -185,9 +185,10 @@ public class GUI implements Runnable{
 	
 	private ArrayList<Point> searchStartPoint;
 	private Map searchStartMap;
-	private Point searchDestPoint;
+	private ArrayList<Point> searchDestPoint;
 	private Map searchDestMap;
-	private static SearchLocation google = new SearchLocation();
+	private static SearchLocation googleStart = new SearchLocation();
+	private static SearchLocation googleDest = new SearchLocation();
 	
 	
 	
@@ -221,7 +222,8 @@ public class GUI implements Runnable{
 			}
 		}
 		//System.out.println("------------------edges check-------------------");
-		google.prepData(allPoints);
+		googleStart.prepData(allPoints);
+		googleDest.prepData(allPoints);
 
 
 		mainMenu = new JPanel();
@@ -873,34 +875,55 @@ public class GUI implements Runnable{
 			}
 			
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(KeyEvent startSearchTypeEvent) {
 				// TODO Auto-generated method stub
-				try{
-					if(txtSearchStart.getCaretPosition()>0)
-					{
+				if(startSearchTypeEvent.getKeyCode() != KeyEvent.VK_ENTER )
+				{
+					try{
 						String searchString;
-						
-						searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
-						System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
-						searchStartPoint = google.searchFor(searchString);
-						if(searchStartPoint.size() != 0 )
+						if(txtSearchStart.getCaretPosition()>0)
 						{
-							String searchStartPointName = searchStartPoint.get(0).getName();
-							//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
 							
-							txtSearchStart.setText(searchStartPointName);
-							txtSearchStart.setCaretPosition(searchString.length());
-							System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+							searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
+							System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
+							searchStartPoint = googleStart.searchFor(searchString);
+							if(searchStartPoint.size() != 0 )
+							{
+								String searchStartPointName = searchStartPoint.get(0).getName();
+								//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+								
+								txtSearchStart.setText(searchStartPointName);
+								txtSearchStart.setCaretPosition(searchString.length());
+								System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+							}else{
+								System.out.println("no autocomplete found");
+							}
 						}else{
-							System.out.println("no autocomplete found");
+							txtSearchStart.setText("");
+							searchString = "";
 						}
-					}else{
-						txtSearchStart.setText("");
+					}catch(java.lang.IllegalArgumentException searchExcept1){
+						
 					}
-				}catch(java.lang.IllegalArgumentException searchExcept1){
+				}else if(searchStartPoint.get(0) != null)
+				{
+				System.out.println("Enter Pressed, Point: "+searchStartPoint.get(0).getName());
 					
+					for(int i=0;i<maps.size();i++)
+					{
+						if(searchStartPoint.get(0).getMapId() == maps.get(i).getMapId())
+						{
+							System.out.println("MapSearchedName: "+maps.get(i).getMapName());
+							startMapsDropDown.setSelectedIndex(i+1);
+						}
+					}
+					
+					for(int i=0; i<startBuilds.getItemCount();i++)
+					{
+						if(searchStartPoint.get(0).equals(startBuilds.getItemAt(i)))
+							startBuilds.setSelectedIndex(i);
+					}
 				}
-				
 			}
 			
 			@Override
@@ -946,34 +969,60 @@ public class GUI implements Runnable{
 			}
 			
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(KeyEvent destSearchTypeEvent) {
 				// TODO Auto-generated method stub
+			if(destSearchTypeEvent.getKeyCode() != KeyEvent.VK_ENTER )
+			{
+				System.out.println(destSearchTypeEvent.getKeyCode());
 				try
 				{
+					String searchString;
+
 					if(txtSearchDest.getCaretPosition()>0)
 					{
-						String searchString;
 						
 						searchString = txtSearchDest.getText().substring(0, txtSearchDest.getCaretPosition());
-						System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
-						searchStartPoint = google.searchFor(searchString);
-						if(searchStartPoint.size() != 0 )
+						//System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
+						searchDestPoint = googleDest.searchFor(searchString);
+						if(searchDestPoint.size() != 0 )
 						{
-							String searchStartPointName = searchStartPoint.get(0).getName();
+							String searchDestPointName = searchDestPoint.get(0).getName();
 							//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
 							
-							txtSearchDest.setText(searchStartPointName);
+							txtSearchDest.setText(searchDestPointName);
 							txtSearchDest.setCaretPosition(searchString.length());
-							System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+							System.out.println("Search Term: "+searchString+" Result: "+searchDestPointName);
 						}else{
 							System.out.println("no autocomplete found");
 						}
 					}else{
 						txtSearchDest.setText("");
+						searchString ="";
 					}
 				}catch(java.lang.IllegalArgumentException searchExcept1){
 					
 				}
+				
+			}else if(searchDestPoint.get(0) != null)
+				{
+				System.out.println("Enter Pressed, Point: "+searchDestPoint.get(0).getName());
+					
+					for(int i=0;i<maps.size();i++)
+					{
+						if(searchDestPoint.get(0).getMapId() == maps.get(i).getMapId())
+						{
+							System.out.println("MapSearchedName: "+maps.get(i).getMapName());
+							destMapsDropDown.setSelectedIndex(i+1);
+						}
+					}
+					
+					for(int i=0; i<destBuilds.getItemCount();i++)
+					{
+						if(searchDestPoint.get(0).equals(destBuilds.getItemAt(i)))
+							destBuilds.setSelectedIndex(i);
+					}
+				}
+				
 			}
 			
 			@Override

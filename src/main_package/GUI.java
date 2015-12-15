@@ -701,7 +701,7 @@ public class GUI implements Runnable{
 						
 						if(txtSearchStart.getCaretPosition()>0)
 						{
-							
+						
 							searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
 							System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
 							searchStartPointName = googleStart.searchFor(searchString);
@@ -710,6 +710,9 @@ public class GUI implements Runnable{
 								//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
 								
 								txtSearchStart.setText(searchStartPointName);
+								//txtSearchStart.select(0, searchString.length());
+							//	txtSearchStart.selectAll();
+								//txtSearchStart.setSelectedTextColor(Color.RED);
 								txtSearchStart.setCaretPosition(searchString.length());
 								System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
 							}else{
@@ -1224,6 +1227,7 @@ public class GUI implements Runnable{
 
 					startMapsDropDown.setSelectedIndex(destMapsDropDown.getSelectedIndex());
 					startBuilds.setSelectedIndex(destBuilds.getSelectedIndex());
+					
 
 					destMapsDropDown.setSelectedIndex(startMapIndex);
 					destBuilds.setSelectedIndex(startPointIndex);

@@ -44,15 +44,15 @@ public class GradientButton extends JButton{
         GradientPaint gp = new GradientPaint(0, 0, baseColor.brighter(), 0, getHeight(), baseColor.darker());
 
         g2d.setPaint(gp);
-        if(System.getProperty("os.name").toLowerCase().startsWith("mac"))
-        {
+        //if(System.getProperty("os.name").toLowerCase().startsWith("mac"))
+        //{
 		    // Draws a round rectangle with gradient color specified previously
 		    g2d.fillRoundRect(3, 3, getWidth()-6, getHeight()-6, 5, 5);
 		
 		    // Draws a black border around the rectangle 
 		    g2d.setColor(Color.BLACK);
 		    //g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 5, 5);
-        }
+        //}
         super.paintComponent(g);
     }
 }

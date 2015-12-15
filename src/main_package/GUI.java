@@ -1275,6 +1275,14 @@ public class GUI implements Runnable{
 						startStarX = ((Point)(startBuilds.getSelectedItem())).getLocX();
 						startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
 						startMap = currentMap;
+						startPoint = (Point) startBuilds.getSelectedItem();
+						if(destPoint != destPointName && startPoint != startPointName && !(destPoint == startPoint)){
+							startPoint = startPointName;
+							startBuilds.setSelectedItem(startPointName);
+							startIsSelected = false;
+						} else { 
+							startIsSelected = true;
+						}
 						frame.repaint();
 					}
 				}
@@ -2542,145 +2550,33 @@ public class GUI implements Runnable{
 			
 			
 			
-			if (!showRoute && route == null) {
-				//Draws the points in each room so that the user can select each point as a source or destination
-				if(roomPointsToDraw != null && roomPointsToDraw.size() != 0){
-					System.out.println("roomPointsToDraw size: " + roomPointsToDraw.size());
-
-					for (int i = 0; i < roomPointsToDraw.size(); i++){
-						int point1x = (int)((roomPointsToDraw.get(i).getLocX()*newImageWidth)+drawnposx);
-						int point1y = (int)((roomPointsToDraw.get(i).getLocY()*newImageHeight)+drawnposy);			
-						g.setColor(pointColor);
-						g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
-						g.setColor(Color.BLACK);
-						g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
-					}
-				}
-				for(int i = 0; i < roomPointsToDraw.size(); i++){
-					double posx = ((roomPointsToDraw.get(i).getLocX()*newImageWidth)+drawnposx);
-					double posy = ((roomPointsToDraw.get(i).getLocY()*newImageHeight)+drawnposy);
-
-					DEBUG = false;
-					if(DEBUG){
-						System.out.println(i + " - Point Name: " + roomPointsToDraw.get(i).getName());
-						System.out.println("posx: " + posx);
-						System.out.println("posy: " + posy);
-						System.out.println("lastMouseX: " + lastMouseX);
-						System.out.println("lastMouseY: " + lastMouseY);
-						System.out.println("startIsSelected: " + startIsSelected);
-						System.out.println("startPoint ID: " + startPoint.getName());
-						if(startMap != null)
-							System.out.println("Current Start Map Name: " + startMap.getMapId());
-						System.out.println("------------------------------------");
-						System.out.println("destPoint ID: " + destPoint.getName());
-						if(selectedPointID != null)
-							System.out.println("Selected Point ID: " + selectedPointID);
-						System.out.println("destIsSelected: " + destIsSelected);
-						if(destMap != null)
-							System.out.println("Current Dest Map Name: " + destMap.getMapId());
-						System.out.println("------------------------------------");
-					}
-					DEBUG = false;
-					if ((lastMouseX > posx - (pointSize + (1*scaleSize))
-							&& lastMouseX < posx + (pointSize + (1*scaleSize)))
-							&& (lastMouseY > posy - (pointSize + (1*scaleSize))
-									&& lastMouseY < posy + (pointSize + (1*scaleSize)))) {
-						//If there is a new click action and a start point has not been selected then the start point is set
-						if(DEBUG){
-							System.out.println("Point Name: " + roomPointsToDraw.get(i).getName());
-						}
-						selectedPoint = roomPointsToDraw.get(i);
-						selectedPointID = selectedPoint.getId();
-
-
-						System.out.println("newClick: " + newClick);
-						System.out.println("selectedPointID is null: " + (selectedPointID == null));
-
-						//select the starting point
-						if(!(startIsSelected)){
-							if (newClick == true && startPoint.getName().equals("Select Start Location")) {
-								//if we select a new point to edit
-								startPoint = selectedPoint;
-								startPointIndex = i;
-								System.out.println("Set the startPoint to first point clicked");
-
-								//set the drop down for points
-								//startBuilds.setSelectedIndex(tempStartRoom.indexOf(roomPointsToDraw.get(i)));
-								startBuilds.setSelectedItem(startPoint);
-
-
-								System.out.println("starBuilds selectedIndex: " + startBuilds.getSelectedIndex());
-
-								newClick = false;
-								startIsSelected = true;
-							}
-						}
-
-						//unselect the starting point
-						if(startIsSelected){
-							if(newClick == true && selectedPointID.equals(startPoint.getId()) && startIsSelected){
-								startPoint = startPointName;
-								startPointIndex = 0;
-								startBuilds.setSelectedItem(startPointName);
-								System.out.println("Unselected the startPoint");
-								newClick = false;
-								startIsSelected = false;
-							}
-						}
-
-						//select destination point
-						if(!(destIsSelected)){
-							if(newClick == true && destPoint.getName().equals("Select Destination Location") ){
-								System.out.println("Set the Selected Destination Point");
-								destPoint = selectedPoint;
-								destPointIndex = i;
-								destBuilds.setSelectedItem(destPoint);
-								System.out.println("Unselected the destPoint");
-								newClick = false;
-								destIsSelected = true;
-							}
-						}
-
-						//unselect the destination point
-						if(destIsSelected){
-							if(newClick == true && destPoint.getId().equals(destPointName.getId()) && destIsSelected){
-								destPoint = destPointName;
-								destPointIndex = 0;
-								destBuilds.setSelectedItem(destPointName);
-								System.out.println("Unselected the destPoint");
-								newClick = false;
-								destIsSelected = false;
-							}
-						}
-					}
-					mainMenu.repaint();
-				}
+			
 
 
 
-				if(startMap != null && currentMap != null && currentMap.getMapId() == startMap.getMapId()){
-					if(startPoint.getId() != null && !(startPoint.getName().equals(startPointName.getName())) && currentMap.getMapId() == startPoint.getMapId()){
-						int point1x = (int)((startPoint.getLocX()*newImageWidth)+drawnposx);
-						int point1y = (int)((startPoint.getLocY()*newImageHeight)+drawnposy);			
-						g.setColor(Color.GREEN);
-						g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
-						g.setColor(Color.BLACK);
-						g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
-					}
-				}
-
-
-				if(destMap != null && currentMap != null && currentMap.getMapId() == destMap.getMapId()){
-					if(destPoint.getId() != null && !(destPoint.getName().equals(destPointName.getName())) && currentMap.getMapId() == destPoint.getMapId()){
-						int point1x = (int)((destPoint.getLocX()*newImageWidth)+drawnposx);
-						int point1y = (int)((destPoint.getLocY()*newImageHeight)+drawnposy);			
-						g.setColor(Color.RED);
-						g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
-						g.setColor(Color.BLACK);
-						g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
-					}
+			if(startMap != null && currentMap != null && currentMap.getMapId() == startMap.getMapId()){
+				if(startPoint.getId() != null && !(startPoint.getName().equals(startPointName.getName())) && currentMap.getMapId() == startPoint.getMapId()){
+					int point1x = (int)((startPoint.getLocX()*newImageWidth)+drawnposx);
+					int point1y = (int)((startPoint.getLocY()*newImageHeight)+drawnposy);			
+					g.setColor(Color.GREEN);
+					g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+					g.setColor(Color.BLACK);
+					g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
 				}
 			}
+
+
+			if(destMap != null && currentMap != null && currentMap.getMapId() == destMap.getMapId()){
+				if(destPoint.getId() != null && !(destPoint.getName().equals(destPointName.getName())) && currentMap.getMapId() == destPoint.getMapId()){
+					int point1x = (int)((destPoint.getLocX()*newImageWidth)+drawnposx);
+					int point1y = (int)((destPoint.getLocY()*newImageHeight)+drawnposy);			
+					g.setColor(Color.RED);
+					g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+					g.setColor(Color.BLACK);
+					g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+				}
+			}
+			
 			
 			if (showStartPoint && !(startPoint.getName().equals("Select Start Location"))){
 				Shape startStar = createStar(5, (int)((startStarX * newImageWidth) + drawnposx) , (int)((startStarY * newImageHeight) + drawnposy), 7, 12);

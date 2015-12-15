@@ -1,43 +1,27 @@
 package main_package;
 
 
-import javax.swing.JFrame;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-
-import com.mysql.fabric.Server;
-
-import database.AlreadyExistsException;
-import database.DoesNotExistException;
-import database.InsertFailureException;
-import database.NoMapException;
-import database.PopulateErrorException;
-import database.ServerDB;
-import main_package.MapUpdaterGUI.DrawPanel;
-
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -47,9 +31,17 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import database.AlreadyExistsException;
+import database.DoesNotExistException;
+import database.PopulateErrorException;
+import database.ServerDB;
 
 
 public class PointEditerGUI extends JFrame {
@@ -101,13 +93,15 @@ public class PointEditerGUI extends JFrame {
 	private double newImageWidth;
 	private boolean scrolled = false;
 	private ArrayList<Map> emptyMaps;
+	private Map currentMap;
+	private int mousezoomx;
+	private int mousezoomy;
+	private double minZoomSize;
 	
 //=============================set grid size==============================================
 	
 	private double gridSize = 0.005;
-	protected int mousezoomx;
-	protected int mousezoomy;
-	protected double minZoomSize;
+	
 
 //=============================set grid size==============================================
 
@@ -286,9 +280,21 @@ public class PointEditerGUI extends JFrame {
 		}	
 		btnConfirmSelection.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent a){
-				
+				for(int i = 0; i < pointArray.size(); i++){
+					/*try {
+							ServerDB.updatePoint(pointArray.get(i));
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (DoesNotExistException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}*/
+				}
 			}
 		});
+		
+		
 		
 		changexneg.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent a){
@@ -325,8 +331,8 @@ public class PointEditerGUI extends JFrame {
 					for(int i = 0; i < pointArray.size(); i++){
 						double pointposx = (pointArray.get(i).getLocX()*newImageWidth)+drawnposx;
 						double pointposy = (pointArray.get(i).getLocY()*newImageHeight)+drawnposy;
-						if(lastMousex < (pointposx+(pointSize/2)) && lastMousex > (pointposx-(pointSize/2))){
-							if(lastMousey < (pointposy+(pointSize/2)) && lastMousey > (pointposy-(pointSize/2))){
+						if(lastMousex < (pointposx+(pointSize)) && lastMousex > (pointposx-(pointSize))){
+							if(lastMousey < (pointposy+(pointSize)) && lastMousey > (pointposy-(pointSize))){
 								currentPoint = pointArray.get(i);
 								i = pointArray.size();
 							}
@@ -374,6 +380,41 @@ public class PointEditerGUI extends JFrame {
 				mousezoomy = j.getY();
 			}
 		});
+		
+		frame.addKeyListener(new KeyListener(){
+			public void keyPressed(KeyEvent e) {
+				System.out.println("key pressed");
+				if (e.getKeyCode() == KeyEvent.VK_LEFT){
+					editPoint(-gridSize,0);
+					System.out.println("left");
+	            }
+	            else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+	            	editPoint(gridSize,0);
+	            	System.out.println("right");
+	            }
+	            else if (e.getKeyCode() == KeyEvent.VK_UP){
+	            	editPoint(0,-gridSize);
+	            	System.out.println("up");
+	            }
+	            else if (e.getKeyCode() == KeyEvent.VK_DOWN){
+	            	editPoint(0,gridSize);
+	            	System.out.println("down");
+	            }
+				
+			}
+
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+	      });
 
 		mapFrame.addMouseWheelListener(new MouseWheelListener(){
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -445,7 +486,7 @@ public class PointEditerGUI extends JFrame {
 		});
 
 		mapDropDown.addActionListener(new ActionListener() {//Open the dropdown menu
-			private Map currentMap;
+			
 
 			public void actionPerformed(ActionEvent a) {
 				pointArray.clear();
@@ -483,11 +524,41 @@ public class PointEditerGUI extends JFrame {
 							for(int j = 0; j < tempArrayList.size(); j++){
 								Point point = tempArrayList.get(j);
 								double newx = (((int)Math.floor((tempArrayList.get(j).getLocX()*(1/gridSize))+.5))*gridSize);
-								//System.out.println("new x pos: "+newx);
 								double newy = (((int)Math.floor((tempArrayList.get(j).getLocY()*(1/gridSize))+.5))*gridSize);
-								//System.out.println("new y pos: "+newy);
-								newpoint = new Point(point.getId(), point.getMapId(), point.getName(), point.getIndex(), newx, newy, point.getGlobX(), 
-										point.getGlobY(), point.getNumEdges(), point.isStairs(), point.isOutside());
+								double ourRotation = currentMap.getRotationAngle();
+								ourRotation = 2 * Math.PI - ourRotation;
+
+								File destinationFile2 = new File("src/VectorMaps/" + "campus" + ".png");
+								destinationFile2 = new File(destinationFile2.getAbsolutePath());
+								BufferedImage campusImage = null;
+								try {
+									campusImage = ImageIO.read(destinationFile2);
+								} catch (IOException e) {
+									System.out.println("Invalid Map Selection");
+									e.printStackTrace();
+								}
+								double tempPreRotateX ;
+								double tempPreRotateY;
+								//System.out.println("At step 1 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+								tempPreRotateX = newx;
+								tempPreRotateY = newy;
+								//System.out.println("At step 2 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+								tempPreRotateX = tempPreRotateX - 0.5;
+								tempPreRotateY = tempPreRotateY - 0.5;
+								//System.out.println("At step 3 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+								tempPreRotateX = tempPreRotateX * currentMap.getWidth();
+								tempPreRotateY = tempPreRotateY * currentMap.getHeight();
+								//System.out.println("At step 4 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+								double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
+								double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+								//System.out.println("At step 5 x is: " + rotateX + " y is: " + rotateY);
+								rotateX = rotateX * campusImage.getWidth();
+								rotateY = rotateY * campusImage.getHeight();
+								//System.out.println("At step 6 x is: " + rotateX + " y is: " + rotateY);
+								int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
+								int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
+								newpoint = new Point(point.getId(), point.getMapId(), point.getName(), point.getIndex(), newx, newy, finalGlobX, 
+										finalGlobY, point.getNumEdges(), point.isStairs(), point.isOutside());
 								newpoint.setEdges(point.getEdges());
 								pointArray.add(newpoint);
 								ArrayList<Edge> tmpEdges = newpoint.getEdges();
@@ -558,7 +629,7 @@ public class PointEditerGUI extends JFrame {
 	}
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
-
+		
 		new PointEditerGUI();
 
 	}
@@ -568,9 +639,45 @@ public class PointEditerGUI extends JFrame {
 		for(int i = 0; i < pointArray.size(); i++){
 			if(currentPoint.getId().equals(pointArray.get(i).getId())){
 				Point point = pointArray.get(i);
-				System.out.println("change in x: "+(point.getLocX()+changex)+", change in y: "+(point.getLocY()+changey));
-				pointtoadd = new Point(point.getId(), point.getMapId(), point.getName(), point.getIndex(), (point.getLocX()+changex), (point.getLocY()+changey), point.getGlobX(), 
-								point.getGlobY(), point.getNumEdges(), point.isStairs(), point.isOutside());
+				System.out.println("old local pos x: "+point.getLocX()+", old local pos y: "+point.getLocY());
+				System.out.println("new local pos x: "+(point.getLocX()+changex)+", new local pos y: "+(point.getLocY()+changey));
+				Integer nameNumber = currentMap.getPointIDIndex()+1;
+				double ourRotation = currentMap.getRotationAngle();
+				ourRotation = 2 * Math.PI - ourRotation;
+
+				File destinationFile2 = new File("src/VectorMaps/" + "campus" + ".png");
+				destinationFile2 = new File(destinationFile2.getAbsolutePath());
+				BufferedImage campusImage = null;
+				try {
+					campusImage = ImageIO.read(destinationFile2);
+				} catch (IOException e) {
+					System.out.println("Invalid Map Selection");
+					e.printStackTrace();
+				}
+				double tempPreRotateX ;
+				double tempPreRotateY;
+				//System.out.println("At step 1 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+				tempPreRotateX = (point.getLocX()+changex);
+				tempPreRotateY = (point.getLocY()+changey);
+				//System.out.println("At step 2 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+				tempPreRotateX = tempPreRotateX - 0.5;
+				tempPreRotateY = tempPreRotateY - 0.5;
+				//System.out.println("At step 3 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+				tempPreRotateX = tempPreRotateX * currentMap.getWidth();
+				tempPreRotateY = tempPreRotateY * currentMap.getHeight();
+				//System.out.println("At step 4 x is: " + tempPreRotateX + " y is: " + tempPreRotateY);
+				double rotateX = Math.cos(ourRotation) * tempPreRotateX - Math.sin(ourRotation) * tempPreRotateY;
+				double rotateY = Math.sin(ourRotation) * tempPreRotateX + Math.cos(ourRotation) * tempPreRotateY;
+				//System.out.println("At step 5 x is: " + rotateX + " y is: " + rotateY);
+				rotateX = rotateX * campusImage.getWidth();
+				rotateY = rotateY * campusImage.getHeight();
+				//System.out.println("At step 6 x is: " + rotateX + " y is: " + rotateY);
+				int finalGlobX = (int) Math.round(rotateX + (campusImage.getWidth() * (currentMap.getxTopLeft() + currentMap.getxBotRight()) / 2));
+				int finalGlobY = (int) Math.round(rotateY + (campusImage.getHeight() * (currentMap.getyTopLeft() + currentMap.getyBotRight()) / 2));
+				System.out.println("old global pos x: "+point.getGlobX()+", old global pos y: "+point.getGlobY());
+				System.out.println("new global pos x: "+finalGlobX+", new global pos y: "+finalGlobY);
+				pointtoadd = new Point(point.getId(), point.getMapId(), point.getName(), point.getIndex(), (point.getLocX()+changex), (point.getLocY()+changey), finalGlobX, 
+								finalGlobY, point.getNumEdges(), point.isStairs(), point.isOutside());
 						pointtoadd.setEdges(point.getEdges());
 				pointArray.remove(i);
 				pointArray.add(pointtoadd);

@@ -4,9 +4,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Box;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import database.AlreadyExistsException;
 import database.DoesNotExistException;
@@ -27,22 +31,23 @@ import database.InsertFailureException;
 import database.ServerDB;
 import database.NoMapException;
 import database.PopulateErrorException;
+import javax.swing.border.EtchedBorder;
 
 public class MapUpdaterGUI extends MapUpdaterControl{
 
 	private int lastMousex, lastMousey;
 	private int pointSize = 10;
 	private boolean newClick = false;
-	
 
-	
+
+
 	String name = "Select Map";
 	File logo;
 	int prevRadButtonVal = 0;
 
 	//private static ServerDB md = ServerDB.getInstance();
 
-	
+
 
 	// ---------------------------------
 	private double windowScale = 2;
@@ -70,7 +75,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 	private static JComboBox<String> mapDropDown;
 	private File mapToAdd;
 	private JCheckBox chckbxPathMode;
-	
+
 
 	private Color buttonColor = new Color(153, 204, 255);
 
@@ -85,9 +90,9 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 	//private ArrayList<Map> maps = new ArrayList<Map>();
 	private static ArrayList<Map> emptyMaps = new ArrayList<Map>();
 	private JButton btnConnectToOther;
-	
+
 	private static SplashPage loadingAnimation = new SplashPage("updater Splash");
-	
+
 	private boolean drawnfirst = false;
 	private int screenHeight;
 	private int screenWidth;
@@ -105,6 +110,12 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 	private double mousezoomy;
 	private boolean scrolled = false;
 	private double minZoomSize;
+	private JScrollPane scrollPaneHelp;
+	private JTextArea textAreaHelp;
+	private Component verticalStrut_1;
+	private Component verticalStrut_2;
+	private Component horizontalStrut;
+	private Component horizontalStrut_1;
 
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException {
@@ -143,12 +154,37 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 
 		tabs.addTab("Maps", createMapsPanel());
 		tabs.addTab("Points", createPointsPanel());
-		
+		tabs.addTab("Help", createHelpPanel());
+
+		tabs.addChangeListener(new ChangeListener(){
+			public void stateChanged(ChangeEvent event) {
+				if (tabs.getSelectedIndex() == 2){
+					drawPanel.setVisible(false);
+					try{
+						FileReader reader = new FileReader("src/VectorLogo/helpUpdater.txt");
+						BufferedReader br = new BufferedReader(reader);	
+						textAreaHelp.read( br, null );
+						br.close();
+						textAreaHelp.requestFocus();
+						scrollPaneHelp.setPreferredSize(new Dimension(1000, 550));
+					}
+					catch(Exception e2) { 
+						System.out.println(e2); 
+					}
+				}
+				else{
+					drawPanel.setVisible(true);
+					textAreaHelp.setText("");
+					scrollPaneHelp.setPreferredSize(new Dimension(10, 10));
+				}
+			}
+		});
+
 
 		buttonPanel.add(tabs, BorderLayout.NORTH);
 
 		frame.getContentPane().add(drawPanel);
-		
+
 		drawPanel.setBackground(Color.WHITE);
 
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -257,9 +293,9 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		gbc_label.gridx = 2;
 		gbc_label.gridy = 0;
 		mapsLoadingLabel.setVisible(false);
-		
-		
-		
+
+
+
 
 		// When the Updater opens the software the list will be populated with
 		// the files in
@@ -687,7 +723,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		gbc_chckbxPathMode.gridx = 3;
 		gbc_chckbxPathMode.gridy = 1;
 		pointsPanel.add(chckbxPathMode, gbc_chckbxPathMode);
-		
+
 		chckbxPathMode.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -699,7 +735,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 				}
 			}
 		});
-		
+
 		isOutsideBox = new JCheckBox("Outside");
 		isOutsideBox.setEnabled(false);
 		GridBagConstraints gbc_isOutsideBox= new GridBagConstraints();
@@ -708,7 +744,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		gbc_isOutsideBox.gridx = 3;
 		gbc_isOutsideBox.gridy = 3;
 		pointsPanel.add(isOutsideBox, gbc_isOutsideBox);
-		
+
 		isOutsideBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent g) {
 				if(isOutsideBox.isSelected()){
@@ -725,7 +761,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 							}
 						}
 					}
-						
+
 					if(DEBUG)
 						System.out.println("IsOutsideBox: true");
 				}
@@ -748,8 +784,8 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 				}
 			}
 		});
-				
-		
+
+
 		isStairsBox = new JCheckBox("Stairs");
 		isStairsBox.setEnabled(false);
 		GridBagConstraints gbc_isStairsBox= new GridBagConstraints();
@@ -758,7 +794,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		gbc_isStairsBox.gridx = 3;
 		gbc_isStairsBox.gridy = 2;
 		pointsPanel.add(isStairsBox, gbc_isStairsBox);
-		
+
 		isStairsBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent g) {
 				if(isStairsBox.isSelected()){
@@ -774,10 +810,10 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 								}
 							}
 						}
-						
-						
+
+
 					}
-						
+
 					if(DEBUG)
 						System.out.println("IsOutsideBox: true");
 				}
@@ -801,9 +837,9 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 				}
 			}
 		});
-		
-		
-		
+
+
+
 
 
 		// creates a centered text field that will write back the users info
@@ -929,18 +965,18 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		});
 
 		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
-			 
-            @Override
-            public void ancestorMoved(HierarchyEvent e) {
-                           
-            }
-            @Override
-            public void ancestorResized(HierarchyEvent e) {
-            	drawnfirst = false;
-                frame.repaint();
-            }           
-        });
-		
+
+			@Override
+			public void ancestorMoved(HierarchyEvent e) {
+
+			}
+			@Override
+			public void ancestorResized(HierarchyEvent e) {
+				drawnfirst = false;
+				frame.repaint();
+			}           
+		});
+
 		drawPanel.addMouseMotionListener(new MouseMotionListener(){
 			public void mouseDragged(MouseEvent g){
 				//System.out.println("dragged");
@@ -1015,10 +1051,10 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 						}
 						drawPanel.repaint();
 					} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
-	
+
 					}
 				}
-				
+
 				// System.out.println(message);
 			}
 		});
@@ -1174,6 +1210,62 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 
 	}
 
+	public JComponent createHelpPanel(){
+		JPanel helpPanel = new JPanel();
+		helpPanel.setBackground(new Color(255, 235, 205));
+		GridBagLayout gbl_helpPanel = new GridBagLayout();
+		gbl_helpPanel.columnWidths = new int[]{0, 1150, 0, 0};
+		gbl_helpPanel.rowHeights = new int[]{0, 167, 0, 0};
+		gbl_helpPanel.columnWeights = new double[]{0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_helpPanel.rowWeights = new double[]{1.0, 0.0, 0.0, Double.MIN_VALUE};
+		helpPanel.setLayout(gbl_helpPanel);
+
+		verticalStrut_1 = Box.createVerticalStrut(20);
+		GridBagConstraints gbc_verticalStrut_1 = new GridBagConstraints();
+		gbc_verticalStrut_1.insets = new Insets(0, 0, 5, 5);
+		gbc_verticalStrut_1.gridx = 1;
+		gbc_verticalStrut_1.gridy = 0;
+		helpPanel.add(verticalStrut_1, gbc_verticalStrut_1);
+
+		horizontalStrut = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
+		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 5);
+		gbc_horizontalStrut.gridx = 0;
+		gbc_horizontalStrut.gridy = 1;
+		helpPanel.add(horizontalStrut, gbc_horizontalStrut);
+
+		scrollPaneHelp = new JScrollPane();
+		scrollPaneHelp.setViewportBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		scrollPaneHelp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		GridBagConstraints gbc_scrollPaneHelp = new GridBagConstraints();
+		gbc_scrollPaneHelp.insets = new Insets(0, 0, 5, 5);
+		gbc_scrollPaneHelp.fill = GridBagConstraints.BOTH;
+		gbc_scrollPaneHelp.gridx = 1;
+		gbc_scrollPaneHelp.gridy = 1;
+		helpPanel.add(scrollPaneHelp, gbc_scrollPaneHelp);
+		scrollPaneHelp.setPreferredSize(new Dimension(10, 10));
+
+		textAreaHelp = new JTextArea();
+		textAreaHelp.setEditable(false);
+		scrollPaneHelp.setViewportView(textAreaHelp);
+
+		horizontalStrut_1 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
+		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 0);
+		gbc_horizontalStrut_1.gridx = 2;
+		gbc_horizontalStrut_1.gridy = 1;
+		helpPanel.add(horizontalStrut_1, gbc_horizontalStrut_1);
+
+		verticalStrut_2 = Box.createVerticalStrut(20);
+		GridBagConstraints gbc_verticalStrut_2 = new GridBagConstraints();
+		gbc_verticalStrut_2.insets = new Insets(0, 0, 0, 5);
+		gbc_verticalStrut_2.gridx = 1;
+		gbc_verticalStrut_2.gridy = 2;
+		helpPanel.add(verticalStrut_2, gbc_verticalStrut_2);
+
+		return helpPanel;
+	}
+
 	public static void setInfo(double x, double y, double x2, double y2, double angle){
 		if(DEBUG)
 			System.out.println("setting info");
@@ -1299,11 +1391,11 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 			// loop)
 			if (newClick == true) {
 				//System.out.println(newClick);
-				
+
 				if (getRadButton() == 1) // if addpoint
 				{
 
-					
+
 					Integer nameNumber = currentMap.getPointIDIndex()+1;
 					double ourRotation = currentMap.getRotationAngle();
 					ourRotation = 2 * Math.PI - ourRotation;
@@ -1350,10 +1442,10 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 					//System.out.println("At step 7 x is: " + finalGlobX + " y is: " + finalGlobY);
 					//if(DEBUG)
 					//System.out.println("Global X is: " + finalGlobX + " and Y is: " + finalGlobY);
-					
+
 					if(DEBUG)
 						System.out.println("newest map id: "+currentMap.getNewPointID());
-					
+
 					System.out.println("Point(x, " + currentMap.getMapId() + ", " + roomNumber.getText() + ", y, " + LocalX + ", " + LocalY + ", " + finalGlobX + ", " + finalGlobY + ", " + numEdges + ");");
 					Point point = new Point(currentMap.getNewPointID(), currentMap.getMapId(),
 							roomNumber.getText(), currentMap.getPointIDIndex(),
@@ -1426,7 +1518,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 									editingPoint = true;
 									roomNumber.setText(editPoint.getName());
 									btnSavePoint.setText("Unselect Current Point");
-									
+
 								} else if (newClick == true && editingPoint == true) {
 									if(editPoint.getId().contentEquals(currentPoint.getId())){
 
@@ -1512,13 +1604,13 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 
 									}
 								}
-								
+
 								repaint();
 							}
 							break;
 						case 3:// remove points
 							editingPoint = false;
-							
+
 							if(DEBUG){
 								System.out.println("Remove point called.");
 								System.out.println("Size of edgeArray:"+edgeArray.size());
@@ -1686,7 +1778,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 						//g2D.setColor(Color.RED);
 						double posx = ((editPoint.getLocX()*newImageWidth)+drawnposx);
 						double posy = ((editPoint.getLocY()*newImageHeight)+drawnposy);
-						
+
 						g.fillOval((int)(posx - ((pointSize / 2) + (2))), (int)(posy - ((pointSize / 2)+(2))), (int)(pointSize + (4)), (int)(pointSize + (4)));
 						g.setColor(Color.BLACK);
 						g.drawOval((int)(posx - ((pointSize / 2) + (2))), (int)(posy - ((pointSize / 2)+(2))), (int)(pointSize + (4)), (int)(pointSize + (4)));
@@ -1721,7 +1813,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 				g.setColor(Color.ORANGE);
 				g.fillOval((int)editPoint.getLocX() - 4, (int)editPoint.getLocY() - 4, 8, 8);
 			}
-			
+
 			for( int w = 0; w < pointArray.size(); w++){
 				int drawX = (int) (double)((pointArray.get(w).getLocX()*newImageWidth)+drawnposx);
 				int drawY = (int) (double)((pointArray.get(w).getLocY()*newImageHeight)+drawnposy);
@@ -1771,7 +1863,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 	}
 }
 
-	/*
+/*
 	private Map updateCurrentMap(Map map)
 	{
 		int mapId = map.getMapId();

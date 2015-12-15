@@ -807,27 +807,32 @@ public class GUI implements Runnable{
 			@Override
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
-				if(txtSearchStart.getCaretPosition()>0)
-				{
-					String searchString;
-					
-					searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
-					System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
-					searchStartPoint = google.searchFor(searchString);
-					if(searchStartPoint.size() != 0 )
+				try{
+					if(txtSearchStart.getCaretPosition()>0)
 					{
-						String searchStartPointName = searchStartPoint.get(0).getName();
-						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+						String searchString;
 						
-						txtSearchStart.setText(searchStartPointName);
-						txtSearchStart.setCaretPosition(searchString.length());
-						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+						searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
+						System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
+						searchStartPoint = google.searchFor(searchString);
+						if(searchStartPoint.size() != 0 )
+						{
+							String searchStartPointName = searchStartPoint.get(0).getName();
+							//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+							
+							txtSearchStart.setText(searchStartPointName);
+							txtSearchStart.setCaretPosition(searchString.length());
+							System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+						}else{
+							System.out.println("no autocomplete found");
+						}
 					}else{
-						System.out.println("no autocomplete found");
+						txtSearchStart.setText("");
 					}
-				}else{
-					txtSearchStart.setText("");
+				}catch(java.lang.IllegalArgumentException searchExcept1){
+					
 				}
+				
 			}
 			
 			@Override
@@ -875,26 +880,31 @@ public class GUI implements Runnable{
 			@Override
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
-				if(txtSearchDest.getCaretPosition()>0)
+				try
 				{
-					String searchString;
-					
-					searchString = txtSearchDest.getText().substring(0, txtSearchDest.getCaretPosition());
-					System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
-					searchStartPoint = google.searchFor(searchString);
-					if(searchStartPoint.size() != 0 )
+					if(txtSearchDest.getCaretPosition()>0)
 					{
-						String searchStartPointName = searchStartPoint.get(0).getName();
-						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+						String searchString;
 						
-						txtSearchDest.setText(searchStartPointName);
-						txtSearchDest.setCaretPosition(searchString.length());
-						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+						searchString = txtSearchDest.getText().substring(0, txtSearchDest.getCaretPosition());
+						System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
+						searchStartPoint = google.searchFor(searchString);
+						if(searchStartPoint.size() != 0 )
+						{
+							String searchStartPointName = searchStartPoint.get(0).getName();
+							//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+							
+							txtSearchDest.setText(searchStartPointName);
+							txtSearchDest.setCaretPosition(searchString.length());
+							System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+						}else{
+							System.out.println("no autocomplete found");
+						}
 					}else{
-						System.out.println("no autocomplete found");
+						txtSearchDest.setText("");
 					}
-				}else{
-					txtSearchDest.setText("");
+				}catch(java.lang.IllegalArgumentException searchExcept1){
+					
 				}
 			}
 			

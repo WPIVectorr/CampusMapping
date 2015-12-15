@@ -22,8 +22,8 @@ public class GradientButton extends JButton{
     	super(text);
         this.baseColor = baseColor;
         this.putClientProperty( "JButton.buttonType", "textured" );
-        Border emptyBorder = BorderFactory.createSoftBevelBorder(BevelBorder.LOWERED, baseColor, baseColor);
-        this.setBorder(emptyBorder);
+        //Border emptyBorder = BorderFactory.createSoftBevelBorder(BevelBorder.LOWERED, baseColor, baseColor);
+        this.setColor(baseColor);
         setContentAreaFilled(false);
     }
     

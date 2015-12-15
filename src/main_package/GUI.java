@@ -1650,6 +1650,15 @@ public class GUI implements Runnable{
 							i = maps.size();
 						}
 					}
+					File destinationFile = new File("src/VectorMaps/" + currentMap.getMapName() + ".png");
+					destinationFile = new File(destinationFile.getAbsolutePath());
+					drawnfirst = false;
+					try {
+						img = ImageIO.read(destinationFile);
+					} catch (IOException g) {
+						System.out.println("Invalid Map Selection");
+						g.printStackTrace();
+					}
 					ArrayList<Point> tempPointList = currentMap.getPointList();
 					pointArray = tempPointList;
 					boolean check = true;

@@ -715,7 +715,7 @@ public class GUI implements Runnable{
 								txtSearchStart.setText(searchStartPointName);
 								//txtSearchStart.select(0, searchString.length());
 							//	txtSearchStart.selectAll();
-								//txtSearchStart.setSelectedTextColor(Color.RED);
+								//txtSearchStart.setSelectedTetColor(Color.RED);
 								txtSearchStart.setCaretPosition(searchString.length());
 								System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
 							}else{

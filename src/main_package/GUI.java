@@ -16,6 +16,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -1003,7 +1004,7 @@ public class GUI{
 					showStartPoint = false;
 					try{
 						tempImg = img;
-						img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+						img = ImageIO.read(getClass().getResource("/VectorLogo/VectorrLogo.png"));
 					}
 					catch(IOException g){
 						System.out.println("Invalid logo1");
@@ -1156,7 +1157,7 @@ public class GUI{
 					showDestPoint = false;
 					try{
 						tempImg = img;
-						img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+						img = ImageIO.read(getClass().getResource("/VectorLogo/VectorrLogo.png"));
 					}
 					catch(IOException g){
 						System.out.println("Invalid logo1");
@@ -1794,11 +1795,11 @@ public class GUI{
 		}*/
 
 		//adds the logo to the front screen of the window
-		File logo = new File("src/VectorLogo/VectorrLogo.png");
-		logo = new File(logo.getAbsolutePath());
+/*		File logo = new File("src/VectorLogo/VectorrLogo.png");
+		logo = new File(logo.getAbsolutePath());*/
 		//System.out.println("logoFinal: " + logo);
 		try{
-			img = ImageIO.read(logo);
+			img = ImageIO.read(getClass().getResource("/VectorLogo/VectorrLogo.png"));
 		}
 		catch(IOException g){
 			System.out.println("Invalid logo1");
@@ -1882,7 +1883,7 @@ public class GUI{
 					showStartPoint = false;
 					try{
 						tempImg = img;
-						img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+						img = ImageIO.read(getClass().getResource("VectorLogo/VectorrLogo.png"));
 					}
 					catch(IOException g){
 						System.out.println("Invalid logo1");
@@ -2587,8 +2588,8 @@ public class GUI{
 
 				menus.setVisible(false);
 				try{
-					FileReader reader = new FileReader("src/VectorLogo/helpMain.txt");
-					BufferedReader br = new BufferedReader(reader);
+					//FileReader reader = new FileReader(getClass().getResource("/VectorLogo/helpMain.txt").toString());
+					BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/VectorLogo/helpMain.txt")));
 					textAreaHelp.read( br, null );
 					br.close();
 					textAreaHelp.requestFocus();
@@ -2611,7 +2612,7 @@ public class GUI{
 				roomPointsToDraw.clear();
 				try{
 					tempImg = img;
-					img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+					img = ImageIO.read(getClass().getResource("/VectorLogo/VectorrLogo.png"));
 				}
 				catch(IOException g){
 					System.out.println("Invalid logo1");

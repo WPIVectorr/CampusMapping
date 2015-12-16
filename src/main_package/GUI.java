@@ -2755,45 +2755,48 @@ public class GUI{
 
 		
 		//added by JPG starts and plays the animation
-		loadingAnimation = new SplashPage("GuiSplashThread");
-		loadingAnimation.showSplash();
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
 
 
 		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					
+				}
+			}
 		} catch (Exception e) {
 			// If Nimbus is not available, use lookAndFeel of current system
 			try {
-				UIManager.setLookAndFeel("nimbus");
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch (ClassNotFoundException | InstantiationException
 					| IllegalAccessException | UnsupportedLookAndFeelException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				GUI gui = new GUI();
+	
+				
+				try {
+					gui.createAndShowGUI();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (AlreadyExistsException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 
-		try {
-			gui.createAndShowGUI();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (AlreadyExistsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-		loadingAnimation.hideSplash(0);
+		//loadingAnimation.hideSplash(0);
 
 	}				
 

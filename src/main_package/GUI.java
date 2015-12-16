@@ -188,6 +188,7 @@ public class GUI implements Runnable{
 	private Point selectedPoint;
 	private boolean startIsSelected = false;
 	private boolean destIsSelected = false;
+	private JLabel lblCurrentMap;
 
 
 
@@ -278,7 +279,7 @@ public class GUI implements Runnable{
 
 		GridBagLayout gbl_navMenu = new GridBagLayout();
 		gbl_navMenu.columnWidths = new int[]{30, 215, 290, 215, 30};
-		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 45, 45, 30, 7, 0};
+		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 45, 20, 30, 40, 0};
 		gbl_navMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
@@ -648,6 +649,7 @@ public class GUI implements Runnable{
 		});
 
 		JLabel lblStart = new JLabel("Start");
+		lblStart.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		GridBagConstraints gbc_lblStart = new GridBagConstraints();
 		gbc_lblStart.gridwidth = 3;
 		gbc_lblStart.insets = new Insets(0, 0, 5, 5);
@@ -657,6 +659,7 @@ public class GUI implements Runnable{
 
 
 		JLabel lblDestination_1 = new JLabel("Destination");
+		lblDestination_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		GridBagConstraints gbc_lblDestination_1 = new GridBagConstraints();
 		gbc_lblDestination_1.gridwidth = 4;
 		gbc_lblDestination_1.insets = new Insets(0, 0, 5, 5);
@@ -1588,7 +1591,6 @@ public class GUI implements Runnable{
 
 								}
 
-
 								try {
 									textDir = gentextdir.genDirStrings(multiMapFinalDir);
 								} catch (MalformedDirectionException e) {
@@ -1633,11 +1635,37 @@ public class GUI implements Runnable{
 								System.out.println("Invalid Map Selection");
 								g.printStackTrace();
 							}
+
+							String toAdd = "";
+							boolean prevIsUnderscore = true;
+							for(int j = 0; j < dirMaps.get(m).getMapName().length(); j++){
+								char tempChar;
+								if(prevIsUnderscore){
+									tempChar = dirMaps.get(m).getMapName().charAt(j);
+									//converts to upper case
+									tempChar = Character.toUpperCase(tempChar);
+									prevIsUnderscore = false;
+								}
+								else if (dirMaps.get(m).getMapName().charAt(j) == ('_')){
+									prevIsUnderscore = true;
+									tempChar = ' ';
+								}
+								else{
+									tempChar = dirMaps.get(m).getMapName().charAt(j);
+									prevIsUnderscore = false;
+								}
+								toAdd += tempChar;
+								//mapsDropdown.addItem(maps.get(i).getMapName());
+								//DestMaps.addItem(maps.get(i).getMapName());
+							}
+							lblCurrentMap.setText("Current Map: " + toAdd);
+
 							frame.repaint();
 							for(int r = 0; r < multiMapFinalDir.size(); r++){
 								if(multiMapFinalDir.get(r).size() == 0){
 									mapPos++;
-								} else {
+								}
+								else {
 									r = multiMapFinalDir.size();
 								}
 							}
@@ -1661,6 +1689,7 @@ public class GUI implements Runnable{
 						frame.repaint();
 						menuLayout.show(menus, "Nav Menu");
 					}
+
 					//if the points are identical, asks the user to input different points
 					else{
 						directionsText.setText("Pick two different points");
@@ -1932,10 +1961,10 @@ public class GUI implements Runnable{
 		directionsText.putClientProperty("Nimbus.Overrides", defaults);
 		directionsText.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
 		directionsText.setBackground(backgroundColor);
-		
+
 		directionsText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		directionsText.setMinimumSize(new Dimension(720, 90));
-		directionsText.setPreferredSize(new Dimension(720, 90));
+		directionsText.setMinimumSize(new Dimension(720, 65));
+		directionsText.setPreferredSize(new Dimension(720, 65));
 
 		StyledDocument doc = directionsText.getStyledDocument();
 		SimpleAttributeSet center = new SimpleAttributeSet();
@@ -2057,6 +2086,31 @@ public class GUI implements Runnable{
 						System.out.println("Invalid Map Selection");
 						g.printStackTrace();
 					}
+
+					String toAdd = "";
+					boolean prevIsUnderscore = true;
+					for(int j = 0; j < dirMaps.get(mapPos).getMapName().length(); j++){
+						char tempChar;
+						if(prevIsUnderscore){
+							tempChar = dirMaps.get(mapPos).getMapName().charAt(j);
+							//converts to upper case
+							tempChar = Character.toUpperCase(tempChar);
+							prevIsUnderscore = false;
+						}
+						else if (dirMaps.get(mapPos).getMapName().charAt(j) == ('_')){
+							prevIsUnderscore = true;
+							tempChar = ' ';
+						}
+						else{
+							tempChar = dirMaps.get(mapPos).getMapName().charAt(j);
+							prevIsUnderscore = false;
+						}
+						toAdd += tempChar;
+						//mapsDropdown.addItem(maps.get(i).getMapName());
+						//DestMaps.addItem(maps.get(i).getMapName());
+					}
+					lblCurrentMap.setText("Current Map: " + toAdd);
+
 					frame.repaint();
 				} else {
 					if (textPos != 0){
@@ -2089,6 +2143,16 @@ public class GUI implements Runnable{
 		gbc_btnPrevious.gridx = 1;
 		gbc_btnPrevious.gridy = 5;
 		navMenu.add(btnPrevious, gbc_btnPrevious);
+
+
+		lblCurrentMap = new JLabel("Current Map:");
+		lblCurrentMap.setFont(new Font("Serif", Font.PLAIN, 18));
+		GridBagConstraints gbc_lblCurrentMap = new GridBagConstraints();
+		gbc_lblCurrentMap.gridwidth = 3;
+		gbc_lblCurrentMap.insets = new Insets(0, 0, 0, 5);
+		gbc_lblCurrentMap.gridx = 1;
+		gbc_lblCurrentMap.gridy = 6;
+		navMenu.add(lblCurrentMap, gbc_lblCurrentMap);
 
 		// Button to get next step in directions
 		//sets the next button color to red
@@ -2196,6 +2260,30 @@ public class GUI implements Runnable{
 								System.out.println("Invalid Map Selection");
 								g.printStackTrace();
 							}
+
+							String toAdd = "";
+							boolean prevIsUnderscore = true;
+							for(int j = 0; j < dirMaps.get(mapPos).getMapName().length(); j++){
+								char tempChar;
+								if(prevIsUnderscore){
+									tempChar = dirMaps.get(mapPos).getMapName().charAt(j);
+									//converts to upper case
+									tempChar = Character.toUpperCase(tempChar);
+									prevIsUnderscore = false;
+								}
+								else if (dirMaps.get(mapPos).getMapName().charAt(j) == ('_')){
+									prevIsUnderscore = true;
+									tempChar = ' ';
+								}
+								else{
+									tempChar = dirMaps.get(mapPos).getMapName().charAt(j);
+									prevIsUnderscore = false;
+								}
+								toAdd += tempChar;
+								//mapsDropdown.addItem(maps.get(i).getMapName());
+								//DestMaps.addItem(maps.get(i).getMapName());
+							}
+							lblCurrentMap.setText("Current Map: " + toAdd);
 						}
 						mapChange = true;
 						frame.repaint();
@@ -2221,6 +2309,7 @@ public class GUI implements Runnable{
 		gbc_btnNext.gridx = 3;
 		gbc_btnNext.gridy = 5;
 		navMenu.add(btnNext, gbc_btnNext);
+
 
 		panelDirections = new JPanel();
 		panelDirections.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));

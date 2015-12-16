@@ -785,7 +785,7 @@ public class GUI{
 
 					for(int i=0; i<startBuilds.getItemCount();i++)
 					{
-						if(searchStartPoint.equals(startBuilds.getItemAt(i)))
+						if(searchStartPoint.getName().compareToIgnoreCase(startBuilds.getItemAt(i).getName()) == 0)
 							startBuilds.setSelectedIndex(i);
 					}
 				}
@@ -894,7 +894,7 @@ public class GUI{
 
 					for(int i=0; i<destBuilds.getItemCount();i++)
 					{
-						if(searchDestPoint.equals(destBuilds.getItemAt(i)))
+						if(searchDestPoint.getName().compareToIgnoreCase(destBuilds.getItemAt(i).getName()) == 0)
 							destBuilds.setSelectedIndex(i);
 					}
 				}
@@ -2148,7 +2148,7 @@ public class GUI{
 
 
 		lblCurrentMap = new JLabel("Current Map:");
-		lblCurrentMap.setFont(new Font("Serif", Font.PLAIN, 18));
+		lblCurrentMap.setFont(new Font("Serif", Font.BOLD, 18));
 		GridBagConstraints gbc_lblCurrentMap = new GridBagConstraints();
 		gbc_lblCurrentMap.gridwidth = 3;
 		gbc_lblCurrentMap.insets = new Insets(0, 0, 0, 5);

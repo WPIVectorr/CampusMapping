@@ -238,6 +238,7 @@ public class GenTextDir {
 			//System.out.println("Found getTurn of: " + directions.get(i).getTurn());
 			if(shouldAdd && directions.get(i).getTurn().equals("slight left")){
 				currDir = directions.get(i);
+				
 				i++;
 				if(currDir.getOrigin().getMapId() != currDir.getDestination().getMapId()){
 					isInterEdgeMap = true;
@@ -432,6 +433,11 @@ public class GenTextDir {
 			 * }
 			 * 
 			 */
+			if(currSet.size() > 0){
+				Directions tmpDir = currSet.get(0);
+				tmpDir.setTurn("straight");
+				currSet.set(0, tmpDir);
+			}
 			returnDirections.add(currSet);
 		}
 

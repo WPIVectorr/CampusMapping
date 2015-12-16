@@ -17,6 +17,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -689,7 +691,7 @@ public class GUI{
 				startMapsDropDown.setSelectedIndex(0);
 				try{
 					tempImg = img;
-					img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+					img = ImageIO.read(getClass().getResource("/VectorLogo/VectorrLogo.png"));
 				}
 				catch(IOException g){
 					System.out.println("Invalid logo1");
@@ -949,7 +951,7 @@ public class GUI{
 				destMapsDropDown.setSelectedIndex(0);
 				try{
 					tempImg = img;
-					img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+					img = ImageIO.read(getClass().getResource("/VectorLogo/VectorrLogo.png"));
 				}
 				catch(IOException g){
 					System.out.println("Invalid logo1");
@@ -1040,14 +1042,16 @@ public class GUI{
 
 					//String mapTitle = "AtwaterKent1";
 					if(startPoint != null && destPoint != null && startPoint.getMapId() != destPoint.getMapId() || destPoint == null || destPoint.getMapId() == 0){
-						File start = new File("src/VectorMaps");
-						String startInput = start.getAbsolutePath();
-						//assuming all maps saved in vectorMaps are in jpg
-						startInput = startInput + "/" + mapTitle + ".png";
+						File start = null;
+							//start = new File();
 
-						File destFile = new File(startInput);
+						// startInput = start.getAbsolutePath();
+						//assuming all maps saved in vectorMaps are in jpg
+						URL startInput = getClass().getResource("/VectorMaps"+ "/" + mapTitle + ".png") ;
+
+						//File destFile = new File(startInput);
 						try{
-							img = ImageIO.read(destFile);
+							img = ImageIO.read(startInput);
 							frame.repaint();
 						}
 						catch(IOException a){
@@ -1192,18 +1196,18 @@ public class GUI{
 
 
 					if(startPoint != null && destPoint != null && startPoint.getMapId() != destPoint.getMapId() || startPoint == null || startPoint.getMapId() == 0){
-						File dest = new File("src/VectorMaps");
+/*						File dest = new File("src/VectorMaps");
 						String destInput = dest.getAbsolutePath();
 						//assuming all maps saved in vectorMaps are in jpg
 						destInput = destInput + "/" + mapTitle + ".png";
-
-						File destFile = new File(destInput);
+*/
+						URL destFile = getClass().getResource("/VectorMaps" + "/" + mapTitle + ".png");
 						try{
 							img = ImageIO.read(destFile);
 							frame.repaint();
 						}
 						catch(IOException a){
-							System.out.println("Could not find file:"+destInput);
+							//System.out.println("Could not find file:"+destInput);
 							a.printStackTrace();
 						}
 					}
@@ -1398,19 +1402,19 @@ public class GUI{
 
 
 
-							//String mapTitle = "AtwaterKent1";
+				/*			//String mapTitle = "AtwaterKent1";
 							File start = new File("src/VectorMaps");
 							String startInput = start.getAbsolutePath();
 							//assuming all maps saved in vectorMaps are in jpg
-							startInput = startInput + "/" + mapTitle + ".png";
+							startInput = startInput + "/" + mapTitle + ".png";*/
 
-							File destFile = new File(startInput);
+							URL destFile = getClass().getResource("/VectorMaps"+ "/" + mapTitle + ".png");
 							try{
 								img = ImageIO.read(destFile);
 								frame.repaint();
 							}
 							catch(IOException a){
-								System.out.println("Could not find file:"+startInput);
+								//System.out.println("Could not find file:"+startInput);
 								a.printStackTrace();
 							}
 							roomPointsToDraw = getRoomPoints(currentMap.getPoints());
@@ -1483,19 +1487,19 @@ public class GUI{
 
 
 
-							//String mapTitle = "AtwaterKent1";
+							/*//String mapTitle = "AtwaterKent1";
 							File dest = new File("src/VectorMaps");
 							String destInput = dest.getAbsolutePath();
 							//assuming all maps saved in vectorMaps are in jpg
-							destInput = destInput + "/" + mapTitle + ".png";
+							destInput = destInput + "/" + mapTitle + ".png";*/
 
-							File destFile = new File(destInput);
+							URL destFile = getClass().getResource("/VectorMaps"+ "/" + mapTitle + ".png");
 							try{
 								img = ImageIO.read(destFile);
 								frame.repaint();
 							}
 							catch(IOException a){
-								System.out.println("Could not find file:"+destInput);
+								//System.out.println("Could not find file:"+destInput);
 								a.printStackTrace();
 							}
 							roomPointsToDraw = getRoomPoints(currentMap.getPoints());
@@ -1651,8 +1655,8 @@ public class GUI{
 							while(multiMapFinalDir.get(m).size() == 0){
 								m++;
 							}
-							File destinationFile = new File("src/VectorMaps/" + dirMaps.get(m).getMapName() + ".png");
-							destinationFile = new File(destinationFile.getAbsolutePath());
+							URL destinationFile = getClass().getResource("/VectorMaps/" + dirMaps.get(m).getMapName() + ".png");
+							//destinationFile = new File(destinationFile.getAbsolutePath());
 							try {
 								img = ImageIO.read(destinationFile);
 							} catch (IOException g) {
@@ -1823,8 +1827,8 @@ public class GUI{
 							i = maps.size();
 						}
 					}
-					File destinationFile = new File("src/VectorMaps/" + currentMap.getMapName() + ".png");
-					destinationFile = new File(destinationFile.getAbsolutePath());
+					URL destinationFile = getClass().getResource("/VectorMaps/" + currentMap.getMapName() + ".png");
+					//destinationFile = new File(destinationFile.getAbsolutePath());
 					drawnfirst = false;
 					try {
 						img = ImageIO.read(destinationFile);
@@ -2089,8 +2093,8 @@ public class GUI{
 						}
 						directionsText.setText("Enter " + toAdd);
 					}
-					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
-					destinationFile = new File(destinationFile.getAbsolutePath());
+					URL destinationFile = getClass().getResource("/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
+					//destinationFile = new File(destinationFile.getAbsolutePath());
 					drawnfirst = false;
 					try {
 						img = ImageIO.read(destinationFile);
@@ -2260,12 +2264,12 @@ public class GUI{
 						}
 						//change map
 						if(mapChange){
-							File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
+							URL destinationFile = getClass().getResource("/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
 							directionsText.setText(textDir.get(mapPos).get(textPos));
 							drawnfirst = false;
 
 
-							destinationFile = new File(destinationFile.getAbsolutePath());
+							//destinationFile = new File(destinationFile.getAbsolutePath());
 							try {
 								img = ImageIO.read(destinationFile);
 							} catch (IOException g) {
@@ -2840,7 +2844,7 @@ public class GUI{
 					//assuming all maps saved in vectorMaps are in jpg
 					startInput = startInput + "/" + mapTitle + ".png";
 
-					File destFile = new File(startInput);
+					URL destFile = getClass().getResource("/VectorMaps/"+mapTitle+".png");
 					try{
 						img = ImageIO.read(destFile);
 						frame.repaint();

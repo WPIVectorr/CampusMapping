@@ -154,7 +154,7 @@ public class SplashPage extends JWindow implements Runnable {
 		int x = (screen.width - width) / 2;
 		int y = (screen.height - height) / 2;
 		setBounds(x, y, width, height);
-		loadingIcon = new ImageIcon("src/VectorLogo/VectorrLogo-transparent.png");
+		loadingIcon = new ImageIcon(getClass().getResource("/VectorLogo/VectorrLogo-transparent.png"));
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{850, 0};
 		gridBagLayout.rowHeights = new int[]{45, 546, 34, 0};

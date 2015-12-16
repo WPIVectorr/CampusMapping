@@ -276,7 +276,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 
 	public JComponent createMapsPanel(){
 		JPanel mapsPanel = new JPanel();
-		mapsPanel.setBackground(new Color(255, 235, 205));
+		mapsPanel.setBackground(new Color(75, 98, 128));
 		GridBagLayout gbl_mapsPanel = new GridBagLayout();
 		gbl_mapsPanel.rowHeights = new int[] {0, 0, 30, 30};
 		gbl_mapsPanel.columnWidths = new int[] {280, 280, 280};
@@ -1779,9 +1779,9 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 						double posx = ((editPoint.getLocX()*newImageWidth)+drawnposx);
 						double posy = ((editPoint.getLocY()*newImageHeight)+drawnposy);
 
-						g.fillOval((int)(posx - ((pointSize / 2) + (2))), (int)(posy - ((pointSize / 2)+(2))), (int)(pointSize + (4)), (int)(pointSize + (4)));
+						g.fillOval((int)(posx - ((pointSize / 2) + (4))), (int)(posy - ((pointSize / 2)+(4))), (int)(pointSize + (8)), (int)(pointSize + (8)));
 						g.setColor(Color.BLACK);
-						g.drawOval((int)(posx - ((pointSize / 2) + (2))), (int)(posy - ((pointSize / 2)+(2))), (int)(pointSize + (4)), (int)(pointSize + (4)));
+						g.drawOval((int)(posx - ((pointSize / 2) + (4))), (int)(posy - ((pointSize / 2)+(4))), (int)(pointSize + (8)), (int)(pointSize + (8)));
 					}
 					//draw lines between points
 				}

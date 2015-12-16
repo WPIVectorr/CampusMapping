@@ -1157,6 +1157,7 @@ public class ServerDB {
 							try {
 								pt2 = getPointFromLocal(newEdgePt2);
 							} catch (DoesNotExistException e) {
+								System.out.println("New Edge ID: "+newEdgeId);
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}

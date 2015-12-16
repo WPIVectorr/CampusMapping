@@ -36,6 +36,9 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
+
 import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboBoxUI;
@@ -44,6 +47,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import database.AlreadyExistsException;
 import database.DoesNotExistException;
@@ -54,6 +60,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class GUI implements Runnable{
 
@@ -76,9 +84,9 @@ public class GUI implements Runnable{
 	private boolean showRoute;
 	private boolean showStartPoint = false;
 	private boolean showDestPoint = false;
+	private JTextPane directionsText;
 	private boolean isShowStart = false;
 	private boolean isShowDest = false;
-	private JLabel directionsText;
 	private JPanel mainMenu;
 	private JPanel navMenu;
 	private JPanel prefMenu;
@@ -207,6 +215,9 @@ public class GUI implements Runnable{
 	private Highlighter hilit;
 	private Highlighter.HighlightPainter painter;
 
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
 
@@ -255,9 +266,9 @@ public class GUI implements Runnable{
 		//destMapsDropDown.setEnabled(startIsSelected);
 
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
-		gbl_mainMenu.columnWidths = new int[]{80, 90, 75, 110, 150, 90, 75, 110, 80};
+		gbl_mainMenu.columnWidths = new int[]{80, 90, 123, 62, 150, 90, 93, 30, 62, 80};
 		gbl_mainMenu.rowHeights = new int[]{10, 18, 27, 0, 0, 0, 0, 0, 0};
-		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		mainMenu.setLayout(gbl_mainMenu);
 
@@ -266,9 +277,9 @@ public class GUI implements Runnable{
 		navMenu.setBackground(backgroundColor);
 
 		GridBagLayout gbl_navMenu = new GridBagLayout();
-		gbl_navMenu.columnWidths = new int[]{30, 215, 290, 215, 30, 0};
-		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 0, 31, 30, 7, 0};
-		gbl_navMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		gbl_navMenu.columnWidths = new int[]{30, 215, 290, 215, 30};
+		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 45, 45, 30, 7, 0};
+		gbl_navMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
 
@@ -277,7 +288,7 @@ public class GUI implements Runnable{
 		aboutMenu.setBackground(backgroundColor);
 
 		GridBagLayout gbl_aboutMenu = new GridBagLayout();
-		gbl_aboutMenu.columnWidths = new int[]{30, 280, 50, 280, 0};
+		gbl_aboutMenu.columnWidths = new int[]{50, 280, 50, 280, 50};
 		gbl_aboutMenu.rowHeights = new int[]{13, 19, 0, 20, 20, 20, 20, 30, 0};
 		gbl_aboutMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_aboutMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
@@ -479,6 +490,7 @@ public class GUI implements Runnable{
 		GradientButton btnOptionsMain = new GradientButton("Set Preferences", buttonColor);
 		btnOptionsMain.setText("Options\r\n");
 		GridBagConstraints gbc_btnOptionsMain = new GridBagConstraints();
+		gbc_btnOptionsMain.gridwidth = 2;
 		gbc_btnOptionsMain.anchor = GridBagConstraints.SOUTHEAST;
 		gbc_btnOptionsMain.insets = new Insets(0, 0, 5, 5);
 		gbc_btnOptionsMain.gridx = 7;
@@ -499,7 +511,7 @@ public class GUI implements Runnable{
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
 		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 0);
-		gbc_horizontalStrut.gridx = 8;
+		gbc_horizontalStrut.gridx = 9;
 		gbc_horizontalStrut.gridy = 1;
 		mainMenu.add(horizontalStrut, gbc_horizontalStrut);
 
@@ -651,7 +663,7 @@ public class GUI implements Runnable{
 
 		JLabel lblStart = new JLabel("Start");
 		GridBagConstraints gbc_lblStart = new GridBagConstraints();
-		gbc_lblStart.gridwidth = 2;
+		gbc_lblStart.gridwidth = 3;
 		gbc_lblStart.insets = new Insets(0, 0, 5, 5);
 		gbc_lblStart.gridx = 1;
 		gbc_lblStart.gridy = 2;
@@ -660,7 +672,7 @@ public class GUI implements Runnable{
 
 		JLabel lblDestination_1 = new JLabel("Destination");
 		GridBagConstraints gbc_lblDestination_1 = new GridBagConstraints();
-		gbc_lblDestination_1.gridwidth = 2;
+		gbc_lblDestination_1.gridwidth = 4;
 		gbc_lblDestination_1.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDestination_1.gridx = 5;
 		gbc_lblDestination_1.gridy = 2;
@@ -668,7 +680,7 @@ public class GUI implements Runnable{
 
 
 		GradientButton btnClearStart = new GradientButton("X", new Color(240,128,128));
-		btnClearStart.setText("Clear Selection");
+		btnClearStart.setText("Clear");
 		btnClearStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				showStartPoint = false;
@@ -808,7 +820,7 @@ public class GUI implements Runnable{
 		txtSearchDest = new JTextField();
 		txtSearchDest.setText("Search");
 		GridBagConstraints gbc_txtSearchDest = new GridBagConstraints();
-		gbc_txtSearchDest.gridwidth = 2;
+		gbc_txtSearchDest.gridwidth = 3;
 		gbc_txtSearchDest.insets = new Insets(0, 0, 5, 5);
 		gbc_txtSearchDest.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtSearchDest.gridx = 5;
@@ -915,11 +927,11 @@ public class GUI implements Runnable{
 		});
 
 		GradientButton btnClearDest = new GradientButton("X", new Color(240,128,128));
-		btnClearDest.setText("Clear Selection");
+		btnClearDest.setText("Clear");
 		GridBagConstraints gbc_btnClearDest = new GridBagConstraints();
 		gbc_btnClearDest.anchor = GridBagConstraints.EAST;
 		gbc_btnClearDest.insets = new Insets(0, 0, 5, 5);
-		gbc_btnClearDest.gridx = 7;
+		gbc_btnClearDest.gridx = 8;
 		gbc_btnClearDest.gridy = 3;
 		mainMenu.add(btnClearDest, gbc_btnClearDest);
 		btnClearDest.addActionListener(new ActionListener() {
@@ -1298,7 +1310,7 @@ public class GUI implements Runnable{
 
 
 		GridBagConstraints gbc_destMaps = new GridBagConstraints();
-		gbc_destMaps.gridwidth = 2;
+		gbc_destMaps.gridwidth = 3;
 		gbc_destMaps.fill = GridBagConstraints.HORIZONTAL;
 		gbc_destMaps.insets = new Insets(0, 0, 5, 5);
 		gbc_destMaps.gridx = 6;
@@ -1343,11 +1355,40 @@ public class GUI implements Runnable{
 						// "Select
 						if(startPoint != startPointName && !(destPoint == startPoint)){
 							startIsSelected = true;
+							for(int i = 0; i < maps.size(); i++){
+								if(startPoint.getMapId() == maps.get(i).getMapId()){
+									currentMap = maps.get(i);
+									i = maps.size();
+								}
+							}
+							mapTitle = currentMap.getMapName();
+							
+							
+							
+
+							//String mapTitle = "AtwaterKent1";
+							File start = new File("src/VectorMaps");
+							String startInput = start.getAbsolutePath();
+							//assuming all maps saved in vectorMaps are in jpg
+							startInput = startInput + "/" + mapTitle + ".png";
+
+							File destFile = new File(startInput);
+							try{
+								img = ImageIO.read(destFile);
+								frame.repaint();
+							}
+							catch(IOException a){
+								System.out.println("Could not find file:"+startInput);
+								a.printStackTrace();
+							}
+							roomPointsToDraw = getRoomPoints(currentMap.getPoints());
+							drawnfirst = false;
 						}
 						else{
 							startIsSelected = false;
 							startPoint = startPointName;
 						}
+						
 						System.out.println("Selected Point Name From the DropDown: " + startPoint.getName());
 						frame.repaint();
 					}
@@ -1368,7 +1409,7 @@ public class GUI implements Runnable{
 
 		//adds destBuilds to the dropdown for destination
 		GridBagConstraints gbc_destBuilds = new GridBagConstraints();
-		gbc_destBuilds.gridwidth = 2;
+		gbc_destBuilds.gridwidth = 3;
 		gbc_destBuilds.fill = GridBagConstraints.BOTH;
 		gbc_destBuilds.insets = new Insets(0, 0, 5, 5);
 		gbc_destBuilds.gridx = 6;
@@ -1388,6 +1429,34 @@ public class GUI implements Runnable{
 						destPoint = (Point) destBuilds.getSelectedItem();
 						if(destPoint != destPointName && !(destPoint == startPoint)){
 							destIsSelected = true;
+							for(int i = 0; i < maps.size(); i++){
+								if(destPoint.getMapId() == maps.get(i).getMapId()){
+									currentMap = maps.get(i);
+									i = maps.size();
+								}
+							}
+							mapTitle = currentMap.getMapName();
+							
+							
+							
+
+							//String mapTitle = "AtwaterKent1";
+							File dest = new File("src/VectorMaps");
+							String destInput = dest.getAbsolutePath();
+							//assuming all maps saved in vectorMaps are in jpg
+							destInput = destInput + "/" + mapTitle + ".png";
+
+							File destFile = new File(destInput);
+							try{
+								img = ImageIO.read(destFile);
+								frame.repaint();
+							}
+							catch(IOException a){
+								System.out.println("Could not find file:"+destInput);
+								a.printStackTrace();
+							}
+							roomPointsToDraw = getRoomPoints(currentMap.getPoints());
+							drawnfirst = false;
 						}
 						else{
 							destIsSelected = false;
@@ -1679,7 +1748,8 @@ public class GUI implements Runnable{
 				menuLayout.show(menus, "Main Menu");
 				showRoute = false;
 				panelDirections.setVisible(false);
-				btnFullTextDirections.setText("Send Email");
+
+				btnFullTextDirections.setText("Show Full Text Directions");
 				route = null;
 				showRoute = false;
 				if(startPoint.getMapId() != 0){
@@ -1828,14 +1898,26 @@ public class GUI implements Runnable{
 
 
 		//creates a centered text field that will write back the users info they typed in
-		directionsText = new JLabel(" ");
-		directionsText.setHorizontalAlignment(JTextField.CENTER);
+		directionsText = new JTextPane();
+		directionsText.setEditable(false);
 		directionsText.setToolTipText("");
 		directionsText.setBounds(6, 174, 438, 30);
+		directionsText.setBackground(backgroundColor);
+		directionsText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		directionsText.setMinimumSize(new Dimension(720, 90));
+		directionsText.setPreferredSize(new Dimension(720, 90));
+		
+		StyledDocument doc = directionsText.getStyledDocument();
+		SimpleAttributeSet center = new SimpleAttributeSet();
+		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+		StyleConstants.setBackground(center, backgroundColor);
+		doc.setParagraphAttributes(0, doc.getLength(), center, false);
+		
 
 		//directionsText.setColumns(1);
 		directionsText.setFont(new Font("Serif", Font.BOLD, 20));
 		GridBagConstraints gbc_directionsText = new GridBagConstraints();
+		gbc_directionsText.gridheight = 2;
 		gbc_directionsText.gridwidth = 5;
 		gbc_directionsText.insets = new Insets(0, 0, 5, 0);
 		gbc_directionsText.gridx = 0;
@@ -2114,7 +2196,7 @@ public class GUI implements Runnable{
 		frame.getContentPane().add(panelDirections, BorderLayout.WEST);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{0, 110, 110, 0, 0};
-		gbl_panel.rowHeights = new int[]{23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0};
+		gbl_panel.rowHeights = new int[]{23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, -11, 0, 0, 0};
 		gbl_panel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panelDirections.setLayout(gbl_panel);
@@ -2168,6 +2250,16 @@ public class GUI implements Runnable{
 			}
 		});
 
+
+		JLabel labelEmail = new JLabel("New label");
+		GridBagConstraints gbc_labelEmail = new GridBagConstraints();
+		gbc_labelEmail.gridwidth = 2;
+		gbc_labelEmail.insets = new Insets(0, 0, 5, 5);
+		gbc_labelEmail.gridx = 1;
+		gbc_labelEmail.gridy = 12;
+		panelDirections.add(labelEmail, gbc_labelEmail);
+		labelEmail.setVisible(false);
+
 		GradientButton btnEmailDirections = new GradientButton("E-Mail Directions", buttonColor);
 		GridBagConstraints gbc_btnEmailDirections = new GridBagConstraints();
 		gbc_btnEmailDirections.insets = new Insets(0, 0, 5, 5);
@@ -2176,14 +2268,76 @@ public class GUI implements Runnable{
 		gbc_btnEmailDirections.gridx = 1;
 		gbc_btnEmailDirections.gridy = 11;
 		panelDirections.add(btnEmailDirections, gbc_btnEmailDirections);
+		btnEmailDirections.setEnabled(false);
 		btnEmailDirections.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					new PrintDirections(textDir,finalDir,txtFieldEmail.getText());
 					txtFieldEmail.setText("");
+					labelEmail.setVisible(true);
+					labelEmail.setForeground(Color.BLACK);
+					labelEmail.setText("Email Successfully Sent!");
 				} catch (AddressException e1) {
 					// TODO Auto-generated catch block
-					btnEmailDirections.setText("Invalid Address");
+					labelEmail.setVisible(true);
+					labelEmail.setForeground(Color.RED);
+					labelEmail.setText("Invalid Address");
+				}
+			}
+		});
+
+		txtFieldEmail.getDocument().addDocumentListener(new DocumentListener()
+		{
+
+			public void changedUpdate(DocumentEvent arg0) 
+			{
+
+			}
+			public void insertUpdate(DocumentEvent arg0) 
+			{
+				String format = StringUtils.substringAfter(txtFieldEmail.getText(), "@");
+				if (format.contains(".") && format.charAt(0) != '.'
+						&& format.charAt(format.length()-1) != '.' && !format.contains("@")){
+					labelEmail.setVisible(false);
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+					btnEmailDirections.setEnabled(true);
+				}
+				else if(txtFieldEmail.getText().equals("") || txtFieldEmail.getText().equals("Enter E-Mail Here")){
+					labelEmail.setVisible(false);
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+					btnEmailDirections.setEnabled(false);
+				}
+				else{
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.RED));
+					labelEmail.setForeground(Color.RED);
+					labelEmail.setText("Invalid Format");
+					labelEmail.setVisible(true);
+					btnEmailDirections.setEnabled(false);
+				}
+
+
+			}
+
+			public void removeUpdate(DocumentEvent arg0) 
+			{
+				String format = StringUtils.substringAfter(txtFieldEmail.getText(), "@");
+				if (format.contains(".") && format.charAt(0) != '.'
+						&& format.charAt(format.length()-1) != '.' && !format.contains("@")){
+					labelEmail.setVisible(false);
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+					btnEmailDirections.setEnabled(true);
+				}
+				else if(txtFieldEmail.getText().equals("") || txtFieldEmail.getText().equals("Enter E-Mail Here")){
+					labelEmail.setVisible(false);
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+					btnEmailDirections.setEnabled(false);
+				}
+				else{
+					txtFieldEmail.setBorder(BorderFactory.createLineBorder(Color.RED));
+					labelEmail.setForeground(Color.RED);
+					labelEmail.setText("Invalid Format");
+					labelEmail.setVisible(true);
+					btnEmailDirections.setEnabled(false);
 				}
 			}
 		});
@@ -2192,22 +2346,15 @@ public class GUI implements Runnable{
 		GridBagConstraints gbc_horizontalStrut_4 = new GridBagConstraints();
 		gbc_horizontalStrut_4.insets = new Insets(0, 0, 5, 5);
 		gbc_horizontalStrut_4.gridx = 0;
-		gbc_horizontalStrut_4.gridy = 12;
+		gbc_horizontalStrut_4.gridy = 13;
 		panelDirections.add(horizontalStrut_4, gbc_horizontalStrut_4);
 
 		Component horizontalStrut_5 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_5 = new GridBagConstraints();
 		gbc_horizontalStrut_5.insets = new Insets(0, 0, 5, 0);
 		gbc_horizontalStrut_5.gridx = 3;
-		gbc_horizontalStrut_5.gridy = 12;
+		gbc_horizontalStrut_5.gridy = 13;
 		panelDirections.add(horizontalStrut_5, gbc_horizontalStrut_5);
-
-		Component verticalStrut = Box.createVerticalStrut(20);
-		GridBagConstraints gbc_verticalStrut = new GridBagConstraints();
-		gbc_verticalStrut.insets = new Insets(0, 0, 5, 5);
-		gbc_verticalStrut.gridx = 1;
-		gbc_verticalStrut.gridy = 14;
-		panelDirections.add(verticalStrut, gbc_verticalStrut);
 
 		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
 		GridBagConstraints gbc_horizontalStrut_2 = new GridBagConstraints();
@@ -2273,20 +2420,21 @@ public class GUI implements Runnable{
 		Hashtable<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
 		labels.put(0, new JLabel("Neutral"));
 		labels.put(-1, new JLabel("Avoid"));
-		labels.put(1, new JLabel("Priority"));
+		labels.put(1, new JLabel("Prefer"));
 
 		prefMenu = new JPanel();
 		prefMenu.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		prefMenu.setBackground(backgroundColor);
 		GridBagLayout gbl_prefMenu = new GridBagLayout();
-		gbl_prefMenu.columnWidths = new int[]{25, 125, 125, 75, 175, 250, 25};
+		gbl_prefMenu.columnWidths = new int[]{25, 75, 30, 145, 110, 30, 110, 250, 25};
 		gbl_prefMenu.rowHeights = new int[]{0, 0, 10, 0, 32, 12, 11, 0};
-		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		gbl_prefMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_prefMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		prefMenu.setLayout(gbl_prefMenu);
 
 		GradientButton btnHelp = new GradientButton("Help", buttonColor);
 		GridBagConstraints gbc_btnHelp = new GridBagConstraints();
+		gbc_btnHelp.anchor = GridBagConstraints.EAST;
 		gbc_btnHelp.insets = new Insets(0, 0, 5, 5);
 		gbc_btnHelp.gridx = 1;
 		gbc_btnHelp.gridy = 0;
@@ -2312,8 +2460,9 @@ public class GUI implements Runnable{
 
 		GradientButton btnAbout = new GradientButton("About", buttonColor);
 		GridBagConstraints gbc_btnAbout = new GridBagConstraints();
+		gbc_btnAbout.anchor = GridBagConstraints.WEST;
 		gbc_btnAbout.insets = new Insets(0, 0, 5, 5);
-		gbc_btnAbout.gridx = 2;
+		gbc_btnAbout.gridx = 3;
 		gbc_btnAbout.gridy = 0;
 		prefMenu.add(btnAbout, gbc_btnAbout);
 		btnAbout.addActionListener(new ActionListener() {
@@ -2349,7 +2498,7 @@ public class GUI implements Runnable{
 
 		JLabel lblOutside = new JLabel("Outside");
 		GridBagConstraints gbc_lblOutside = new GridBagConstraints();
-		gbc_lblOutside.gridwidth = 2;
+		gbc_lblOutside.gridwidth = 3;
 		gbc_lblOutside.insets = new Insets(0, 0, 5, 5);
 		gbc_lblOutside.gridx = 1;
 		gbc_lblOutside.gridy = 2;
@@ -2357,23 +2506,23 @@ public class GUI implements Runnable{
 
 		JLabel lblStairs = new JLabel("Stairs");
 		GridBagConstraints gbc_lblStairs = new GridBagConstraints();
-		gbc_lblStairs.gridwidth = 2;
+		gbc_lblStairs.gridwidth = 3;
 		gbc_lblStairs.insets = new Insets(0, 0, 5, 5);
-		gbc_lblStairs.gridx = 3;
+		gbc_lblStairs.gridx = 4;
 		gbc_lblStairs.gridy = 2;
 		prefMenu.add(lblStairs, gbc_lblStairs);
 
 		JLabel lblWalkingSpeed = new JLabel("Walking Speed");
 		GridBagConstraints gbc_lblWalkingSpeed = new GridBagConstraints();
 		gbc_lblWalkingSpeed.insets = new Insets(0, 0, 5, 5);
-		gbc_lblWalkingSpeed.gridx = 5;
+		gbc_lblWalkingSpeed.gridx = 7;
 		gbc_lblWalkingSpeed.gridy = 2;
 		prefMenu.add(lblWalkingSpeed, gbc_lblWalkingSpeed);
 
 		JSlider sliderOutside = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
 		sliderOutside.setPaintLabels(true);
 		GridBagConstraints gbc_slider = new GridBagConstraints();
-		gbc_slider.gridwidth = 2;
+		gbc_slider.gridwidth = 3;
 		gbc_slider.fill = GridBagConstraints.HORIZONTAL;
 		gbc_slider.insets = new Insets(0, 0, 5, 5);
 		gbc_slider.gridx = 1;
@@ -2403,10 +2552,10 @@ public class GUI implements Runnable{
 		JSlider sliderStairs = new JSlider(JSlider.HORIZONTAL, -1, 1, 0);
 		sliderStairs.setPaintLabels(true);
 		GridBagConstraints gbc_slider_1 = new GridBagConstraints();
-		gbc_slider_1.gridwidth = 2;
+		gbc_slider_1.gridwidth = 3;
 		gbc_slider_1.fill = GridBagConstraints.HORIZONTAL;
 		gbc_slider_1.insets = new Insets(0, 0, 5, 5);
-		gbc_slider_1.gridx = 3;
+		gbc_slider_1.gridx = 4;
 		gbc_slider_1.gridy = 3;
 		prefMenu.add(sliderStairs, gbc_slider_1);
 
@@ -2438,7 +2587,7 @@ public class GUI implements Runnable{
 		GridBagConstraints gbc_walkingSpeed = new GridBagConstraints();
 		gbc_walkingSpeed.fill = GridBagConstraints.HORIZONTAL;
 		gbc_walkingSpeed.insets = new Insets(0, 0, 5, 5);
-		gbc_walkingSpeed.gridx = 5;
+		gbc_walkingSpeed.gridx = 7;
 		gbc_walkingSpeed.gridy = 3;
 		prefMenu.add(sliderWalkingSpeed, gbc_walkingSpeed);
 		sliderWalkingSpeed.addChangeListener(new ChangeListener(){
@@ -2470,23 +2619,24 @@ public class GUI implements Runnable{
 		GridBagConstraints gbc_lblVisualPreferences = new GridBagConstraints();
 		gbc_lblVisualPreferences.anchor = GridBagConstraints.EAST;
 		gbc_lblVisualPreferences.insets = new Insets(0, 0, 5, 5);
-		gbc_lblVisualPreferences.gridx = 3;
+		gbc_lblVisualPreferences.gridx = 4;
 		gbc_lblVisualPreferences.gridy = 4;
 		prefMenu.add(lblVisualPreferences, gbc_lblVisualPreferences);
 
 		JComboBox<String> dropdownTheme = new JComboBox(themes);
 		GridBagConstraints gbc_dropdownTheme = new GridBagConstraints();
+		gbc_dropdownTheme.gridwidth = 2;
 		gbc_dropdownTheme.insets = new Insets(0, 0, 5, 5);
 		gbc_dropdownTheme.fill = GridBagConstraints.HORIZONTAL;
-		gbc_dropdownTheme.gridx = 4;
+		gbc_dropdownTheme.gridx = 5;
 		gbc_dropdownTheme.gridy = 4;
 		prefMenu.add(dropdownTheme, gbc_dropdownTheme);
 
 		GradientButton btnCancel = new GradientButton("Cancel", buttonColor);
 		GridBagConstraints gbc_btnCancel = new GridBagConstraints();
-		gbc_btnCancel.anchor = GridBagConstraints.WEST;
+		gbc_btnCancel.anchor = GridBagConstraints.EAST;
 		gbc_btnCancel.insets = new Insets(0, 0, 0, 5);
-		gbc_btnCancel.gridx = 3;
+		gbc_btnCancel.gridx = 4;
 		gbc_btnCancel.gridy = 6;
 		prefMenu.add(btnCancel, gbc_btnCancel);
 		btnCancel.addActionListener(new ActionListener() {
@@ -2508,9 +2658,11 @@ public class GUI implements Runnable{
 		});
 
 		GradientButton btnSavePreferences = new GradientButton("Save Preferences", buttonColor);
+		btnSavePreferences.setText(" Save ");
 		GridBagConstraints gbc_btnSavePreferences = new GridBagConstraints();
+		gbc_btnSavePreferences.anchor = GridBagConstraints.WEST;
 		gbc_btnSavePreferences.insets = new Insets(0, 0, 0, 5);
-		gbc_btnSavePreferences.gridx = 4;
+		gbc_btnSavePreferences.gridx = 6;
 		gbc_btnSavePreferences.gridy = 6;
 		prefMenu.add(btnSavePreferences, gbc_btnSavePreferences);
 		// Return to previous view

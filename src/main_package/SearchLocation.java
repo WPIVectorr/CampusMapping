@@ -50,6 +50,7 @@ public class SearchLocation {
 		ArrayList<String> Campus 			= 	new ArrayList<String>();
 		ArrayList<String> AlumniGym 		= 	new ArrayList<String>();
 		ArrayList<String> ProjectCenter		= 	new ArrayList<String>();
+		ArrayList<String> Harrington 		=	new ArrayList<String>();
 
 
 		StrattonHall.add("SH");		StrattonHall.add("Stratton Hall");		StrattonHall.add("Stratton");
@@ -68,8 +69,9 @@ public class SearchLocation {
 		Campus.add("Campus");		
 		AlumniGym.add("AG");		AlumniGym.add("Alumni Gym");		 	AlumniGym.add("Alumni");
 		ProjectCenter.add("PC");	ProjectCenter.add("Project Center");	ProjectCenter.add("CDC");
-		AtwaterKent.add("AK");		AtwaterKent.add("Atwater Kent");
-	
+		AtwaterKent.add("AK");		AtwaterKent.add("Atwater Kent");		AtwaterKent.add("Atwater");
+		Harrington.add("HA");		Harrington.add("Harrington Auditorium");Harrington.add("Harrington");
+		
 		//shortname,aliases
 		allNames.put("SH",		StrattonHall);
 		allNames.put("BH",		BoyntonHall);
@@ -89,6 +91,7 @@ public class SearchLocation {
 		allNames.put("Fountain",Campus);
 		allNames.put("Seal", 	Campus);
 		allNames.put("SDCC",	West157);
+		allNames.put("HA",  	Harrington);
 		
 		
 		
@@ -104,7 +107,7 @@ public class SearchLocation {
 					//System.out.println("long point name: " + LN);
 					pointNames.put(LN, point);
 					keyList.add(LN);
-					System.out.println("KeyPrep: "+LN);
+					//System.out.println("KeyPrep: "+LN);
 				}
 			}
 		}

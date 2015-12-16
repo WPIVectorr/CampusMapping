@@ -730,9 +730,6 @@ public class GUI implements Runnable{
 					}catch(java.lang.IllegalArgumentException searchExcept1){
 
 					}
-					txtSearchStart.setSelectionStart(searchString.length());
-					txtSearchStart.setSelectionEnd(txtSearchStart.getText().length());
-					txtSearchStart.setCaretPosition(searchString.length());
 
 				}else if(searchStartPointName != "")
 				{

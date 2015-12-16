@@ -16,7 +16,7 @@ import main_package.Point;
 
 public class ServerDB {
 	//------------------------------------------------------------Constants--------------------------------------------------------------------
-	private static String DATABASE_URL = "jdbc:mysql://campusmappingold.cxx9stnbmosg.us-east-1.rds.amazonaws.com:3306/";	
+	private static String DATABASE_URL = "jdbc:mysql://campusmapping.cxx9stnbmosg.us-east-1.rds.amazonaws.com:3306/";	
 	private static String DATABASE_NAME = "campusMapping_db";
 	private static String userName = "Vectorr";
 	private static String password = "mag";
@@ -1157,6 +1157,7 @@ public class ServerDB {
 							try {
 								pt2 = getPointFromLocal(newEdgePt2);
 							} catch (DoesNotExistException e) {
+								System.out.println("New Edge ID: "+newEdgeId);
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}

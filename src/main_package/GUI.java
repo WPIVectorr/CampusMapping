@@ -1321,7 +1321,7 @@ public class GUI implements Runnable{
 						System.out.println("Selected Point Name From the DropDown: " + startPoint.getName());
 						frame.repaint();
 					}
-					showStartPoint = true;
+					showStartPoint = false;
 					showDestPoint = false;
 					startStarX = ((Point)(startBuilds.getSelectedItem())).getLocX();
 					startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
@@ -1373,7 +1373,7 @@ public class GUI implements Runnable{
 						directionsButton.setEnabled(true);
 						frame.repaint();
 					}
-					showDestPoint = true;
+					showDestPoint = false;
 					showStartPoint = false;
 					destStarX = ((Point)(destBuilds.getSelectedItem())).getLocX();
 					destStarY = ((Point)(destBuilds.getSelectedItem())).getLocY();

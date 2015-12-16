@@ -139,7 +139,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//maps = ServerDB.getMapsFromLocal();
-		//emptyMaps = ServerDB.getEmptyMapsFromServer();
+		emptyMaps = ServerDB.getEmptyMapsFromServer();
 
 		frame.setMinimumSize(new Dimension(800, 600));
 		frame.getContentPane().setBackground(new Color(255, 235, 205));
@@ -1779,9 +1779,9 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 						double posx = ((editPoint.getLocX()*newImageWidth)+drawnposx);
 						double posy = ((editPoint.getLocY()*newImageHeight)+drawnposy);
 
-						g.fillOval((int)(posx - ((pointSize / 2) + (2))), (int)(posy - ((pointSize / 2)+(2))), (int)(pointSize + (4)), (int)(pointSize + (4)));
+						g.fillOval((int)(posx - ((pointSize / 2) + (4))), (int)(posy - ((pointSize / 2)+(4))), (int)(pointSize + (8)), (int)(pointSize + (8)));
 						g.setColor(Color.BLACK);
-						g.drawOval((int)(posx - ((pointSize / 2) + (2))), (int)(posy - ((pointSize / 2)+(2))), (int)(pointSize + (4)), (int)(pointSize + (4)));
+						g.drawOval((int)(posx - ((pointSize / 2) + (4))), (int)(posy - ((pointSize / 2)+(4))), (int)(pointSize + (8)), (int)(pointSize + (8)));
 					}
 					//draw lines between points
 				}

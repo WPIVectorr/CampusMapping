@@ -104,7 +104,7 @@ public class SearchLocation {
 					//System.out.println("long point name: " + LN);
 					pointNames.put(LN, point);
 					keyList.add(LN);
-					System.out.println("KeyPrep: "+LN);
+					//System.out.println("KeyPrep: "+LN);
 				}
 			}
 		}

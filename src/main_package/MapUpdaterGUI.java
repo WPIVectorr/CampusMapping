@@ -1771,19 +1771,7 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 
 
 
-					if(editPoint != null)
-					{
-						//g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5.0f));
-						g.setColor(Color.RED);
-						//g2D.setColor(Color.RED);
-						double posx = ((editPoint.getLocX()*newImageWidth)+drawnposx);
-						double posy = ((editPoint.getLocY()*newImageHeight)+drawnposy);
-
-						g.fillOval((int)(posx - ((pointSize / 2) + (2))), (int)(posy - ((pointSize / 2)+(2))), (int)(pointSize + (4)), (int)(pointSize + (4)));
-						g.setColor(Color.BLACK);
-						g.drawOval((int)(posx - ((pointSize / 2) + (2))), (int)(posy - ((pointSize / 2)+(2))), (int)(pointSize + (4)), (int)(pointSize + (4)));
-					}
-					//draw lines between points
+					
 				}
 
 
@@ -1830,6 +1818,20 @@ public class MapUpdaterGUI extends MapUpdaterControl{
 				g.fillOval(drawX - (pointSize / 2), drawY - (pointSize / 2), pointSize, pointSize);
 				g.setColor(Color.BLACK);
 			}
+			
+			if(editPoint != null)
+			{
+				//g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5.0f));
+				g.setColor(Color.RED);
+				//g2D.setColor(Color.RED);
+				double posx = ((editPoint.getLocX()*newImageWidth)+drawnposx);
+				double posy = ((editPoint.getLocY()*newImageHeight)+drawnposy);
+
+				g.fillOval((int)(posx - ((pointSize / 2) + (4))), (int)(posy - ((pointSize / 2)+(4))), (int)(pointSize + (8)), (int)(pointSize + (8)));
+				g.setColor(Color.BLACK);
+				g.drawOval((int)(posx - ((pointSize / 2) + (4))), (int)(posy - ((pointSize / 2)+(4))), (int)(pointSize + (8)), (int)(pointSize + (8)));
+			}
+			//draw lines between points
 
 			drawnEdges.clear();
 			newClick = false;

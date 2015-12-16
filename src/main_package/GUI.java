@@ -76,6 +76,8 @@ public class GUI implements Runnable{
 	private boolean showRoute;
 	private boolean showStartPoint = false;
 	private boolean showDestPoint = false;
+	private boolean isShowStart = false;
+	private boolean isShowDest = false;
 	private JLabel directionsText;
 	private JPanel mainMenu;
 	private JPanel navMenu;
@@ -102,7 +104,7 @@ public class GUI implements Runnable{
 	private Color currentColor = new Color(219, 209, 0);
 	private Color nextColor = new Color(51, 255, 51);
 	private Color pointColor = Color.ORANGE;
-	private Color backgroundColor = new Color(255, 235, 205);
+	private Color backgroundColor = new Color(135,206,250);
 	private Color buttonColor = new Color(153, 204, 255);
 	private Color starColor = new Color(255, 51, 255);
 	private ArrayList<Point> pointArray;
@@ -394,6 +396,15 @@ public class GUI implements Runnable{
 			public void actionPerformed(ActionEvent e) {
 				menuLayout.show(menus, "Pref Menu");
 				img = tempImg;
+				roomPointsToDraw = getRoomPoints(currentMap.getPointList());
+				if(isShowStart){
+					startIsSelected = true;
+					isShowStart = false;
+				}
+				if(isShowDest){
+					destIsSelected = true;
+					isShowDest = false;
+				}
 				frame.repaint();
 			}
 		});
@@ -2243,6 +2254,7 @@ public class GUI implements Runnable{
 				panelHelp.setVisible(false);
 				menus.setVisible(true);
 				panelLayout.show(panels, "Draw Panel");
+				roomPointsToDraw = getRoomPoints(currentMap.getPoints());
 			}
 		});
 
@@ -2306,6 +2318,7 @@ public class GUI implements Runnable{
 		btnAbout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				menuLayout.show(menus, "About Menu");
+				roomPointsToDraw.clear();
 				try{
 					tempImg = img;
 					img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
@@ -2313,6 +2326,14 @@ public class GUI implements Runnable{
 				catch(IOException g){
 					System.out.println("Invalid logo1");
 					g.printStackTrace();
+				}
+				if(startIsSelected){
+					startIsSelected = false;
+					isShowStart = true;
+				}
+				if(destIsSelected){
+					destIsSelected = false; 
+					isShowDest = true;
 				}
 				frame.repaint();
 			}

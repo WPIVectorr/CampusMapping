@@ -780,9 +780,11 @@ public class GUI{
 
 					for(int i=0; i<startBuilds.getItemCount();i++)
 					{
-						if(searchStartPoint.equals(startBuilds.getItemAt(i)))
+						if(searchStartPoint.getName().compareToIgnoreCase(startBuilds.getItemAt(i).getName())==0){
 							startBuilds.setSelectedIndex(i);
+						}
 					}
+					
 				}
 
 			}

@@ -63,7 +63,7 @@ import javax.swing.border.EtchedBorder;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class GUI implements Runnable{
+public class GUI{
 
 	private static Thread guiThreadObject;
 	private String threadName;
@@ -188,7 +188,6 @@ public class GUI implements Runnable{
 	private Point selectedPoint;
 	private boolean startIsSelected = false;
 	private boolean destIsSelected = false;
-	private JLabel lblCurrentMap;
 
 
 
@@ -279,7 +278,7 @@ public class GUI implements Runnable{
 
 		GridBagLayout gbl_navMenu = new GridBagLayout();
 		gbl_navMenu.columnWidths = new int[]{30, 215, 290, 215, 30};
-		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 45, 20, 30, 40, 0};
+		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 45, 45, 30, 7, 0};
 		gbl_navMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
@@ -649,7 +648,6 @@ public class GUI implements Runnable{
 		});
 
 		JLabel lblStart = new JLabel("Start");
-		lblStart.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		GridBagConstraints gbc_lblStart = new GridBagConstraints();
 		gbc_lblStart.gridwidth = 3;
 		gbc_lblStart.insets = new Insets(0, 0, 5, 5);
@@ -659,7 +657,6 @@ public class GUI implements Runnable{
 
 
 		JLabel lblDestination_1 = new JLabel("Destination");
-		lblDestination_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		GridBagConstraints gbc_lblDestination_1 = new GridBagConstraints();
 		gbc_lblDestination_1.gridwidth = 4;
 		gbc_lblDestination_1.insets = new Insets(0, 0, 5, 5);
@@ -1005,7 +1002,7 @@ public class GUI implements Runnable{
 					}
 					startPoint = startPointName;
 					startIsSelected = false;
-					directionsButton.setEnabled(false);
+
 					frame.repaint();
 				}
 				else{
@@ -1025,7 +1022,6 @@ public class GUI implements Runnable{
 					if(!(startMap.getMapId() == startPoint.getMapId())){
 						startPoint = startPointName;
 						startIsSelected = false;
-						directionsButton.setEnabled(false);
 					}
 
 					//String mapTitle = "AtwaterKent1";
@@ -1156,7 +1152,7 @@ public class GUI implements Runnable{
 					}
 					destPoint = destPointName;
 					destIsSelected = false;
-					directionsButton.setEnabled(false);
+
 					frame.repaint();
 				}
 				else{
@@ -1177,7 +1173,6 @@ public class GUI implements Runnable{
 					if(!(destMap.getMapId() == destPoint.getMapId())){
 						destPoint = destPointName;
 						destIsSelected = false;
-						directionsButton.setEnabled(false);
 					}
 
 
@@ -1357,9 +1352,6 @@ public class GUI implements Runnable{
 						startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
 						startMap = currentMap;
 						startPoint = (Point) startBuilds.getSelectedItem();
-						if(destPoint != destPointName){
-							directionsButton.setEnabled(true);
-						}
 
 						//If the startPoint and the destPoint are the same then force the startPoint to be
 						// "Select
@@ -1397,19 +1389,11 @@ public class GUI implements Runnable{
 						else{
 							startIsSelected = false;
 							startPoint = startPointName;
-							directionsButton.setEnabled(false);
-						}
-						if(startPoint == startPointName){
-							directionsButton.setEnabled(false);
 						}
 
 						System.out.println("Selected Point Name From the DropDown: " + startPoint.getName());
 						frame.repaint();
 					}
-				} else {
-					startIsSelected = false;
-					startPoint = startPointName;
-					directionsButton.setEnabled(false);
 				}
 			}
 		});
@@ -1445,9 +1429,6 @@ public class GUI implements Runnable{
 						destStarY = ((Point)(destBuilds.getSelectedItem())).getLocY();
 						startMap = currentMap;
 						destPoint = (Point) destBuilds.getSelectedItem();
-						if(startPoint != startPointName){
-							directionsButton.setEnabled(true);
-						}
 						if(destPoint != destPointName && !(destPoint == startPoint)){
 							destIsSelected = true;
 							for(int i = 0; i < maps.size(); i++){
@@ -1482,12 +1463,9 @@ public class GUI implements Runnable{
 						else{
 							destIsSelected = false;
 							destPoint = destPointName;
-							directionsButton.setEnabled(false);
 						}
 						System.out.println("Selected Point ID From the DropDown: " + destPoint.getName());
-						if(startPoint != startPointName){
-							directionsButton.setEnabled(true);
-						}
+						directionsButton.setEnabled(true);
 						frame.repaint();
 					}
 				}
@@ -1512,193 +1490,163 @@ public class GUI implements Runnable{
 		mainMenu.add(directionsButton, gbc_directionsButton);
 		directionsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(startIsSelected && destIsSelected){
-					drawnfirst = false;
-					// reset text position and map position indexes
-					textPos = 0;
-					mapPos = 0;
-					showStartPoint = false;
-					showDestPoint = false;
+				drawnfirst = false;
+				// reset text position and map position indexes
+				textPos = 0;
+				mapPos = 0;
+				showStartPoint = false;
+				showDestPoint = false;
 
 
-					//gets the start and end building and room numbers the user chose
+				//gets the start and end building and room numbers the user chose
 
-					for(int i = 0; i < allPoints.size(); i++){
-						if(allPoints.get(i).getName().equals(startBuilds.getSelectedItem().toString())){
-							start = allPoints.get(i);
-							i = allPoints.size();
-						}
+				for(int i = 0; i < allPoints.size(); i++){
+					if(allPoints.get(i).getName().equals(startBuilds.getSelectedItem().toString())){
+						start = allPoints.get(i);
+						i = allPoints.size();
 					}
-					for(int i = 0; i < allPoints.size(); i++){
-						if(allPoints.get(i).getName().equals(destBuilds.getSelectedItem().toString())){
-							end = allPoints.get(i);
-							i = allPoints.size();
-						}
+				}
+				for(int i = 0; i < allPoints.size(); i++){
+					if(allPoints.get(i).getName().equals(destBuilds.getSelectedItem().toString())){
+						end = allPoints.get(i);
+						i = allPoints.size();
 					}
+				}
 
-					if(!start.getId().equals(end.getId())){
+				if(!start.getId().equals(end.getId())){
 
-						//System.out.println("--------------------astar--------------------------------");
-						//start.print();
-						//end.print();
+					//System.out.println("--------------------astar--------------------------------");
+					//start.print();
+					//end.print();
 
-						AStar.reset();
+					AStar.reset();
 
-						route = AStar.PathFind(start, end, outside, stairs, allPoints);
-						//System.out.println("route variable: " + (route == null));
+					route = AStar.PathFind(start, end, outside, stairs, allPoints);
+					//System.out.println("route variable: " + (route == null));
 
-						if(route != null){
-							/*System.out.println("route: ");
+					if(route != null){
+						/*System.out.println("route: ");
 																														for(int i = route.size() - 1; i >= 0; i--){
 																															System.out.println(route.get(i));
 																														}*/
 
+					}
+					showRoute = true;
+					if (route == null){
+						directionsText.setText("No Valid Route.");
+					}
+					else{
+						btnNext.setEnabled(true);
+						btnPrevious.setEnabled(false);
+						//System.out.println(route.size());
+						GenTextDir gentextdir = new GenTextDir();
+						ArrayList<Directions> tempDir = gentextdir.genTextDir(route, 2.8);
+						//ArrayList<Directions> finalDir = null;
+						try {
+							finalDir = gentextdir.generateDirections(tempDir);
+						} catch (MalformedDirectionException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-						showRoute = true;
-						if (route == null){
-							directionsText.setText("No Valid Route.");
+
+						dirMaps = new ArrayList<Map>();
+						if(multiMapFinalDir != null){
+							multiMapFinalDir.clear();
 						}
-						else{
-							btnNext.setEnabled(true);
-							btnPrevious.setEnabled(false);
-							//System.out.println(route.size());
-							GenTextDir gentextdir = new GenTextDir();
-							ArrayList<Directions> tempDir = gentextdir.genTextDir(route, 2.8);
-							//ArrayList<Directions> finalDir = null;
+						multiMapFinalDir = gentextdir.genMultiMapDirections(finalDir);
+						if(!(multiMapFinalDir.get(0).isEmpty() && multiMapFinalDir.size() == 1)){
+
+							for(int r = 0; r < multiMapFinalDir.size(); r++){
+								if(multiMapFinalDir.get(r).size() != 0){
+									System.out.println("Found a valid map!");
+									for(int s = 0; s < maps.size(); s++){
+										if(multiMapFinalDir.get(r).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
+											dirMaps.add(maps.get(s));
+										}
+									}
+								} else {
+									dirMaps.add(new Map());
+								}
+
+							}
+
+
 							try {
-								finalDir = gentextdir.generateDirections(tempDir);
+								textDir = gentextdir.genDirStrings(multiMapFinalDir);
 							} catch (MalformedDirectionException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-
-							dirMaps = new ArrayList<Map>();
-							if(multiMapFinalDir != null){
-								multiMapFinalDir.clear();
-							}
-							multiMapFinalDir = gentextdir.genMultiMapDirections(finalDir);
-							if(!(multiMapFinalDir.get(0).isEmpty() && multiMapFinalDir.size() == 1)){
-
-								for(int r = 0; r < multiMapFinalDir.size(); r++){
-									if(multiMapFinalDir.get(r).size() != 0){
-										System.out.println("Found a valid map!");
-										for(int s = 0; s < maps.size(); s++){
-											if(multiMapFinalDir.get(r).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
-												dirMaps.add(maps.get(s));
-											}
-										}
-									} else {
-										dirMaps.add(new Map());
-									}
-
-								}
-
-								try {
-									textDir = gentextdir.genDirStrings(multiMapFinalDir);
-								} catch (MalformedDirectionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							} else {
-								multiMapFinalDir.add(gentextdir.genTextDir(route, 2.8));
-								try {
-									textDir = gentextdir.genDirStrings(multiMapFinalDir);
-								} catch (MalformedDirectionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-							double estimatedDirDist = 0;
-							for(int g = 0; g < multiMapFinalDir.size(); g++){
-								for(int p = 0; p < multiMapFinalDir.get(g).size(); p++){
-									estimatedDirDist+=multiMapFinalDir.get(g).get(p).getDistance();
-								}
-							}
-
-							timeEst = (int) (estimatedDirDist / walkSpeed);
-							int minEst = (int) Math.floor(timeEst / 60);
-							int secEst = timeEst % 60;
-							String secEstString = Integer.toString(secEst);
-							if(secEstString.length() == 1){
-								secEstString = "0" + secEstString;
-							} else if (secEstString.length() == 0){
-								secEstString = "00";
-							}
-							txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
-							int m = mapPos;
-							while(multiMapFinalDir.get(m).size() == 0){
-								m++;
-							}
-							File destinationFile = new File("src/VectorMaps/" + dirMaps.get(m).getMapName() + ".png");
-							destinationFile = new File(destinationFile.getAbsolutePath());
+						} else {
+							multiMapFinalDir.add(gentextdir.genTextDir(route, 2.8));
 							try {
-								img = ImageIO.read(destinationFile);
-							} catch (IOException g) {
-								System.out.println("Invalid Map Selection");
-								g.printStackTrace();
+								textDir = gentextdir.genDirStrings(multiMapFinalDir);
+							} catch (MalformedDirectionException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
-
-							String toAdd = "";
-							boolean prevIsUnderscore = true;
-							for(int j = 0; j < dirMaps.get(m).getMapName().length(); j++){
-								char tempChar;
-								if(prevIsUnderscore){
-									tempChar = dirMaps.get(m).getMapName().charAt(j);
-									//converts to upper case
-									tempChar = Character.toUpperCase(tempChar);
-									prevIsUnderscore = false;
-								}
-								else if (dirMaps.get(m).getMapName().charAt(j) == ('_')){
-									prevIsUnderscore = true;
-									tempChar = ' ';
-								}
-								else{
-									tempChar = dirMaps.get(m).getMapName().charAt(j);
-									prevIsUnderscore = false;
-								}
-								toAdd += tempChar;
-								//mapsDropdown.addItem(maps.get(i).getMapName());
-								//DestMaps.addItem(maps.get(i).getMapName());
+						}
+						double estimatedDirDist = 0;
+						for(int g = 0; g < multiMapFinalDir.size(); g++){
+							for(int p = 0; p < multiMapFinalDir.get(g).size(); p++){
+								estimatedDirDist+=multiMapFinalDir.get(g).get(p).getDistance();
 							}
-							lblCurrentMap.setText("Current Map: " + toAdd);
-
-							frame.repaint();
-							for(int r = 0; r < multiMapFinalDir.size(); r++){
-								if(multiMapFinalDir.get(r).size() == 0){
-									mapPos++;
-								}
-								else {
-									r = multiMapFinalDir.size();
-								}
-							}
-
-							String fullText = " Full List of Directions:\n";
-							directionsText.setText(textDir.get(mapPos).get(0));
-
-							int tempPos = 0;
-							for(int i = 0; i < textDir.size(); i++){
-								for(int j = 0; j < textDir.get(i).size(); j++){
-									tempPos++;
-									fullText += " " + tempPos + ". " + textDir.get(i).get(j) + "\n\n";
-								}
-							}
-
-							txtpnFullTextDir.setText(fullText);
-							// Reset text box to top
-							txtpnFullTextDir.setCaretPosition(0);
 						}
 
+						timeEst = (int) (estimatedDirDist / walkSpeed);
+						int minEst = (int) Math.floor(timeEst / 60);
+						int secEst = timeEst % 60;
+						String secEstString = Integer.toString(secEst);
+						if(secEstString.length() == 1){
+							secEstString = "0" + secEstString;
+						} else if (secEstString.length() == 0){
+							secEstString = "00";
+						}
+						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
+						int m = mapPos;
+						while(multiMapFinalDir.get(m).size() == 0){
+							m++;
+						}
+						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(m).getMapName() + ".png");
+						destinationFile = new File(destinationFile.getAbsolutePath());
+						try {
+							img = ImageIO.read(destinationFile);
+						} catch (IOException g) {
+							System.out.println("Invalid Map Selection");
+							g.printStackTrace();
+						}
 						frame.repaint();
-						menuLayout.show(menus, "Nav Menu");
+						for(int r = 0; r < multiMapFinalDir.size(); r++){
+							if(multiMapFinalDir.get(r).size() == 0){
+								mapPos++;
+							} else {
+								r = multiMapFinalDir.size();
+							}
+						}
+
+						String fullText = " Full List of Directions:\n";
+						directionsText.setText(textDir.get(mapPos).get(0));
+
+						int tempPos = 0;
+						for(int i = 0; i < textDir.size(); i++){
+							for(int j = 0; j < textDir.get(i).size(); j++){
+								tempPos++;
+								fullText += " " + tempPos + ". " + textDir.get(i).get(j) + "\n\n";
+							}
+						}
+
+						txtpnFullTextDir.setText(fullText);
+						// Reset text box to top
+						txtpnFullTextDir.setCaretPosition(0);
 					}
 
-					//if the points are identical, asks the user to input different points
-					else{
-						directionsText.setText("Pick two different points");
-						frame.repaint();
-					}
-				} else {
-					directionsButton.setEnabled(false);
+					frame.repaint();
+					menuLayout.show(menus, "Nav Menu");
+				}
+				//if the points are identical, asks the user to input different points
+				else{
+					directionsText.setText("Pick two different points");
+					frame.repaint();
 				}
 			}
 		});
@@ -1882,7 +1830,6 @@ public class GUI implements Runnable{
 					}
 					startPoint = startPointName;
 					startIsSelected = false;
-					directionsButton.setEnabled(false);
 				}
 				frame.repaint();
 
@@ -1963,10 +1910,10 @@ public class GUI implements Runnable{
 		directionsText.putClientProperty("Nimbus.Overrides", defaults);
 		directionsText.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
 		directionsText.setBackground(backgroundColor);
-
+		
 		directionsText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		directionsText.setMinimumSize(new Dimension(720, 65));
-		directionsText.setPreferredSize(new Dimension(720, 65));
+		directionsText.setMinimumSize(new Dimension(720, 90));
+		directionsText.setPreferredSize(new Dimension(720, 90));
 
 		StyledDocument doc = directionsText.getStyledDocument();
 		SimpleAttributeSet center = new SimpleAttributeSet();
@@ -2088,31 +2035,6 @@ public class GUI implements Runnable{
 						System.out.println("Invalid Map Selection");
 						g.printStackTrace();
 					}
-
-					String toAdd = "";
-					boolean prevIsUnderscore = true;
-					for(int j = 0; j < dirMaps.get(mapPos).getMapName().length(); j++){
-						char tempChar;
-						if(prevIsUnderscore){
-							tempChar = dirMaps.get(mapPos).getMapName().charAt(j);
-							//converts to upper case
-							tempChar = Character.toUpperCase(tempChar);
-							prevIsUnderscore = false;
-						}
-						else if (dirMaps.get(mapPos).getMapName().charAt(j) == ('_')){
-							prevIsUnderscore = true;
-							tempChar = ' ';
-						}
-						else{
-							tempChar = dirMaps.get(mapPos).getMapName().charAt(j);
-							prevIsUnderscore = false;
-						}
-						toAdd += tempChar;
-						//mapsDropdown.addItem(maps.get(i).getMapName());
-						//DestMaps.addItem(maps.get(i).getMapName());
-					}
-					lblCurrentMap.setText("Current Map: " + toAdd);
-
 					frame.repaint();
 				} else {
 					if (textPos != 0){
@@ -2145,16 +2067,6 @@ public class GUI implements Runnable{
 		gbc_btnPrevious.gridx = 1;
 		gbc_btnPrevious.gridy = 5;
 		navMenu.add(btnPrevious, gbc_btnPrevious);
-
-
-		lblCurrentMap = new JLabel("Current Map:");
-		lblCurrentMap.setFont(new Font("Serif", Font.PLAIN, 18));
-		GridBagConstraints gbc_lblCurrentMap = new GridBagConstraints();
-		gbc_lblCurrentMap.gridwidth = 3;
-		gbc_lblCurrentMap.insets = new Insets(0, 0, 0, 5);
-		gbc_lblCurrentMap.gridx = 1;
-		gbc_lblCurrentMap.gridy = 6;
-		navMenu.add(lblCurrentMap, gbc_lblCurrentMap);
 
 		// Button to get next step in directions
 		//sets the next button color to red
@@ -2262,30 +2174,6 @@ public class GUI implements Runnable{
 								System.out.println("Invalid Map Selection");
 								g.printStackTrace();
 							}
-
-							String toAdd = "";
-							boolean prevIsUnderscore = true;
-							for(int j = 0; j < dirMaps.get(mapPos).getMapName().length(); j++){
-								char tempChar;
-								if(prevIsUnderscore){
-									tempChar = dirMaps.get(mapPos).getMapName().charAt(j);
-									//converts to upper case
-									tempChar = Character.toUpperCase(tempChar);
-									prevIsUnderscore = false;
-								}
-								else if (dirMaps.get(mapPos).getMapName().charAt(j) == ('_')){
-									prevIsUnderscore = true;
-									tempChar = ' ';
-								}
-								else{
-									tempChar = dirMaps.get(mapPos).getMapName().charAt(j);
-									prevIsUnderscore = false;
-								}
-								toAdd += tempChar;
-								//mapsDropdown.addItem(maps.get(i).getMapName());
-								//DestMaps.addItem(maps.get(i).getMapName());
-							}
-							lblCurrentMap.setText("Current Map: " + toAdd);
 						}
 						mapChange = true;
 						frame.repaint();
@@ -2311,7 +2199,6 @@ public class GUI implements Runnable{
 		gbc_btnNext.gridx = 3;
 		gbc_btnNext.gridy = 5;
 		navMenu.add(btnNext, gbc_btnNext);
-
 
 		panelDirections = new JPanel();
 		panelDirections.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
@@ -2870,18 +2757,10 @@ public class GUI implements Runnable{
 		return prefMenu;
 	}
 
-	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
+	public static void main(String[] args) {
 
 		GUI gui = new GUI();
 
-		if(guiThreadObject == null)
-		{
-			guiThreadObject= new Thread (gui, "GUI Thread");
-			guiThreadObject.setPriority(4);
-			guiThreadObject.start();
-
-
-		}
 
 
 		//added by JPG starts and plays the animation
@@ -2927,7 +2806,6 @@ public class GUI implements Runnable{
 		});
 
 		//loadingAnimation.hideSplash(0);
-
 
 	}				
 
@@ -3397,49 +3275,5 @@ public class GUI implements Runnable{
 	}
 
 
-	//runs the startup and the object for the GUI class in its' own thread.
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		//added by JPG starts and plays the animation
-		loadingAnimation = new SplashPage("GuiSplashThread");
-		loadingAnimation.showSplash();
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
 
-
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-		} catch (Exception e) {
-			// If Nimbus is not available, use lookAndFeel of current system
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (ClassNotFoundException | InstantiationException
-					| IllegalAccessException | UnsupportedLookAndFeelException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-
-		try {
-			this.createAndShowGUI();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (AlreadyExistsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-		loadingAnimation.hideSplash(0);
-	}
 }

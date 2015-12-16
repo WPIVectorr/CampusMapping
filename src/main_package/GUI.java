@@ -39,6 +39,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import database.AlreadyExistsException;
 import database.ServerDB;
@@ -67,7 +70,7 @@ public class GUI{
 	private boolean showRoute;
 	private boolean showStartPoint = false;
 	private boolean showDestPoint = false;
-	private JLabel directionsText;
+	private JTextPane directionsText;
 	private JPanel mainMenu;
 	private JPanel navMenu;
 	private JPanel prefMenu;
@@ -215,9 +218,9 @@ public class GUI{
 		navMenu.setBackground(backgroundColor);
 
 		GridBagLayout gbl_navMenu = new GridBagLayout();
-		gbl_navMenu.columnWidths = new int[]{30, 215, 290, 215, 30, 0};
+		gbl_navMenu.columnWidths = new int[]{30, 215, 290, 215, 30};
 		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 0, 31, 30, 7, 0};
-		gbl_navMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		gbl_navMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
 
@@ -1502,14 +1505,25 @@ public class GUI{
 
 
 		//creates a centered text field that will write back the users info they typed in
-		directionsText = new JLabel(" ");
-		directionsText.setHorizontalAlignment(JTextField.CENTER);
+		directionsText = new JTextPane();
+		directionsText.setEditable(false);
 		directionsText.setToolTipText("");
 		directionsText.setBounds(6, 174, 438, 30);
+		directionsText.setBackground(backgroundColor);
+		directionsText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		directionsText.setMinimumSize(new Dimension(720, 60));
+		
+		StyledDocument doc = directionsText.getStyledDocument();
+		SimpleAttributeSet center = new SimpleAttributeSet();
+		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+		StyleConstants.setBackground(center, backgroundColor);
+		doc.setParagraphAttributes(0, doc.getLength(), center, false);
+		
 
 		//directionsText.setColumns(1);
 		directionsText.setFont(new Font("Serif", Font.BOLD, 20));
 		GridBagConstraints gbc_directionsText = new GridBagConstraints();
+		gbc_directionsText.gridheight = 2;
 		gbc_directionsText.gridwidth = 5;
 		gbc_directionsText.insets = new Insets(0, 0, 5, 0);
 		gbc_directionsText.gridx = 0;

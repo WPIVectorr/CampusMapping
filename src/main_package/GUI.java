@@ -717,10 +717,10 @@ public class GUI implements Runnable{
 
 
 		hilit = new DefaultHighlighter();
-	    painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
+		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
 
 		txtSearchStart.addKeyListener(new KeyListener() {
-		
+
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
@@ -871,7 +871,7 @@ public class GUI implements Runnable{
 							txtSearchDest.setText("");
 							searchString ="";
 						}
-						
+
 
 					}catch(java.lang.IllegalArgumentException searchExcept1){
 
@@ -908,7 +908,7 @@ public class GUI implements Runnable{
 				// TODO Auto-generated method stub
 
 			}
-			
+
 		});
 
 
@@ -1000,7 +1000,7 @@ public class GUI implements Runnable{
 					}
 					startPoint = startPointName;
 					startIsSelected = false;
-
+					directionsButton.setEnabled(false);
 					frame.repaint();
 				}
 				else{
@@ -1020,6 +1020,7 @@ public class GUI implements Runnable{
 					if(!(startMap.getMapId() == startPoint.getMapId())){
 						startPoint = startPointName;
 						startIsSelected = false;
+						directionsButton.setEnabled(false);
 					}
 
 					//String mapTitle = "AtwaterKent1";
@@ -1150,7 +1151,7 @@ public class GUI implements Runnable{
 					}
 					destPoint = destPointName;
 					destIsSelected = false;
-
+					directionsButton.setEnabled(false);
 					frame.repaint();
 				}
 				else{
@@ -1171,6 +1172,7 @@ public class GUI implements Runnable{
 					if(!(destMap.getMapId() == destPoint.getMapId())){
 						destPoint = destPointName;
 						destIsSelected = false;
+						directionsButton.setEnabled(false);
 					}
 
 
@@ -1350,6 +1352,9 @@ public class GUI implements Runnable{
 						startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
 						startMap = currentMap;
 						startPoint = (Point) startBuilds.getSelectedItem();
+						if(destPoint != destPointName){
+							directionsButton.setEnabled(true);
+						}
 
 						//If the startPoint and the destPoint are the same then force the startPoint to be
 						// "Select
@@ -1362,9 +1367,9 @@ public class GUI implements Runnable{
 								}
 							}
 							mapTitle = currentMap.getMapName();
-							
-							
-							
+
+
+
 
 							//String mapTitle = "AtwaterKent1";
 							File start = new File("src/VectorMaps");
@@ -1387,11 +1392,18 @@ public class GUI implements Runnable{
 						else{
 							startIsSelected = false;
 							startPoint = startPointName;
+							directionsButton.setEnabled(false);
 						}
-						
+						if(startPoint == startPointName){
+							directionsButton.setEnabled(false);
+						}
 						System.out.println("Selected Point Name From the DropDown: " + startPoint.getName());
 						frame.repaint();
 					}
+				} else {
+					startIsSelected = false;
+					startPoint = startPointName;
+					directionsButton.setEnabled(false);
 				}
 			}
 		});
@@ -1427,6 +1439,9 @@ public class GUI implements Runnable{
 						destStarY = ((Point)(destBuilds.getSelectedItem())).getLocY();
 						startMap = currentMap;
 						destPoint = (Point) destBuilds.getSelectedItem();
+						if(startPoint != startPointName){
+							directionsButton.setEnabled(true);
+						}
 						if(destPoint != destPointName && !(destPoint == startPoint)){
 							destIsSelected = true;
 							for(int i = 0; i < maps.size(); i++){
@@ -1436,9 +1451,9 @@ public class GUI implements Runnable{
 								}
 							}
 							mapTitle = currentMap.getMapName();
-							
-							
-							
+
+
+
 
 							//String mapTitle = "AtwaterKent1";
 							File dest = new File("src/VectorMaps");
@@ -1461,9 +1476,12 @@ public class GUI implements Runnable{
 						else{
 							destIsSelected = false;
 							destPoint = destPointName;
+							directionsButton.setEnabled(false);
 						}
 						System.out.println("Selected Point ID From the DropDown: " + destPoint.getName());
-						directionsButton.setEnabled(true);
+						if(startPoint != startPointName){
+							directionsButton.setEnabled(true);
+						}
 						frame.repaint();
 					}
 				}
@@ -1488,163 +1506,167 @@ public class GUI implements Runnable{
 		mainMenu.add(directionsButton, gbc_directionsButton);
 		directionsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				drawnfirst = false;
-				// reset text position and map position indexes
-				textPos = 0;
-				mapPos = 0;
-				showStartPoint = false;
-				showDestPoint = false;
+				if(startIsSelected && destIsSelected){
+					drawnfirst = false;
+					// reset text position and map position indexes
+					textPos = 0;
+					mapPos = 0;
+					showStartPoint = false;
+					showDestPoint = false;
 
 
-				//gets the start and end building and room numbers the user chose
+					//gets the start and end building and room numbers the user chose
 
-				for(int i = 0; i < allPoints.size(); i++){
-					if(allPoints.get(i).getName().equals(startBuilds.getSelectedItem().toString())){
-						start = allPoints.get(i);
-						i = allPoints.size();
+					for(int i = 0; i < allPoints.size(); i++){
+						if(allPoints.get(i).getName().equals(startBuilds.getSelectedItem().toString())){
+							start = allPoints.get(i);
+							i = allPoints.size();
+						}
 					}
-				}
-				for(int i = 0; i < allPoints.size(); i++){
-					if(allPoints.get(i).getName().equals(destBuilds.getSelectedItem().toString())){
-						end = allPoints.get(i);
-						i = allPoints.size();
+					for(int i = 0; i < allPoints.size(); i++){
+						if(allPoints.get(i).getName().equals(destBuilds.getSelectedItem().toString())){
+							end = allPoints.get(i);
+							i = allPoints.size();
+						}
 					}
-				}
 
-				if(!start.getId().equals(end.getId())){
+					if(!start.getId().equals(end.getId())){
 
-					//System.out.println("--------------------astar--------------------------------");
-					//start.print();
-					//end.print();
+						//System.out.println("--------------------astar--------------------------------");
+						//start.print();
+						//end.print();
 
-					AStar.reset();
+						AStar.reset();
 
-					route = AStar.PathFind(start, end, outside, stairs, allPoints);
-					//System.out.println("route variable: " + (route == null));
+						route = AStar.PathFind(start, end, outside, stairs, allPoints);
+						//System.out.println("route variable: " + (route == null));
 
-					if(route != null){
-						/*System.out.println("route: ");
+						if(route != null){
+							/*System.out.println("route: ");
 																														for(int i = route.size() - 1; i >= 0; i--){
 																															System.out.println(route.get(i));
 																														}*/
 
-					}
-					showRoute = true;
-					if (route == null){
-						directionsText.setText("No Valid Route.");
-					}
-					else{
-						btnNext.setEnabled(true);
-						btnPrevious.setEnabled(false);
-						//System.out.println(route.size());
-						GenTextDir gentextdir = new GenTextDir();
-						ArrayList<Directions> tempDir = gentextdir.genTextDir(route, 2.8);
-						//ArrayList<Directions> finalDir = null;
-						try {
-							finalDir = gentextdir.generateDirections(tempDir);
-						} catch (MalformedDirectionException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
-
-						dirMaps = new ArrayList<Map>();
-						if(multiMapFinalDir != null){
-							multiMapFinalDir.clear();
+						showRoute = true;
+						if (route == null){
+							directionsText.setText("No Valid Route.");
 						}
-						multiMapFinalDir = gentextdir.genMultiMapDirections(finalDir);
-						if(!(multiMapFinalDir.get(0).isEmpty() && multiMapFinalDir.size() == 1)){
+						else{
+							btnNext.setEnabled(true);
+							btnPrevious.setEnabled(false);
+							//System.out.println(route.size());
+							GenTextDir gentextdir = new GenTextDir();
+							ArrayList<Directions> tempDir = gentextdir.genTextDir(route, 2.8);
+							//ArrayList<Directions> finalDir = null;
+							try {
+								finalDir = gentextdir.generateDirections(tempDir);
+							} catch (MalformedDirectionException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 
-							for(int r = 0; r < multiMapFinalDir.size(); r++){
-								if(multiMapFinalDir.get(r).size() != 0){
-									System.out.println("Found a valid map!");
-									for(int s = 0; s < maps.size(); s++){
-										if(multiMapFinalDir.get(r).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
-											dirMaps.add(maps.get(s));
+							dirMaps = new ArrayList<Map>();
+							if(multiMapFinalDir != null){
+								multiMapFinalDir.clear();
+							}
+							multiMapFinalDir = gentextdir.genMultiMapDirections(finalDir);
+							if(!(multiMapFinalDir.get(0).isEmpty() && multiMapFinalDir.size() == 1)){
+
+								for(int r = 0; r < multiMapFinalDir.size(); r++){
+									if(multiMapFinalDir.get(r).size() != 0){
+										System.out.println("Found a valid map!");
+										for(int s = 0; s < maps.size(); s++){
+											if(multiMapFinalDir.get(r).get(0).getOrigin().getMapId() == maps.get(s).getMapId()){
+												dirMaps.add(maps.get(s));
+											}
 										}
+									} else {
+										dirMaps.add(new Map());
 									}
-								} else {
-									dirMaps.add(new Map());
+
 								}
 
-							}
 
-
-							try {
-								textDir = gentextdir.genDirStrings(multiMapFinalDir);
-							} catch (MalformedDirectionException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						} else {
-							multiMapFinalDir.add(gentextdir.genTextDir(route, 2.8));
-							try {
-								textDir = gentextdir.genDirStrings(multiMapFinalDir);
-							} catch (MalformedDirectionException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						double estimatedDirDist = 0;
-						for(int g = 0; g < multiMapFinalDir.size(); g++){
-							for(int p = 0; p < multiMapFinalDir.get(g).size(); p++){
-								estimatedDirDist+=multiMapFinalDir.get(g).get(p).getDistance();
-							}
-						}
-
-						timeEst = (int) (estimatedDirDist / walkSpeed);
-						int minEst = (int) Math.floor(timeEst / 60);
-						int secEst = timeEst % 60;
-						String secEstString = Integer.toString(secEst);
-						if(secEstString.length() == 1){
-							secEstString = "0" + secEstString;
-						} else if (secEstString.length() == 0){
-							secEstString = "00";
-						}
-						txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
-						int m = mapPos;
-						while(multiMapFinalDir.get(m).size() == 0){
-							m++;
-						}
-						File destinationFile = new File("src/VectorMaps/" + dirMaps.get(m).getMapName() + ".png");
-						destinationFile = new File(destinationFile.getAbsolutePath());
-						try {
-							img = ImageIO.read(destinationFile);
-						} catch (IOException g) {
-							System.out.println("Invalid Map Selection");
-							g.printStackTrace();
-						}
-						frame.repaint();
-						for(int r = 0; r < multiMapFinalDir.size(); r++){
-							if(multiMapFinalDir.get(r).size() == 0){
-								mapPos++;
+								try {
+									textDir = gentextdir.genDirStrings(multiMapFinalDir);
+								} catch (MalformedDirectionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							} else {
-								r = multiMapFinalDir.size();
+								multiMapFinalDir.add(gentextdir.genTextDir(route, 2.8));
+								try {
+									textDir = gentextdir.genDirStrings(multiMapFinalDir);
+								} catch (MalformedDirectionException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
+							double estimatedDirDist = 0;
+							for(int g = 0; g < multiMapFinalDir.size(); g++){
+								for(int p = 0; p < multiMapFinalDir.get(g).size(); p++){
+									estimatedDirDist+=multiMapFinalDir.get(g).get(p).getDistance();
+								}
+							}
+
+							timeEst = (int) (estimatedDirDist / walkSpeed);
+							int minEst = (int) Math.floor(timeEst / 60);
+							int secEst = timeEst % 60;
+							String secEstString = Integer.toString(secEst);
+							if(secEstString.length() == 1){
+								secEstString = "0" + secEstString;
+							} else if (secEstString.length() == 0){
+								secEstString = "00";
+							}
+							txtTimeToDestination.setText("Estimated Time to Destination: " + minEst + ":" + secEstString);
+							int m = mapPos;
+							while(multiMapFinalDir.get(m).size() == 0){
+								m++;
+							}
+							File destinationFile = new File("src/VectorMaps/" + dirMaps.get(m).getMapName() + ".png");
+							destinationFile = new File(destinationFile.getAbsolutePath());
+							try {
+								img = ImageIO.read(destinationFile);
+							} catch (IOException g) {
+								System.out.println("Invalid Map Selection");
+								g.printStackTrace();
+							}
+							frame.repaint();
+							for(int r = 0; r < multiMapFinalDir.size(); r++){
+								if(multiMapFinalDir.get(r).size() == 0){
+									mapPos++;
+								} else {
+									r = multiMapFinalDir.size();
+								}
+							}
+
+							String fullText = " Full List of Directions:\n";
+							directionsText.setText(textDir.get(mapPos).get(0));
+
+							int tempPos = 0;
+							for(int i = 0; i < textDir.size(); i++){
+								for(int j = 0; j < textDir.get(i).size(); j++){
+									tempPos++;
+									fullText += " " + tempPos + ". " + textDir.get(i).get(j) + "\n\n";
+								}
+							}
+
+							txtpnFullTextDir.setText(fullText);
+							// Reset text box to top
+							txtpnFullTextDir.setCaretPosition(0);
 						}
 
-						String fullText = " Full List of Directions:\n";
-						directionsText.setText(textDir.get(mapPos).get(0));
-
-						int tempPos = 0;
-						for(int i = 0; i < textDir.size(); i++){
-							for(int j = 0; j < textDir.get(i).size(); j++){
-								tempPos++;
-								fullText += " " + tempPos + ". " + textDir.get(i).get(j) + "\n\n";
-							}
-						}
-
-						txtpnFullTextDir.setText(fullText);
-						// Reset text box to top
-						txtpnFullTextDir.setCaretPosition(0);
+						frame.repaint();
+						menuLayout.show(menus, "Nav Menu");
 					}
-
-					frame.repaint();
-					menuLayout.show(menus, "Nav Menu");
-				}
-				//if the points are identical, asks the user to input different points
-				else{
-					directionsText.setText("Pick two different points");
-					frame.repaint();
+					//if the points are identical, asks the user to input different points
+					else{
+						directionsText.setText("Pick two different points");
+						frame.repaint();
+					}
+				} else {
+					directionsButton.setEnabled(false);
 				}
 			}
 		});
@@ -1828,6 +1850,7 @@ public class GUI implements Runnable{
 					}
 					startPoint = startPointName;
 					startIsSelected = false;
+					directionsButton.setEnabled(false);
 				}
 				frame.repaint();
 
@@ -1906,13 +1929,13 @@ public class GUI implements Runnable{
 		directionsText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		directionsText.setMinimumSize(new Dimension(720, 90));
 		directionsText.setPreferredSize(new Dimension(720, 90));
-		
+
 		StyledDocument doc = directionsText.getStyledDocument();
 		SimpleAttributeSet center = new SimpleAttributeSet();
 		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
 		StyleConstants.setBackground(center, backgroundColor);
 		doc.setParagraphAttributes(0, doc.getLength(), center, false);
-		
+
 
 		//directionsText.setColumns(1);
 		directionsText.setFont(new Font("Serif", Font.BOLD, 20));

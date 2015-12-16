@@ -702,10 +702,10 @@ public class GUI implements Runnable{
 				// TODO Auto-generated method stub
 				if(startSearchTypeEvent.getKeyCode() != KeyEvent.VK_ENTER )
 				{
-					String searchString;
+					String searchString ="";
 					try{
 
-						if(txtSearchStart.getCaretPosition()>0)
+						if(txtSearchStart.getCaretPosition()>1)
 						{
 
 							searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
@@ -715,24 +715,28 @@ public class GUI implements Runnable{
 							{
 								//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
 
+								txtSearchStart.setCaretPosition(searchString.length());
 								txtSearchStart.setText(searchStartPointName);
-								//txtSearchStart.select(0, searchString.length());
-							//	txtSearchStart.selectAll();
-								//txtSearchStart.setSelectedTetColor(Color.RED);
 								txtSearchStart.setCaretPosition(searchString.length());
 								System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
 							}else{
 								System.out.println("no autocomplete found");
 							}
-						}else{
+
+						}else if(txtSearchStart.getCaretPosition() ==0){
 							txtSearchStart.setText("");
 							searchString = "";
 						}
 					}catch(java.lang.IllegalArgumentException searchExcept1){
 
 					}
+					txtSearchStart.setSelectionStart(searchString.length());
+					txtSearchStart.setSelectionEnd(txtSearchStart.getText().length());
+					txtSearchStart.setCaretPosition(searchString.length());
+
 				}else if(searchStartPointName != "")
 				{
+
 					searchStartPoint = googleStart.getPointFromName(searchStartPointName);
 					System.out.println("Enter Pressed, Point: "+searchStartPoint.getName());
 

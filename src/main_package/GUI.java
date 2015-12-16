@@ -40,6 +40,9 @@ import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.plaf.metal.MetalComboBoxUI;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
 import database.AlreadyExistsException;
@@ -198,6 +201,9 @@ public class GUI implements Runnable{
 	private Map searchDestMap;
 	private static SearchLocation googleStart = new SearchLocation();
 	private static SearchLocation googleDest = new SearchLocation();
+
+	private Highlighter hilit;
+	private Highlighter.HighlightPainter painter;
 
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
 
@@ -391,7 +397,7 @@ public class GUI implements Runnable{
 				frame.repaint();
 			}
 		});
-		
+
 
 		destMapsDropDown.addItem("Select Map");
 		startMapsDropDown.addItem("Select Map");
@@ -507,16 +513,16 @@ public class GUI implements Runnable{
 						System.out.println("startMapsDropDown selectedItem: " + startMapsDropDown.getSelectedItem().toString());
 						if (!(startMapsDropDown.getSelectedItem().equals("Select Map")) || !(destMapsDropDown.getSelectedItem().equals("Select Map")))
 							newClick = true;
-						
-						
+
+
 						//frame.repaint();
 					} else {
 						// System.out.println("dragged = true");
 						Dragged = false;
 						drawnfirst = true;
 					}
-					
-					
+
+
 				}
 				else{
 					if(!(roomPointsToDraw == null)){
@@ -687,10 +693,11 @@ public class GUI implements Runnable{
 		txtSearchStart.setColumns(10);
 
 
-
+		hilit = new DefaultHighlighter();
+	    painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
 
 		txtSearchStart.addKeyListener(new KeyListener() {
-
+		
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
@@ -699,6 +706,8 @@ public class GUI implements Runnable{
 
 			@Override
 			public void keyReleased(KeyEvent startSearchTypeEvent) {
+
+				txtSearchStart.setHighlighter(hilit);
 				// TODO Auto-generated method stub
 				if(startSearchTypeEvent.getKeyCode() != KeyEvent.VK_ENTER )
 				{
@@ -715,21 +724,29 @@ public class GUI implements Runnable{
 							{
 								//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
 
-								txtSearchStart.setText(searchStartPointName);
-								//txtSearchStart.select(0, searchString.length());
-							//	txtSearchStart.selectAll();
+								txtSearchStart.setText(searchStartPointName);				
 								//txtSearchStart.setSelectedTetColor(Color.RED);
 								txtSearchStart.setCaretPosition(searchString.length());
 								System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
 							}else{
 								System.out.println("no autocomplete found");
 							}
+							hilit.addHighlight(searchString.length(), searchStartPointName.length(), painter);
+
 						}else{
 							txtSearchStart.setText("");
 							searchString = "";
 						}
+
+						//txtSearchStart.moveCaretPosition(searchString.length());
+						//txtSearchStart.select(searchString.length(), searchStartPointName.length());
+
+
 					}catch(java.lang.IllegalArgumentException searchExcept1){
 
+					} catch (BadLocationException e) {
+						// TODO Auto-generated catch block
+						//e.printStackTrace();
 					}
 				}else if(searchStartPointName != "")
 				{
@@ -751,6 +768,7 @@ public class GUI implements Runnable{
 							startBuilds.setSelectedIndex(i);
 					}
 				}
+
 			}
 
 			@Override
@@ -797,16 +815,18 @@ public class GUI implements Runnable{
 
 			@Override
 			public void keyReleased(KeyEvent destSearchTypeEvent) {
+				txtSearchDest.setHighlighter(hilit);
+
 				// TODO Auto-generated method stub
 				if(destSearchTypeEvent.getKeyCode() != KeyEvent.VK_ENTER )
 				{
 					System.out.println(destSearchTypeEvent.getKeyCode());
 					try
 					{
-						String searchString;
+						String searchString= "";
 
 
-						if(txtSearchDest.getCaretPosition()>0)
+						if(txtSearchDest.getCaretPosition()>1)
 						{
 							searchString = txtSearchDest.getText().substring(0, txtSearchDest.getCaretPosition());
 							//System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
@@ -816,18 +836,25 @@ public class GUI implements Runnable{
 								//String searchDestPointName = searchDestPoint.get(0).getName();
 								//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
 
+								txtSearchDest.setCaretPosition(searchString.length());
 								txtSearchDest.setText(searchDestPointName);
 								txtSearchDest.setCaretPosition(searchString.length());
 								System.out.println("Search Term: "+searchString+" Result: "+searchDestPointName);
 							}else{
 								System.out.println("no autocomplete found");
 							}
-						}else{
+							hilit.addHighlight(searchString.length(), searchDestPointName.length(), painter);
+						}else if(txtSearchDest.getCaretPosition() == 0){
 							txtSearchDest.setText("");
 							searchString ="";
 						}
+						
+
 					}catch(java.lang.IllegalArgumentException searchExcept1){
 
+					} catch (BadLocationException e) {
+						// TODO Auto-generated catch block
+						//e.printStackTrace();
 					}
 
 				}else if(searchDestPointName != "")
@@ -1241,7 +1268,7 @@ public class GUI implements Runnable{
 
 					startMapsDropDown.setSelectedIndex(destMapsDropDown.getSelectedIndex());
 					startBuilds.setSelectedIndex(destBuilds.getSelectedIndex());
-					
+
 
 					destMapsDropDown.setSelectedIndex(startMapIndex);
 					destBuilds.setSelectedIndex(startPointIndex);
@@ -1721,7 +1748,7 @@ public class GUI implements Runnable{
 					startIsSelected = false;
 				}
 				frame.repaint();
-				
+
 			}
 		});
 		GridBagConstraints gbc_btnReturn = new GridBagConstraints();
@@ -2713,7 +2740,7 @@ public class GUI implements Runnable{
 								//g.fillOval(campusX, campusY, 20, 20);
 								System.out.println("Found that the click is contained by: " + maps.get(m).getMapName());
 							}
-					}
+						}
 					}
 				}
 				for(int i = 0; i < roomPointsToDraw.size(); i++){
@@ -2741,7 +2768,7 @@ public class GUI implements Runnable{
 							System.out.println("Current Dest Map Name: " + destMap.getMapId());
 						System.out.println("------------------------------------");
 					}
-					
+
 					DEBUG = false;
 					if ((lastMouseX > posx - (pointSize + (1*scaleSize))
 							&& lastMouseX < posx + (pointSize + (1*scaleSize)))
@@ -2760,7 +2787,7 @@ public class GUI implements Runnable{
 						if( !(selectedPointID == null) ){
 							//System.out.println("selectedPointID: " + selectedPoint.getId());
 						}
-						
+
 						if(currentMap == startMap && startMap != null){
 							//System.out.println("Marker 1---------");
 							//select the starting point

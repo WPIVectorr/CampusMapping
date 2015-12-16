@@ -112,7 +112,7 @@ public class GUI{
 	private Color currentColor = new Color(219, 209, 0);
 	private Color nextColor = new Color(51, 255, 51);
 	private Color pointColor = Color.ORANGE;
-	private Color backgroundColor = new Color(135,206,250);
+	private Color backgroundColor = new Color(124, 140, 157);
 	private Color buttonColor = new Color(153, 204, 255);
 	private Color starColor = new Color(255, 51, 255);
 	private ArrayList<Point> pointArray;

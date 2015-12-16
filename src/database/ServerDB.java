@@ -62,7 +62,6 @@ public class ServerDB {
 
 	{ 
 		//updateAllPointIDIndexes();
-		clearDatabase();
 
 		//tryCreateDB();
 		conn = connect();

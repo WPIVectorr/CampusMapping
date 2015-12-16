@@ -73,6 +73,8 @@ public class GUI implements Runnable{
 	private boolean showRoute;
 	private boolean showStartPoint = false;
 	private boolean showDestPoint = false;
+	private boolean isShowStart = false;
+	private boolean isShowDest = false;
 	private JLabel directionsText;
 	private JPanel mainMenu;
 	private JPanel navMenu;
@@ -389,6 +391,14 @@ public class GUI implements Runnable{
 				menuLayout.show(menus, "Pref Menu");
 				img = tempImg;
 				roomPointsToDraw = getRoomPoints(currentMap.getPointList());
+				if(isShowStart){
+					startIsSelected = true;
+					isShowStart = false;
+				}
+				if(isShowDest){
+					destIsSelected = true;
+					isShowDest = false;
+				}
 				frame.repaint();
 			}
 		});
@@ -2289,6 +2299,14 @@ public class GUI implements Runnable{
 				catch(IOException g){
 					System.out.println("Invalid logo1");
 					g.printStackTrace();
+				}
+				if(startIsSelected){
+					startIsSelected = false;
+					isShowStart = true;
+				}
+				if(destIsSelected){
+					destIsSelected = false; 
+					isShowDest = true;
 				}
 				frame.repaint();
 			}

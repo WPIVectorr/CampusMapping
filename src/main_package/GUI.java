@@ -38,12 +38,22 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
+
+import javax.swing.plaf.ComboBoxUI;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
+import javax.swing.plaf.basic.BasicComboBoxUI;
+import javax.swing.plaf.metal.MetalComboBoxUI;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import database.AlreadyExistsException;
+import database.DoesNotExistException;
+import database.PopulateErrorException;
 import database.ServerDB;
 
 import javax.swing.border.TitledBorder;
@@ -53,7 +63,11 @@ import javax.swing.border.EtchedBorder;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class GUI{
+public class GUI implements Runnable{
+
+	private static Thread guiThreadObject;
+	private String threadName;
+
 	private boolean DEBUG = false;
 	private ServerDB md = ServerDB.getInstance();
 
@@ -71,6 +85,8 @@ public class GUI{
 	private boolean showStartPoint = false;
 	private boolean showDestPoint = false;
 	private JTextPane directionsText;
+	private boolean isShowStart = false;
+	private boolean isShowDest = false;
 	private JPanel mainMenu;
 	private JPanel navMenu;
 	private JPanel prefMenu;
@@ -96,7 +112,7 @@ public class GUI{
 	private Color currentColor = new Color(219, 209, 0);
 	private Color nextColor = new Color(51, 255, 51);
 	private Color pointColor = Color.ORANGE;
-	private Color backgroundColor = new Color(255, 235, 205);
+	private Color backgroundColor = new Color(135,206,250);
 	private Color buttonColor = new Color(153, 204, 255);
 	private Color starColor = new Color(255, 51, 255);
 	private ArrayList<Point> pointArray;
@@ -106,7 +122,7 @@ public class GUI{
 	private JComboBox<Point> destBuilds = new JComboBox();
 	private JComboBox<Point> startBuilds = new JComboBox();
 	private JComboBox destMapsDropDown = new JComboBox();
-	private int pointSize = 16;
+	private int pointSize = 10;
 	private int originalpointSize = 25;
 	private double scaleSize = 1;
 	private double drawnposx;
@@ -124,6 +140,8 @@ public class GUI{
 	private int mousey;
 	private int originx;
 	private int originy;
+	private int lastMouseX;
+	private int lastMouseY;
 	private double difWidth;
 	private double difHeight;
 	private double newImageHeight;
@@ -136,13 +154,17 @@ public class GUI{
 	private int stairs;
 	private double walkSpeed = 4.5;
 	private Map startMap;
+	private Map destMap;
 	private String mapTitle = "Select Map";
+	//private String startPointName = "Select Start Location";
+	//private String destPointName = "Select Destination Location";
 	private static SplashPage loadingAnimation;
 	private JTextField txtFieldEmail;
 	private JLabel txtTimeToDestination;
 	private boolean resetPath = false;
 	private GradientButton btnSwapStartAndDest;
 	private GradientButton directionsButton;
+	private ArrayList<Point> roomPointsToDraw = new ArrayList<Point>();
 	private JPanel panelDirections;
 	private double mousezoomx;
 	private double mousezoomy;
@@ -152,6 +174,23 @@ public class GUI{
 	private JTextField txtSearchStart;
 	private JTextField txtSearchDest;
 	private GradientButton btnFullTextDirections;
+	private boolean newClick = false;
+	private Point startPoint = new Point();
+	private Point destPoint = new Point();
+	private int startPointIndex;
+	private int destPointIndex;
+	private Map currentMap;
+	private ArrayList<Point> tempStartRoom = new ArrayList<Point>();
+	private ArrayList<Point> tempDestRoom = new ArrayList<Point>();
+	private Point startPointName = new Point();
+	private Point destPointName = new Point();
+	private String selectedPointID;
+	private Point selectedPoint;
+	private boolean startIsSelected = false;
+	private boolean destIsSelected = false;
+
+
+
 	private double startStarX;
 	private double startStarY;
 	private double destStarX;
@@ -163,15 +202,25 @@ public class GUI{
 	private int themeIndex = 0;
 
 
-	private ArrayList<Point> searchStartPoint;
+
+	private static String searchStartPointName;
+	private static String searchDestPointName;
+	private static Point searchStartPoint;
+	private static Point searchDestPoint;
 	private Map searchStartMap;
-	private Point searchDestPoint;
 	private Map searchDestMap;
-	private static SearchLocation google = new SearchLocation();
+	private static SearchLocation googleStart = new SearchLocation();
+	private static SearchLocation googleDest = new SearchLocation();
 
+	private Highlighter hilit;
+	private Highlighter.HighlightPainter painter;
 
-
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	public void createAndShowGUI() throws IOException, AlreadyExistsException, SQLException{
+
+
 
 		//frame.setSize(932, 778);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -199,12 +248,22 @@ public class GUI{
 			}
 		}
 		//System.out.println("------------------edges check-------------------");
-		google.prepData(allPoints);
+		googleStart.prepData(allPoints);
+		googleDest.prepData(allPoints);
 
 
 		mainMenu = new JPanel();
 		mainMenu.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		mainMenu.setBackground(backgroundColor);
+
+		//create a dummy point for the titles of the dropdowns for selecting points
+		startPointName.setName("Select Start Location");
+		destPointName.setName("Select Destination Location");
+
+		startPoint = startPointName;
+		destPoint = destPointName;
+
+		//destMapsDropDown.setEnabled(startIsSelected);
 
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
 		gbl_mainMenu.columnWidths = new int[]{80, 90, 123, 62, 150, 90, 93, 30, 62, 80};
@@ -219,7 +278,7 @@ public class GUI{
 
 		GridBagLayout gbl_navMenu = new GridBagLayout();
 		gbl_navMenu.columnWidths = new int[]{30, 215, 290, 215, 30};
-		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 0, 31, 30, 7, 0};
+		gbl_navMenu.rowHeights = new int[]{15, 19, 0, 45, 45, 30, 7, 0};
 		gbl_navMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_navMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		navMenu.setLayout(gbl_navMenu);
@@ -348,9 +407,19 @@ public class GUI{
 			public void actionPerformed(ActionEvent e) {
 				menuLayout.show(menus, "Pref Menu");
 				img = tempImg;
+				roomPointsToDraw = getRoomPoints(currentMap.getPointList());
+				if(isShowStart){
+					startIsSelected = true;
+					isShowStart = false;
+				}
+				if(isShowDest){
+					destIsSelected = true;
+					isShowDest = false;
+				}
 				frame.repaint();
 			}
 		});
+
 
 		destMapsDropDown.addItem("Select Map");
 		startMapsDropDown.addItem("Select Map");
@@ -451,6 +520,43 @@ public class GUI{
 				originx = e.getX();
 				originy = e.getY();
 			}
+
+			public void mouseReleased(MouseEvent a) {
+				System.out.println("New Mouse Release");
+				System.out.println("Map Title: " + mapTitle);
+				if(!(mapTitle.equals("Select Map"))){
+					System.out.println("Dragged: " + Dragged);
+					if (!Dragged) {
+						// System.out.println("not dragged");
+						newClick = false;
+						lastMouseX = a.getX();
+						lastMouseY = a.getY();
+						System.out.println("lastMouseX: " + lastMouseX);
+						System.out.println("lastMouseY: " + lastMouseY);
+						System.out.println("startMapsDropDown selectedItem: " + startMapsDropDown.getSelectedItem().toString());
+						if (!(startMapsDropDown.getSelectedItem().equals("Select Map")) || !(destMapsDropDown.getSelectedItem().equals("Select Map")))
+							newClick = true;
+
+
+						//frame.repaint();
+					} else {
+						// System.out.println("dragged = true");
+						Dragged = false;
+						drawnfirst = true;
+					}
+
+
+				}
+				else{
+					if(!(roomPointsToDraw == null)){
+						roomPointsToDraw.clear();
+						System.out.println("\tHey I'm clearing the roomPointsToDraw");
+					}
+				}
+				frame.repaint();
+
+			}
+
 		});
 
 		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
@@ -468,15 +574,17 @@ public class GUI{
 
 		drawPanel.addMouseMotionListener(new MouseMotionListener(){
 			public void mouseDragged(MouseEvent g){
-				//System.out.println("dragged");
-				Dragged = true;
-				mousex = g.getX();
-				mousey = g.getY();
-				frame.repaint();
+				if(!mapTitle.equals("Select Map")){
+					//System.out.println("dragged");
+					drawnfirst = true;
+					Dragged = true;
+					mousex = g.getX();
+					mousey = g.getY();
+					frame.repaint();
+				}
 			}
 
 			public void mouseMoved(MouseEvent j) {
-				//System.out.println((j.getX()-(drawnposx+newImageWidth/2))+", "+(j.getY()-(drawnposy+newImageHeight/2)));
 				mousezoomx = j.getX();
 				mousezoomy = j.getY();
 			}
@@ -493,7 +601,7 @@ public class GUI{
 							minZoomSize = 1 / ((double) img.getHeight() / (double) drawPanel.getHeight());
 						}
 					}
-					System.out.println(minZoomSize);
+					//System.out.println(minZoomSize);
 					double oldWidth = (img.getWidth() * scaleSize);
 					double oldHeight = (img.getHeight() * scaleSize);
 					if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && (!(mapTitle.equals("Select Map")))) {
@@ -561,6 +669,7 @@ public class GUI{
 		gbc_lblStart.gridy = 2;
 		mainMenu.add(lblStart, gbc_lblStart);
 
+
 		JLabel lblDestination_1 = new JLabel("Destination");
 		GridBagConstraints gbc_lblDestination_1 = new GridBagConstraints();
 		gbc_lblDestination_1.gridwidth = 4;
@@ -569,77 +678,6 @@ public class GUI{
 		gbc_lblDestination_1.gridy = 2;
 		mainMenu.add(lblDestination_1, gbc_lblDestination_1);
 
-
-		txtSearchStart = new JTextField();
-
-		txtSearchStart.setText("Search");
-		GridBagConstraints gbc_txtSearchStart = new GridBagConstraints();
-		gbc_txtSearchStart.gridwidth = 2;
-		gbc_txtSearchStart.insets = new Insets(0, 0, 5, 5);
-		gbc_txtSearchStart.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtSearchStart.gridx = 1;
-		gbc_txtSearchStart.gridy = 3;
-		mainMenu.add(txtSearchStart, gbc_txtSearchStart);
-		txtSearchStart.setColumns(10);
-
-
-
-		txtSearchStart.addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-				if(txtSearchStart.getCaretPosition()>0)
-				{
-					String searchString;
-
-					searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
-					System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
-					searchStartPoint = google.searchFor(searchString);
-					if(searchStartPoint.size() != 0 )
-					{
-						String searchStartPointName = searchStartPoint.get(0).getName();
-						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
-
-						txtSearchStart.setText(searchStartPointName);
-						txtSearchStart.setCaretPosition(searchString.length());
-						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
-					}else{
-						System.out.println("no autocomplete found");
-					}
-				}else{
-					txtSearchStart.setText("");
-				}
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
-
-		txtSearchStart.addFocusListener(new FocusListener() {
-			public void focusGained(FocusEvent e){
-				// Empty textbox for input upon click if placeholder text
-				if (txtSearchStart.getText().equals("Search"))
-					txtSearchStart.setText("");
-
-			}
-
-			public void focusLost(FocusEvent e) {
-				// If textboxes are empty and somewhere else is clicked, bring back placeholder text
-				if (txtSearchStart.getText().equals(""))
-					txtSearchStart.setText("Search");
-			}
-		});
 
 		GradientButton btnClearStart = new GradientButton("X", new Color(240,128,128));
 		btnClearStart.setText("Clear");
@@ -665,6 +703,120 @@ public class GUI{
 		gbc_btnClearStart.gridy = 3;
 		mainMenu.add(btnClearStart, gbc_btnClearStart);
 
+		txtSearchStart = new JTextField();
+
+		txtSearchStart.setText("Search");
+		GridBagConstraints gbc_txtSearchStart = new GridBagConstraints();
+		gbc_txtSearchStart.gridwidth = 2;
+		gbc_txtSearchStart.insets = new Insets(0, 0, 5, 5);
+		gbc_txtSearchStart.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtSearchStart.gridx = 1;
+		gbc_txtSearchStart.gridy = 3;
+		mainMenu.add(txtSearchStart, gbc_txtSearchStart);
+		txtSearchStart.setColumns(10);
+
+
+		hilit = new DefaultHighlighter();
+	    painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
+
+		txtSearchStart.addKeyListener(new KeyListener() {
+		
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent startSearchTypeEvent) {
+
+				txtSearchStart.setHighlighter(hilit);
+				// TODO Auto-generated method stub
+				if(startSearchTypeEvent.getKeyCode() != KeyEvent.VK_ENTER )
+				{
+					String searchString;
+					try{
+
+						if(txtSearchStart.getCaretPosition()>0)
+						{
+
+							searchString = txtSearchStart.getText().substring(0, txtSearchStart.getCaretPosition());
+							System.out.println("Caret Position: "+txtSearchStart.getCaretPosition()+" SearchString: "+searchString);
+							searchStartPointName = googleStart.searchFor(searchString);
+							if(searchStartPointName != "" )
+							{
+								//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+
+								txtSearchStart.setText(searchStartPointName);				
+								//txtSearchStart.setSelectedTetColor(Color.RED);
+								txtSearchStart.setCaretPosition(searchString.length());
+								System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
+							}else{
+								System.out.println("no autocomplete found");
+							}
+							hilit.addHighlight(searchString.length(), searchStartPointName.length(), painter);
+
+						}else{
+							txtSearchStart.setText("");
+							searchString = "";
+						}
+
+						//txtSearchStart.moveCaretPosition(searchString.length());
+						//txtSearchStart.select(searchString.length(), searchStartPointName.length());
+
+
+					}catch(java.lang.IllegalArgumentException searchExcept1){
+
+					} catch (BadLocationException e) {
+						// TODO Auto-generated catch block
+						//e.printStackTrace();
+					}
+				}else if(searchStartPointName != "")
+				{
+					searchStartPoint = googleStart.getPointFromName(searchStartPointName);
+					System.out.println("Enter Pressed, Point: "+searchStartPoint.getName());
+
+					for(int i=0;i<maps.size();i++)
+					{
+						if(searchStartPoint.getMapId() == maps.get(i).getMapId())
+						{
+							System.out.println("MapSearchedName: "+maps.get(i).getMapName());
+							startMapsDropDown.setSelectedIndex(i+1);
+						}
+					}
+
+					for(int i=0; i<startBuilds.getItemCount();i++)
+					{
+						if(searchStartPoint.equals(startBuilds.getItemAt(i)))
+							startBuilds.setSelectedIndex(i);
+					}
+				}
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+
+
+		txtSearchStart.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e){
+				// Empty textbox for input upon click if placeholder text
+				if (txtSearchStart.getText().equals("Search"))
+					txtSearchStart.setText("");
+
+			}
+
+			public void focusLost(FocusEvent e) {
+				// If textboxes are empty and somewhere else is clicked, bring back placeholder text
+				if (txtSearchStart.getText().equals(""))
+					txtSearchStart.setText("Search");
+			}
+		});
+
 		txtSearchDest = new JTextField();
 		txtSearchDest.setText("Search");
 		GridBagConstraints gbc_txtSearchDest = new GridBagConstraints();
@@ -685,29 +837,70 @@ public class GUI{
 			}
 
 			@Override
-			public void keyReleased(KeyEvent e) {
+			public void keyReleased(KeyEvent destSearchTypeEvent) {
+				txtSearchDest.setHighlighter(hilit);
+
 				// TODO Auto-generated method stub
-				if(txtSearchDest.getCaretPosition()>0)
+				if(destSearchTypeEvent.getKeyCode() != KeyEvent.VK_ENTER )
 				{
-					String searchString;
-
-					searchString = txtSearchDest.getText().substring(0, txtSearchDest.getCaretPosition());
-					System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
-					searchStartPoint = google.searchFor(searchString);
-					if(searchStartPoint.size() != 0 )
+					System.out.println(destSearchTypeEvent.getKeyCode());
+					try
 					{
-						String searchStartPointName = searchStartPoint.get(0).getName();
-						//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+						String searchString= "";
 
-						txtSearchDest.setText(searchStartPointName);
-						txtSearchDest.setCaretPosition(searchString.length());
-						System.out.println("Search Term: "+searchString+" Result: "+searchStartPointName);
-					}else{
-						System.out.println("no autocomplete found");
+
+						if(txtSearchDest.getCaretPosition()>1)
+						{
+							searchString = txtSearchDest.getText().substring(0, txtSearchDest.getCaretPosition());
+							//System.out.println("Caret Position: "+txtSearchDest.getCaretPosition()+" SearchString: "+searchString);
+							searchDestPointName = googleDest.searchFor(searchString);
+							if(searchDestPointName != "")
+							{
+								//String searchDestPointName = searchDestPoint.get(0).getName();
+								//String fullResult = searchString.concat(searchStartPointName).substring(searchString.length()-1);
+
+								txtSearchDest.setCaretPosition(searchString.length());
+								txtSearchDest.setText(searchDestPointName);
+								txtSearchDest.setCaretPosition(searchString.length());
+								System.out.println("Search Term: "+searchString+" Result: "+searchDestPointName);
+							}else{
+								System.out.println("no autocomplete found");
+							}
+							hilit.addHighlight(searchString.length(), searchDestPointName.length(), painter);
+						}else if(txtSearchDest.getCaretPosition() == 0){
+							txtSearchDest.setText("");
+							searchString ="";
+						}
+						
+
+					}catch(java.lang.IllegalArgumentException searchExcept1){
+
+					} catch (BadLocationException e) {
+						// TODO Auto-generated catch block
+						//e.printStackTrace();
 					}
-				}else{
-					txtSearchDest.setText("");
+
+				}else if(searchDestPointName != "")
+				{
+					searchDestPoint = googleDest.getPointFromName(searchDestPointName);
+					System.out.println("Enter Pressed, Point: "+searchDestPoint.getName());
+
+					for(int i=0;i<maps.size();i++)
+					{
+						if(searchDestPoint.getMapId() == maps.get(i).getMapId())
+						{
+							System.out.println("MapSearchedName: "+maps.get(i).getMapName());
+							destMapsDropDown.setSelectedIndex(i+1);
+						}
+					}
+
+					for(int i=0; i<destBuilds.getItemCount();i++)
+					{
+						if(searchDestPoint.equals(destBuilds.getItemAt(i)))
+							destBuilds.setSelectedIndex(i);
+					}
 				}
+
 			}
 
 			@Override
@@ -715,6 +908,7 @@ public class GUI{
 				// TODO Auto-generated method stub
 
 			}
+			
 		});
 
 
@@ -784,6 +978,9 @@ public class GUI{
 				if (startMapsDropDown.getSelectedItem().equals("Select Map")){
 					startBuilds.removeAllItems();
 					startBuilds.setEnabled(false);
+					if(!(roomPointsToDraw.isEmpty())){
+						roomPointsToDraw.clear();
+					}
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
 					showStartPoint = false;
@@ -795,6 +992,15 @@ public class GUI{
 						System.out.println("Invalid logo1");
 						g.printStackTrace();
 					}
+					if(currentMap != null){
+						currentMap = null;
+					}
+					if(startMap != null){
+						startMap = null;
+					}
+					startPoint = startPointName;
+					startIsSelected = false;
+
 					frame.repaint();
 				}
 				else{
@@ -807,38 +1013,63 @@ public class GUI{
 
 
 					mapTitle = maps.get(buildStartIndex-1).getMapName();
-					//String mapTitle = "AtwaterKent1";
+					System.out.println("MapTitle: " + mapTitle);
+					currentMap = maps.get(buildStartIndex-1); //old
+					startMap = maps.get(buildStartIndex-1); //new	
 
-					File start = new File("src/VectorMaps");
-					String startInput = start.getAbsolutePath();
-					//assuming all maps saved in vectorMaps are in jpg
-					startInput = startInput + "/" + mapTitle + ".png";
-
-					File destFile = new File(startInput);
-					try{
-						img = ImageIO.read(destFile);
-						frame.repaint();
+					if(!(startMap.getMapId() == startPoint.getMapId())){
+						startPoint = startPointName;
+						startIsSelected = false;
 					}
-					catch(IOException a){
-						System.out.println("Could not find file:"+startInput);
-						a.printStackTrace();
+
+					//String mapTitle = "AtwaterKent1";
+					if(startPoint != null && destPoint != null && startPoint.getMapId() != destPoint.getMapId() || destPoint == null || destPoint.getMapId() == 0){
+						File start = new File("src/VectorMaps");
+						String startInput = start.getAbsolutePath();
+						//assuming all maps saved in vectorMaps are in jpg
+						startInput = startInput + "/" + mapTitle + ".png";
+
+						File destFile = new File(startInput);
+						try{
+							img = ImageIO.read(destFile);
+							frame.repaint();
+						}
+						catch(IOException a){
+							System.out.println("Could not find file:"+startInput);
+							a.printStackTrace();
+						}
 					}
 
 					startBuilds.removeAllItems();
-					//destBuilds.removeAllItems();
+					//-----------------------------------------------------------------------------------------------------------------------------
+
+					if(!(roomPointsToDraw == null)){
+						roomPointsToDraw.clear();
+					}
+
 					if(buildStartIndex!=0){
 						edgeArray = new ArrayList<Edge>();
 
 						pointArray = maps.get(buildStartIndex - 1).getPointList();
+						//roomPointsToDraw = maps.get(buildStartIndex - 1).getPointList();
+						String pointName = "";
 
 						for(int i = 0; i < pointArray.size(); i++){
 							for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
 								edgeArray.add(pointArray.get(i).getEdges().get(j));
 							}
+							pointName = pointArray.get(i).getName();
+							pointName = pointName.trim();
+							pointName = pointName.toLowerCase();
+							if(!(pointArray == null)){
+								if(!((pointName.equals("hallway")) || (pointName.equals("stairs bottom")) || (pointName.equals("stairs top")) || (pointName.equals("stairs")) || (pointName.equals("elevator") || (pointName.equals("room")) || (pointName.equals("path"))))){
+									roomPointsToDraw.add(pointArray.get(i));
+								}
+							}
 						}
-						ArrayList<Point> tempStartRoom = new ArrayList<Point>();
 						boolean check = true;
 						System.out.println("number of points: " + maps.get(buildStartIndex-1).getPointList().size());
+						tempStartRoom.clear();
 						for (int i = 0; i < maps.get(buildStartIndex-1).getPointList().size(); i++){
 							check = true;
 							if(!maps.get(buildStartIndex-1).getPointList().get(i).getName().equalsIgnoreCase("Hallway") &&
@@ -860,6 +1091,9 @@ public class GUI{
 								}
 								if(check){
 									tempStartRoom.add(maps.get(buildStartIndex - 1).getPointList().get(i));
+									if(!(roomPointsToDraw.contains(pointArray.get(i)))){
+										roomPointsToDraw.add(pointArray.get(i));
+									}
 									//mapsDropdown.addItem(maps.get(i).getMapName());
 									//DestMaps.addItem(maps.get(i).getMapName());
 								}
@@ -872,42 +1106,30 @@ public class GUI{
 						Collections.sort(tempStartRoom);
 						System.out.println("tempStartRoom size: " + tempStartRoom.size());
 						//tempStartRoom = sort(tempStartRoom);
+						startBuilds.addItem(startPointName);
 						for(int count = 0; count < tempStartRoom.size(); count++){
 							startBuilds.addItem(tempStartRoom.get(count));
+						}		
+					}
 
-						}
-						//System.out.println("buildings[i] " + buildings[i]);
 
-						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
-						//}
-
-						/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-																						if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
-																							destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
-																						}*/
-						//System.out.println("buildings[i] " + buildings[i]);
-
-						// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+					if(startIsSelected){
+						startBuilds.setSelectedItem(startPoint);
 					}
 				}
-				//startBuilds.removeAllItems();
-				//for (int i=0; i < buildings.length; i++){
-				//System.out.println("buildings[i] match: " + buildings[i]);
-				//startBuilds.addItem(buildings[i]);
-				//}
-				//destBuilds.removeAllItems();
-				//for (int i=0; i < buildings.length; i++){
-				///destBuilds.addItem(buildings[i]);
-				//}
 			}
-		}
-				);
+		});
+
+
 		//adds the correct points for the building specified
 		destMapsDropDown.addActionListener (new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
 				drawnfirst = false;
 				if (destMapsDropDown.getSelectedItem().equals("Select Map")){
 					destBuilds.removeAllItems();
+					if(!(roomPointsToDraw.isEmpty())){
+						roomPointsToDraw.clear();
+					}
 					destBuilds.setEnabled(false);
 					btnSwapStartAndDest.setEnabled(false);
 					directionsButton.setEnabled(false);
@@ -920,10 +1142,18 @@ public class GUI{
 						System.out.println("Invalid logo1");
 						g.printStackTrace();
 					}
+					if(currentMap != null){
+						currentMap = null;
+					}
+					if(destMap != null){
+						destMap = null;
+					}
+					destPoint = destPointName;
+					destIsSelected = false;
+
 					frame.repaint();
 				}
 				else{
-
 					destBuilds.setEnabled(true);
 					if (startBuilds.isEnabled()){
 						btnSwapStartAndDest.setEnabled(true);
@@ -933,41 +1163,66 @@ public class GUI{
 					buildDestIndex = destMapsDropDown.getSelectedIndex();
 
 
+					mapTitle = maps.get(buildDestIndex-1).getMapName();
 
-					String mapTitle = maps.get(buildDestIndex-1).getMapName();
-					//String mapTitle = "AtwaterKent1";
+					currentMap = maps.get(buildDestIndex-1);
+					destMap = maps.get(buildDestIndex-1); //new
 
-					File dest = new File("src/VectorMaps");
-					String destInput = dest.getAbsolutePath();
-					//assuming all maps saved in vectorMaps are in jpg
-					destInput = destInput + "/" + mapTitle + ".png";
-
-					File destFile = new File(destInput);
-					try{
-						img = ImageIO.read(destFile);
-						frame.repaint();
+					if(!(destMap.getMapId() == destPoint.getMapId())){
+						destPoint = destPointName;
+						destIsSelected = false;
 					}
-					catch(IOException a){
-						System.out.println("Could not find file:"+destInput);
-						a.printStackTrace();
+
+
+					if(startPoint != null && destPoint != null && startPoint.getMapId() != destPoint.getMapId() || startPoint == null || startPoint.getMapId() == 0){
+						File dest = new File("src/VectorMaps");
+						String destInput = dest.getAbsolutePath();
+						//assuming all maps saved in vectorMaps are in jpg
+						destInput = destInput + "/" + mapTitle + ".png";
+
+						File destFile = new File(destInput);
+						try{
+							img = ImageIO.read(destFile);
+							frame.repaint();
+						}
+						catch(IOException a){
+							System.out.println("Could not find file:"+destInput);
+							a.printStackTrace();
+						}
 					}
 
 					//startBuilds.removeAllItems();
 					destBuilds.removeAllItems();
+
+					if(!(roomPointsToDraw == null)){
+						roomPointsToDraw.clear();
+					}
+
 					if(buildDestIndex!=0){
 						edgeArray = new ArrayList<Edge>();
 
 						pointArray = maps.get(buildDestIndex - 1).getPointList();
+						String pointName = "";
 
 						for(int i = 0; i < pointArray.size(); i++){
 							for(int j = 0; j < pointArray.get(i).getEdges().size(); j++){
 								edgeArray.add(pointArray.get(i).getEdges().get(j));
 							}
+							pointName = pointArray.get(i).getName();
+							pointName = pointName.trim();
+							pointName = pointName.toLowerCase();
+							if(!(pointArray == null)){
+								if(!((pointName.equals("hallway")) || (pointName.equals("stairs bottom")) || (pointName.equals("stairs top")) || (pointName.equals("stairs")) || (pointName.equals("elevator") || (pointName.equals("room")) || (pointName.equals("path"))))){
+									roomPointsToDraw.add(pointArray.get(i));
+								}
+							}
 						}
-						ArrayList<Point> tempDestRoom = new ArrayList<Point>();
+
 						System.out.println("pointArraysize: " + pointArray.size());
 						boolean check = true;
 						//System.out.println("building size: " + buildings.length);
+
+						tempDestRoom.clear();
 						for (int i = 0; i < pointArray.size(); i++){
 							check = true;
 							if(!pointArray.get(i).getName().equalsIgnoreCase("Hallway") &&
@@ -992,6 +1247,9 @@ public class GUI{
 								if(check){
 
 									tempDestRoom.add(pointArray.get(i));
+									if(!(roomPointsToDraw.contains(pointArray.get(i)))){
+										roomPointsToDraw.add(pointArray.get(i));
+									}
 									System.out.println("testDestRoom last added: " + maps.get(buildDestIndex - 1).getPointList().get(i));
 									//mapsDropdown.addItem(maps.get(i).getMapName());
 									//DestMaps.addItem(maps.get(i).getMapName());
@@ -1005,32 +1263,17 @@ public class GUI{
 						Collections.sort(tempDestRoom);
 						System.out.println("tempDestRoom size: " + tempDestRoom.size());
 						//tempStartRoom = sort(tempStartRoom);
+						destBuilds.addItem(destPointName);
 						for(int count = 0; count < tempDestRoom.size(); count++){
 							destBuilds.addItem(tempDestRoom.get(count));
-
 						}
 					}
 
-					/*for (int i = 0; i < maps.get(buildDestIndex-1).getPointList().size(); i++){
-																								if(!maps.get(buildDestIndex-1).getPointList().get(i).getName().equals("Hallway")){
-																									destBuilds.addItem(maps.get(buildDestIndex-1).getPointList().get(i));
-																								}*/
-					//System.out.println("buildings[i] " + buildings[i]);
-
-					// destRooms.setModel(new DefaultComboBoxModel(generateRoomNums(buildSelectDest)));
+					if(destIsSelected){
+						destBuilds.setSelectedItem(destPoint);
+					}
 				}
 			}
-
-			//startBuilds.removeAllItems();
-			//for (int i=0; i < buildings.length; i++){
-			//System.out.println("buildings[i] match: " + buildings[i]);
-			//startBuilds.addItem(buildings[i]);
-			//}
-			//destBuilds.removeAllItems();
-			//for (int i=0; i < buildings.length; i++){
-			///destBuilds.addItem(buildings[i]);
-			//}
-
 		});
 
 		btnSwapStartAndDest = new GradientButton("Swap Start and Destination", buttonColor);
@@ -1049,6 +1292,7 @@ public class GUI{
 
 					startMapsDropDown.setSelectedIndex(destMapsDropDown.getSelectedIndex());
 					startBuilds.setSelectedIndex(destBuilds.getSelectedIndex());
+
 
 					destMapsDropDown.setSelectedIndex(startMapIndex);
 					destBuilds.setSelectedIndex(startPointIndex);
@@ -1098,12 +1342,56 @@ public class GUI{
 		startBuilds.setBounds(122, 30, 148, 20);
 		startBuilds.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (startBuilds.getItemCount() != 0){
-					showStartPoint = true;
-					showDestPoint = false;
-					startStarX = ((Point)(startBuilds.getSelectedItem())).getLocX();
-					startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
-					frame.repaint();
+				if (!(startBuilds.getSelectedIndex() == 0)){
+					if (startBuilds.getItemCount() > 1){
+						showStartPoint = false;
+						showDestPoint = false;
+						startStarX = ((Point)(startBuilds.getSelectedItem())).getLocX();
+						startStarY = ((Point)(startBuilds.getSelectedItem())).getLocY();
+						startMap = currentMap;
+						startPoint = (Point) startBuilds.getSelectedItem();
+
+						//If the startPoint and the destPoint are the same then force the startPoint to be
+						// "Select
+						if(startPoint != startPointName && !(destPoint == startPoint)){
+							startIsSelected = true;
+							for(int i = 0; i < maps.size(); i++){
+								if(startPoint.getMapId() == maps.get(i).getMapId()){
+									currentMap = maps.get(i);
+									i = maps.size();
+								}
+							}
+							mapTitle = currentMap.getMapName();
+							
+							
+							
+
+							//String mapTitle = "AtwaterKent1";
+							File start = new File("src/VectorMaps");
+							String startInput = start.getAbsolutePath();
+							//assuming all maps saved in vectorMaps are in jpg
+							startInput = startInput + "/" + mapTitle + ".png";
+
+							File destFile = new File(startInput);
+							try{
+								img = ImageIO.read(destFile);
+								frame.repaint();
+							}
+							catch(IOException a){
+								System.out.println("Could not find file:"+startInput);
+								a.printStackTrace();
+							}
+							roomPointsToDraw = getRoomPoints(currentMap.getPoints());
+							drawnfirst = false;
+						}
+						else{
+							startIsSelected = false;
+							startPoint = startPointName;
+						}
+						
+						System.out.println("Selected Point Name From the DropDown: " + startPoint.getName());
+						frame.repaint();
+					}
 				}
 			}
 		});
@@ -1131,12 +1419,56 @@ public class GUI{
 		destBuilds.setBounds(122, 30, 148, 20);
 		destBuilds.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (destBuilds.getItemCount() != 0){
-					showDestPoint = true;
-					showStartPoint = false;
-					destStarX = ((Point)(destBuilds.getSelectedItem())).getLocX();
-					destStarY = ((Point)(destBuilds.getSelectedItem())).getLocY();
-					frame.repaint();
+				if (!(destBuilds.getSelectedIndex() == 0)){
+					if (destBuilds.getItemCount() > 1){
+						showDestPoint = false;
+						showStartPoint = false;
+						destStarX = ((Point)(destBuilds.getSelectedItem())).getLocX();
+						destStarY = ((Point)(destBuilds.getSelectedItem())).getLocY();
+						startMap = currentMap;
+						destPoint = (Point) destBuilds.getSelectedItem();
+						if(destPoint != destPointName && !(destPoint == startPoint)){
+							destIsSelected = true;
+							for(int i = 0; i < maps.size(); i++){
+								if(destPoint.getMapId() == maps.get(i).getMapId()){
+									currentMap = maps.get(i);
+									i = maps.size();
+								}
+							}
+							mapTitle = currentMap.getMapName();
+							
+							
+							
+
+							//String mapTitle = "AtwaterKent1";
+							File dest = new File("src/VectorMaps");
+							String destInput = dest.getAbsolutePath();
+							//assuming all maps saved in vectorMaps are in jpg
+							destInput = destInput + "/" + mapTitle + ".png";
+
+							File destFile = new File(destInput);
+							try{
+								img = ImageIO.read(destFile);
+								frame.repaint();
+							}
+							catch(IOException a){
+								System.out.println("Could not find file:"+destInput);
+								a.printStackTrace();
+							}
+							roomPointsToDraw = getRoomPoints(currentMap.getPoints());
+							drawnfirst = false;
+						}
+						else{
+							destIsSelected = false;
+							destPoint = destPointName;
+						}
+						System.out.println("Selected Point ID From the DropDown: " + destPoint.getName());
+						directionsButton.setEnabled(true);
+						frame.repaint();
+					}
+				}
+				else{
+					directionsButton.setEnabled(false);
 				}
 			}
 		});
@@ -1214,6 +1546,7 @@ public class GUI{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+
 						dirMaps = new ArrayList<Map>();
 						if(multiMapFinalDir != null){
 							multiMapFinalDir.clear();
@@ -1316,13 +1649,6 @@ public class GUI{
 			}
 		});
 
-		drawPanel.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				originx = e.getX();
-				originy = e.getY();
-			}
-		});
-
 		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
 
 			@Override
@@ -1336,23 +1662,7 @@ public class GUI{
 			}           
 		});
 
-		drawPanel.addMouseMotionListener(new MouseMotionListener(){
-			public void mouseDragged(MouseEvent g){
-				if(!mapTitle.equals("Select Map")){
-					//System.out.println("dragged");
-					drawnfirst = true;
-					Dragged = true;
-					mousex = g.getX();
-					mousey = g.getY();
-					frame.repaint();
-				}
-			}
 
-			public void mouseMoved(MouseEvent j) {
-				mousezoomx = j.getX();
-				mousezoomy = j.getY();
-			}
-		});
 
 		frame.addMouseWheelListener(new MouseWheelListener(){
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -1362,7 +1672,7 @@ public class GUI{
 					if (WidthSize > (double) drawPanel.getHeight()) {
 						minZoomSize = 1 / ((double) img.getHeight() / (double) drawPanel.getHeight());
 					}
-					System.out.println(minZoomSize);
+					//System.out.println(minZoomSize);
 					double oldWidth = (img.getWidth() * scaleSize);
 					double oldHeight = (img.getHeight() * scaleSize);
 					if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL && !mapTitle.equals("SelectMap")){
@@ -1433,11 +1743,94 @@ public class GUI{
 		btnReturn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Return to main menu, don't show route anymore
+				currentMap = null;
+				roomPointsToDraw.clear();
 				menuLayout.show(menus, "Main Menu");
 				showRoute = false;
 				panelDirections.setVisible(false);
+
 				btnFullTextDirections.setText("Show Full Text Directions");
+				route = null;
+				showRoute = false;
+				if(startPoint.getMapId() != 0){
+					for(int i = 0; i < maps.size(); i++){
+						if(maps.get(i).getMapId() == startPoint.getMapId()){
+							currentMap = maps.get(i);
+							i = maps.size();
+						}
+					}
+					File destinationFile = new File("src/VectorMaps/" + currentMap.getMapName() + ".png");
+					destinationFile = new File(destinationFile.getAbsolutePath());
+					drawnfirst = false;
+					try {
+						img = ImageIO.read(destinationFile);
+					} catch (IOException g) {
+						System.out.println("Invalid Map Selection");
+						g.printStackTrace();
+					}
+					ArrayList<Point> tempPointList = currentMap.getPointList();
+					pointArray = tempPointList;
+					boolean check = true;
+					for(int n = 0; n < tempPointList.size(); n++){
+						check = true;
+						if(!tempPointList.get(n).getName().equalsIgnoreCase("Hallway") &&
+								!tempPointList.get(n).getName().contains("Stair") &&
+								!tempPointList.get(n).getName().equalsIgnoreCase("Path") &&
+								!tempPointList.get(n).getName().contains("stair") &&
+								!tempPointList.get(n).getName().equalsIgnoreCase("room") &&
+								!tempPointList.get(n).getName().contains("Elevator") &&
+								!tempPointList.get(n).getName().contains("elevator")) {
+							if(n > 0){
+								//System.out.println("i>0");
+								for(int count = n-1;count >= 0 ; count--){
+									if(maps.get(buildStartIndex - 1).getPointList().get(n).getName().compareTo(maps.get(buildStartIndex-1).getPointList().get(count).getName()) == 0){
+										System.out.println("here");
+										check = false;
+										count = -1;
+									}
+								}
+							}
+							if(check){
+								tempStartRoom.add(maps.get(buildStartIndex - 1).getPointList().get(n));
+								if(!(roomPointsToDraw.contains(tempPointList.get(n)))){
+									roomPointsToDraw.add(tempPointList.get(n));
+								}
+								//mapsDropdown.addItem(maps.get(i).getMapName());
+								//DestMaps.addItem(maps.get(i).getMapName());
+							}
+
+						}
+					}
+				} else {
+					directionsButton.setEnabled(false);
+					startBuilds.removeAllItems();
+					startBuilds.setEnabled(false);
+					startMapsDropDown.setSelectedIndex(0);
+					if(!(roomPointsToDraw.isEmpty())){
+						roomPointsToDraw.clear();
+					}
+					btnSwapStartAndDest.setEnabled(false);
+					directionsButton.setEnabled(false);
+					showStartPoint = false;
+					try{
+						tempImg = img;
+						img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
+					}
+					catch(IOException g){
+						System.out.println("Invalid logo1");
+						g.printStackTrace();
+					}
+					if(currentMap != null){
+						currentMap = null;
+					}
+					if(startMap != null){
+						startMap = null;
+					}
+					startPoint = startPointName;
+					startIsSelected = false;
+				}
 				frame.repaint();
+
 			}
 		});
 		GridBagConstraints gbc_btnReturn = new GridBagConstraints();
@@ -1511,7 +1904,8 @@ public class GUI{
 		directionsText.setBounds(6, 174, 438, 30);
 		directionsText.setBackground(backgroundColor);
 		directionsText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		directionsText.setMinimumSize(new Dimension(720, 60));
+		directionsText.setMinimumSize(new Dimension(720, 90));
+		directionsText.setPreferredSize(new Dimension(720, 90));
 		
 		StyledDocument doc = directionsText.getStyledDocument();
 		SimpleAttributeSet center = new SimpleAttributeSet();
@@ -1529,6 +1923,8 @@ public class GUI{
 		gbc_directionsText.gridx = 0;
 		gbc_directionsText.gridy = 3;
 		navMenu.add(directionsText, gbc_directionsText);
+
+
 
 
 		// Button to get previous step in directions
@@ -1568,14 +1964,58 @@ public class GUI{
 						}
 						//directionsText.setText(textDir.get(mapPos).get(textPos));
 						if(mapPos != marker){
-							directionsText.setText("Enter " + dirMaps.get(m).getMapName());
+							String toAdd = "";
+							boolean prevIsUnderscore = true;
+							for(int j = 0; j < dirMaps.get(m).getMapName().length(); j++){
+								char tempChar;
+								if(prevIsUnderscore){
+									tempChar = dirMaps.get(m).getMapName().charAt(j);
+									//converts to upper case
+									tempChar = Character.toUpperCase(tempChar);
+									prevIsUnderscore = false;
+								}
+								else if (dirMaps.get(m).getMapName().charAt(j) == ('_')){
+									prevIsUnderscore = true;
+									tempChar = ' ';
+								}
+								else{
+									tempChar = dirMaps.get(m).getMapName().charAt(j);
+									prevIsUnderscore = false;
+								}
+								toAdd += tempChar;
+								//mapsDropdown.addItem(maps.get(i).getMapName());
+								//DestMaps.addItem(maps.get(i).getMapName());
+							}
+
+							directionsText.setText("Enter " + toAdd);
 						}
 					} else {
 
 						textPos = multiMapFinalDir.get(mapPos).size();
 						//directionsText.setText(textDir.get(mapPos).get(textPos));
-
-						directionsText.setText("Enter " + dirMaps.get(mapPos + 1).getMapName());
+						String toAdd = "";
+						boolean prevIsUnderscore = true;
+						for(int j = 0; j < dirMaps.get(mapPos + 1).getMapName().length(); j++){
+							char tempChar;
+							if(prevIsUnderscore){
+								tempChar = dirMaps.get(mapPos + 1).getMapName().charAt(j);
+								//converts to upper case
+								tempChar = Character.toUpperCase(tempChar);
+								prevIsUnderscore = false;
+							}
+							else if (dirMaps.get(mapPos + 1).getMapName().charAt(j) == ('_')){
+								prevIsUnderscore = true;
+								tempChar = ' ';
+							}
+							else{
+								tempChar = dirMaps.get(mapPos + 1).getMapName().charAt(j);
+								prevIsUnderscore = false;
+							}
+							toAdd += tempChar;
+							//mapsDropdown.addItem(maps.get(i).getMapName());
+							//DestMaps.addItem(maps.get(i).getMapName());
+						}
+						directionsText.setText("Enter " + toAdd);
 					}
 					File destinationFile = new File("src/VectorMaps/" + dirMaps.get(mapPos).getMapName() + ".png");
 					destinationFile = new File(destinationFile.getAbsolutePath());
@@ -1785,6 +2225,7 @@ public class GUI{
 		txtpnFullTextDir.setEditable(false);
 
 		txtFieldEmail = new JTextField();
+
 		txtFieldEmail.setText("Enter E-Mail Here");
 		GridBagConstraints gbc_txtFieldEmail = new GridBagConstraints();
 		gbc_txtFieldEmail.insets = new Insets(0, 0, 5, 5);
@@ -1961,12 +2402,12 @@ public class GUI{
 				panelHelp.setVisible(false);
 				menus.setVisible(true);
 				panelLayout.show(panels, "Draw Panel");
+				roomPointsToDraw = getRoomPoints(currentMap.getPoints());
 			}
 		});
 
 		// Make frame visible after initializing everything
 		frame.setVisible(true);
-		loadingAnimation.hideSplash(0);
 	}
 
 	public JPanel createPrefMenu(){
@@ -2027,6 +2468,7 @@ public class GUI{
 		btnAbout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				menuLayout.show(menus, "About Menu");
+				roomPointsToDraw.clear();
 				try{
 					tempImg = img;
 					img = ImageIO.read(new File("src/VectorLogo/VectorrLogo.png"));
@@ -2034,6 +2476,14 @@ public class GUI{
 				catch(IOException g){
 					System.out.println("Invalid logo1");
 					g.printStackTrace();
+				}
+				if(startIsSelected){
+					startIsSelected = false;
+					isShowStart = true;
+				}
+				if(destIsSelected){
+					destIsSelected = false; 
+					isShowDest = true;
 				}
 				frame.repaint();
 			}
@@ -2295,62 +2745,57 @@ public class GUI{
 				frame.repaint();
 			}
 		});
-
 		return prefMenu;
 	}
 
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 
-		//added by JPG starts and plays the animation
-		loadingAnimation = new SplashPage("GuiSplashThread");
-		loadingAnimation.run();
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
+		GUI gui = new GUI();
 
-
-		try {
-			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
-					UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		} catch (Exception e) {
-			// If Nimbus is not available, use lookAndFeel of current system
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (ClassNotFoundException | InstantiationException
-					| IllegalAccessException | UnsupportedLookAndFeelException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-		SwingUtilities.invokeLater(new Runnable()
+		if(guiThreadObject == null)
 		{
-			public void run()
-			{
-				GUI gui = new GUI();
-				try {
-					gui.createAndShowGUI();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (AlreadyExistsException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
+			guiThreadObject= new Thread (gui, "GUI Thread");
+			guiThreadObject.setPriority(4);
+			guiThreadObject.start();
+
+		}
+
+	}				
+
+
+	public double getMaxXPoint(ArrayList<Point> pointList){
+		int length = pointList.size();
+		double maxX = pointList.get(0).getGlobX();
+		for(int i = 0; i < length-1; i++){
+			if(pointList.get(i).getGlobX() < pointList.get(i+1).getGlobX())
+				maxX = pointList.get(i+1).getGlobX();
+		}
+		return maxX;
 	}
 
+	public double getMaxYPoint(ArrayList<Point> pointList){
+		int length = pointList.size();
+		double maxY = pointList.get(0).getGlobX();
+		for(int i = 0; i < length-1; i++){
+			if(pointList.get(i).getGlobY() < pointList.get(i+1).getGlobY())
+				maxY = pointList.get(i+1).getGlobY();
+		}
+		return maxY;
+	}
 
+	public ArrayList<Point> getRoomPoints(ArrayList<Point> pointList){
+		int length = pointList.size();
+		ArrayList<Point> roomPoints = new ArrayList<Point>();
+		String name = "";
+		for(int i = 0; i < length; i++){
+			name = pointList.get(i).getName();
+			name = name.trim();
+			name = name.toLowerCase();
+			if(!(name.equals("stairs top")) && !(name.equals("stairs bottom")) && !(name.equals("room")) && !(name.equals("hallway")) && !(name.equals("elevator")))
+				roomPoints.add(pointList.get(i));
+		}
+		return roomPoints;
+	}
 
 	class DrawRoute extends JPanel {
 
@@ -2374,8 +2819,12 @@ public class GUI{
 
 		@Override
 		public void paintComponent(Graphics g) {
+
+
+
 			Graphics2D g2 = (Graphics2D) g;
 			if (!(img == null)) {
+
 
 				// Scale the image to the appropriate screen size
 
@@ -2421,14 +2870,237 @@ public class GUI{
 				}
 			}
 
-			if (showStartPoint){
+
+
+
+			if (!showRoute && route == null) {
+				//Draws the points in each room so that the user can select each point as a source or destination
+				//System.out.println("\t\t\t\t\t\troomPointsToDraw size: " + roomPointsToDraw.size());
+				if(roomPointsToDraw != null && !(roomPointsToDraw.isEmpty()) ){
+					//System.out.println("\t\t\t12312312321roomPointsToDraw size: " + roomPointsToDraw.size());
+					for (int i = 0; i < roomPointsToDraw.size(); i++){
+						int point1x = (int)((roomPointsToDraw.get(i).getLocX()*newImageWidth)+drawnposx);
+						int point1y = (int)((roomPointsToDraw.get(i).getLocY()*newImageHeight)+drawnposy);			
+						g.setColor(pointColor);
+						g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+						g.setColor(Color.BLACK);
+						g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+					}
+				}
+				System.out.println("Found Something?");
+				if(currentMap != null){
+					if(currentMap.getMapName().equalsIgnoreCase("campus") && newClick == true){
+						double campusX = (lastMouseX-drawnposx)/newImageWidth;
+						double campusY = (lastMouseY-drawnposy)/newImageHeight;
+						System.out.println("=================IN CAMPUS=================");
+						System.out.println("Campus x is: " + campusX);
+						System.out.println("Campus y is: " + campusY);
+						for(int m = 0; m < maps.size(); m++){
+							double x1 = maps.get(m).getxTopLeft();
+							double y1 = maps.get(m).getyTopLeft();
+							double x2 = x1 + maps.get(m).getWidth() * Math.cos(maps.get(m).getRotationAngle());
+							double y2 = y1 + maps.get(m).getWidth() * Math.sin(maps.get(m).getRotationAngle());
+							double x3 = maps.get(m).getxBotRight();
+							double y3 = maps.get(m).getyBotRight();
+							double x4 = x1 - maps.get(m).getHeight() * Math.cos(maps.get(m).getRotationAngle());
+							double y4 = y1 - maps.get(m).getHeight() * Math.sin(maps.get(m).getRotationAngle());
+							double centerX = (x1 + x3) / 2;
+							double centerY = (y1 + y3) / 2;
+							g.fillOval((int)((centerX / newImageWidth) - drawnposx - pointSize), (int)((centerY / newImageHeight) - drawnposy - pointSize), pointSize, pointSize);
+							if(campusX > maps.get(m).getxTopLeft() + ((campusY - maps.get(m).getyTopLeft()) * Math.sin(maps.get(m).getRotationAngle()))&&
+									campusX < maps.get(m).getxBotRight() + ((maps.get(m).getyBotRight() - campusY) * Math.sin(maps.get(m).getRotationAngle())) && 
+									campusY > maps.get(m).getyTopLeft() - ((campusX - maps.get(m).getxTopLeft()) * Math.cos(maps.get(m).getRotationAngle())) && 
+									campusY < maps.get(m).getyBotRight() - ((maps.get(m).getxBotRight()) * Math.cos(maps.get(m).getRotationAngle()))){
+								//g.fillOval(campusX, campusY, 20, 20);
+								System.out.println("Found that the click is contained by: " + maps.get(m).getMapName());
+							}
+						}
+					}
+				}
+				for(int i = 0; i < roomPointsToDraw.size(); i++){
+					//System.out.println("Room point " + i + " name is: " + roomPointsToDraw.get(i).getName());
+					double posx = ((roomPointsToDraw.get(i).getLocX()*newImageWidth)+drawnposx);
+					double posy = ((roomPointsToDraw.get(i).getLocY()*newImageHeight)+drawnposy);
+
+					DEBUG = false;
+					if(DEBUG){
+						System.out.println(i + " - Point Name: " + roomPointsToDraw.get(i).getName());
+						System.out.println("posx: " + posx);
+						System.out.println("posy: " + posy);
+						System.out.println("lastMouseX: " + lastMouseX);
+						System.out.println("lastMouseY: " + lastMouseY);
+						System.out.println("startIsSelected: " + startIsSelected);
+						System.out.println("startPoint ID: " + startPoint.getName());
+						if(startMap != null)
+							System.out.println("Current Start Map Name: " + startMap.getMapId());
+						System.out.println("------------------------------------");
+						System.out.println("destPoint ID: " + destPoint.getName());
+						if(selectedPointID != null)
+							System.out.println("Selected Point ID: " + selectedPointID);
+						System.out.println("destIsSelected: " + destIsSelected);
+						if(destMap != null)
+							System.out.println("Current Dest Map Name: " + destMap.getMapId());
+						System.out.println("------------------------------------");
+					}
+
+					DEBUG = false;
+					if ((lastMouseX > posx - (pointSize + (1*scaleSize))
+							&& lastMouseX < posx + (pointSize + (1*scaleSize)))
+							&& (lastMouseY > posy - (pointSize + (1*scaleSize))
+									&& lastMouseY < posy + (pointSize + (1*scaleSize)))) {
+						//If there is a new click action and a start point has not been selected then the start point is set
+						if(DEBUG){
+							System.out.println("Point Name: " + roomPointsToDraw.get(i).getName());
+						}
+						selectedPoint = roomPointsToDraw.get(i);
+						selectedPointID = selectedPoint.getId();
+
+
+						//System.out.println("newClick: " + newClick);
+						//System.out.println("selectedPointID is null: " + (selectedPointID == null));
+						if( !(selectedPointID == null) ){
+							//System.out.println("selectedPointID: " + selectedPoint.getId());
+						}
+
+						if(currentMap == startMap && startMap != null){
+							//System.out.println("Marker 1---------");
+							//select the starting point
+							if(!(startIsSelected)){
+								//System.out.println("Marker 2---------");
+								if (newClick == true && startPoint.getName().equals("Select Start Location")) {
+									//if we select a new point to edit
+									startPoint = selectedPoint;
+									startPointIndex = i;
+									//System.out.println("Set the startPoint to first point clicked");
+
+									//set the drop down for points
+									//startBuilds.setSelectedIndex(tempStartRoom.indexOf(roomPointsToDraw.get(i)));
+									startBuilds.setSelectedItem(startPoint);
+
+									//System.out.println("startPoint Name: " + startPoint.getName());
+									//System.out.println("starBuilds selectedIndex: " + startBuilds.getSelectedIndex());
+									//System.out.println("startPointIndex: " + startPointIndex);
+
+
+
+									newClick = false;
+									startIsSelected = true;
+									selectedPoint = null;
+									if(destPoint != destPointName){
+										directionsButton.setEnabled(true);
+									}
+								}
+							}
+
+							//unselect the starting point
+							if(startIsSelected){
+								if(newClick == true && selectedPointID.equals(startPoint.getId()) && startIsSelected){
+									startPoint = startPointName;
+									startPointIndex = 0;
+									startBuilds.setSelectedItem(startPointName);
+									//System.out.println("Unselected the startPoint");
+									newClick = false;
+									startIsSelected = false;
+									selectedPoint = null;
+									directionsButton.setEnabled(false);
+								}
+							}
+						}//end of currentMap = startMap
+
+						if(currentMap == destMap){
+							//select destination point
+							if(!(destIsSelected)){
+								if(newClick == true && destPoint.getName().equals("Select Destination Location") ){
+									//System.out.println("Set the Selected Destination Point");
+									destPoint = selectedPoint;
+									destPointIndex = i;
+									destBuilds.setSelectedItem(destPoint);
+									//System.out.println("Unselected the destPoint");
+									newClick = false;
+									destIsSelected = true;
+									selectedPoint = null;
+									if(startPoint != startPointName){
+										directionsButton.setEnabled(true);
+									}
+								}
+							}
+
+							//unselect the destination point
+							if(destIsSelected){
+								if(newClick == true && destPoint.getId().equals(destPointName.getId()) && destIsSelected){
+									destPoint = destPointName;
+									destPointIndex = 0;
+									destBuilds.setSelectedItem(destPointName);
+									//System.out.println("Unselected the destPoint");
+									newClick = false;
+									destIsSelected = false;
+									selectedPoint = null;
+									directionsButton.setEnabled(false);
+									directionsButton.setEnabled(false);
+								}
+							}
+						}//end of currentMap == destMap
+					}
+					mainMenu.repaint();
+				}
+
+
+
+
+
+				if(startMap != null && currentMap != null && startPoint != startPointName && startPoint.getMapId() == currentMap.getMapId()){
+					System.out.println("In startMap");
+					//System.out.println("startPointID: " + startPoint.getId());
+					//System.out.println("startPoint name: " + startPoint.getName());
+					//System.out.println("currentMapID: " + currentMap.getMapId());
+					//System.out.println("startMapID: " + startMap.getMapId());
+
+					if(startPoint.getId() != null && !(startPoint.getName().equals(startPointName.getName())) && startIsSelected){
+						int point1x = (int)((startPoint.getLocX()*newImageWidth)+drawnposx);
+						int point1y = (int)((startPoint.getLocY()*newImageHeight)+drawnposy);			
+						g.setColor(Color.GREEN);
+						g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+						g.setColor(Color.BLACK);
+						g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+					}
+				}
+
+
+				if(destMap != null && currentMap != null && destPoint != destPointName && destPoint.getMapId() == currentMap.getMapId()){
+					System.out.println("In destMap");
+
+					if(destPoint.getId() != null && !(destPoint.getName().equals(destPointName.getName())) && destIsSelected){
+						int point1x = (int)((destPoint.getLocX()*newImageWidth)+drawnposx);
+						int point1y = (int)((destPoint.getLocY()*newImageHeight)+drawnposy);			
+						g.setColor(Color.RED);
+						g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+						g.setColor(Color.BLACK);
+						g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+					}
+				}
+			}
+
+
+			if(destMap != null && currentMap != null && currentMap.getMapId() == destMap.getMapId() && showDestPoint){
+				if(destPoint.getId() != null && !(destPoint.getName().equals(destPointName.getName())) && currentMap.getMapId() == destPoint.getMapId()){
+					int point1x = (int)((destPoint.getLocX()*newImageWidth)+drawnposx);
+					int point1y = (int)((destPoint.getLocY()*newImageHeight)+drawnposy);			
+					g.setColor(Color.RED);
+					g.fillOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+					g.setColor(Color.BLACK);
+					g.drawOval((int)(point1x - (pointSize/2)), (int)(point1y - (pointSize/2)), pointSize, pointSize);
+				}
+			}
+
+
+			if (showStartPoint && !(startPoint.getName().equals("Select Start Location"))){
 				Shape startStar = createStar(5, (int)((startStarX * newImageWidth) + drawnposx) , (int)((startStarY * newImageHeight) + drawnposy), 7, 12);
 				g.setColor(starColor);
 				g2.fill(startStar);
 				g.setColor(Color.BLACK);
 				g2.draw(startStar);
 			}
-			if (showDestPoint){
+			if (showDestPoint && !(destPoint.getName().equals("Select Destination Location"))){
 				Shape destStar = createStar(5, (int)((destStarX * newImageWidth) + drawnposx), (int)((destStarY * newImageHeight) + drawnposy), 7, 12);
 				g.setColor(starColor);
 				g2.fill(destStar);
@@ -2437,7 +3109,6 @@ public class GUI{
 			}
 
 			if (showRoute && route != null) {
-
 				// Draw multi colored lines depending on current step in
 				// directions and color settings (color blind mode or not)
 				// Draw lines for all points up to current point, use
@@ -2479,6 +3150,7 @@ public class GUI{
 							* newImageHeight) + drawnposy);
 					g2.drawLine(point1x, point1y, point2x, point2y);
 				}
+
 
 				g2.setStroke(new BasicStroke(8));
 				g.setColor(nextColor);
@@ -2551,5 +3223,54 @@ public class GUI{
 				}
 			}
 		}
+
+
+	}
+
+
+	//runs the startup and the object for the GUI class in its' own thread.
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		//added by JPG starts and plays the animation
+		loadingAnimation = new SplashPage("GuiSplashThread");
+		loadingAnimation.showSplash();
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+
+
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+		} catch (Exception e) {
+			// If Nimbus is not available, use lookAndFeel of current system
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException | InstantiationException
+					| IllegalAccessException | UnsupportedLookAndFeelException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+		try {
+			this.createAndShowGUI();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AlreadyExistsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		loadingAnimation.hideSplash(0);
 	}
 }

@@ -65,7 +65,7 @@ public class SearchLocation {
 		AldenHall.add("AH");		AldenHall.add("Alden Hall");		 	AldenHall.add("Alden");
 		OlinHall.add("OH");		 	OlinHall.add("Olin Hall");		 		OlinHall.add("Olin");
 		West157.add("SDCC");		West157.add("157 West");		 		West157.add("157");
-		Campus.add("Fountain");	 	Campus.add("Campus");		 			Campus.add("Seal");
+		Campus.add("Campus");		
 		AlumniGym.add("AG");		AlumniGym.add("Alumni Gym");		 	AlumniGym.add("Alumni");
 		ProjectCenter.add("PC");	ProjectCenter.add("Project Center");	ProjectCenter.add("CDC");
 		AtwaterKent.add("AK");		AtwaterKent.add("Atwater Kent");
@@ -225,10 +225,10 @@ public class SearchLocation {
 		for(String search:searchTerms)
 		{
 			//search for one of the items in the test array
-			ArrayList<Point> result = searchFor(search);
+			String result = searchFor(search);
+			Point returnedPoint = getPointFromName(result);
 			if(result != null)
 			{
-				for(Point returnedPoint:result)
 				System.out.println("Searched for: "+ search+" Result: " +returnedPoint.getName());
 			}
 	
@@ -239,12 +239,12 @@ public class SearchLocation {
 	
 	
 	//return a sorted arraylist of 
-	public static ArrayList<Point> searchFor(String searchTerm)
+	public static String searchFor(String searchTerm)
 	{
 		if(searchTerm.length() != 0)
 		{
 			searchTerm = StringUtils.lowerCase(searchTerm);
-			ArrayList<Point> results = new ArrayList<Point>();
+			String result = "";
 			ArrayList<ArrayList<String>> orderList = new ArrayList<ArrayList<String>>();
 			System.out.println("Search Term: "+searchTerm);
 			//goes through the list of keys(of the hashmap) and adds them to
@@ -274,36 +274,39 @@ public class SearchLocation {
 			
 			orderList.sort(new orderListComparator());
 			//System.out.println("sortedList: ");
-			for(ArrayList<String> sortedName:orderList)
-			{
-					String buildingLetter = sortedName.get(0).substring(0, 1);
+
+					String buildingLetter = orderList.get(0).get(0).substring(0, 1);
 					String searchLetter = searchTerm.substring(0,1);
 					//System.out.println("build Letter: "+buildingLetter+" Search letter: "+searchLetter);
 					if(buildingLetter.equalsIgnoreCase(searchLetter))
 					{
-						if(results.size()<6)
-							results.add(pointNames.get(sortedName.get(0)));
+						/*if(results.size()<6)
+							results.add(pointNames.get(sortedName.get(0)));*/
+						result = orderList.get(0).get(0);
 					}
 				//System.out.println("Build: "+sortedName.get(0)+" lev: "+ sortedName.get(1));
-			}
+		
 			
 			
 			
-			if(results.isEmpty()){
+			if(result.isEmpty()){
 				System.out.println("Result = null");
 			}
-			else{
-				//System.out.println("In searched for: "+ result.getName());
-			}
-			return results;
+			
+			return result;
 		}else{
-			ArrayList<Point> emptyArrayList = new ArrayList<Point>();
-			return emptyArrayList;
+			//ArrayList<Point> emptyArrayList = new ArrayList<Point>();
+			return "";
 		}
 		
 	}
 
-	
+	public static Point getPointFromName(String pointName)
+	{
+		
+		return pointNames.get(pointName);
+		
+	}
 	
 	//returns the levenshtein value for two Strings
 	//@param String String 

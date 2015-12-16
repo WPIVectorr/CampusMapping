@@ -7,14 +7,16 @@ public class Directions {
 	private double time;
 	private Point origin;
 	private Point destination;
+	private Double angle;
 	
-	public Directions(String turn, int distance, boolean isStraight, double time, Point origin, Point destination){
+	public Directions(String turn, int distance, boolean isStraight, double time, Point origin, Point destination, double angle){
 		this.turn = turn;
 		this.distance = distance;
 		this.isStraight = isStraight;
 		this.time = time;
 		this.origin = origin;
 		this.destination = destination;
+		this.angle = angle;
 	}
 
 	public String getTurn() {
@@ -64,8 +66,12 @@ public class Directions {
 	public void setDestination(Point destination) {
 		this.destination = destination;
 	}
-	
-	
+	public double getAngle(){
+		return angle;
+	}
+	public void setAngle(double angle){
+		this.angle = angle;
+	}
 	
 	
 	

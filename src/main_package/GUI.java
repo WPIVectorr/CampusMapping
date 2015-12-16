@@ -63,7 +63,7 @@ import javax.swing.border.EtchedBorder;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class GUI implements Runnable{
+public class GUI{
 
 	private static Thread guiThreadObject;
 	private String threadName;
@@ -2439,6 +2439,7 @@ public class GUI implements Runnable{
 
 		// Make frame visible after initializing everything
 		frame.setVisible(true);
+		loadingAnimation.hideSplash(0);
 	}
 
 	public JPanel createPrefMenu(){
@@ -2782,15 +2783,10 @@ public class GUI implements Runnable{
 	public static void main(String[] args) throws IOException, AlreadyExistsException, SQLException{
 
 		GUI gui = new GUI();
+		
+		loadingAnimation = new SplashPage();
+		loadingAnimation.showStaticSplash();
 
-		if(guiThreadObject == null)
-		{
-			guiThreadObject= new Thread (gui, "GUI Thread");
-			guiThreadObject.setPriority(4);
-			guiThreadObject.start();
-
-
-		}
 
 
 		//added by JPG starts and plays the animation
@@ -2835,7 +2831,7 @@ public class GUI implements Runnable{
 			}
 		});
 
-		//loadingAnimation.hideSplash(0);
+		
 
 
 	}				
@@ -3306,49 +3302,5 @@ public class GUI implements Runnable{
 	}
 
 
-	//runs the startup and the object for the GUI class in its' own thread.
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		//added by JPG starts and plays the animation
-		loadingAnimation = new SplashPage("GuiSplashThread");
-		loadingAnimation.showSplash();
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
 
-
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-		} catch (Exception e) {
-			// If Nimbus is not available, use lookAndFeel of current system
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (ClassNotFoundException | InstantiationException
-					| IllegalAccessException | UnsupportedLookAndFeelException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-
-		try {
-			this.createAndShowGUI();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (AlreadyExistsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-		loadingAnimation.hideSplash(0);
-	}
 }

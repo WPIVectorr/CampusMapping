@@ -2876,15 +2876,6 @@ public class GUI implements Runnable{
 
 		GUI gui = new GUI();
 
-		if(guiThreadObject == null)
-		{
-			guiThreadObject= new Thread (gui, "GUI Thread");
-			guiThreadObject.setPriority(4);
-			guiThreadObject.start();
-
-
-		}
-
 
 		//added by JPG starts and plays the animation
 

@@ -408,7 +408,9 @@ public class GUI implements Runnable{
 			public void actionPerformed(ActionEvent e) {
 				menuLayout.show(menus, "Pref Menu");
 				img = tempImg;
-				roomPointsToDraw = getRoomPoints(currentMap.getPointList());
+				if(currentMap != null){
+					roomPointsToDraw = getRoomPoints(currentMap.getPointList());
+				}
 				if(isShowStart){
 					startIsSelected = true;
 					isShowStart = false;
@@ -2522,7 +2524,9 @@ public class GUI implements Runnable{
 				panelHelp.setVisible(false);
 				menus.setVisible(true);
 				panelLayout.show(panels, "Draw Panel");
-				roomPointsToDraw = getRoomPoints(currentMap.getPoints());
+				if(currentMap != null){
+					roomPointsToDraw = getRoomPoints(currentMap.getPoints());
+				}
 			}
 		});
 

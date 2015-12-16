@@ -266,7 +266,7 @@ public class GUI{
 		//destMapsDropDown.setEnabled(startIsSelected);
 
 		GridBagLayout gbl_mainMenu = new GridBagLayout();
-		gbl_mainMenu.columnWidths = new int[]{80, 90, 123, 62, 150, 90, 93, 30, 62, 80};
+		gbl_mainMenu.columnWidths = new int[]{80, 90, 113, 62, 150, 90, 83, 30, 62, 80};
 		gbl_mainMenu.rowHeights = new int[]{10, 18, 27, 0, 0, 0, 0, 0, 0};
 		gbl_mainMenu.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		gbl_mainMenu.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
@@ -508,13 +508,6 @@ public class GUI{
 			}
 		});
 
-		Component horizontalStrut = Box.createHorizontalStrut(20);
-		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
-		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 0);
-		gbc_horizontalStrut.gridx = 9;
-		gbc_horizontalStrut.gridy = 1;
-		mainMenu.add(horizontalStrut, gbc_horizontalStrut);
-
 		drawPanel.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				originx = e.getX();
@@ -654,13 +647,6 @@ public class GUI{
 			}
 		});
 
-		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
-		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
-		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 5);
-		gbc_horizontalStrut_1.gridx = 0;
-		gbc_horizontalStrut_1.gridy = 2;
-		mainMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
-
 		JLabel lblStart = new JLabel("Start");
 		GridBagConstraints gbc_lblStart = new GridBagConstraints();
 		gbc_lblStart.gridwidth = 3;
@@ -697,6 +683,13 @@ public class GUI{
 				frame.repaint();
 			}
 		});
+
+		Component horizontalStrut = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut = new GridBagConstraints();
+		gbc_horizontalStrut.insets = new Insets(0, 0, 5, 5);
+		gbc_horizontalStrut.gridx = 0;
+		gbc_horizontalStrut.gridy = 3;
+		mainMenu.add(horizontalStrut, gbc_horizontalStrut);
 		GridBagConstraints gbc_btnClearStart = new GridBagConstraints();
 		gbc_btnClearStart.insets = new Insets(0, 0, 5, 5);
 		gbc_btnClearStart.gridx = 3;
@@ -717,10 +710,10 @@ public class GUI{
 
 
 		hilit = new DefaultHighlighter();
-	    painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
+		painter = new DefaultHighlighter.DefaultHighlightPainter(Color.LIGHT_GRAY);
 
 		txtSearchStart.addKeyListener(new KeyListener() {
-		
+
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
@@ -871,7 +864,7 @@ public class GUI{
 							txtSearchDest.setText("");
 							searchString ="";
 						}
-						
+
 
 					}catch(java.lang.IllegalArgumentException searchExcept1){
 
@@ -908,7 +901,7 @@ public class GUI{
 				// TODO Auto-generated method stub
 
 			}
-			
+
 		});
 
 
@@ -950,6 +943,13 @@ public class GUI{
 				frame.repaint();
 			}
 		});
+
+		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
+		GridBagConstraints gbc_horizontalStrut_1 = new GridBagConstraints();
+		gbc_horizontalStrut_1.insets = new Insets(0, 0, 5, 0);
+		gbc_horizontalStrut_1.gridx = 9;
+		gbc_horizontalStrut_1.gridy = 3;
+		mainMenu.add(horizontalStrut_1, gbc_horizontalStrut_1);
 
 
 		JLabel lblMaps = new JLabel("Starting Map:");
@@ -1362,9 +1362,9 @@ public class GUI{
 								}
 							}
 							mapTitle = currentMap.getMapName();
-							
-							
-							
+
+
+
 
 							//String mapTitle = "AtwaterKent1";
 							File start = new File("src/VectorMaps");
@@ -1388,7 +1388,7 @@ public class GUI{
 							startIsSelected = false;
 							startPoint = startPointName;
 						}
-						
+
 						System.out.println("Selected Point Name From the DropDown: " + startPoint.getName());
 						frame.repaint();
 					}
@@ -1436,9 +1436,9 @@ public class GUI{
 								}
 							}
 							mapTitle = currentMap.getMapName();
-							
-							
-							
+
+
+
 
 							//String mapTitle = "AtwaterKent1";
 							File dest = new File("src/VectorMaps");
@@ -1902,17 +1902,24 @@ public class GUI{
 		directionsText.setEditable(false);
 		directionsText.setToolTipText("");
 		directionsText.setBounds(6, 174, 438, 30);
+
+		UIDefaults defaults = new UIDefaults();
+		defaults.put("TextPane[Enabled].backgroundPainter", backgroundColor);
+		directionsText.putClientProperty("Nimbus.Overrides", defaults);
+		directionsText.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
 		directionsText.setBackground(backgroundColor);
+		
 		directionsText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		directionsText.setMinimumSize(new Dimension(720, 90));
 		directionsText.setPreferredSize(new Dimension(720, 90));
-		
+
 		StyledDocument doc = directionsText.getStyledDocument();
 		SimpleAttributeSet center = new SimpleAttributeSet();
 		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
 		StyleConstants.setBackground(center, backgroundColor);
 		doc.setParagraphAttributes(0, doc.getLength(), center, false);
-		
+
+
 
 		//directionsText.setColumns(1);
 		directionsText.setFont(new Font("Serif", Font.BOLD, 20));
@@ -2753,47 +2760,50 @@ public class GUI{
 		GUI gui = new GUI();
 
 
-		
+
 		//added by JPG starts and plays the animation
-		loadingAnimation = new SplashPage("GuiSplashThread");
-		loadingAnimation.showSplash();
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
 
 
 		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
 
+				}
+			}
 		} catch (Exception e) {
 			// If Nimbus is not available, use lookAndFeel of current system
 			try {
-				UIManager.setLookAndFeel("nimbus");
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch (ClassNotFoundException | InstantiationException
 					| IllegalAccessException | UnsupportedLookAndFeelException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
-
-		try {
-			gui.createAndShowGUI();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (AlreadyExistsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				GUI gui = new GUI();
 
 
-		loadingAnimation.hideSplash(0);
+				try {
+					gui.createAndShowGUI();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (AlreadyExistsException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+
+		//loadingAnimation.hideSplash(0);
 
 	}				
 

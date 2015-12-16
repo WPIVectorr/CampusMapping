@@ -189,7 +189,9 @@ public class GUI{
 	private boolean startIsSelected = false;
 	private boolean destIsSelected = false;
 	private JLabel lblCurrentMap;
-
+	private boolean sizemoved = false;
+	private double zoomsize = .15;
+	private double maxZoomSize = 2;
 
 
 	private double startStarX;
@@ -563,8 +565,13 @@ public class GUI{
 			}
 			@Override
 			public void ancestorResized(HierarchyEvent e) {
-				drawnfirst = false;
-				frame.repaint();
+				if(drawnfirst == false){
+					System.out.println("was not changed");
+					frame.repaint();
+				} else if(sizemoved == false) {
+					zoomtopoints(multiMapFinalDir);
+					System.out.println("is zooming to points");
+				}
 			}           
 		});
 
@@ -574,6 +581,7 @@ public class GUI{
 					//System.out.println("dragged");
 					drawnfirst = true;
 					Dragged = true;
+					sizemoved = true;
 					mousex = g.getX();
 					mousey = g.getY();
 					frame.repaint();
@@ -590,6 +598,7 @@ public class GUI{
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				if(!mapTitle.equals("Select Map")){
 					scrolled = true;
+					sizemoved = true;
 					if(!(img == null)){
 						minZoomSize = 1 / ((double) img.getWidth() / (double) drawPanel.getWidth());
 						int WidthSize = (int) ((double) img.getHeight() * minZoomSize);
@@ -643,6 +652,7 @@ public class GUI{
 							difHeight = 0;
 						}
 						drawPanel.repaint();
+						frame.repaint();
 					} else { // scroll type == MouseWheelEvent.WHEEL_BLOCK_SCROLL
 
 					}
@@ -1299,10 +1309,22 @@ public class GUI{
 
 					startMapsDropDown.setSelectedIndex(destMapsDropDown.getSelectedIndex());
 					startBuilds.setSelectedIndex(destBuilds.getSelectedIndex());
-
+					Point tempStartPoint = startPoint;
+					Point tempDestPoint = destPoint;
+					for(int i = 0; i < allPoints.size(); i++){
+						if(allPoints.get(i).getId() == tempStartPoint.getId()){
+							destPoint = allPoints.get(i);
+							destIsSelected = true;
+						}
+						if(allPoints.get(i).getId() == tempDestPoint.getId()){
+							startPoint = allPoints.get(i);
+							startIsSelected = true;
+						}
+					}
 
 					destMapsDropDown.setSelectedIndex(startMapIndex);
 					destBuilds.setSelectedIndex(startPointIndex);
+					directionsButton.setEnabled(true);
 				}
 			}
 		});
@@ -1687,7 +1709,8 @@ public class GUI{
 							// Reset text box to top
 							txtpnFullTextDir.setCaretPosition(0);
 						}
-
+						zoomtopoints(multiMapFinalDir);
+						drawPanel.repaint();
 						frame.repaint();
 						menuLayout.show(menus, "Nav Menu");
 					}
@@ -1701,19 +1724,6 @@ public class GUI{
 					directionsButton.setEnabled(false);
 				}
 			}
-		});
-
-		frame.getContentPane().addHierarchyBoundsListener(new HierarchyBoundsListener(){
-
-			@Override
-			public void ancestorMoved(HierarchyEvent e) {
-
-			}
-			@Override
-			public void ancestorResized(HierarchyEvent e) {
-				drawnfirst = false;
-				frame.repaint();
-			}           
 		});
 
 
@@ -2112,7 +2122,7 @@ public class GUI{
 						//DestMaps.addItem(maps.get(i).getMapName());
 					}
 					lblCurrentMap.setText("Current Map: " + toAdd);
-
+					zoomtopoints(multiMapFinalDir);
 					frame.repaint();
 				} else {
 					if (textPos != 0){
@@ -2286,6 +2296,7 @@ public class GUI{
 								//DestMaps.addItem(maps.get(i).getMapName());
 							}
 							lblCurrentMap.setText("Current Map: " + toAdd);
+							zoomtopoints(multiMapFinalDir);
 						}
 						mapChange = true;
 						frame.repaint();
@@ -2926,11 +2937,77 @@ public class GUI{
 			}
 		});
 
-		
-
-
 	}				
 
+	public void zoomtopoints(ArrayList<ArrayList<Directions>> list){
+		sizemoved = false;
+		double maxx = 0;
+		double maxy = 0;
+		double minx = 1;
+		double miny = 1;
+		System.out.println(list.get(mapPos).size());
+		for(int j = 0; j < list.get(mapPos).size(); j++){
+			Point point1 = list.get(mapPos).get(j).getOrigin();
+			//System.out.println(multiMapFinalDir.get(mapPos).get(j).getOrigin().getLocX()+", "+multiMapFinalDir.get(mapPos).get(j).getOrigin().getLocY());
+			if(point1.getLocX() > maxx){
+				maxx = point1.getLocX();
+			} 
+			if(point1.getLocY() > maxy){
+				maxy = point1.getLocY();
+			} 
+			if(point1.getLocX() < minx){
+				minx = point1.getLocX();
+			} 
+			if(point1.getLocY() < miny){
+				miny = point1.getLocY();
+			}
+			point1 = list.get(mapPos).get(j).getDestination();
+			System.out.println(list.get(mapPos).get(j).getDestination().getLocX()+", "+list.get(mapPos).get(j).getDestination().getLocY());
+			if(point1.getLocX() > maxx){
+				maxx = point1.getLocX();
+			} 
+			if(point1.getLocY() > maxy){
+				maxy = point1.getLocY();
+			} 
+			if(point1.getLocX() < minx){
+				minx = point1.getLocX();
+			} 
+			if(point1.getLocY() < miny){
+				miny = point1.getLocY();
+			}
+		}
+		maxx += zoomsize;
+		maxy += zoomsize;
+		minx -= zoomsize;
+		miny -= zoomsize;
+		System.out.println(minx+", "+miny+", "+maxx+", "+maxy);
+		maxZoomSize = 2;
+		double screenx = Math.abs(maxx - minx);
+		double screeny = Math.abs(maxy - miny);
+		if(screeny > screenx){
+			scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
+			if((screenx*img.getWidth()*scaleSize) > drawPanel.getWidth())
+				scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
+		} else {
+			scaleSize = drawPanel.getWidth()/(screenx*img.getWidth());
+			if((screeny*img.getHeight()*scaleSize) > drawPanel.getHeight())
+				scaleSize = drawPanel.getHeight()/(screeny*img.getHeight());
+		}
+		System.out.println("screen scale: "+(scaleSize));
+		System.out.println("screen sizex: "+(screenx*img.getWidth()*scaleSize));
+		System.out.println("screen sizey: "+(screeny*img.getHeight()*scaleSize));
+		System.out.println("screen size framex: "+drawPanel.getWidth());
+		System.out.println("screen size framey: "+drawPanel.getHeight());
+		if(scaleSize > maxZoomSize)
+			maxZoomSize = scaleSize;
+		drawnfirst = true;
+		Dragged = false;
+		scrolled = false;
+		drawnposx = (drawPanel.getWidth()/2)-(((maxx+minx)/2)*(img.getWidth()*scaleSize));
+		drawnposy = (drawPanel.getHeight()/2)-(((maxy+miny)/2)*(img.getHeight()*scaleSize));
+		System.out.println("drawnposx: "+drawnposx);
+		System.out.println("drawnposy: "+drawnposy);
+}
 
 	public double getMaxXPoint(ArrayList<Point> pointList){
 		int length = pointList.size();
@@ -2960,7 +3037,7 @@ public class GUI{
 			name = pointList.get(i).getName();
 			name = name.trim();
 			name = name.toLowerCase();
-			if(!(name.equals("stairs top")) && !(name.equals("stairs bottom")) && !(name.equals("room")) && !(name.equals("hallway")) && !(name.equals("elevator")))
+			if(!(name.equals("stairs top")) && !(name.equals("stairs bottom")) && !(name.equals("room")) && !(name.equals("hallway")) && !(name.equals("elevator")) && !(name.equals("path")))
 				roomPoints.add(pointList.get(i));
 		}
 		return roomPoints;

@@ -16,7 +16,7 @@ import main_package.Point;
 
 public class ServerDB {
 	//------------------------------------------------------------Constants--------------------------------------------------------------------
-	private static String DATABASE_URL = "jdbc:mysql://campusmapping.cxx9stnbmosg.us-east-1.rds.amazonaws.com:3306/";	
+	private static String DATABASE_URL = "jdbc:mysql://testdb.cxx9stnbmosg.us-east-1.rds.amazonaws.com:3306/";	
 	private static String DATABASE_NAME = "campusMapping_db";
 	private static String userName = "Vectorr";
 	private static String password = "mag";
@@ -164,7 +164,6 @@ public class ServerDB {
 			databaseChanged = true;
 			//---------------------------------------------Finish inserting-------------------------------------------------------------------
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		finally
@@ -202,7 +201,6 @@ public class ServerDB {
 				try {
 					insertPoint(map, tempPt);
 				} catch (NoMapException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (InsertFailureException e) {
 					System.out.println(e.getMessage());
@@ -788,11 +786,9 @@ public class ServerDB {
 			conn = connect();
 			Statement statement = conn.createStatement();
 			statement.executeUpdate("DROP DATABASE "+DATABASE_NAME);
-			//conn.createStatement().executeUpdate("FLUSH HOSTS");
 			tryCreateDB();
 			System.out.println("Done Clearing DataBase");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -825,15 +821,12 @@ public class ServerDB {
 				
 				double yTopLeftDeRotate = map.getyTopLeft() * Math.cos(map.getRotationAngle()) + map.getxTopLeft() * Math.sin(map.getRotationAngle());
 				double yBotRightDeRotate = map.getyBotRight() * Math.cos(map.getRotationAngle()) + map.getxBotRight() * Math.sin(map.getRotationAngle());
-				//System.out.println("Y top left derotate is: " + yTopLeftDeRotate);
-				//System.out.println("Y bot right derotate is: " + yBotRightDeRotate);
 				map.setHeight(Math.abs(yTopLeftDeRotate - yBotRightDeRotate));
 				
 				ArrayList<Point> tempPts = new ArrayList<Point>();
 				try {
 					tempPts = getPointsFromServer(map);
 				} catch (PopulateErrorException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				map.setPointList(tempPts); 							//Automatically sets numPoints
@@ -844,7 +837,6 @@ public class ServerDB {
 				throw new DoesNotExistException("Could not find map in database");
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -855,14 +847,11 @@ public class ServerDB {
 		try {
 			populateFromDatabase();
 		} catch (PopulateErrorException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		int counter = 0;
-		//ArrayList<Map>serverMaps
 		for (counter = 0; counter<allMaps.size(); counter++)
 		{
 			Map tempMap = allMaps.get(counter);
@@ -895,7 +884,6 @@ public class ServerDB {
 				retMaps.add(newMap);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return retMaps;
@@ -933,7 +921,6 @@ public class ServerDB {
 		try {
 			populateFromDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		if (DEBUG)
@@ -1179,7 +1166,6 @@ public class ServerDB {
 				}
 				databaseChanged = false;
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -1293,8 +1279,8 @@ public class ServerDB {
 		}
 		catch(SQLException e)
 		{
-			System.err.println(e.getMessage());												// if the error message is "out of memory", 
-			// it probably means no database file is found
+			System.err.println(e.getMessage());												//if the error message is "out of memory", 
+																							//it probably means no database file is found
 		}
 		finally
 		{
@@ -1350,10 +1336,8 @@ public class ServerDB {
 		try {
 			populateFromDatabase();
 		} catch (PopulateErrorException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		int j = 0;
@@ -1365,7 +1349,6 @@ public class ServerDB {
 			try {
 				currPoints = getPointsFromServer(currentMap);
 			} catch (PopulateErrorException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			currentMap.setPointIDIndex(currPoints.size() + 200);
@@ -1382,167 +1365,6 @@ public class ServerDB {
 	
 	//---------------------------------------------------------------Test Functions----------------------------------------------------------------
 	
-	public static void testDB()
-	{
-		/*clearDatabase();
-		System.out.println("Database cleared");
-		ArrayList<Point> insertablePoints = new ArrayList<Point>();
-		ArrayList<Edge> insertableEdges = new ArrayList<Edge>();
-		Map testMap = new Map(1, "testMap", 12, 20, 45, 60, 12.6, 0);
-		Point p1 = new Point(testMap.getNewPointID(), "p1", testMap.getPointIDIndex(), 0, 1, 0);
-		Point p2 = new Point(testMap.getNewPointID(), "p2", testMap.getPointIDIndex(), 0, 1, 0);
-		Point p3 = new Point(testMap.getNewPointID(), "p3", testMap.getPointIDIndex(), 1, 0, 0);
-		Point p4 = new Point(testMap.getNewPointID(), "p4", testMap.getPointIDIndex(), 2, 0, 0);
-		Point p5 = new Point(testMap.getNewPointID(), "p5", testMap.getPointIDIndex(), 23, 90, 0);
-		Point p6 = new Point(testMap.getNewPointID(), "p6", testMap.getPointIDIndex(), 27, 90, 0);
-		Edge e1 = new Edge(p1, p2, 1);
-		Edge e2 = new Edge(p2, p5, 1);
-		Edge e3 = new Edge(p2, p3, 1);
-		Edge e4 = new Edge(p3, p4, 1);
-		Edge e5 = new Edge(p3, p5, 1);
-		Edge e6 = new Edge(p4, p5, 1);
-		Edge[] emptyArray = null;
-		//--------------------------------------------------Add points to insert arraylist--------------------------------
-		insertablePoints.add(p1);
-		insertablePoints.add(p2);
-		insertablePoints.add(p3);
-		insertablePoints.add(p4);
-		insertablePoints.add(p5);
-		insertableEdges.add(e1);
-		insertableEdges.add(e2);
-		insertableEdges.add(e3);
-		insertableEdges.add(e4);
-		insertableEdges.add(e5);
-		insertableEdges.add(e6);
-		int counter = 0;
-
-		//------------------------------------------------Populate Object storage from database-----------------------------
-		System.out.println("Printing database");
-		try {
-			printDatabase(true, true, true);
-		} catch (SQLException e7) {
-			e7.printStackTrace();
-		}
-		System.out.println("Finished printing database");
-		//-------------------------------------------------------Test map insert--------------------------------------------
-		System.out.println("Testing map insert");
-		try {																																						
-			insertMap(testMap);
-			printDatabase(true, true, true);
-		} catch (AlreadyExistsException e) {
-			System.out.println("Map already exists in Database");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		System.out.println("Finished testing map insert");
-		//------------------------------------------------------Test point insert--------------------------------------------
-		System.out.println("Testing point insert");
-		for (counter = 0; counter<insertablePoints.size(); counter++)
-		{
-			try {																				//Test insert point
-				insertPoint(testMap, insertablePoints.get(counter));
-			} catch (AlreadyExistsException e) {
-				System.out.println("Point:"+insertablePoints.get(counter).getId()+ " already exists");
-			} catch (NoMapException e) {
-				e.printStackTrace();
-			} catch (InsertFailureException e) {
-				e.printStackTrace();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		System.out.println("Finished testing point insert");
-		//----------------------------------------------------Test edge insert----------------------------------------------
-		System.out.println("Testing edge insert");
-		for (counter = 0; counter<insertableEdges.size(); counter++)
-		{
-			try {																				//Test insert point
-				insertEdge(insertableEdges.get(counter));
-			} catch (AlreadyExistsException e) {
-				System.out.println("Edge:"+insertablePoints.get(counter).getId()+ " already exists");
-			} catch (InsertFailureException e) {
-				e.printStackTrace();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} catch (DoesNotExistException e) {
-				System.out.println("Edge not added to database");
-				e.printStackTrace();
-			}
-		}
-		System.out.println("Finished testing edge insert");
-		//----------------------------------------------See results of insertions-----------------------------------------
-		System.out.println("Testing results of inserts");
-		ArrayList<Point> testArray = new ArrayList<Point>();
-		
-		if (DEBUG)
-			System.out.println("Populating from database");
-		try {
-			populateFromDatabase();
-		} catch (PopulateErrorException e8) {
-			// TODO Auto-generated catch block
-			e8.printStackTrace();
-		} catch (SQLException e8) {
-			// TODO Auto-generated catch block
-			e8.printStackTrace();
-		}
-		
-		try {
-			testArray = getPointsFromServer(testMap);
-		} catch (PopulateErrorException e) {
-			e.printStackTrace();
-		}
-
-		int count = 0;
-		System.out.println("Printing points found in map: "+testMap.getMapId());
-		for (count = 0; count<testArray.size(); count++)
-		{
-			Point tempPt = testArray.get(count);
-			tempPt.print();
-		}
-
-		//---------------------------------------------------Test removal------------------------------------------------
-		System.out.println("--------------------Testing edge removal--------------------");
-		System.out.println("Database before removing edge e1");
-		try {
-			printDatabase(false, true, true);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		System.out.println("----------Removing edge e1----------");
-		try {
-			removeEdge(e1);
-		} catch (DoesNotExistException e) {
-			e.printStackTrace();
-		}
-		System.out.println("Database after removing e1");
-		try {
-			printDatabase(true, true, true);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		System.out.println("--------------------Finished edge removal--------------------");
-		System.out.println("--------------------Testing Point removal--------------------");
-		System.out.println("Database before removing point p2");
-		try {
-			printDatabase(false, true, true);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		System.out.println("----------Removing point p2----------");
-		try {
-			removePoint(p2);
-		} catch (DoesNotExistException e7) {
-			e7.printStackTrace();
-		}
-		System.out.println("Database after removing p2");
-		try {
-			printDatabase(true, true, true);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		System.out.println("--------------------Finished Point removal--------------------");*/
-	}
-
 	public static void testRetrieval()
 	{
 		System.out.println("--------------------Testing Retrieval--------------------");

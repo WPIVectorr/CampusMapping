@@ -43,6 +43,7 @@ public class ServerDB {
 	private static boolean databaseChanged = true;
 	//--------------------------------------------------------Singleton Handling--------------------------------------------------------------
 	private static ServerDB instance;	
+	
 	private ServerDB()
 	{
 			
@@ -73,10 +74,9 @@ public class ServerDB {
 	{
 		Statement statement;
 		try {
-			conn = DriverManager.getConnection(DATABASE_URL, userName, password);
+			conn = DriverManager.getConnection(DATABASE_URL + DATABASE_NAME, userName, password);
 			conn.createStatement().executeUpdate("CREATE DATABASE IF NOT EXISTS "+DATABASE_NAME);
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		conn = connect();
@@ -95,26 +95,24 @@ public class ServerDB {
 
 	public static Connection connect()
 	{
-		if (conn != null)
+		if (conn == null)
 		{
+			Connection connection = null;
 			try {
-			
-				conn.close();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
+				connection = DriverManager.getConnection(DATABASE_URL + DATABASE_NAME, userName, password);
+			} catch (SQLException e) {
+				System.out.println("Failed to get connection to amazon server");
+				e.printStackTrace();
 			}
+			return connection;
+		} else 
+		{
+			return conn;
 		}
-		Connection connection = null;
-		try {
-			connection = DriverManager.getConnection(DATABASE_URL + DATABASE_NAME, userName, password);
-		} catch (SQLException e) {
-			System.out.println("Failed to get connection to amazon server");
-			e.printStackTrace();
-		}
-		return connection;
+
 	}
 
-	//---------------------------------------------------------Insert functions------------------------------------------------------------
+	//----------------------------------------------------------Insert functions---------------------------------------------------------------
 
 	public static void insertMap(Map map) throws AlreadyExistsException, SQLException
 	{
@@ -143,6 +141,7 @@ public class ServerDB {
 			}
 			rs.close();
 			//----------------------------------------------Build insert statement---------------------------------------------------------
+			//TODO Change to Stringbuilder
 			String insertStatement = "insert into " +MAP_TABLE_NAME+" values(";
 			insertStatement += mapId;
 			insertStatement += ", ";
@@ -165,10 +164,6 @@ public class ServerDB {
 			//---------------------------------------------Finish inserting-------------------------------------------------------------------
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		finally
-		{
-			conn.close();
 		}
 		//-------------------------------------------------Add to objects--------------------------------------------------------------------
 		int counter = 0;
@@ -248,42 +243,29 @@ public class ServerDB {
 				
 				rs.close();																	//Close resultSet to prevent errors
 				//----------------------------------------------Build insert statement---------------------------------------------------
-				String insertStatement = "insert into " +RELEVANT_TABLE_NAME+" values(";	//Start building MySQL insert statement
-				insertStatement += ("'"+pointID+"'");													
-				insertStatement += ", ";													//Add commas for formatting reasons
-				insertStatement += pt.getMapId();
-				insertStatement += ", ";
-				insertStatement += ("'"+ptName+"'");										
-				insertStatement += ", ";
-				insertStatement += pt.getIndex();
-				insertStatement += ", ";
-				insertStatement += pt.getLocX();
-				insertStatement += ", ";
-				insertStatement += pt.getLocY();
-				insertStatement += ", ";
-				insertStatement += pt.getGlobX();
-				insertStatement += ", ";
-				insertStatement += pt.getGlobY();
-				insertStatement += ", ";
-				insertStatement += numberEdges;
-				insertStatement += ", ";
-				insertStatement += pt.isStairs();
-				insertStatement += ", ";
-				insertStatement += pt.isOutside();
-				insertStatement += ", ";
+				StringBuilder insertStatement = 
+						new StringBuilder("insert into " +RELEVANT_TABLE_NAME+" values(");	//Start building MySQL insert statement
+				insertStatement.append("'"+pointID+"'"+", ");								//Add commas for formatting reasons
+				insertStatement.append(pt.getMapId()+", ");
+				insertStatement.append("'"+ptName+"'"+", ");										
+				insertStatement.append(pt.getIndex()+", ");
+				insertStatement.append(pt.getLocX()+", ");
+				insertStatement.append(pt.getLocY()+", ");
+				insertStatement.append(pt.getGlobX()+", ");
+				insertStatement.append(pt.getGlobY()+", ");
+				insertStatement.append(numberEdges+", ");
+				insertStatement.append(pt.isStairs()+", ");
+				insertStatement.append(pt.isOutside()+", ");
 				for (counter =0; counter < numberEdges; counter++)							//Add number of edges edges to the point
 				{
-					insertStatement += "'"+edgeArray.get(counter).getID()+"'";
-					insertStatement += ", ";
+					insertStatement.append("'"+edgeArray.get(counter).getID()+"'" + ", ");
 				}
 				for (counter = numberEdges; counter < 9; counter++)							//Add null padding so there are enough arguments in the insert statement
 				{
-					insertStatement += "null";
-					insertStatement += ", ";
+					insertStatement.append("null"+", ");
 				}
-				insertStatement += "null";													//Formatting, last value must not have comma after it
-				insertStatement += ")";
-				statement.executeUpdate(insertStatement);									//Insert data
+				insertStatement.append("null"+")");											//Formatting, last value must not have comma after it
+				statement.executeUpdate(insertStatement.toString());						//Insert data
 				databaseChanged = true;
 				if (DEBUG)
 					System.out.println("Sucessfully inserted point into database");
@@ -291,10 +273,6 @@ public class ServerDB {
 			} catch (SQLException e) {
 				e.printStackTrace();
 				throw new InsertFailureException("Failed to add to MySQL database");
-			}
-			finally
-			{
-				conn.close();
 			}
 			//-------------------------------------------------Add to local object storage-------------------------------------------------
 			//-------------------------------------------------------Add to Map object-----------------------------------------------------
@@ -395,6 +373,7 @@ public class ServerDB {
 			rs.close();
 
 			//----------------------------------------------Build insert statement---------------------------------------------------
+			//TODO change to StringBuilder
 			String insertStatement = "insert into " +EDGE_TABLE_NAME+" values(";
 			insertStatement += ("'"+edgeId+"'");
 			insertStatement += ", ";
@@ -429,10 +408,6 @@ public class ServerDB {
 		catch (SQLException e) {
 			e.printStackTrace();
 			throw new InsertFailureException("Failed to add to MySQL database");
-		}
-		finally
-		{
-			conn.close();
 		}
 		//-------------------------------------------------Add to local object storage----------------------------------------
 		boolean alreadyExists = false;
@@ -475,6 +450,9 @@ public class ServerDB {
 
 	//---------------------------------------------------------Modifying Functions-------------------------------------------------------=---
 
+	
+	//----------------------------------------------------------Helper Functions--------------------------------------------------------------
+	
 	public static void updateMap (Map map) throws SQLException, DoesNotExistException
 	{
 		int mapId = map.getMapId();
@@ -482,7 +460,7 @@ public class ServerDB {
 		conn = connect();
 		Statement statement = conn.createStatement();
 		statement.setQueryTimeout(5);  											// set timeout to 30 sec.
-		
+		//TODO Change to String Builder
 		String updateStatement = "UPDATE "+MAP_TABLE_NAME+" SET ";
 		updateStatement += ("id = "+map.getMapId());
 		updateStatement += ", ";
@@ -503,7 +481,6 @@ public class ServerDB {
 		int updateResult = statement.executeUpdate(updateStatement);
 		databaseChanged = true;
 		
-		conn.close();
 		if (updateResult == 0)
 		{
 			throw new DoesNotExistException("No Rows changed, could not find"); 
@@ -526,6 +503,7 @@ public class ServerDB {
 	
 	}
 	
+	
 	public static void updatePoint (Point point) throws SQLException, DoesNotExistException
 	{
 		String ptId = point.getId();
@@ -541,6 +519,7 @@ public class ServerDB {
 		{
 			if (rs2.getString("id").contentEquals(ptId))
 			{
+				//TODO Change to String Builder
 				found = true;
 				String updateStatement = ("UPDATE "+tableName+" SET ");
 				updateStatement += ("name ="+"'"+point.getName()+"'");										
@@ -582,7 +561,6 @@ public class ServerDB {
 			}
 		}
 		rs2.close();
-		conn.close();
 		if (found == false)
 		{
 			throw new DoesNotExistException("Could not find point in database"); 
@@ -607,6 +585,9 @@ public class ServerDB {
 		}
 	}
 
+	
+	//----------------------------------------------------------Removal Functions------------------------------------------------------------
+	
 	public static void removePoint (Point pt) throws DoesNotExistException
 	{
 		//------------------------------------------------------Remove Edges from DB---------------------------------------------------------
@@ -670,6 +651,7 @@ public class ServerDB {
 			e.printStackTrace();
 		}
 	}
+	
 	
 	public static void removeEdge(Edge edge) throws DoesNotExistException
 	{
@@ -779,6 +761,7 @@ public class ServerDB {
 		}
 	}
 	
+	
 	private static void clearDatabase()
 	{
 		databaseChanged = true;
@@ -793,6 +776,9 @@ public class ServerDB {
 		}
 	}
 	//----------------------------------------------------------Retrieval Functions------------------------------------------------------------
+	
+	
+	//---------------------------------------------------------Retrieval Functions-----------------------------------------------------------
 	
 	public static Map getMapFromServer(int mapId) throws DoesNotExistException
 	{
@@ -842,6 +828,7 @@ public class ServerDB {
 		return null;
 	}
 
+	
 	public static ArrayList<Map> getMapsFromLocal()
 	{
 		try {
@@ -866,6 +853,7 @@ public class ServerDB {
 		return allMaps;
 	}
 
+	
 	public static ArrayList<Map> getEmptyMapsFromServer()
 	{
 		ArrayList<Map> retMaps = new ArrayList<Map>();
@@ -888,6 +876,7 @@ public class ServerDB {
 		}
 		return retMaps;
 	}
+	
 	
 	private static Point getPointFromLocal(String pointId) throws DoesNotExistException
 	{
@@ -916,6 +905,7 @@ public class ServerDB {
 		}
 	}
 
+	
 	public static ArrayList<Point> getPointsFromServer(Map map) throws PopulateErrorException
 	{
 		try {
@@ -1007,6 +997,7 @@ public class ServerDB {
 		}
 	}
 
+	
 	private static void populateFromDatabase() throws PopulateErrorException, SQLException
 	{
 		if (databaseChanged)
@@ -1175,7 +1166,7 @@ public class ServerDB {
 		}
 	}
 
-	//-----------------------------------------------------------Helper Functions--------------------------------------------------------------
+	//-----------------------------------------------------------Helper Functions------------------------------------------------------------
 
 	public static boolean checkObjectExists (Map map, Point pt)
 	{
@@ -1196,7 +1187,7 @@ public class ServerDB {
 			return false;
 		}
 	}
-
+	
 	public static void printTableNames() throws SQLException
 	{
 		ResultSet rs = null;
@@ -1212,7 +1203,7 @@ public class ServerDB {
 			System.out.println(rs.getString(1));
 		}
 	}
-
+	
 	public static void printDatabase(boolean printMaps, boolean printPoints, boolean printEdges) throws SQLException
 	{
 		try
@@ -1282,12 +1273,8 @@ public class ServerDB {
 			System.err.println(e.getMessage());												//if the error message is "out of memory", 
 																							//it probably means no database file is found
 		}
-		finally
-		{
-			conn.close();
-		}
 	}
-
+	
 	public static void printObjects(boolean printMaps, boolean printPoints, boolean printEdges)
 	{
 		int counter = 0;
@@ -1316,7 +1303,7 @@ public class ServerDB {
 			}
 		}
 	}
-
+	
 	public static class pointComparator implements Comparator<Point>
 	{
 		@Override
@@ -1365,6 +1352,9 @@ public class ServerDB {
 	
 	//---------------------------------------------------------------Test Functions----------------------------------------------------------------
 	
+	
+	//-----------------------------------------------------------Test Functions------------------------------------------------------------------
+	
 	public static void testRetrieval()
 	{
 		System.out.println("--------------------Testing Retrieval--------------------");
@@ -1377,6 +1367,7 @@ public class ServerDB {
 		System.out.println("--------------------Finished Testing Retrieval--------------------");
 	}
 
+	
 	public static void testRemoval()
 	{
 		

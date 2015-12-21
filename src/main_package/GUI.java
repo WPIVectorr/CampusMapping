@@ -739,7 +739,6 @@ public class GUI{
 			public void keyReleased(KeyEvent startSearchTypeEvent) {
 
 				txtSearchStart.setHighlighter(hilit);
-				// TODO Auto-generated method stub
 				if(startSearchTypeEvent.getKeyCode() != KeyEvent.VK_ENTER )
 				{
 					String searchString;
@@ -3472,7 +3471,5 @@ public class GUI{
 
 
 	}
-
-
 
 }
